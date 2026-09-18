@@ -1,0 +1,10 @@
+const fs = require('fs');
+const V = 'D:/阀门网站/';
+let s = fs.readFileSync(V + 'app/services/[slug]/ServiceDetailClient.tsx', 'utf8');
+let m = s.match(/features\.map[\s\S]{0,800}/);
+console.log('== VALTRIX features.map block:');
+console.log(m ? m[0].slice(0, 800) : 'NOT FOUND');
+s = fs.readFileSync(V + 'app/about/[section]/AboutSectionClient.tsx', 'utf8');
+m = s.match(/certIssuer[\s\S]{0,500}/);
+console.log('\n== VALTRIX cert card inner:');
+console.log(m ? m[0].slice(0, 500) : 'NOT FOUND');

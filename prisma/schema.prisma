@@ -1,0 +1,2009 @@
+// Prisma Schema — VALTRIX 后台管理系统
+// 数据库：PostgreSQL 17
+// 本文件为核心表（M1 基础建设），内容表在 M2/M3 阶段扩展
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// 1. 用户权限域
+// ============================================================
+
+model User {
+  id           BigInt     @id @default(autoincrement())
+  username     String     @unique @db.VarChar(50)
+  email        String?    @unique @db.VarChar(100)
+  phone        String?    @db.VarChar(20)
+  passwordHash String     @db.VarChar(255)
+  displayName  String     @db.VarChar(50)
+  avatar       String?    @db.VarChar(500)
+  status       String     @default("active") @db.VarChar(20) // active/disabled
+  // 销售跟进标记（商城订单分配/轮转）：isSales=是否参与订单跟进，salesOrder=轮转顺序（小优先）
+  isSales      Boolean    @default(false)
+  salesOrder   Int        @default(0)
+  lastLoginAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  userRoles    UserRole[]
+  operationLogs OperationLog[]
+  shopOrders   ShopOrder[] @relation("ShopOrderSales")
+  // 销售绑定的商城产品（隐式多对多 _UserToShopProduct）：仅绑定产品的订单才有权限接待
+  salesProducts ShopProduct[]
+
+  createdNews News[]
+
+  @@map("users")
+}
+
+// 前台会员（会员中心插件）：独立于后台 User 的鉴权体系（HMAC token cookie，与 admin NextAuth 隔离）
+model Member {
+  id           BigInt    @id @default(autoincrement())
+  email        String    @unique @db.VarChar(100)
+  passwordHash String    @db.VarChar(255)
+  name         String    @default("") @db.VarChar(50)
+  phone        String?   @db.VarChar(20)
+  // 米思米式 B 端客户画像
+  company      String?   @db.VarChar(200) // 公司名称
+  industry     String?   @db.VarChar(50) // 所属行业（semiconductor/jewelry/optical/...）
+  country      String?   @db.VarChar(50) // 国家/地区
+  customerNo   String?   @unique @db.VarChar(30) // 客户编号，如 ZW-000001（注册/后台创建自动生成）
+  companyVerified Json? // 公司真实性核验结果 {exists, confidence, reason, verified, checkedAt}
+  status       String    @default("active") @db.VarChar(20) // active/disabled
+  locale       String?   @default("zh") @db.VarChar(10)
+  level        String    @default("normal") @db.VarChar(30) // 会员等级 key（normal/silver/gold/black 或自定义）
+  customerType String    @default("inquiry") @db.VarChar(30) // 客户分类 key（inquiry/machine/material/parts，见 customer_types）
+  points       Int       @default(0) // 积分
+  // 发票与收货信息（米思米式会员中心）
+  invoiceTitle String?   @db.VarChar(200) // 默认发票抬头
+  taxNo        String?   @db.VarChar(50) // 默认税号
+  invoiceEmail String?   @db.VarChar(100) // 发票接收邮箱
+  address      Json? // 默认收货地址 {name, phone, province, city, district, detail}
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  favorites MemberFavorite[]
+
+  @@map("members")
+}
+model MemberLevel {
+  id          BigInt   @id @default(autoincrement())
+  key         String   @unique @db.VarChar(30) // normal/silver/gold/black 或自定义
+  name        String   @db.VarChar(50)
+  nameEn      String?  @db.VarChar(50)
+  nameJa      String?  @db.VarChar(50)
+  nameKo      String?  @db.VarChar(50)
+  nameFr      String?  @db.VarChar(50)
+  nameAr      String?  @db.VarChar(50)
+  threshold   Int      @default(0) // 升级所需积分门槛
+  discount    Int      @default(0) // 等级折扣（0-100，百分数）
+  benefits    String?  @db.Text // 权益描述（中文，支持换行）
+  benefitsEn  String?  @db.Text
+  benefitsJa  String?  @db.Text
+  benefitsKo  String?  @db.Text
+  benefitsFr  String?  @db.Text
+  benefitsAr  String?  @db.Text
+  sortOrder   Int      @default(0)
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("member_levels")
+}
+
+model CustomerType {
+  id          BigInt   @id @default(autoincrement())
+  key         String   @unique @db.VarChar(30) // inquiry/machine/material/parts 或自定义
+  name        String   @db.VarChar(50)
+  nameEn      String?  @db.VarChar(50)
+  nameJa      String?  @db.VarChar(50)
+  nameKo      String?  @db.VarChar(50)
+  nameFr      String?  @db.VarChar(50)
+  nameAr      String?  @db.VarChar(50)
+  discount    Int      @default(0) // 该客户类型折扣（0-100 百分数，0=无折扣）
+  seePartsPrice Boolean @default(false) // 是否可见配件价格
+  isDefault   Boolean  @default(false) // 新注册会员默认类型
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("customer_types")
+}
+
+
+// 客户门户工单（customer-portal 插件）
+model Ticket {
+  id          BigInt   @id @default(autoincrement())
+  ticketNo    String   @unique @db.VarChar(30) // 工单号 TK20260906-0001
+  memberId    BigInt?  // 关联会员（门户提交）
+  customerName String  @default("") @db.VarChar(100)
+  contactEmail String  @default("") @db.VarChar(100)
+  category    String   @default("general") @db.VarChar(50) // general/授权/手册/报价/其他
+  subject     String   @db.VarChar(200)
+  content     String   @db.Text
+  reply       String?  @db.Text          // 后台回复
+  status      String   @default("open") @db.VarChar(20) // open待处理/replied已回复/closed已关闭
+  priority    String   @default("normal") @db.VarChar(20)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([memberId])
+  @@index([status])
+  @@map("tickets")
+}
+
+model MemberFavorite {
+  id        BigInt   @id @default(autoincrement())
+  memberId  BigInt
+  productId BigInt
+  createdAt DateTime @default(now())
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, productId])
+  @@index([memberId])
+  @@map("member_favorites")
+}
+
+model Role {
+  id          BigInt   @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50) // admin / editor
+  displayName String   @db.VarChar(50)
+  description String?  @db.VarChar(200)
+  createdAt   DateTime @default(now())
+
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          BigInt   @id @default(autoincrement())
+  code        String   @unique @db.VarChar(100) // e.g. product:create
+  name        String   @db.VarChar(50)
+  module      String   @db.VarChar(30)
+  action      String   @db.VarChar(20)
+  createdAt   DateTime @default(now())
+
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+model UserRole {
+  userId BigInt
+  roleId BigInt
+  assignedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model RolePermission {
+  roleId       BigInt
+  permissionId BigInt
+  assignedAt   DateTime @default(now())
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// ============================================================
+// 2. 产品域（核心内容）
+// ============================================================
+
+model ProductTab {
+  id        BigInt   @id @default(autoincrement())
+  siteId    BigInt?  // 所属站点（null=全局共享）
+  slug      String   @unique @db.VarChar(50) // vcr-fittings/welded-fittings/diaphragm-valves/... 
+  name      String   @db.VarChar(100)
+  nameEn    String?  @db.VarChar(100)
+  nameJa    String?  @db.VarChar(100)
+  nameKo    String?  @db.VarChar(100)
+  nameFr    String?  @db.VarChar(100)
+  nameAr    String?  @db.VarChar(100)
+  purchaseMode String   @default("quote") @db.VarChar(20) // quote=询价 / shop=商城购买
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  categories ProductCategory[]
+  products   Product[]
+
+  @@map("product_tabs")
+}
+
+model ProductCategory {
+  id        BigInt   @id @default(autoincrement())
+  siteId    BigInt?  // 所属站点（null=全局共享）
+  tabId     BigInt
+  slug      String   @db.VarChar(50)
+  name      String   @db.VarChar(100)
+  nameEn    String?  @db.VarChar(100)
+  nameJa    String?  @db.VarChar(100)
+  nameKo    String?  @db.VarChar(100)
+  nameFr    String?  @db.VarChar(100)
+  nameAr    String?  @db.VarChar(100)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  tab      ProductTab @relation(fields: [tabId], references: [id], onDelete: Cascade)
+  products Product[]
+
+  @@unique([tabId, slug])
+  @@map("product_categories")
+}
+model Product {
+  siteId       BigInt?  // 所属站点（null=全局共享，多租户数据隔离）
+  id           BigInt   @id @default(autoincrement())
+  tabId        BigInt
+  categoryId   BigInt?
+  slug         String   @unique @db.VarChar(100)
+  model        String   @db.VarChar(100) // 型号，如 ZW-10D
+  name         String   @db.VarChar(200)
+  nameEn       String?  @db.VarChar(200)
+  nameJa       String?  @db.VarChar(200)
+  nameKo       String?  @db.VarChar(200)
+  nameFr       String?  @db.VarChar(200)
+  nameAr       String?  @db.VarChar(200)
+  subtitle     String?  @db.VarChar(300)
+  subtitleEn   String?  @db.VarChar(300)
+  subtitleJa   String?  @db.VarChar(300)
+  subtitleKo   String?  @db.VarChar(300)
+  subtitleFr   String?  @db.VarChar(300)
+  subtitleAr   String?  @db.VarChar(300)
+  summary      String?  @db.Text
+  summaryEn    String?  @db.Text
+  summaryJa    String?  @db.Text
+  summaryKo    String?  @db.Text
+  summaryFr    String?  @db.Text
+  summaryAr    String?  @db.Text
+  description  String?  @db.Text // 富文本/HTML
+  descriptionEn String? @db.Text // 英文详细描述
+  descriptionJa String? @db.Text // 日文详细描述
+  descriptionKo String? @db.Text // 韩文详细描述
+  descriptionFr String? @db.Text // 法文详细描述
+  descriptionAr String? @db.Text // 阿拉伯文详细描述
+  features     Json?    // 特性列表
+  featuresEn   Json?    // 英文特性列表
+  featuresJa   Json?    // 日文特性列表
+  featuresKo   Json?    // 韩文特性列表
+  featuresFr   Json?    // 法文特性列表
+  featuresAr   Json?    // 阿拉伯文特性列表
+  images       Json?    // 图片列表 [{url, alt}]
+  price        Decimal? @db.Decimal(12,2) // 参考价（受价格显示策略控制）
+  priceTiers   Json?    // 阶梯价 [{qty, price}] 批量价
+  isParts      Boolean  @default(false) // 是否配件（配件价仅整机/配件客户可见）
+  coverImage   String?  @db.VarChar(500)
+  video        String?  @db.VarChar(500)
+  frames360    Json?    // {template, totalFrames, startIndex}
+  manualUrl    String?  @db.VarChar(500) // 产品手册下载链接
+  // 询价/报价字段（2026-09-04 RFQ 自动报价）
+  priceMin     Decimal? @db.Decimal(12,2) // 参考价下限（人民币元）
+  priceMax     Decimal? @db.Decimal(12,2) // 参考价上限（空=单值；两者都空=面议）
+  priceUnit    String?  @db.VarChar(20)   // 价格单位，默认"元/台"
+  moq          Int?     @default(1)       // 最小起订量
+  priceNote    String?  @db.VarChar(300)  // 价格备注（含税/运费等）
+  priceNoteEn  String?  @db.VarChar(300)
+  priceNoteJa  String?  @db.VarChar(300)
+  priceNoteKo  String?  @db.VarChar(300)
+  priceNoteFr  String?  @db.VarChar(300)
+  priceNoteAr  String?  @db.VarChar(300)
+  specs        Json?    // 规格参数（兼容旧数据）
+  sortOrder    Int      @default(0)
+  status       String   @default("published") @db.VarChar(20) // published/draft
+  publishedAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  // SEO/GEO字段
+  seoTitle     String?  @db.VarChar(200)
+  seoTitleJa   String?  @db.VarChar(200)
+  seoTitleKo   String?  @db.VarChar(200)
+  seoTitleFr   String?  @db.VarChar(200)
+  seoTitleAr   String?  @db.VarChar(200)
+  seoTitleEn   String?  @db.VarChar(200)
+  seoDescription String? @db.Text
+  seoDescriptionJa String?  @db.Text
+  seoDescriptionKo String?  @db.Text
+  seoDescriptionFr String?  @db.Text
+  seoDescriptionAr String?  @db.Text
+  seoDescriptionEn String? @db.Text
+  seoKeywords  String?  @db.Text
+  seoKeywordsJa String?  @db.Text
+  seoKeywordsKo String?  @db.Text
+  seoKeywordsFr String?  @db.Text
+  seoKeywordsAr String?  @db.Text
+  seoKeywordsEn String? @db.Text
+  geoRegion    String?  @db.Text
+  geoCity      String?  @db.Text
+
+  tab         ProductTab       @relation(fields: [tabId], references: [id])
+  category    ProductCategory? @relation(fields: [categoryId], references: [id])
+  productSpecs ProductSpec[]
+
+  @@index([tabId])
+  @@index([categoryId])
+  @@index([status])
+  @@map("products")
+
+  favorites MemberFavorite[]
+  shopProduct ShopProduct?
+}
+
+
+// ===== 在线商城（2026-09-06 深化三十三：mall 插件转正，B2B 询单制）=====
+model ShopProduct {
+  siteId       BigInt?  // 所属站点（null=全局共享）
+  id           BigInt   @id @default(autoincrement())
+  slug         String   @unique @db.VarChar(120)
+  productId    BigInt?  @unique // 来源产品（产品同步上架，null=独立商品）
+  name         String   @db.VarChar(200)
+  nameEn       String?  @db.VarChar(200)
+  nameJa       String?  @db.VarChar(200)
+  nameKo       String?  @db.VarChar(200)
+  nameFr       String?  @db.VarChar(200)
+  nameAr       String?  @db.VarChar(200)
+  summary      String?  @db.Text
+  summaryEn    String?  @db.Text
+  summaryJa    String?  @db.Text
+  summaryKo    String?  @db.Text
+  summaryFr    String?  @db.Text
+  summaryAr    String?  @db.Text
+  description  String?  @db.Text // 富文本/HTML
+  descriptionEn String? @db.Text
+  descriptionJa String? @db.Text
+  descriptionKo String? @db.Text
+  descriptionFr String? @db.Text
+  descriptionAr String? @db.Text
+  coverImage   String?  @db.VarChar(500)
+  categoryId   BigInt? // 所属商城分类（null=未分类）
+  images       Json?    // [{url, alt}]
+  isParts      Boolean  @default(false) // 是否配件（配件价仅整机/配件客户可见）
+  priceTiers   Json?    // [{qty, price}] 阶梯价（批量价），按数量取档
+  specs        Json?    // 规格 [{name, nameEn, options:[{label, labelEn, price(增量), stock}]}]
+  modelFiles   Json?    // 模型及图纸下载 [{name, url, size}]
+  price        Decimal? @db.Decimal(12,2) // 售价（空=面议）
+  originalPrice Decimal? @db.Decimal(12,2) // 划线原价（可空）
+  unit         String?  @db.VarChar(20)   // 件/套/台
+  stock        Int      @default(0)       // -1=不限
+  minOrder     Int      @default(1)       // 最小起订
+  status       String   @default("published") @db.VarChar(20) // published/draft
+  featured     Boolean  @default(false)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  product      Product?  @relation(fields: [productId], references: [id])
+  // 绑定的销售用户（销售仅可接待自己绑定产品的订单）
+  salesUsers   User[]
+
+  @@index([status])
+  @@index([featured])
+  @@index([categoryId])
+  @@map("shop_products")
+}
+
+model ShopCategory {
+  siteId       BigInt?  // 所属站点（null=全局共享）
+  id           BigInt   @id @default(autoincrement())
+  slug         String   @unique @db.VarChar(120)
+  name         String   @db.VarChar(200)
+  nameEn       String?  @db.VarChar(200)
+  nameJa       String?  @db.VarChar(200)
+  nameKo       String?  @db.VarChar(200)
+  nameFr       String?  @db.VarChar(200)
+  nameAr       String?  @db.VarChar(200)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("shop_categories")
+}
+
+model ShopOrder {
+  siteId       BigInt?
+  id           BigInt   @id @default(autoincrement())
+  orderNo      String   @unique @db.VarChar(40)
+  memberId     BigInt?  // 登录会员下单时关联（游客为 null）
+  // 客户信息
+  name         String   @db.VarChar(100)
+  phone        String   @db.VarChar(50)
+  email        String   @db.VarChar(200)
+  company      String?  @db.VarChar(200)
+  address      String?  @db.VarChar(500)
+  remark       String?  @db.Text
+  // 商品明细 [{id, slug, name, nameEn, price, qty, unit, cover}]
+  items        Json
+  amount       Decimal  @db.Decimal(14,2)
+  currency     String   @default("CNY") @db.VarChar(10)
+  status       String   @default("pending") @db.VarChar(20) // pending/confirmed/completed/cancelled
+  payMethod    String   @db.VarChar(50) // offline(线下转账)/bank(对公汇款)/contact(联系销售)/wechat/alipay
+  ipInfo       Json?    // {ip, country, city}
+  // 发货信息（confirmed 后可填写；shippingCompany 存物流商 code：SF=顺丰速运 / KY=跨越速运 / JD=京东物流）
+  shippingCompany String? @db.VarChar(100)
+  trackingNo      String? @db.VarChar(100)
+  shippedAt       DateTime?
+  shippingStatus  String   @default("not_shipped") @db.VarChar(20) // not_shipped/shipped/delivered
+  deliveredAt     DateTime?
+  // 优惠券（couponCode=券码，discountAmount=优惠金额，实付=amount-discountAmount）
+  couponCode     String?  @db.VarChar(40)
+  // 发票与采购订单
+  poNo          String?  @db.VarChar(60)  // 客户采购单号
+  invoiceTitle  String?  @db.VarChar(200) // 发票抬头
+  taxNo         String?  @db.VarChar(100) // 税号
+  // 支付状态（bank/offline 对公转账）
+  payStatus     String   @default("unpaid") @db.VarChar(20) // unpaid/paid/confirmed
+  payVoucher    String?  @db.VarChar(500) // 转账凭证图片 URL
+  paidAt        DateTime?
+  discountAmount Decimal  @default(0) @db.Decimal(14,2)
+  // 销售跟进（分配/响应/2小时轮转）
+  salesUserId   BigInt?  // 当前负责跟进的销售 User id
+  salesUser     User?    @relation("ShopOrderSales", fields: [salesUserId], references: [id])
+  assignedAt    DateTime? // 分配时间（轮转后重置为轮转时刻）
+  respondedAt   DateTime? // 销售标记跟进/状态变更时间（非空则停止轮转）
+  escalationCount Int    @default(0) // 已轮转次数
+  // 操作历史 [{status, at, note}] 状态流转轨迹
+  history      Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status])
+  @@index([email])
+  @@index([memberId])
+  @@map("shop_orders")
+}
+
+model ProductSpec {
+  id        BigInt   @id @default(autoincrement())
+  siteId    BigInt?  // 所属站点（null=全局共享）
+  productId BigInt
+  groupName String?  @db.VarChar(100) // 规格分组
+  label     String   @db.VarChar(100) // 参数名（中文）
+  value     String   @db.Text // 参数值（中文）
+  unit      String?  @db.VarChar(20)
+  // 多语言字段
+  labelEn   String?  @db.VarChar(100)
+  labelJa   String?  @db.VarChar(100)
+  labelKo   String?  @db.VarChar(100)
+  labelFr   String?  @db.VarChar(100)
+  labelAr   String?  @db.VarChar(100)
+  valueEn   String?  @db.Text
+  valueJa   String?  @db.Text
+  valueKo   String?  @db.Text
+  valueFr   String?  @db.Text
+  valueAr   String?  @db.Text
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_specs")
+}
+
+// ============================================================
+// 3. 配置域
+// ============================================================
+
+model SiteConfig {
+  id          BigInt   @id @default(autoincrement())
+  configKey   String   @unique @db.VarChar(100)
+  configValue Json?
+  remark      String?  @db.VarChar(200)
+  updatedAt   DateTime @updatedAt
+
+  @@map("site_config")
+}
+
+// 多租户站点级配置覆盖（siteId 维度，优先于全局 site_config）
+model SiteConfigOverride {
+  id          BigInt   @id @default(autoincrement())
+  siteId      BigInt
+  configKey   String   @db.VarChar(100)
+  configValue Json?
+  updatedAt   DateTime @updatedAt
+
+  @@unique([siteId, configKey])
+  @@map("site_config_override")
+}
+
+model ThemeConfig {
+  id           BigInt   @id @default(autoincrement())
+  siteId       BigInt?  // 所属站点（null=全局共享）
+  primary      String   @default("#CC0000") @db.VarChar(7)
+  primaryLight String?  @db.VarChar(7)
+  primaryDark  String?  @db.VarChar(7)
+  accent       String   @default("#C0C0C0") @db.VarChar(7)
+  dark         String   @default("#111111") @db.VarChar(7)
+  darkLight    String?  @db.VarChar(7)
+  fontFamily   String?  @db.VarChar(100)
+  templateSlug String?  @db.VarChar(50)
+  remark       String?  @db.VarChar(200)
+  updatedAt    DateTime @updatedAt
+
+  @@map("theme_config")
+}
+
+// ============================================================
+// 菜单管理
+// ============================================================
+
+model Menu {
+  id        BigInt   @id @default(autoincrement())
+  siteId    BigInt?  // 所属站点（null=全局共享，行业包安装时写入站点归属）
+  name      String   @db.VarChar(100)
+  nameEn    String?  @db.VarChar(100)
+  nameJa    String?  @db.VarChar(100)
+  nameKo    String?  @db.VarChar(100)
+  nameFr    String?  @db.VarChar(100)
+  nameAr    String?  @db.VarChar(100)
+  description   String? @db.VarChar(500)
+  descriptionEn String? @db.VarChar(500)
+  descriptionJa String? @db.VarChar(500)
+  descriptionKo String? @db.VarChar(500)
+  descriptionFr String? @db.VarChar(500)
+  descriptionAr String? @db.VarChar(500)
+  url       String   @db.VarChar(500)
+  parentId  BigInt?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  icon      String?  @db.VarChar(50)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("menu")
+}
+
+// ============================================================
+// 语种管理
+// ============================================================
+
+model Language {
+  id        BigInt   @id @default(autoincrement())
+  siteId    BigInt?  // 所属站点（null=全局共享，行业包语种预设）
+  code      String   @unique @db.VarChar(10)
+  name      String   @db.VarChar(50)
+  nameEn    String?  @db.VarChar(50)
+  flag      String?  @db.VarChar(10)
+  isDefault Boolean  @default(false)
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("language")
+}
+
+// ============================================================
+// 4. 系统域
+// ============================================================
+
+model OperationLog {
+  id        BigInt   @id @default(autoincrement())
+  userId    BigInt?
+  username  String?  @db.VarChar(50)
+  module    String   @db.VarChar(30)
+  action    String   @db.VarChar(20)
+  target    String?  @db.VarChar(200)
+  detail    Json?
+  ip        String?  @db.VarChar(45)
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([module])
+  @@index([createdAt])
+  @@map("operation_logs")
+}
+
+// ============================================================
+// 访客统计（埋点数据）
+// ============================================================
+
+model AnalyticsVisitor {
+  id           BigInt   @id @default(autoincrement())
+  visitorKey   String   @unique @db.VarChar(64) // 访客唯一标识（前端生成）
+  ip           String?  @db.VarChar(45)
+  userAgent    String?  @db.Text
+  deviceType   String?  @db.VarChar(20) // mobile/tablet/desktop
+  browser      String?  @db.VarChar(50)
+  os           String?  @db.VarChar(50)
+  language     String?  @db.VarChar(20)
+  country      String?  @db.VarChar(50) // 预留地域字段
+  region       String?  @db.VarChar(50)
+  city         String?  @db.VarChar(50)
+  referrer     String?  @db.Text // 首次来源
+  landingPage  String?  @db.VarChar(255) // 落地页
+  firstVisitAt DateTime @default(now())
+  lastSeenAt   DateTime @default(now())
+  totalDuration Int     @default(0) // 累计停留（秒）
+  visitCount   Int      @default(1)
+  isOnline     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  pageViews AnalyticsPageView[]
+  events    AnalyticsEvent[]
+
+  @@index([ip])
+  @@index([createdAt])
+  @@index([lastSeenAt])
+  @@map("analytics_visitors")
+}
+
+model AnalyticsPageView {
+  id        BigInt   @id @default(autoincrement())
+  visitorId BigInt
+  path      String   @db.VarChar(255)
+  title     String?  @db.VarChar(255)
+  referrer  String?  @db.Text
+  duration  Int      @default(0) // 停留（秒）
+  enteredAt DateTime @default(now())
+  exitedAt  DateTime?
+  createdAt DateTime @default(now())
+
+  visitor AnalyticsVisitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+
+  @@index([visitorId])
+  @@index([path])
+  @@index([enteredAt])
+  @@map("analytics_page_views")
+}
+
+model AnalyticsEvent {
+  id         BigInt   @id @default(autoincrement())
+  visitorId  BigInt
+  pageViewId BigInt? // 关联的页面浏览
+  type       String   @db.VarChar(20) // click/scroll/form/search/download/custom
+  category   String?  @db.VarChar(50) // button/link/nav/form/search/scroll/download
+  action     String?  @db.VarChar(100)
+  label      String?  @db.VarChar(200)
+  value      String?  @db.VarChar(500)
+  url        String?  @db.VarChar(255)
+  createdAt  DateTime @default(now())
+
+  visitor AnalyticsVisitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+
+  @@index([visitorId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("analytics_events")
+}
+
+model SystemVersion {
+  id          BigInt   @id @default(autoincrement())
+  version     String   @db.VarChar(20)
+  releaseDate DateTime @db.Date
+  buildTime   DateTime?
+  gitCommit   String?  @db.VarChar(40)
+  environment String   @default("production") @db.VarChar(20)
+  isCurrent   Boolean  @default(false)
+  notes       String?  @db.Text
+  ip      String?  @db.VarChar(64)
+  country String? @db.VarChar(100)
+  city    String? @db.VarChar(100)
+  createdAt   DateTime @default(now())
+
+  updateLogs SystemUpdateLog[]
+
+  @@unique([version, environment])
+  @@index([isCurrent])
+  @@map("system_versions")
+}
+
+model SystemUpdateLog {
+  id          BigInt   @id @default(autoincrement())
+  versionId   BigInt?
+  version     String   @db.VarChar(20)
+  changeType  String   @db.VarChar(20) // feature/improvement/bugfix/security
+  title       String   @db.VarChar(200)
+  description String?  @db.Text
+  module      String?  @db.VarChar(30)
+  sortOrder   Int      @default(0)
+  createdBy   BigInt?
+  createdAt   DateTime @default(now())
+
+  systemVersion SystemVersion? @relation(fields: [versionId], references: [id])
+
+  @@index([version])
+  @@index([changeType])
+  @@index([versionId])
+  @@map("system_update_logs")
+}
+
+// ============================================================
+// 新闻资讯模块
+// ============================================================
+
+model NewsCategory {
+  id        BigInt   @id @default(autoincrement())
+  siteId    BigInt?  // 所属站点（null=全局共享）
+  name      String   @db.VarChar(50)
+  nameEn    String?  @db.VarChar(100)
+  slug      String   @unique @db.VarChar(50)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  news News[]
+  collectionSources NewsCollectionSource[]
+
+  @@map("news_categories")
+}
+
+model News {
+  siteId       BigInt?  // 所属站点（null=全局共享，多租户数据隔离）
+  id           BigInt    @id @default(autoincrement())
+  categoryId   BigInt?
+  title        String    @db.VarChar(200)
+  titleEn      String?   @db.VarChar(300)
+  titleJa      String?   @db.VarChar(300)
+  titleKo      String?   @db.VarChar(300)
+  titleFr      String?   @db.VarChar(300)
+  titleAr      String?   @db.VarChar(300)
+  slug         String    @unique @db.VarChar(200)
+  summary      String?   @db.Text
+  summaryEn    String?   @db.Text
+  summaryJa    String?   @db.Text
+  summaryKo    String?   @db.Text
+  summaryFr    String?   @db.Text
+  summaryAr    String?   @db.Text
+  content      String?   @db.Text
+  contentEn    String?   @db.Text
+  contentJa    String?   @db.Text
+  contentKo    String?   @db.Text
+  contentFr    String?   @db.Text
+  contentAr    String?   @db.Text
+  coverImage   String?   @db.VarChar(500)
+  video        String?   @db.VarChar(500)
+  author       String?   @db.VarChar(50)
+  source       String?   @db.VarChar(100)
+  sourceUrl    String?   @db.VarChar(500)
+  tags         Json?
+  isFeatured   Boolean   @default(false)
+  isTop        Boolean   @default(false)
+  viewCount    Int       @default(0)
+  status       String    @default("draft") @db.VarChar(20) // draft/published/offline
+  publishedAt  DateTime?
+  scheduledAt  DateTime?
+  createdById  BigInt?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  // SEO/GEO字段
+  seoTitle     String?   @db.VarChar(200)
+  seoTitleJa   String?  @db.VarChar(200)
+  seoTitleKo   String?  @db.VarChar(200)
+  seoTitleFr   String?  @db.VarChar(200)
+  seoTitleAr   String?  @db.VarChar(200)
+  seoTitleEn   String?   @db.VarChar(300)
+  seoDescription String? @db.Text
+  seoDescriptionJa String?  @db.Text
+  seoDescriptionKo String?  @db.Text
+  seoDescriptionFr String?  @db.Text
+  seoDescriptionAr String?  @db.Text
+  seoDescriptionEn String? @db.Text
+  seoKeywords  String?   @db.Text
+  seoKeywordsJa String?  @db.Text
+  seoKeywordsKo String?  @db.Text
+  seoKeywordsFr String?  @db.Text
+  seoKeywordsAr String?  @db.Text
+  seoKeywordsEn String?  @db.Text
+  geoRegion    String?   @db.Text
+  geoCity      String?   @db.Text
+
+  category    NewsCategory? @relation(fields: [categoryId], references: [id])
+  createdBy   User?         @relation(fields: [createdById], references: [id])
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([slug])
+  @@map("news")
+}
+
+model NewsCollectionSource {
+  id           BigInt   @id @default(autoincrement())
+  name         String   @db.VarChar(100)
+  url          String   @db.VarChar(500)
+  type         String   @default("rss") @db.VarChar(20) // rss/html/api
+  categoryId   BigInt?
+  enabled      Boolean  @default(true)
+  intervalMin  Int      @default(60)
+  lastFetched  DateTime?
+  lastStatus   String?  @db.VarChar(20)
+  lastError    String?  @db.Text
+  autoPublish  Boolean  @default(false)
+  useAI        Boolean  @default(false)
+  aiMode       String   @default("off") @db.VarChar(20) // off/summary/polish 采集后 AI 处理策略
+  createdAt    DateTime @default(now())
+
+  category NewsCategory? @relation(fields: [categoryId], references: [id])
+
+  @@map("news_collection_sources")
+}
+// ============================================================
+// 资源下载模块
+// ============================================================
+
+model ResourceCategory {
+  id            BigInt   @id @default(autoincrement())
+  siteId        BigInt?  // 所属站点（null=全局共享）
+  type          String   @unique @db.VarChar(50)
+  title         String   @db.VarChar(100)
+  titleEn       String?  @db.VarChar(150)
+  titleJa       String?  @db.VarChar(150)
+  titleKo       String?  @db.VarChar(150)
+  titleFr       String?  @db.VarChar(150)
+  titleAr       String?  @db.VarChar(150)
+  description   String?  @db.Text
+  descriptionEn String?  @db.Text
+  descriptionJa String?  @db.Text
+  descriptionKo String?  @db.Text
+  descriptionFr String?  @db.Text
+  descriptionAr String?  @db.Text
+  icon          String?  @db.VarChar(50)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  items ResourceItem[]
+
+  @@map("resource_categories")
+}
+
+model ResourceItem {
+  siteId       BigInt?  // 所属站点（null=全局共享，多租户数据隔离）
+  id            BigInt   @id @default(autoincrement())
+  categoryId    BigInt
+  slug          String   @unique @db.VarChar(100)
+  title         String   @db.VarChar(200)
+  titleEn       String?  @db.VarChar(300)
+  titleJa       String?  @db.VarChar(300)
+  titleKo       String?  @db.VarChar(300)
+  titleFr       String?  @db.VarChar(300)
+  titleAr       String?  @db.VarChar(300)
+  description   String?  @db.Text
+  descriptionEn String?  @db.Text
+  descriptionJa String?  @db.Text
+  descriptionKo String?  @db.Text
+  descriptionFr String?  @db.Text
+  descriptionAr String?  @db.Text
+  format        String   @db.VarChar(20)
+  size          String?  @db.VarChar(20)
+  fileUrl       String?  @db.VarChar(500)
+  downloadCount Int      @default(0)
+  sortOrder     Int      @default(0)
+  status        String   @default("published") @db.VarChar(20) // published/draft
+  publishedAt   DateTime?
+  // SEO/GEO字段
+  seoTitle      String?  @db.VarChar(200)
+  seoTitleEn   String?  @db.VarChar(200)
+  seoTitleJa   String?  @db.VarChar(200)
+  seoTitleKo   String?  @db.VarChar(200)
+  seoTitleFr   String?  @db.VarChar(200)
+  seoTitleAr   String?  @db.VarChar(200)
+  seoDescription String? @db.Text
+  seoDescriptionEn String?  @db.Text
+  seoDescriptionJa String?  @db.Text
+  seoDescriptionKo String?  @db.Text
+  seoDescriptionFr String?  @db.Text
+  seoDescriptionAr String?  @db.Text
+  seoKeywords   String?  @db.Text
+  seoKeywordsEn String?  @db.Text
+  seoKeywordsJa String?  @db.Text
+  seoKeywordsKo String?  @db.Text
+  seoKeywordsFr String?  @db.Text
+  seoKeywordsAr String?  @db.Text
+  geoRegion     String?  @db.Text
+  geoCity       String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  category ResourceCategory @relation(fields: [categoryId], references: [id])
+
+  @@index([categoryId])
+  @@index([status])
+  @@map("resource_items")
+}
+// ============================================================
+// 行业应用模块
+// ============================================================
+
+model Industry {
+  siteId       BigInt?  // 所属站点（null=全局共享，多租户数据隔离）
+  id            BigInt   @id @default(autoincrement())
+  slug          String   @unique @db.VarChar(50)
+  name          String   @db.VarChar(100)
+  nameEn        String?  @db.VarChar(150)
+  nameJa        String?  @db.VarChar(150)
+  nameKo        String?  @db.VarChar(150)
+  nameFr        String?  @db.VarChar(150)
+  nameAr        String?  @db.VarChar(150)
+  tagline       String?  @db.VarChar(200)
+  taglineEn     String?  @db.VarChar(300)
+  taglineJa     String?  @db.VarChar(300)
+  taglineKo     String?  @db.VarChar(300)
+  taglineFr     String?  @db.VarChar(300)
+  taglineAr     String?  @db.VarChar(300)
+  description   String?  @db.Text
+  descriptionEn String?  @db.Text
+  descriptionJa String?  @db.Text
+  descriptionKo String?  @db.Text
+  descriptionFr String?  @db.Text
+  descriptionAr String?  @db.Text
+  challenges    Json?
+  challengesEn  Json?
+  challengesJa  Json?
+  challengesKo  Json?
+  challengesFr  Json?
+  challengesAr  Json?
+  solutions     Json?
+  solutionsEn   Json?
+  solutionsJa   Json?
+  solutionsKo   Json?
+  solutionsFr   Json?
+  solutionsAr   Json?
+  products      Json?
+  productsEn    Json?
+  productsJa    Json?
+  productsKo    Json?
+  productsFr    Json?
+  productsAr    Json?
+  cases         Json?
+  casesEn       Json?
+  casesJa       Json?
+  casesKo       Json?
+  casesFr       Json?
+  casesAr       Json?
+  image         String?  @db.VarChar(500)
+  video         String?  @db.VarChar(500)
+  icon          String?  @db.VarChar(50)
+  sortOrder     Int      @default(0)
+  status        String   @default("published") @db.VarChar(20)
+  // SEO/GEO字段
+  seoTitle      String?  @db.VarChar(200)
+  seoTitleEn   String?  @db.VarChar(200)
+  seoTitleJa   String?  @db.VarChar(200)
+  seoTitleKo   String?  @db.VarChar(200)
+  seoTitleFr   String?  @db.VarChar(200)
+  seoTitleAr   String?  @db.VarChar(200)
+  seoDescription String? @db.Text
+  seoDescriptionEn String?  @db.Text
+  seoDescriptionJa String?  @db.Text
+  seoDescriptionKo String?  @db.Text
+  seoDescriptionFr String?  @db.Text
+  seoDescriptionAr String?  @db.Text
+  seoKeywords   String?  @db.Text
+  seoKeywordsEn String?  @db.Text
+  seoKeywordsJa String?  @db.Text
+  seoKeywordsKo String?  @db.Text
+  seoKeywordsFr String?  @db.Text
+  seoKeywordsAr String?  @db.Text
+  geoRegion     String?  @db.Text
+  geoCity       String?  @db.Text
+  // 解决方案下载（后台确认留资后开放下载）
+  solutionFile     String?  @db.VarChar(500)
+  solutionFileName String?  @db.VarChar(200)
+  solutionFileNameEn String? @db.VarChar(200)
+  solutionFileNameJa String? @db.VarChar(200)
+  solutionFileNameKo String? @db.VarChar(200)
+  solutionFileNameFr String? @db.VarChar(200)
+  solutionFileNameAr String? @db.VarChar(200)
+  // 推荐配置：相关产品（产品 slug 数组）、探索其他行业（行业 slug 数组）；为空时前台自动回退
+  relatedProductSlugs  Json?
+  relatedIndustrySlugs Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("industries")
+}
+
+// ============================================================
+// 下载留资（后台确认后开放下载）
+// ============================================================
+model DownloadLead {
+  id           BigInt   @id @default(autoincrement())
+  name         String   @db.VarChar(100)
+  company      String   @db.VarChar(200)
+  phone        String   @db.VarChar(50)
+  email        String   @db.VarChar(200)
+  // 资源标识，如 solution:jewelry、resource:8、manual
+  resourceType String   @default("resource") @db.VarChar(50)
+  resourceKey  String?  @db.VarChar(200)
+  resourceName String?  @db.VarChar(200)
+  downloadUrl  String?  @db.VarChar(500)
+  // pending 待审核 / approved 已通过 / rejected 已拒绝
+  status       String   @default("pending") @db.VarChar(20)
+  remark       String?  @db.VarChar(500)
+  reviewedBy   String?  @db.VarChar(100)
+  reviewedAt   DateTime?
+  ip      String?  @db.VarChar(64)
+  country String? @db.VarChar(100)
+  city    String? @db.VarChar(100)
+  createdAt    DateTime @default(now())
+
+  @@index([email])
+  @@index([status])
+  @@index([resourceType, resourceKey])
+  @@map("download_leads")
+}
+// ============================================================
+// 关于我们模块
+// ============================================================
+
+model AboutSection {
+  siteId         BigInt?  // 所属站点（null=全局共享，多租户数据隔离）
+  id             BigInt   @id @default(autoincrement())
+  slug           String   @unique @db.VarChar(50)
+  title          String   @db.VarChar(100)
+  titleEn        String?  @db.VarChar(150)
+  titleJa        String?  @db.VarChar(150)
+  titleKo        String?  @db.VarChar(150)
+  titleFr        String?  @db.VarChar(150)
+  titleAr        String?  @db.VarChar(150)
+  subtitle       String?  @db.VarChar(200)
+  subtitleEn     String?  @db.VarChar(300)
+  subtitleJa     String?  @db.VarChar(300)
+  subtitleKo     String?  @db.VarChar(300)
+  subtitleFr     String?  @db.VarChar(300)
+  subtitleAr     String?  @db.VarChar(300)
+  image          String?  @db.VarChar(500)
+  content        Json?
+  contentEn      Json?
+  contentJa      Json?
+  contentKo      Json?
+  contentFr      Json?
+  contentAr      Json?
+  highlights     Json?
+  timeline       Json?
+  certifications Json?
+  sortOrder      Int      @default(0)
+  status         String   @default("published") @db.VarChar(20)
+  // SEO/GEO字段
+  seoTitle       String?  @db.VarChar(200)
+  seoTitleEn   String?  @db.VarChar(200)
+  seoTitleJa   String?  @db.VarChar(200)
+  seoTitleKo   String?  @db.VarChar(200)
+  seoTitleFr   String?  @db.VarChar(200)
+  seoTitleAr   String?  @db.VarChar(200)
+  seoDescription String?  @db.Text
+  seoDescriptionEn String?  @db.Text
+  seoDescriptionJa String?  @db.Text
+  seoDescriptionKo String?  @db.Text
+  seoDescriptionFr String?  @db.Text
+  seoDescriptionAr String?  @db.Text
+  seoKeywords    String?  @db.Text
+  seoKeywordsEn String?  @db.Text
+  seoKeywordsJa String?  @db.Text
+  seoKeywordsKo String?  @db.Text
+  seoKeywordsFr String?  @db.Text
+  seoKeywordsAr String?  @db.Text
+  geoRegion      String?  @db.Text
+  geoCity        String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("about_sections")
+}
+
+// ============================================================
+// 招聘模块
+// ============================================================
+
+model Job {
+  siteId       BigInt?  // 所属站点（null=全局共享，多租户数据隔离）
+  id               BigInt   @id @default(autoincrement())
+  slug             String   @unique @db.VarChar(100)
+  title            String   @db.VarChar(100)
+  titleEn          String?  @db.VarChar(150)
+  titleJa          String?  @db.VarChar(150)
+  titleKo          String?  @db.VarChar(150)
+  titleFr          String?  @db.VarChar(150)
+  titleAr          String?  @db.VarChar(150)
+  department       String   @db.VarChar(50)
+  departmentEn     String?  @db.VarChar(100)
+  departmentJa     String?  @db.VarChar(100)
+  departmentKo     String?  @db.VarChar(100)
+  departmentFr     String?  @db.VarChar(100)
+  departmentAr     String?  @db.VarChar(100)
+  location         String   @db.VarChar(50)
+  locationEn       String?  @db.VarChar(100)
+  locationJa       String?  @db.VarChar(100)
+  locationKo       String?  @db.VarChar(100)
+  locationFr       String?  @db.VarChar(100)
+  locationAr       String?  @db.VarChar(100)
+  type             String   @db.VarChar(20)
+  typeEn           String?  @db.VarChar(50)
+  typeJa           String?  @db.VarChar(50)
+  typeKo           String?  @db.VarChar(50)
+  typeFr           String?  @db.VarChar(50)
+  typeAr           String?  @db.VarChar(50)
+  salary           String?  @db.VarChar(50)
+  salaryEn         String?  @db.VarChar(50)
+  salaryJa         String?  @db.VarChar(50)
+  salaryKo         String?  @db.VarChar(50)
+  salaryFr         String?  @db.VarChar(50)
+  salaryAr         String?  @db.VarChar(50)
+  experience       String?  @db.VarChar(50)
+  experienceEn     String?  @db.VarChar(100)
+  experienceJa     String?  @db.VarChar(100)
+  experienceKo     String?  @db.VarChar(100)
+  experienceFr     String?  @db.VarChar(100)
+  experienceAr     String?  @db.VarChar(100)
+  education        String?  @db.VarChar(50)
+  educationEn      String?  @db.VarChar(100)
+  educationJa      String?  @db.VarChar(100)
+  educationKo      String?  @db.VarChar(100)
+  educationFr      String?  @db.VarChar(100)
+  educationAr      String?  @db.VarChar(100)
+  tags             Json?
+  tagsEn           Json?
+  tagsJa           Json?
+  tagsKo           Json?
+  tagsFr           Json?
+  tagsAr           Json?
+  description      Json?
+  descriptionEn    Json?
+  descriptionJa    Json?
+  descriptionKo    Json?
+  descriptionFr    Json?
+  descriptionAr    Json?
+  responsibilities Json?
+  responsibilitiesEn Json?
+  responsibilitiesJa Json?
+  responsibilitiesKo Json?
+  responsibilitiesFr Json?
+  responsibilitiesAr Json?
+  requirements     Json?
+  requirementsEn   Json?
+  requirementsJa   Json?
+  requirementsKo   Json?
+  requirementsFr   Json?
+  requirementsAr   Json?
+  benefits         Json?
+  benefitsEn       Json?
+  benefitsJa       Json?
+  benefitsKo       Json?
+  benefitsFr       Json?
+  benefitsAr       Json?
+  status           String   @default("open") @db.VarChar(20) // open/closed
+  sortOrder        Int      @default(0)
+  // SEO/GEO字段
+  seoTitle         String?  @db.VarChar(200)
+  seoTitleEn   String?  @db.VarChar(200)
+  seoTitleJa   String?  @db.VarChar(200)
+  seoTitleKo   String?  @db.VarChar(200)
+  seoTitleFr   String?  @db.VarChar(200)
+  seoTitleAr   String?  @db.VarChar(200)
+  seoDescription   String?  @db.Text
+  seoDescriptionEn String?  @db.Text
+  seoDescriptionJa String?  @db.Text
+  seoDescriptionKo String?  @db.Text
+  seoDescriptionFr String?  @db.Text
+  seoDescriptionAr String?  @db.Text
+  seoKeywords      String?  @db.Text
+  seoKeywordsEn String?  @db.Text
+  seoKeywordsJa String?  @db.Text
+  seoKeywordsKo String?  @db.Text
+  seoKeywordsFr String?  @db.Text
+  seoKeywordsAr String?  @db.Text
+  geoRegion        String?  @db.Text
+  geoCity          String?  @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([department])
+  @@index([status])
+  @@map("jobs")
+}
+
+// ============================================================
+// AI大模型配置
+// ============================================================
+
+model AIConfig {
+  id        BigInt   @id @default(autoincrement())
+  provider  String   @default("openai") @db.VarChar(50) // openai/doubao/anthropic
+  apiKey    String?  @db.VarChar(500)
+  baseUrl   String?  @db.VarChar(500)
+  model     String   @default("gpt-4o-mini") @db.VarChar(100)
+  enabled   Boolean  @default(false)
+  remark    String?  @db.VarChar(500)
+  updatedAt DateTime @updatedAt
+
+  @@map("ai_config")
+}
+
+// ============================================================
+// 采集日志
+// ============================================================
+
+model CollectionLog {
+  id          BigInt   @id @default(autoincrement())
+  sourceId    BigInt
+  sourceName  String   @db.VarChar(200)
+  status      String   @db.VarChar(20) // success/failed
+  collected   Int      @default(0)
+  message     String?  @db.Text
+  error       String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  @@index([sourceId])
+  @@index([status])
+  @@map("collection_logs")
+}
+
+// ============================================================
+// 自动采集任务
+// ============================================================
+
+model AutoCollectionTask {
+  id           BigInt   @id @default(autoincrement())
+  name         String   @db.VarChar(200)
+  keyword      String   @db.VarChar(500)
+  categoryId   BigInt?
+  frequency    String   @default("daily") @db.VarChar(20) // daily/weekly/hourly
+  autoPublish  Boolean  @default(false)
+  includeImage Boolean  @default(true)
+  defaultImage String?  @db.VarChar(500)
+  lastRunAt    DateTime?
+  lastStatus   String?  @db.VarChar(20)
+  enabled      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([enabled])
+  @@map("auto_collection_tasks")
+}
+
+// ============================================================
+// 服务模块
+// ============================================================
+
+model Service {
+  siteId       BigInt?  // 所属站点（null=全局共享，多租户数据隔离）
+  id          BigInt   @id @default(autoincrement())
+  slug        String   @unique @db.VarChar(50)
+  title       String   @db.VarChar(100)
+  titleEn     String?  @db.VarChar(150)
+  titleJa     String?  @db.VarChar(150)
+  titleKo     String?  @db.VarChar(150)
+  titleFr     String?  @db.VarChar(150)
+  titleAr     String?  @db.VarChar(150)
+  subtitle    String?  @db.VarChar(200)
+  subtitleEn  String?  @db.VarChar(300)
+  subtitleJa  String?  @db.VarChar(300)
+  subtitleKo  String?  @db.VarChar(300)
+  subtitleFr  String?  @db.VarChar(300)
+  subtitleAr  String?  @db.VarChar(300)
+  description String?  @db.Text
+  descriptionEn String? @db.Text
+  descriptionJa String? @db.Text
+  descriptionKo String? @db.Text
+  descriptionFr String? @db.Text
+  descriptionAr String? @db.Text
+  features    Json?
+  featuresEn  Json?
+  featuresJa  Json?
+  featuresKo  Json?
+  featuresFr  Json?
+  featuresAr  Json?
+  process     Json?
+  processEn   Json?
+  processJa   Json?
+  processKo   Json?
+  processFr   Json?
+  processAr   Json?
+  icon        String?  @db.VarChar(50)
+  video       String?  @db.VarChar(500)
+  sortOrder   Int      @default(0)
+  status      String   @default("published") @db.VarChar(20)
+  // SEO/GEO字段
+  seoTitle    String?  @db.VarChar(200)
+  seoTitleEn   String?  @db.VarChar(200)
+  seoTitleJa   String?  @db.VarChar(200)
+  seoTitleKo   String?  @db.VarChar(200)
+  seoTitleFr   String?  @db.VarChar(200)
+  seoTitleAr   String?  @db.VarChar(200)
+  seoDescription String? @db.Text
+  seoDescriptionEn String?  @db.Text
+  seoDescriptionJa String?  @db.Text
+  seoDescriptionKo String?  @db.Text
+  seoDescriptionFr String?  @db.Text
+  seoDescriptionAr String?  @db.Text
+  seoKeywords String?  @db.Text
+  seoKeywordsEn String?  @db.Text
+  seoKeywordsJa String?  @db.Text
+  seoKeywordsKo String?  @db.Text
+  seoKeywordsFr String?  @db.Text
+  seoKeywordsAr String?  @db.Text
+  geoRegion   String?  @db.Text
+  geoCity     String?  @db.Text
+  // 服务方案下载（审核制：留资后台确认后开放）+ 推荐配置
+  solutionFile     String?  @db.VarChar(500)
+  solutionFileName String?  @db.VarChar(200)
+  solutionFileNameEn String? @db.VarChar(200)
+  solutionFileNameJa String? @db.VarChar(200)
+  solutionFileNameKo String? @db.VarChar(200)
+  solutionFileNameFr String? @db.VarChar(200)
+  solutionFileNameAr String? @db.VarChar(200)
+  relatedProductSlugs  Json?
+  relatedServiceSlugs  Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("services")
+}
+
+// ============================================================
+// SEO配置
+// ============================================================
+
+model SEOConfig {
+  id            BigInt   @id @default(autoincrement())
+  siteId        BigInt?  // 所属站点（null=全局共享，行业包 SEO 预设）
+  // ⚠️ siteName/siteNameEn 的 @default 必须**品牌中立**：
+  //    该值会写入 PostgreSQL 的列默认值。双 fork 共用一份 schema，
+  //    若保留某站品牌名，对另一站执行 `prisma db push` 会把对方的列默认值改成本站品牌。
+  //    留空后由 lib/seo.ts 的 DEFAULT_SEO 兜底（= getBrandName()，读部署级环境变量）。
+  siteName      String   @default("") @db.VarChar(100)
+  siteNameEn    String   @default("") @db.VarChar(150)
+  defaultTitle  String?  @db.VarChar(200)
+  defaultDesc   String?  @db.Text
+  keywords      String?  @db.Text
+  companyName   String?  @db.VarChar(200)
+  companyAddress String? @db.VarChar(500)
+  phone         String?  @db.VarChar(50)
+  email         String?  @db.VarChar(100)
+  latitude      String?  @db.VarChar(50)
+  longitude     String?  @db.VarChar(50)
+  geoRegion     String?  @db.Text
+  socialLinks   Json?
+  baiduSiteUrl  String?  @db.VarChar(200)
+  baiduPushToken String? @db.VarChar(100)
+  indexnowKey    String?  @db.VarChar(100)
+  updatedAt     DateTime @updatedAt
+
+  @@map("seo_config")
+}
+
+// ============================================================
+// 留言线索
+// ============================================================
+
+model ContactMessage {
+  id          BigInt   @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  company     String?  @db.VarChar(200)
+  phone       String   @db.VarChar(50)
+  email       String?  @db.VarChar(100)
+  subject     String?  @db.VarChar(200)
+  message     String   @db.Text
+  source      String?  @db.VarChar(100) // 来源页面
+  status      String   @default("new") @db.VarChar(20) // new, contacted, closed
+  visitorKey  String?  @db.VarChar(64)
+  assignedTo  BigInt?
+  notes       String?  @db.Text
+  ip      String?  @db.VarChar(64)
+  country String? @db.VarChar(100)
+  city    String? @db.VarChar(100)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("contact_messages")
+}
+
+// ============================================================
+// 询价/报价单（2026-09-04 RFQ 自动报价）
+// ============================================================
+
+model QuoteRequest {
+  id         BigInt   @id @default(autoincrement())
+  quoteNo    String   @unique @db.VarChar(30) // 报价单号，如 QT20260904-0001
+  company    String?  @db.VarChar(200)
+  companyVerified Json? // 中国企业名称真实性核验结果 {exists, confidence, reason, verified, checkedAt}
+  name       String   @db.VarChar(100)
+  email      String?  @db.VarChar(100)
+  phone      String   @db.VarChar(50)
+  message    String?  @db.Text // 备注/需求描述
+  items      Json?    // [{id, model, name, qty, unit, priceMin, priceMax}]
+  options    Json?    // 询价附加需求选项 [{key, label, checked}]: 配套设备/交钥匙工程/工艺培训包等
+  totalMin   Decimal? @db.Decimal(14,2) // 预估总价下限（可空=面议）
+  totalMax   Decimal? @db.Decimal(14,2) // 预估总价上限
+  currency   String   @default("CNY") @db.VarChar(10)
+  locale     String   @default("zh") @db.VarChar(10) // 询价客户语言（决定报价单 PDF 生成语言：zh=中文版，其他=英文版）
+  status     String   @default("new") @db.VarChar(20) // new/processing/deal/closed（跟进状态）
+  aiQuote    Json?    // AI 自动报价草稿 {items:[{model,name,qty,unitPrice,amount,delivery,note}], total, currency, validity, payment, notes, lang}
+  reviewStatus String @default("pending") @db.VarChar(20) // pending待审核/approved已通过/rejected已驳回（报价单审核）
+  reviewedAt DateTime?
+  reviewedBy String?  @db.VarChar(100)
+  notes      String?  @db.Text
+  memberId   BigInt?  // 登录会员提交时关联（个人中心「我的询价单」）
+  ip      String?  @db.VarChar(64)
+  country String? @db.VarChar(100)
+  city    String? @db.VarChar(100)
+  visitorKey  String?  @db.VarChar(64)
+  sourcePage String?  @db.VarChar(200)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("quote_requests")
+}
+
+// ============================================================
+// 首页配置
+// ============================================================
+
+model HomeConfig {
+  id          BigInt   @id @default(autoincrement())
+  siteId      BigInt?  // 所属站点（null=全局共享，行业包首页配置）
+  name        String   @default("默认首页配置") @db.VarChar(100)
+  isActive    Boolean  @default(true)
+  banners     Json?    // 轮播图数组 [{image, title, subtitle, link, sortOrder}]
+  features    Json?    // 核心优势数组 [{icon, title, description}]
+  stats       Json?    // 数据统计数组 [{number, label}]
+  featuredProducts Json? // 推荐产品ID数组
+  featuredCategories Json? // 推荐产品类别ID数组
+  showNews    Boolean  @default(true)
+  showIndustries Boolean @default(true)
+  showServices Boolean  @default(true)
+  ctaTitle    String?  @db.VarChar(200)
+  ctaTitleEn  String?  @db.VarChar(200)
+  ctaTitleJa  String?  @db.VarChar(200)
+  ctaTitleKo  String?  @db.VarChar(200)
+  ctaTitleFr  String?  @db.VarChar(200)
+  ctaTitleAr  String?  @db.VarChar(200)
+  ctaSubtitle String?  @db.VarChar(500)
+  ctaSubtitleEn String? @db.VarChar(500)
+  ctaSubtitleJa String? @db.VarChar(500)
+  ctaSubtitleKo String? @db.VarChar(500)
+  ctaSubtitleFr String? @db.VarChar(500)
+  ctaSubtitleAr String? @db.VarChar(500)
+  ctaButtonText String? @db.VarChar(50)
+  ctaButtonTextEn String? @db.VarChar(50)
+  ctaButtonTextJa String? @db.VarChar(50)
+  ctaButtonTextKo String? @db.VarChar(50)
+  ctaButtonTextFr String? @db.VarChar(50)
+  ctaButtonTextAr String? @db.VarChar(50)
+  ctaButtonLink String? @db.VarChar(200)
+  seoTitle    String?  @db.VarChar(200)
+  seoTitleEn  String?  @db.VarChar(200)
+  seoTitleJa  String?  @db.VarChar(200)
+  seoTitleKo  String?  @db.VarChar(200)
+  seoTitleFr  String?  @db.VarChar(200)
+  seoTitleAr  String?  @db.VarChar(200)
+  seoDesc     String?  @db.Text
+  seoDescEn   String?  @db.Text
+  seoDescJa   String?  @db.Text
+  seoDescKo   String?  @db.Text
+  seoDescFr   String?  @db.Text
+  seoDescAr   String?  @db.Text
+  seoKeywords String?  @db.Text
+  seoKeywordsEn String? @db.Text
+  seoKeywordsJa String? @db.Text
+  seoKeywordsKo String? @db.Text
+  seoKeywordsFr String? @db.Text
+  seoKeywordsAr String? @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("home_config")
+}
+
+// ============================================================
+// 验证码与下载记录
+// ============================================================
+
+model VerificationCode {
+  id        BigInt   @id @default(autoincrement())
+  email     String   @db.VarChar(100)
+  code      String   @db.VarChar(10)
+  type      String   @default("download") @db.VarChar(20)
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@map("verification_codes")
+}
+
+model DownloadRecord {
+  id         BigInt   @id @default(autoincrement())
+  name       String   @default("") @db.VarChar(100)
+  company    String   @default("") @db.VarChar(200)
+  phone      String   @default("") @db.VarChar(50)
+  email      String   @db.VarChar(100)
+  resourceId BigInt?
+  resourceName String? @db.VarChar(200)
+  verifiedAt DateTime?
+  downloadedAt DateTime? @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([email])
+  @@index([resourceId])
+  @@map("download_records")
+}
+// ============================================================
+// 服务器配置（部署管理）
+// ============================================================
+
+model Server {
+  id             BigInt   @id @default(autoincrement())
+  name           String   @db.VarChar(100) // 服务器名称，如"阿里云生产服务器"
+  type           String   @default("other") @db.VarChar(20) // aliyun / usa / other
+  host           String   @db.VarChar(100) // IP地址或域名
+  port           Int      @default(22) // SSH端口
+  username       String   @db.VarChar(50) // SSH用户名
+  password       String?  @db.VarChar(255) // SSH密码（加密存储）
+  privateKey     String?  @db.Text // SSH私钥
+  deployPath     String   @db.VarChar(500) // 项目部署路径
+  processManager String   @default("pm2") @db.VarChar(20) // pm2 / systemd / other
+  processName    String?  @db.VarChar(100) // 进程名称（pm2时使用）
+  domain         String?  @db.VarChar(200) // 网站域名
+  nginxPath      String?  @db.VarChar(500) // Nginx配置路径
+  branch         String   @default("main") @db.VarChar(50) // Git分支
+  deployMode     String   @default("git") @db.VarChar(20) // git / upload 部署方式
+  nodeVersion    String?  @db.VarChar(20) // Node版本
+  description    String?  @db.VarChar(500) // 备注说明
+  isActive       Boolean  @default(true) // 是否启用
+  sortOrder      Int      @default(0) // 排序
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([type])
+  @@index([isActive])
+  @@map("servers")
+}
+
+model Template {
+  id          BigInt   @id @default(autoincrement())
+  name        String   @db.VarChar(100) // 模板名称，如"默认模板"
+  slug        String   @unique @db.VarChar(100) // 模板标识，如 default
+  version     String   @default("1.0.0") @db.VarChar(20) // 模板版本
+  description String?  @db.VarChar(500) // 模板描述
+  isDefault   Boolean  @default(false) // 是否默认模板
+  isActive    Boolean  @default(true) // 是否启用
+  screenshot  String?  @db.VarChar(500) // 模板预览图 URL
+  config      Json? // 模板配置（主题色等扩展字段）
+  sortOrder   Int      @default(0) // 排序
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isDefault])
+  @@index([isActive])
+  @@map("templates")
+}
+
+// ============================================================
+// 成功案例（2026-09-04 案例库）
+// ============================================================
+
+model Case {
+  siteId       BigInt?  // 所属站点（null=全局共享，多租户数据隔离）
+  id           BigInt   @id @default(autoincrement())
+  title        String   @db.VarChar(200)
+  titleEn      String?  @db.VarChar(300)
+  titleJa      String?  @db.VarChar(300)
+  titleKo      String?  @db.VarChar(300)
+  titleFr      String?  @db.VarChar(300)
+  titleAr      String?  @db.VarChar(300)
+  slug         String   @unique @db.VarChar(200)
+  industry     String?  @db.VarChar(100)
+  industryEn   String?  @db.VarChar(100)
+  industryJa   String?  @db.VarChar(100)
+  industryKo   String?  @db.VarChar(100)
+  industryFr   String?  @db.VarChar(100)
+  industryAr   String?  @db.VarChar(100)
+  client       String?  @db.VarChar(200)
+  clientEn     String?  @db.VarChar(200)
+  clientJa     String?  @db.VarChar(200)
+  clientKo     String?  @db.VarChar(200)
+  clientFr     String?  @db.VarChar(200)
+  clientAr     String?  @db.VarChar(200)
+  coverImage   String?  @db.VarChar(500)
+  gallery      Json?
+  video        String?  @db.VarChar(500)
+  videoPoster  String?  @db.VarChar(500)
+  summary      String?  @db.Text
+  summaryEn    String?  @db.Text
+  summaryJa    String?  @db.Text
+  summaryKo    String?  @db.Text
+  summaryFr    String?  @db.Text
+  summaryAr    String?  @db.Text
+  content      String?  @db.Text
+  contentEn    String?  @db.Text
+  contentJa    String?  @db.Text
+  contentKo    String?  @db.Text
+  contentFr    String?  @db.Text
+  contentAr    String?  @db.Text
+  tags         Json?
+  caseDate     DateTime?
+  featured     Boolean  @default(false)
+  status       String   @default("published") @db.VarChar(20)
+  sortOrder    Int      @default(0)
+  seoTitle     String?  @db.VarChar(200)
+  seoTitleEn   String?  @db.VarChar(300)
+  seoTitleJa   String?  @db.VarChar(200)
+  seoTitleKo   String?  @db.VarChar(200)
+  seoTitleFr   String?  @db.VarChar(200)
+  seoTitleAr   String?  @db.VarChar(200)
+  seoDescription String? @db.Text
+  seoDescriptionEn String? @db.Text
+  seoDescriptionJa String? @db.Text
+  seoDescriptionKo String? @db.Text
+  seoDescriptionFr String? @db.Text
+  seoDescriptionAr String? @db.Text
+  seoKeywords  String?  @db.Text
+  seoKeywordsEn String? @db.Text
+  seoKeywordsJa String? @db.Text
+  seoKeywordsKo String? @db.Text
+  seoKeywordsFr String? @db.Text
+  seoKeywordsAr String? @db.Text
+  geoRegion    String?  @db.Text
+  geoCity      String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status])
+  @@index([featured])
+  @@index([sortOrder])
+  @@map("cases")
+}
+
+// ============================================================
+// EDM 邮件订阅（2026-09-04）
+// ============================================================
+
+model EmailSubscriber {
+  id             BigInt    @id @default(autoincrement())
+  email          String    @unique @db.VarChar(100)
+  name           String?   @db.VarChar(100)
+  group          String?   @db.VarChar(50)
+  source         String?   @db.VarChar(100)
+  status         String    @default("active") @db.VarChar(20)
+  unsubscribedAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("email_subscribers")
+}
+
+model EmailCampaign {
+  id           BigInt    @id @default(autoincrement())
+  subject      String    @db.VarChar(200)
+  content      String    @db.Text
+  group        String?   @db.VarChar(50)
+  testEmail    String?   @db.VarChar(100)
+  targetCount  Int       @default(0)
+  sentCount    Int       @default(0)
+  failedCount  Int       @default(0)
+  status       String    @default("completed") @db.VarChar(20)
+  createdBy    String?   @db.VarChar(100)
+  createdAt    DateTime  @default(now())
+
+  @@index([createdAt])
+  @@map("email_campaigns")
+}
+
+// ============================================================
+// 考察预约（2026-09-04）
+// ============================================================
+
+model VisitBooking {
+  id           BigInt   @id @default(autoincrement())
+  bookingNo    String   @unique @db.VarChar(30)
+  company      String?  @db.VarChar(200)
+  name         String   @db.VarChar(100)
+  phone        String   @db.VarChar(50)
+  email        String?  @db.VarChar(100)
+  preferredDate DateTime?
+  visitTime    String?  @db.VarChar(50)
+  visitors     Int      @default(1)
+  message      String?  @db.Text
+  status       String   @default("pending") @db.VarChar(20)
+  notes        String?  @db.Text
+  ip      String?  @db.VarChar(64)
+  country String? @db.VarChar(100)
+  city    String? @db.VarChar(100)
+  visitorKey   String?  @db.VarChar(64)
+  sourcePage   String?  @db.VarChar(200)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("visit_bookings")
+}
+
+// ============================================================
+// 常见问题 FAQ（2026-09-04）
+// ============================================================
+
+model Faq {
+  siteId       BigInt?  // 所属站点（null=全局共享，多租户数据隔离）
+  id         BigInt   @id @default(autoincrement())
+  question   String   @db.VarChar(500)
+  questionEn String?  @db.VarChar(500)
+  questionJa String?  @db.VarChar(500)
+  questionKo String?  @db.VarChar(500)
+  questionFr String?  @db.VarChar(500)
+  questionAr String?  @db.VarChar(500)
+  answer     String   @db.Text
+  answerEn   String?  @db.Text
+  answerJa   String?  @db.Text
+  answerKo   String?  @db.Text
+  answerFr   String?  @db.Text
+  answerAr   String?  @db.Text
+  category   String?  @db.VarChar(100)
+  sortOrder  Int      @default(0)
+  status     String   @default("published") @db.VarChar(20)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([status])
+  @@map("faqs")
+}
+
+model AiKnowledge {
+  id         BigInt   @id @default(autoincrement())
+  title      String   @db.VarChar(500)
+  titleEn    String?  @db.VarChar(500)
+  titleJa    String?  @db.VarChar(500)
+  titleKo    String?  @db.VarChar(500)
+  titleFr    String?  @db.VarChar(500)
+  titleAr    String?  @db.VarChar(500)
+  content    String   @db.Text
+  contentEn  String?  @db.Text
+  contentJa  String?  @db.Text
+  contentKo  String?  @db.Text
+  contentFr  String?  @db.Text
+  contentAr  String?  @db.Text
+  category   String?  @db.VarChar(100)
+  tags       String?  @db.VarChar(300)
+  source     String   @default("manual") @db.VarChar(20)
+  status     String   @default("published") @db.VarChar(20)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([status, category])
+  @@map("ai_knowledge")
+}
+
+
+// ============================================================
+// 外链回链管理（SEO 数据回链：第三方平台发文回链本站）
+// ============================================================
+model Backlink {
+  id          BigInt    @id @default(autoincrement())
+  platform    String    @db.VarChar(100)
+  platformType String   @db.VarChar(50) @default("other")
+  title       String?   @db.VarChar(300)
+  url         String    @db.VarChar(500)
+  targetUrl   String    @db.VarChar(300)
+  status      String    @db.VarChar(30) @default("planned")
+  priority    Int       @default(3)
+  keyword     String?   @db.VarChar(200)
+  note        String?   @db.Text
+  publishDate DateTime?
+  checkDate   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("backlinks")
+
+  
+}
+
+  // 外链营销引擎 · 软文（针对某条外链生成/编辑/发布追踪的营销文案）
+  model BacklinkPost {
+    id          BigInt    @id @default(autoincrement())
+    backlinkId  BigInt?
+    platform    String    @db.VarChar(100)
+    platformType String   @db.VarChar(50) @default("other")
+    title       String    @db.VarChar(400)
+    // 多语言正文 {zh,en,ja,ko,fr,ar}
+    content     Json      @default("{}")
+    status      String    @db.VarChar(30) @default("draft") // draft / published / failed
+    publishUrl  String?   @db.VarChar(600)
+    targetUrl   String?   @db.VarChar(400)
+    aiGenerated Boolean   @default(false)
+    publishedAt DateTime?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+  
+    @@map("backlink_posts")
+  }
+
+
+// ============================================================
+// 通用内容架构 P3 · 动态内容类型（后台可视化定义新栏目，无需改代码）
+// ============================================================
+
+model FormDefinition {
+  id           BigInt   @id @default(autoincrement())
+  name         String   @db.VarChar(100)
+  slug         String   @unique @db.VarChar(100)
+  title        Json     // 多语言 {zh,en,ja,ko,fr,ar}
+  description  Json?    // 多语言
+  fields       Json     // [{key,label:{zh,en,...},type,required,options:[{label:{...},value}]}]
+  submitLabel  Json?    // 提交按钮文字
+  status       String   @default("active") @db.VarChar(20) // active/inactive
+  submitCount  BigInt   @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  submissions FormSubmission[]
+    @@map("form_definitions")
+}
+
+model FormSubmission {
+  id        BigInt   @id @default(autoincrement())
+  formId    BigInt
+  form      FormDefinition @relation(fields: [formId], references: [id], onDelete: Cascade)
+  fieldData Json     // {key: value}
+  ip        String?  @db.VarChar(64)
+  country   String?  @db.VarChar(100)
+  city      String?  @db.VarChar(100)
+  createdAt DateTime @default(now())
+  @@map("form_submissions")
+}
+
+model ContentTypeDef {
+  id           BigInt   @id @default(autoincrement())
+  name         String   @unique @db.VarChar(50)
+  label        String   @db.VarChar(100)
+  labelEn      String?  @db.VarChar(100)
+  description  String?  @db.Text
+  fields       Json
+  listColumns  Json
+  titleField   String   @db.VarChar(50)
+  slugField    String?  @db.VarChar(50)
+  enableSeo    Boolean  @default(false)
+  enableStatus Boolean  @default(false)
+  sortOrder    Int      @default(0)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("content_type_defs")
+}
+
+model DynamicContent {
+  siteId      BigInt?   // 所属站点（null=全局共享，多租户数据隔离）
+  id          BigInt    @id @default(autoincrement())
+  type        String    @db.VarChar(50)
+  slug        String    @db.VarChar(200)
+  title       String    @db.VarChar(300)
+  fields      Json
+  status      String    @db.VarChar(30) @default("draft")
+  sortOrder   Int       @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([type, status])
+  @@index([type, slug])
+  @@map("dynamic_contents")
+}
+
+
+// ============================================================
+// R1 多租户基座 · 租户与站点（轻量多租户，存量数据归属默认租户 tenantId=1 兜底）
+// ============================================================
+
+model Tenant {
+  id          BigInt   @id @default(autoincrement())
+  name        String   @db.VarChar(100)   // 租户名称（客户名/公司名）
+  slug        String   @unique @db.VarChar(100) // 租户标识
+  edition     String   @default("standard") @db.VarChar(30) // trial/standard/pro/enterprise
+  status      String   @default("active") @db.VarChar(20)
+  licenseCode String?  @db.VarChar(500)   // 绑定授权码（与站点名称/域名联动）
+  maxSites    Int      @default(1)
+  maxSeats    Int      @default(5)
+  expiresAt   DateTime? // 授权到期时间
+  contactName String?  @db.VarChar(100)
+  contactEmail String? @db.VarChar(200)
+  remark      String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sites Site[]
+  @@map("tenants")
+}
+
+model Site {
+  id          BigInt   @id @default(autoincrement())
+  tenantId    BigInt   @default(1)
+  industryPack      String?  @db.VarChar(100) // 当前安装行业包 slug
+  industryPackVersion String? @db.VarChar(30)  // 当前行业包版本
+  name        String   @db.VarChar(100)   // 站点名称
+  domain      String?  @unique @db.VarChar(200) // 主域名（host 解析）
+  domains     Json?    // 附加域名列表（白标多域名）
+  templateSlug String  @default("default") @db.VarChar(100) // 前台模板
+  themeConfig Json?    // 站点级主题覆盖（{primary, accent, ...}）
+  logo        String?  @db.VarChar(500)
+  favicon     String?  @db.VarChar(500)
+  locale      String   @default("zh") @db.VarChar(10) // 默认语种
+  status      String   @default("active") @db.VarChar(20)
+  isDefault   Boolean  @default(false) // 默认站点（存量数据归属）
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  @@index([tenantId])
+  @@map("sites")
+}
+
+// 行业包安装历史记录（pack-cli 安装/卸载/升级时写入）
+model IndustryPackRecord {
+  id         BigInt   @id @default(autoincrement())
+  siteId     BigInt
+  packKey    String   @db.VarChar(100)
+  packVersion String  @db.VarChar(30)
+  action     String   @db.VarChar(20) // install / uninstall / upgrade
+  operatorId BigInt?
+  result     Json?
+  createdAt  DateTime @default(now())
+
+  @@index([siteId, packKey])
+  @@map("industry_pack_records")
+}
+
+model ShopCoupon {
+  id          BigInt    @id @default(autoincrement())
+  siteId      BigInt?
+  code        String    @unique @db.VarChar(40) // 券码（领券中心领取用）
+  name        String    @db.VarChar(100)
+  nameEn      String?   @db.VarChar(200)
+  nameJa      String?   @db.VarChar(200)
+  nameKo      String?   @db.VarChar(200)
+  nameFr      String?   @db.VarChar(200)
+  nameAr      String?   @db.VarChar(200)
+  type        String    @default("fixed") @db.VarChar(20) // fixed 满减 | percent 折扣
+  amount      Decimal   @db.Decimal(14,2) // 满减金额 或 折扣率(90=9折)
+  minAmount   Decimal   @default(0) @db.Decimal(14,2) // 使用门槛
+  maxDiscount Decimal?  @db.Decimal(14,2) // percent 封顶优惠额
+  startAt     DateTime?
+  endAt       DateTime?
+  total       Int       @default(0) // 发行总量 0=不限
+  claimed     Int       @default(0)
+  perUser     Int       @default(1) // 每人限领
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@index([isActive])
+  @@map("shop_coupons")
+}
+
+model ShopCouponClaim {
+  id        BigInt    @id @default(autoincrement())
+  couponId  BigInt
+  memberId  BigInt?   // 游客不可领券（null 不出现）
+  code      String    @db.VarChar(40)
+  used      Boolean   @default(false)
+  usedAt    DateTime?
+  orderNo   String?   @db.VarChar(40)
+  createdAt DateTime  @default(now())
+  @@index([couponId])
+  @@index([memberId])
+  @@map("shop_coupon_claims")
+}
+

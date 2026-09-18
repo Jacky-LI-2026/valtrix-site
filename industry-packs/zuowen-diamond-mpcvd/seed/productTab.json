@@ -1,0 +1,53 @@
+{
+  "model": "productTab",
+  "rows": [
+    {
+      "id": "2",
+      "slug": "auxiliary",
+      "name": "配套设备",
+      "nameEn": "Auxiliary Equipment",
+      "nameJa": "付帯設備",
+      "nameKo": "부대설비",
+      "nameFr": "Équipements complémentaires",
+      "nameAr": "المعدات المساعدة",
+      "purchaseMode": "quote",
+      "sortOrder": 2
+    },
+    {
+      "id": "1",
+      "slug": "growth",
+      "name": "长晶设备",
+      "nameEn": "Growth Equipment",
+      "nameJa": "長結晶デバイス",
+      "nameKo": "장정 설비",
+      "nameFr": "Équipement à cristaux longs",
+      "nameAr": "معدات الكريستال النمو",
+      "purchaseMode": "quote",
+      "sortOrder": 1
+    },
+    {
+      "id": "3",
+      "slug": "diamonds",
+      "name": "培育钻石",
+      "nameEn": "Lab-Grown Diamonds",
+      "nameJa": "ダイヤモンドを育てる",
+      "nameKo": "육성 다이아몬드",
+      "nameFr": "Cultiver les diamants",
+      "nameAr": "زراعة الماس",
+      "purchaseMode": "shop",
+      "sortOrder": 3
+    },
+    {
+      "id": "4",
+      "slug": "materials",
+      "name": "金刚石功能材料",
+      "nameEn": "Diamond Functional Materials",
+      "nameJa": "ダイヤモンド機能材料",
+      "nameKo": "금강석 기능 재료",
+      "nameFr": "Matériaux fonctionnels diamant",
+      "nameAr": "الماس المواد الفنية",
+      "purchaseMode": "shop",
+      "sortOrder": 4
+    }
+  ]
+}

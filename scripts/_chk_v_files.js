@@ -1,0 +1,12 @@
+const fs = require('fs');
+const V = 'D:/阀门网站/';
+let s = fs.readFileSync(V + 'app/services/[slug]/ServiceDetailClient.tsx', 'utf8');
+let m = s.match(/features[\s\S]{0,900}/);
+console.log('== VALTRIX Service features area (first 900):');
+console.log(m ? m[0].slice(0, 900) : 'NOT FOUND');
+m = s.match(/const features[\s\S]{0,300}/);
+console.log('\n== VALTRIX features const:', m ? m[0].slice(0, 300) : 'none');
+s = fs.readFileSync(V + 'app/about/[section]/AboutSectionClient.tsx', 'utf8');
+m = s.match(/certifications[\s\S]{0,800}/);
+console.log('\n== VALTRIX About cert area (first 800):');
+console.log(m ? m[0].slice(0, 800) : 'NOT FOUND');

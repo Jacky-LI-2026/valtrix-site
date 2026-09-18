@@ -1,0 +1,84 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# 2026-09-18 补（建立 Git 仓库版本管理；AGENTS G8/G27/G29）
+# ------------------------------------------------------------------
+# ⚠️ 本目录是**阶段 3 之前的旧 fork**，不是阀门站服务器的部署基线
+#    （阀门服务器 = D:\企业网站 的 Base + docs/stage3-keep-list.json 的 78 个站点专属文件）。
+#    本仓库的用途：留存 fork 侧历史 / 作为保留清单文件的手工合并底稿。
+
+# ① 秘密：凭据/私钥/环境变量 —— 绝不入库（G8）
+.env
+.env.*
+!.env.example
+config-keys/
+scripts/license-keys/
+
+# ② 备份与本机会话产物（G27）
+_local_backup/
+_backup/
+_backups/
+backups/
+项目备份/
+_archive/
+_valve_sync_bak/
+_qa_audit_*/
+
+# ③ 运行期数据
+data/
+logs/
+*.log
+tmp/
+
+# ④ 构建产物与生成物
+/.next/
+/.next.*
+/out/
+lib/generated/
+*.tsbuildinfo
+
+# ⑤ 运行期上传物（95MB，且属用户数据）
+public/uploads/
+
+# ⑥ 根目录一次性诊断脚本/抓取件（非源码）
+/_*.js
+/_*.sql
+/_*.txt
+/_*.html
+/_*.png
+/_*.json
+/_*.bin
+/_*.out
+/_tmp_*
+/$null

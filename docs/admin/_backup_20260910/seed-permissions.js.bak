@@ -1,0 +1,92 @@
+// 补齐权限码 + admin/editor 角色默认权限（本地与服务器均可执行）
+// 注：schema generator output 为 ../lib/generated/prisma（自定义目录），须用相对路径导入
+const { PrismaClient } = require('../lib/generated/prisma');
+const p = new PrismaClient();
+
+// 新增权限码：module:action
+const NEW_PERMS = [
+  ['industry:view', '查看行业', 'industry', 'view'],
+  ['industry:manage', '管理行业', 'industry', 'manage'],
+  ['service:view', '查看服务', 'service', 'view'],
+  ['service:manage', '管理服务', 'service', 'manage'],
+  ['career:view', '查看职位', 'career', 'view'],
+  ['career:manage', '管理职位', 'career', 'manage'],
+  ['about:view', '查看关于', 'about', 'view'],
+  ['about:manage', '管理关于', 'about', 'manage'],
+  ['menu:view', '查看菜单', 'menu', 'view'],
+  ['menu:manage', '管理菜单', 'menu', 'manage'],
+  ['lead:view', '查看留言', 'lead', 'view'],
+  ['lead:manage', '管理留言', 'lead', 'manage'],
+  ['download-lead:view', '查看下载留资', 'download-lead', 'view'],
+  ['download-lead:manage', '管理下载留资', 'download-lead', 'manage'],
+  ['analytics:view', '查看访客统计', 'analytics', 'view'],
+  ['language:view', '查看语种', 'language', 'view'],
+  ['language:manage', '管理语种', 'language', 'manage'],
+  ['page-hero:view', '查看页面头部', 'page-hero', 'view'],
+  ['page-hero:manage', '管理页面头部', 'page-hero', 'manage'],
+  ['template:view', '查看模板', 'template', 'view'],
+  ['template:manage', '管理模板', 'template', 'manage'],
+  ['deploy:view', '查看部署', 'deploy', 'view'],
+  ['deploy:manage', '执行部署', 'deploy', 'manage'],
+  ['guide:view', '查看说明书', 'guide', 'view'],
+  ['smtp:view', '查看SMTP', 'smtp', 'view'],
+  ['smtp:manage', '管理SMTP', 'smtp', 'manage'],
+  ['translate-config:view', '查看翻译配置', 'translate-config', 'view'],
+  ['translate-config:manage', '管理翻译配置', 'translate-config', 'manage'],
+  ['seo:view', '查看SEO配置', 'seo', 'view'],
+  ['seo:manage', '管理SEO配置', 'seo', 'manage'],
+  ['auto-collection:view', '查看自动采集', 'auto-collection', 'view'],
+  ['auto-collection:manage', '管理自动采集', 'auto-collection', 'manage'],
+  ['license:view', '查看授权', 'license', 'view'],
+  ['license:manage', '管理授权', 'license', 'manage'],
+  ['notification:view', '查看通知', 'notification', 'view'],
+  ['setup:view', '查看初始化', 'setup', 'view'],
+];
+
+(async () => {
+  const created = [];
+  for (const [code, name, module, action] of NEW_PERMS) {
+    const ex = await p.permission.findUnique({ where: { code } });
+    if (!ex) {
+      await p.permission.create({ data: { code, name, module, action } });
+      created.push(code);
+    }
+  }
+  console.log('新增权限:', created.length, created.join(', ') || '(无新增，均已存在)');
+
+  // 角色默认权限
+  const adminRole = await p.role.findUnique({ where: { name: 'admin' } });
+  const editorRole = await p.role.findUnique({ where: { name: 'editor' } });
+
+  // admin = 全部权限
+  if (adminRole) {
+    const all = await p.permission.findMany();
+    for (const perm of all) {
+      const ex = await p.rolePermission.findUnique({ where: { roleId_permissionId: { roleId: adminRole.id, permissionId: perm.id } } });
+      if (!ex) await p.rolePermission.create({ data: { roleId: adminRole.id, permissionId: perm.id } });
+    }
+    console.log('admin 权限已全量:', all.length);
+  }
+
+  // editor = 内容相关 + 留言/统计/说明书只读
+  if (editorRole) {
+    const editorCodes = [
+      'product:view', 'product:create', 'product:edit', 'product:delete',
+      'news:view', 'news:create', 'news:edit', 'news:delete', 'news:publish',
+      'resource:view', 'resource:edit',
+      'industry:view', 'industry:manage', 'service:view', 'service:manage',
+      'career:view', 'career:manage', 'about:view', 'about:manage',
+      'menu:view', 'menu:manage',
+      'lead:view', 'download-lead:view', 'analytics:view', 'guide:view',
+    ];
+    const perms = await p.permission.findMany({ where: { code: { in: editorCodes } } });
+    for (const perm of perms) {
+      const ex = await p.rolePermission.findUnique({ where: { roleId_permissionId: { roleId: editorRole.id, permissionId: perm.id } } });
+      if (!ex) await p.rolePermission.create({ data: { roleId: editorRole.id, permissionId: perm.id } });
+    }
+    console.log('editor 权限:', perms.length);
+  }
+
+  await p.$disconnect();
+  console.log('完成');
+})().catch((e) => { console.error(e.message); process.exit(1); });

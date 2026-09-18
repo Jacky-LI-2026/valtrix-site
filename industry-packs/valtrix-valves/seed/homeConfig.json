@@ -1,0 +1,240 @@
+{
+  "model": "homeConfig",
+  "rows": [
+    {
+      "id": "1",
+      "name": "阀门科技首页配置",
+      "isActive": true,
+      "banners": [
+        {
+          "id": "banner-1",
+          "badge": {
+            "ar": "Ultra-High-Purity Fluid Control",
+            "en": "Ultra-High-Purity Fluid Control",
+            "fr": "Ultra-High-Purity Fluid Control",
+            "ja": "Ultra-High-Purity Fluid Control",
+            "ko": "Ultra-High-Purity Fluid Control",
+            "zh": "Ultra-High-Purity Fluid Control"
+          },
+          "title": {
+            "ar": "Ultra-High-Purity Fluid Control Expert",
+            "en": "Ultra-High-Purity Fluid Control Expert",
+            "fr": "Ultra-High-Purity Fluid Control Expert",
+            "ja": "Ultra-High-Purity Fluid Control Expert",
+            "ko": "Ultra-High-Purity Fluid Control Expert",
+            "zh": "Ultra-High-Purity Fluid Control Expert"
+          },
+          "ctaLink": "/products",
+          "ctaText": {
+            "ar": "Browse Products",
+            "en": "Browse Products",
+            "fr": "Browse Products",
+            "ja": "Browse Products",
+            "ko": "Browse Products",
+            "zh": "Browse Products"
+          },
+          "subtitle": {
+            "ar": "VCR Fittings · Diaphragm Valves · Pressure Reducers",
+            "en": "VCR Fittings · Diaphragm Valves · Pressure Reducers",
+            "fr": "VCR Fittings · Diaphragm Valves · Pressure Reducers",
+            "ja": "VCR Fittings · Diaphragm Valves · Pressure Reducers",
+            "ko": "VCR Fittings · Diaphragm Valves · Pressure Reducers",
+            "zh": "VCR Fittings · Diaphragm Valves · Pressure Reducers"
+          },
+          "sortOrder": 1,
+          "bgGradient": "from-[#1a2a3a] via-[#2d4a63] to-[#1a2a3a]",
+          "description": {
+            "ar": "VALTRIX designs and manufactures ultra-high-purity fluid control components for semiconductor, biopharmaceutical, LED/display, solar and hydrogen industries - 316L stainless steel, electro-polished surfaces, assembled in an ISO Class 4/5 cleanroom and 100% helium leak tested.",
+            "en": "VALTRIX designs and manufactures ultra-high-purity fluid control components for semiconductor, biopharmaceutical, LED/display, solar and hydrogen industries - 316L stainless steel, electro-polished surfaces, assembled in an ISO Class 4/5 cleanroom and 100% helium leak tested.",
+            "fr": "VALTRIX designs and manufactures ultra-high-purity fluid control components for semiconductor, biopharmaceutical, LED/display, solar and hydrogen industries - 316L stainless steel, electro-polished surfaces, assembled in an ISO Class 4/5 cleanroom and 100% helium leak tested.",
+            "ja": "VALTRIX designs and manufactures ultra-high-purity fluid control components for semiconductor, biopharmaceutical, LED/display, solar and hydrogen industries - 316L stainless steel, electro-polished surfaces, assembled in an ISO Class 4/5 cleanroom and 100% helium leak tested.",
+            "ko": "VALTRIX designs and manufactures ultra-high-purity fluid control components for semiconductor, biopharmaceutical, LED/display, solar and hydrogen industries - 316L stainless steel, electro-polished surfaces, assembled in an ISO Class 4/5 cleanroom and 100% helium leak tested.",
+            "zh": "VALTRIX designs and manufactures ultra-high-purity fluid control components for semiconductor, biopharmaceutical, LED/display, solar and hydrogen industries - 316L stainless steel, electro-polished surfaces, assembled in an ISO Class 4/5 cleanroom and 100% helium leak tested."
+          }
+        }
+      ],
+      "features": [
+        {
+          "id": "f1",
+          "icon": "award",
+          "title": {
+            "ar": "ISO 9001 Certified",
+            "en": "ISO 9001 Certified",
+            "fr": "ISO 9001 Certified",
+            "ja": "ISO 9001 Certified",
+            "ko": "ISO 9001 Certified",
+            "zh": "ISO 9001 Certified"
+          },
+          "description": {
+            "ar": "ISO 9001 quality management system with full process control and material traceability",
+            "en": "ISO 9001 quality management system with full process control and material traceability",
+            "fr": "ISO 9001 quality management system with full process control and material traceability",
+            "ja": "ISO 9001 quality management system with full process control and material traceability",
+            "ko": "ISO 9001 quality management system with full process control and material traceability",
+            "zh": "ISO 9001 quality management system with full process control and material traceability"
+          }
+        },
+        {
+          "id": "f2",
+          "icon": "shield",
+          "title": {
+            "ar": "100% He Leak Tested",
+            "en": "100% He Leak Tested",
+            "fr": "100% He Leak Tested",
+            "ja": "100% He Leak Tested",
+            "ko": "100% He Leak Tested",
+            "zh": "100% He Leak Tested"
+          },
+          "description": {
+            "ar": "Every component helium mass-spectrometer tested to 1x10-9 scc/s before shipment",
+            "en": "Every component helium mass-spectrometer tested to 1x10-9 scc/s before shipment",
+            "fr": "Every component helium mass-spectrometer tested to 1x10-9 scc/s before shipment",
+            "ja": "Every component helium mass-spectrometer tested to 1x10-9 scc/s before shipment",
+            "ko": "Every component helium mass-spectrometer tested to 1x10-9 scc/s before shipment",
+            "zh": "Every component helium mass-spectrometer tested to 1x10-9 scc/s before shipment"
+          }
+        },
+        {
+          "id": "f3",
+          "icon": "sparkles",
+          "title": {
+            "ar": "ISO Class 4/5 Cleanroom",
+            "en": "ISO Class 4/5 Cleanroom",
+            "fr": "ISO Class 4/5 Cleanroom",
+            "ja": "ISO Class 4/5 Cleanroom",
+            "ko": "ISO Class 4/5 Cleanroom",
+            "zh": "ISO Class 4/5 Cleanroom"
+          },
+          "description": {
+            "ar": "Cleanroom assembly and double-bagged packaging preserve UHP cleanliness",
+            "en": "Cleanroom assembly and double-bagged packaging preserve UHP cleanliness",
+            "fr": "Cleanroom assembly and double-bagged packaging preserve UHP cleanliness",
+            "ja": "Cleanroom assembly and double-bagged packaging preserve UHP cleanliness",
+            "ko": "Cleanroom assembly and double-bagged packaging preserve UHP cleanliness",
+            "zh": "Cleanroom assembly and double-bagged packaging preserve UHP cleanliness"
+          }
+        },
+        {
+          "id": "f4",
+          "icon": "globe",
+          "title": {
+            "ar": "OEM/ODM Engineering",
+            "en": "OEM/ODM Engineering",
+            "fr": "OEM/ODM Engineering",
+            "ja": "OEM/ODM Engineering",
+            "ko": "OEM/ODM Engineering",
+            "zh": "OEM/ODM Engineering"
+          },
+          "description": {
+            "ar": "Custom manifolds, panels and assemblies with STEP 3D models and fast delivery",
+            "en": "Custom manifolds, panels and assemblies with STEP 3D models and fast delivery",
+            "fr": "Custom manifolds, panels and assemblies with STEP 3D models and fast delivery",
+            "ja": "Custom manifolds, panels and assemblies with STEP 3D models and fast delivery",
+            "ko": "Custom manifolds, panels and assemblies with STEP 3D models and fast delivery",
+            "zh": "Custom manifolds, panels and assemblies with STEP 3D models and fast delivery"
+          }
+        }
+      ],
+      "stats": [
+        {
+          "id": "stat-1",
+          "label": {
+            "ar": "Product Series",
+            "en": "Product Series",
+            "fr": "Product Series",
+            "ja": "Product Series",
+            "ko": "Product Series",
+            "zh": "Product Series"
+          },
+          "value": "6",
+          "number": "6"
+        },
+        {
+          "id": "stat-2",
+          "label": {
+            "ar": "Industries Served",
+            "en": "Industries Served",
+            "fr": "Industries Served",
+            "ja": "Industries Served",
+            "ko": "Industries Served",
+            "zh": "Industries Served"
+          },
+          "value": "6+",
+          "number": "6+"
+        },
+        {
+          "id": "stat-3",
+          "label": {
+            "ar": "He Leak Tested",
+            "en": "He Leak Tested",
+            "fr": "He Leak Tested",
+            "ja": "He Leak Tested",
+            "ko": "He Leak Tested",
+            "zh": "He Leak Tested"
+          },
+          "value": "100%",
+          "number": "100%"
+        },
+        {
+          "id": "stat-4",
+          "label": {
+            "ar": "Cleanroom Class",
+            "en": "Cleanroom Class",
+            "fr": "Cleanroom Class",
+            "ja": "Cleanroom Class",
+            "ko": "Cleanroom Class",
+            "zh": "Cleanroom Class"
+          },
+          "value": "4/5",
+          "number": "4/5"
+        }
+      ],
+      "featuredProducts": [],
+      "featuredCategories": [
+        "gate-valve",
+        "ball-valve",
+        "butterfly-valve"
+      ],
+      "showNews": true,
+      "showIndustries": true,
+      "showServices": true,
+      "ctaTitle": "Need a custom UHP fluid system?",
+      "ctaTitleEn": "Need a custom UHP fluid system?",
+      "ctaTitleJa": null,
+      "ctaTitleKo": null,
+      "ctaTitleFr": null,
+      "ctaTitleAr": null,
+      "ctaSubtitle": "Talk to our engineers about manifolds, panels and OEM projects",
+      "ctaSubtitleEn": "Talk to our engineers about manifolds, panels and OEM projects",
+      "ctaSubtitleJa": null,
+      "ctaSubtitleKo": null,
+      "ctaSubtitleFr": null,
+      "ctaSubtitleAr": null,
+      "ctaButtonText": "Contact Us",
+      "ctaButtonTextEn": "Contact Us",
+      "ctaButtonTextJa": null,
+      "ctaButtonTextKo": null,
+      "ctaButtonTextFr": null,
+      "ctaButtonTextAr": null,
+      "ctaButtonLink": "/contact",
+      "seoTitle": "VALTRIX - Ultra-High-Purity Fluid Control Components",
+      "seoTitleEn": "VALTRIX - Ultra-High-Purity Fluid Control Components",
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDesc": "VALTRIX designs and manufactures ultra-high-purity VCR fittings, diaphragm valves, pressure reducers, check valves and gas filters for semiconductor and high-purity industries.",
+      "seoDescEn": "VALTRIX designs and manufactures ultra-high-purity VCR fittings, diaphragm valves, pressure reducers, check valves and gas filters for semiconductor and high-purity industries.",
+      "seoDescJa": null,
+      "seoDescKo": null,
+      "seoDescFr": null,
+      "seoDescAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null
+    }
+  ]
+}

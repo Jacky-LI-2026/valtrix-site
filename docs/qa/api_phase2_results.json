@@ -1,0 +1,37 @@
+{
+  "passed": [
+    "Visit booking submission succeeds",
+    "Member register succeeds",
+    "Shop products API works",
+    "Pricing config API works"
+  ],
+  "bugs": [
+    {
+      "id": "I-001",
+      "module": "询价车",
+      "url": "/api/quote",
+      "phenomenon": "GET /api/quote 返回405",
+      "expected": "应返回200",
+      "steps": "GET /api/quote",
+      "severity": "P1"
+    },
+    {
+      "id": "I-002",
+      "module": "下载留资",
+      "url": "/api/download/send-code",
+      "phenomenon": "发送验证码失败: 400 {'ok': False, 'message': '验证码邮件发送失败，请稍后再试或联系网站管理员'}",
+      "expected": "应返回200",
+      "steps": "POST /api/download/send-code",
+      "severity": "P2"
+    },
+    {
+      "id": "I-003",
+      "module": "AI客服",
+      "url": "/api/chat",
+      "phenomenon": "聊天API: 400 {'ok': False, 'needVerify': True, 'error': '请先完成人机验证'}",
+      "expected": "应返回200",
+      "steps": "POST /api/chat",
+      "severity": "P2"
+    }
+  ]
+}

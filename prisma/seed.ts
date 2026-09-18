@@ -1,0 +1,169 @@
+import { PrismaClient } from '../lib/generated/prisma'
+import bcrypt from 'bcryptjs'
+
+const prisma = new PrismaClient()
+
+async function main() {
+  console.log('🌱 开始种子数据...')
+
+  // ========== 1. 角色 ==========
+  const adminRole = await prisma.role.upsert({
+    where: { name: 'admin' },
+    update: {},
+    create: { name: 'admin', displayName: '管理员', description: '系统管理员，拥有全部权限' },
+  })
+  const editorRole = await prisma.role.upsert({
+    where: { name: 'editor' },
+    update: {},
+    create: { name: 'editor', displayName: '内容维护人员', description: '内容维护人员，可管理内容但不可管理系统' },
+  })
+  console.log('✅ 角色创建完成')
+
+  // ========== 2. 权限 ==========
+  const permissionsData = [
+    // 产品
+    { code: 'product:view', name: '查看产品', module: 'product', action: 'view' },
+    { code: 'product:create', name: '创建产品', module: 'product', action: 'create' },
+    { code: 'product:edit', name: '编辑产品', module: 'product', action: 'edit' },
+    { code: 'product:delete', name: '删除产品', module: 'product', action: 'delete' },
+    // 新闻
+    { code: 'news:view', name: '查看新闻', module: 'news', action: 'view' },
+    { code: 'news:create', name: '创建新闻', module: 'news', action: 'create' },
+    { code: 'news:edit', name: '编辑新闻', module: 'news', action: 'edit' },
+    { code: 'news:delete', name: '删除新闻', module: 'news', action: 'delete' },
+    { code: 'news:publish', name: '发布新闻', module: 'news', action: 'publish' },
+    // 资源
+    { code: 'resource:view', name: '查看资源', module: 'resource', action: 'view' },
+    { code: 'resource:edit', name: '编辑资源', module: 'resource', action: 'edit' },
+    // 配置
+    { code: 'config:site', name: '站点配置', module: 'config', action: 'site' },
+    { code: 'config:theme', name: '主题配色', module: 'config', action: 'theme' },
+    { code: 'config:home', name: '首页配置', module: 'config', action: 'home' },
+    // 系统
+    { code: 'system:user', name: '用户管理', module: 'system', action: 'user' },
+    { code: 'system:role', name: '角色管理', module: 'system', action: 'role' },
+    { code: 'system:log', name: '操作日志', module: 'system', action: 'log' },
+    { code: 'system:backup', name: '数据备份', module: 'system', action: 'backup' },
+    { code: 'system:update', name: '系统更新', module: 'system', action: 'update' },
+    // 采集与AI
+    { code: 'collect:manage', name: '采集管理', module: 'collect', action: 'manage' },
+    { code: 'ai:config', name: '大模型配置', module: 'ai', action: 'config' },
+    // 插件与内容栏目
+    { code: 'plugin:view', name: '查看插件', module: 'plugin', action: 'view' },
+    { code: 'case:view', name: '查看成功案例', module: 'case', action: 'view' },
+    { code: 'faq:view', name: '查看常见问题', module: 'faq', action: 'view' },
+  ]
+
+  for (const p of permissionsData) {
+    await prisma.permission.upsert({
+      where: { code: p.code },
+      update: {},
+      create: p,
+    })
+  }
+  console.log(`✅ 权限创建完成（${permissionsData.length} 项）`)
+
+  // ========== 3. 角色权限关联 ==========
+  // admin 拥有全部权限
+  const allPermissions = await prisma.permission.findMany()
+  for (const perm of allPermissions) {
+    await prisma.rolePermission.upsert({
+      where: { roleId_permissionId: { roleId: adminRole.id, permissionId: perm.id } },
+      update: {},
+      create: { roleId: adminRole.id, permissionId: perm.id },
+    })
+  }
+  // editor 拥有内容查看/编辑权限，无系统/配置权限
+  const editorCodes = ['product:view', 'product:create', 'product:edit', 'news:view', 'news:create', 'news:edit', 'news:publish', 'resource:view', 'resource:edit', 'case:view', 'faq:view']
+  for (const code of editorCodes) {
+    const perm = await prisma.permission.findUnique({ where: { code } })
+    if (perm) {
+      await prisma.rolePermission.upsert({
+        where: { roleId_permissionId: { roleId: editorRole.id, permissionId: perm.id } },
+        update: {},
+        create: { roleId: editorRole.id, permissionId: perm.id },
+      })
+    }
+  }
+  console.log('✅ 角色权限关联完成')
+
+  // ========== 4. 默认管理员 ==========
+  const adminPassword = await bcrypt.hash('admin123', 10)
+  const adminUser = await prisma.user.upsert({
+    where: { username: 'admin' },
+    update: {},
+    create: {
+      username: 'admin',
+      email: process.env.SEED_ADMIN_EMAIL || 'admin@example.com',
+      passwordHash: adminPassword,
+      displayName: '系统管理员',
+      status: 'active',
+    },
+  })
+  await prisma.userRole.upsert({
+    where: { userId_roleId: { userId: adminUser.id, roleId: adminRole.id } },
+    update: {},
+    create: { userId: adminUser.id, roleId: adminRole.id },
+  })
+  console.log('✅ 默认管理员创建完成（用户名: admin / 密码: admin123）')
+
+  // ========== 5. 产品二级目录 ==========
+  const tabsData = [
+    { slug: 'vcr-fittings', name: 'VCR 面密封接头', nameEn: 'VCR Face Seal Fittings', sortOrder: 1 },
+    { slug: 'welded-fittings', name: '焊接接头', nameEn: 'Welded Fittings', sortOrder: 2 },
+    { slug: 'diaphragm-valves', name: '隔膜阀', nameEn: 'Diaphragm Valves', sortOrder: 3 },
+    { slug: 'pressure-reducers', name: '减压阀', nameEn: 'Pressure Reducers', sortOrder: 4 },
+    { slug: 'check-valves', name: '单向阀', nameEn: 'Check Valves', sortOrder: 5 },
+    { slug: 'filters', name: '气体过滤器', nameEn: 'Gas Filters', sortOrder: 6 },
+  ]
+  for (const t of tabsData) {
+    await prisma.productTab.upsert({
+      where: { slug: t.slug },
+      update: {},
+      create: t,
+    })
+  }
+  console.log('✅ 产品二级目录创建完成')
+
+  // ========== 6. 主题配置默认值 ==========
+  await prisma.themeConfig.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      primary: '#CC0000',
+      primaryLight: '#FF3333',
+      primaryDark: '#990000',
+      accent: '#C0C0C0',
+      dark: '#111111',
+      darkLight: '#333333',
+      remark: '默认主题（红色系）',
+    },
+  })
+  console.log('✅ 主题配置默认值创建完成')
+
+  // ========== 7. 系统版本 ==========
+  await prisma.systemVersion.upsert({
+    where: { version_environment: { version: '1.0.0', environment: 'development' } },
+    update: {},
+    create: {
+      version: '1.0.0',
+      releaseDate: new Date('2026-08-30'),
+      environment: 'development',
+      isCurrent: true,
+      notes: '后台管理系统初始版本',
+    },
+  })
+  console.log('✅ 系统版本创建完成')
+
+  console.log('\n🎉 种子数据全部完成！')
+}
+
+main()
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })

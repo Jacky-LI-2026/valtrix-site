@@ -1,0 +1,324 @@
+{
+  "model": "homeConfig",
+  "rows": [
+    {
+      "id": "1",
+      "name": "默认首页配置",
+      "isActive": true,
+      "banners": [
+        {
+          "id": "banner-1",
+          "title": {
+            "ar": "البحث والتطوير المستقل",
+            "en": "Self-developed",
+            "ja": "自主研究開発",
+            "ko": "자체 개발",
+            "zh": "自主研发"
+          },
+          "ctaLink": "/products",
+          "ctaText": {
+            "ar": "تصفح المنتجات",
+            "en": "Browse Products",
+            "fr": "Parcourir les produits",
+            "ja": "製品の参照",
+            "ko": "제품 찾아보기",
+            "zh": "浏览产品"
+          },
+          "titleEn": "Independent R&D",
+          "subtitle": {
+            "ar": "الكربون في المستقبل",
+            "en": "Carbon for the Future",
+            "ja": "炭素が未来を探す",
+            "ko": "탄소가 미래를 찾다",
+            "zh": "碳寻未来"
+          },
+          "ctaTextEn": "Browse Products",
+          "sortOrder": 1,
+          "bgGradient": "from-[#800000] via-[#CC0000] to-[#990000]",
+          "subtitleEn": "Paving the Diamond Road to Future",
+          "description": {
+            "ar": "تسوه ون التكنولوجيا تركز على التكنولوجيا الأساسية من أجل إعداد mpcvd الماس المواد ، وتطوير الذات 2.45ghz و 915mhz الميكروويف البلازما ترسيب الأبخرة الكيميائية المعدات ، وتحقيق كامل سلسلة التكنولوجيا الأساسية من معدات تصنيع منتجات الماس التطبيق .",
+            "en": "ZUO WEN TECHNOLOGY focuses on MPCVD diamond material preparation core technology, independently developing 2.45GHz and 915MHz microwave plasma CVD equipment, achieving full-chain core technology from equipment manufacturing to diamond product applications.",
+            "fr": "La technologie de zuwen se concentre sur le processus de base de la préparation de matériaux diamantés MPCVD, la recherche indépendante et le développement d'équipements de dépôt chimique en phase vapeur par plasma micro - ondes dans les bandes de fréquences de 2,45 GHz et 915 MHz, réalisant la technologie de base de la chaîne complète de la fabrication d'équipements aux applications de produits diamantés.",
+            "ja": "左文科学技術はMPCVDダイヤモンド材料の製造コア技術に専念し、自主的に2.45 GHz及び915 MHz周波数帯マイクロ波プラズマ化学蒸着設備を研究開発し、設備製造からダイヤモンド製品応用までの全チェーンコア技術を実現した。",
+            "ko": "좌문과학기술은 MPCVD 금강석재료제조핵심공법에 전념하고 자주적으로 2.45GHz 및 915MHz주파수대역 마이크로파 플라즈마화학기상침적설비를 연구개발하여 설비제조로부터 금강석제품응용에 이르는 전반 사슬핵심기술을 실현하였다.",
+            "zh": "左文科技专注MPCVD金刚石材料制备核心工艺，自主研发2.45GHz及915MHz频段微波等离子体化学气相沉积设备，实现从设备制造到金刚石产品应用的全链条核心技术。"
+          },
+          "descriptionEn": "ZUO WEN TECHNOLOGY focuses on MPCVD diamond material preparation core technology, independently developing 2.45GHz and 915MHz microwave plasma CVD equipment, achieving full-chain core technology from equipment manufacturing to diamond product applications."
+        },
+        {
+          "id": "banner-2",
+          "title": {
+            "ar": "البحث والتطوير المستقل",
+            "en": "Self-developed",
+            "ja": "自主研究開発",
+            "ko": "자체 개발",
+            "zh": "自主研发"
+          },
+          "ctaLink": "/about",
+          "ctaText": {
+            "ar": "فهم القوة",
+            "en": "Learn More",
+            "fr": "Comprendre la force",
+            "ja": "実力を知る",
+            "ko": "실력을 알아보다",
+            "zh": "了解实力"
+          },
+          "titleEn": "Full Industry Chain",
+          "subtitle": {
+            "ar": "الكربون في المستقبل",
+            "en": "Carbon for the Future",
+            "ja": "炭素が未来を探す",
+            "ko": "탄소가 미래를 찾다",
+            "zh": "碳寻未来"
+          },
+          "ctaTextEn": "Learn More",
+          "sortOrder": 2,
+          "bgGradient": "from-[#1a1a2e] via-[#16213e] to-[#0f3460]",
+          "subtitleEn": "Independent and Controllable",
+          "description": {
+            "ar": "السيطرة على الأمراض القلبية الوعائية الماس عملية التوليف ، والمعدات الرئيسية ، والمواد الخام والمواد المساعدة التقنية الأساسية وحقوق الملكية الفكرية المستقلة ، وشنتشن قاعدة الانتاج الشامل لتحقيق الصناعية والمجوهرات الماس الصف الإنتاج الضخم .",
+            "en": "Mastering CVD diamond synthesis technology, key equipment, raw material core technology and independent intellectual property rights, Shenzhen mass production base achieves industrial and jewelry-grade diamond large-scale production.",
+            "fr": "Maîtrisant le processus de synthèse de diamant CVD, les équipements clés, la technologie de base des matières premières et auxiliaires et la propriété intellectuelle autonome, la base de production de masse de Shenzhen réalise la production à l'échelle de diamants de qualité industrielle et de bijoux.",
+            "ja": "CVDダイヤモンド合成技術、重要設備、原材料補助材料の核心技術と自主知的財産権を掌握し、深セン量産基地は工業とジュエリー級ダイヤモンドの規模化生産を実現した。",
+            "ko": "CVD 금강석 합성 공예, 핵심 설비, 원부자재 핵심 기술과 자체 지적재산권을 장악하여 선전 양산 기지는 공업과 보석급 금강석 규모화 생산을 실현한다.",
+            "zh": "掌握CVD金刚石合成工艺、关键设备、原辅材料核心技术与自主知识产权，深圳量产基地实现工业与珠宝级金刚石规模化生产。"
+          },
+          "descriptionEn": "Mastering CVD diamond synthesis technology, key equipment, raw material core technology and independent intellectual property rights, Shenzhen mass production base achieves industrial and jewelry-grade diamond large-scale production."
+        },
+        {
+          "id": "banner-3",
+          "title": {
+            "ar": "البحث والتطوير المستقل",
+            "en": "Self-developed",
+            "ja": "自主研究開発",
+            "ko": "자체 개발",
+            "zh": "自主研发"
+          },
+          "ctaLink": "/contact",
+          "ctaText": {
+            "ar": "اتصل بنا",
+            "en": "Contact Us",
+            "fr": "Contactez-nous",
+            "ja": "お問い合わせ",
+            "ko": "연락처",
+            "zh": "联系我们"
+          },
+          "titleEn": "Global Service",
+          "subtitle": {
+            "ar": "الكربون في المستقبل",
+            "en": "Carbon for the Future",
+            "ja": "炭素が未来を探す",
+            "ko": "탄소가 미래를 찾다",
+            "zh": "碳寻未来"
+          },
+          "ctaTextEn": "Contact Us",
+          "sortOrder": 3,
+          "bgGradient": "from-[#2d3436] via-[#636e72] to-[#2d3436]",
+          "subtitleEn": "Quick Response",
+          "description": {
+            "ar": "بكين المقر + قاعدة الانتاج الضخم شنتشن ذات العجلتين ، والمنتجات والخدمات التي تغطي الصين وجنوب شرق آسيا وأوروبا وأمريكا الشمالية وغيرها من المناطق ، وتوفير الدعم التقني المحلي وخدمات ما بعد البيع .",
+            "en": "Beijing headquarters + Shenzhen mass production base dual-wheel drive, products and services covering China, Southeast Asia, Europe, North America and other regions, providing localized technical support and after-sales service.",
+            "fr": "Siège social de Pékin + base de production de masse de Shenzhen à deux roues motrices, les produits et services couvrent la Chine, l'Asie du Sud - Est, l'Europe, l'Amérique du Nord et d'autres régions, fournissant un support technique localisé et un service après - vente.",
+            "ja": "北京本部+深セン量産基地の2輪駆動で、製品とサービスは中国、東南アジア、ヨーロッパ、北米などの地域をカバーし、現地化技術サポートとアフターサービスを提供する。",
+            "ko": "베이징 본사 + 선전 양산 기지 이륜구동, 제품과 서비스는 중국, 동남아시아, 유럽, 북미 등 지역을 포괄하며 현지화 기술 지원과 애프터서비스를 제공한다.",
+            "zh": "北京总部 + 深圳量产基地双轮驱动，产品与服务覆盖中国、东南亚、欧洲、北美等地区，提供本地化技术支持与售后服务。"
+          },
+          "descriptionEn": "Beijing headquarters + Shenzhen mass production base dual-wheel drive, products and services covering China, Southeast Asia, Europe, North America and other regions, providing localized technical support and after-sales service."
+        }
+      ],
+      "features": [
+        {
+          "id": "f1",
+          "icon": "award",
+          "title": {
+            "ar": "البحث والتطوير المستقل",
+            "en": "Independent R&D",
+            "fr": "R&D indépendante",
+            "ja": "自主研究開発",
+            "ko": "자체 연구개발",
+            "zh": "自主研发"
+          },
+          "description": {
+            "ar": "قدرة كاملة على البحث والتطوير المستقل لمعدات MPCVD",
+            "en": "Complete independent MPCVD equipment R&D capability, full-chain core technology from microwave power supply to reactor chamber",
+            "fr": "Capacité complète de R&D indépendante d'équipements MPCVD, technologie de chaîne complète",
+            "ja": "MPCVD装置の完全な自主研究開発能力、マイクロ波電源から反応チャンバーまでのフルチェーンコア技術",
+            "ko": "MPCVD 장비의 완전한 자체 연구개발 능력, 마이크로파 전원부터 반응 챔버까지 전체 체인 핵심 기술",
+            "zh": "拥有完整的MPCVD设备自主研发能力，从微波电源到反应腔体全链条核心技术"
+          }
+        },
+        {
+          "id": "f2",
+          "icon": "zap",
+          "title": {
+            "ar": "كفاءة عالية",
+            "en": "High Efficiency",
+            "fr": "Haute efficacité",
+            "ja": "高効率生産",
+            "ko": "고효율 생산",
+            "zh": "高效产能"
+          },
+          "description": {
+            "ar": "معدات عالية الطاقة 915MHz لنمو سريع للألماس كبير الحجم",
+            "en": "915MHz high-power equipment enables rapid growth of large-size diamonds, leading industry yield per furnace",
+            "fr": "Équipement haute puissance 915MHz pour croissance rapide de diamants de grande taille",
+            "ja": "915MHz大電力装置による大口径ダイヤモンドの高速成長、1バッチあたりの生産量は業界トップクラス",
+            "ko": "915MHz 고출력 장비로 대형 다이아몬드 고속 성장, 배치당 생산량 업계 선두",
+            "zh": "915MHz大功率设备实现大尺寸金刚石快速生长，单炉产量行业领先"
+          }
+        },
+        {
+          "id": "f3",
+          "icon": "shield",
+          "title": {
+            "ar": "جودة مستقرة",
+            "en": "Stable Quality",
+            "fr": "Qualité stable",
+            "ja": "品質安定",
+            "ko": "품질 안정",
+            "zh": "品质稳定"
+          },
+          "description": {
+            "ar": "نظام مراقبة عملية صارم وفحص جودة، اتساق المنتج فوق 99%",
+            "en": "Strict process control and quality inspection system, product consistency over 99%",
+            "fr": "Contrôle de processus strict et système d'inspection qualité, cohérence produit supérieure à 99%",
+            "ja": "厳格なプロセス制御と品質検査システム、製品一致性は99%以上",
+            "ko": "엄격한 공정 제어 및 품질 검사 시스템, 제품 일관성 99% 이상",
+            "zh": "严格的工艺控制和质量检测体系，产品一致性达99%以上"
+          }
+        },
+        {
+          "id": "f4",
+          "icon": "globe",
+          "title": {
+            "ar": "خدمة عالمية",
+            "en": "Global Service",
+            "fr": "Service mondial",
+            "ja": "グローバルサービス",
+            "ko": "글로벌 서비스",
+            "zh": "全球服务"
+          },
+          "description": {
+            "ar": "المنتجات تصدر إلى أكثر من 20 دولة، مع دعم فني محلي",
+            "en": "Products exported to 20+ countries and regions including Europe, America, Southeast Asia, with localized technical support",
+            "fr": "Produits exportés dans plus de 20 pays, avec support technique localisé",
+            "ja": "製品は欧米、東南アジアなど20カ国以上に輸出、ローカライズされた技術サポートを提供",
+            "ko": "제품은 유럽, 미주, 동남아 등 20개국 이상에 수출, 현지화 기술 지원 제공",
+            "zh": "产品远销欧美、东南亚等20+国家和地区，提供本地化技术支持"
+          }
+        }
+      ],
+      "stats": [
+        {
+          "id": "stat-1",
+          "label": {
+            "ar": "سلسلة المنتجات",
+            "en": "Product Series",
+            "ja": "製品ファミリ",
+            "ko": "제품 시리즈",
+            "zh": "产品系列"
+          },
+          "value": "24+",
+          "number": "12+",
+          "labelEn": "Product Series",
+          "valueEn": "24+"
+        },
+        {
+          "id": "stat-2",
+          "label": {
+            "ar": "مجال التطبيق",
+            "en": "Application areas",
+            "ja": "応用分野",
+            "ko": "응용 분야",
+            "zh": "应用领域"
+          },
+          "value": "6",
+          "number": "6",
+          "labelEn": "Industries",
+          "valueEn": "6"
+        },
+        {
+          "id": "stat-3",
+          "label": {
+            "ar": "براءة اختراع التكنولوجيا",
+            "en": "patent technology",
+            "ja": "特許技術",
+            "ko": "특허 기술",
+            "zh": "专利技术"
+          },
+          "value": "ISO4",
+          "number": "53+",
+          "labelEn": "Patents",
+          "valueEn": "ISO4"
+        },
+        {
+          "id": "stat-4",
+          "label": {
+            "ar": "شهادة الكشف عن تسرب الهليوم",
+            "en": "Helium leak detection certification",
+            "ja": "ヘリウム漏れ検知認証",
+            "ko": "헬륨 누출 검사 인증",
+            "zh": "氦检漏认证"
+          },
+          "value": "100%",
+          "number": "ISO4",
+          "labelEn": "Helium Leak Test",
+          "valueEn": "100%"
+        }
+      ],
+      "featuredProducts": [
+        "zw-15d",
+        "zw-10d",
+        "rough-premium",
+        "zw-colorlarity"
+      ],
+      "featuredCategories": [
+        "growth",
+        "diamonds",
+        "auxiliary",
+        "materials"
+      ],
+      "showNews": true,
+      "showIndustries": true,
+      "showServices": true,
+      "ctaTitle": "需要专业的金刚石材料解决方案？",
+      "ctaTitleEn": "Do you need a professional diamond material solution?",
+      "ctaTitleJa": "プロフェッショナルなダイヤモンドマテリアルソリューションが必要ですか？",
+      "ctaTitleKo": "전문 금강석 소재 솔루션이 필요하십니까?",
+      "ctaTitleFr": "",
+      "ctaTitleAr": "تحتاج إلى حلول المواد الماس المهنية ؟",
+      "ctaSubtitle": "我们的技术团队将为您提供一对一的专业咨询与定制化服务",
+      "ctaSubtitleEn": "Our technical team will provide you with one-on-one professional consultation and customized services",
+      "ctaSubtitleJa": "デルの技術チームは、1対1の専門的なコンサルティングとカスタマイズサービスを提供します",
+      "ctaSubtitleKo": "기술 팀에서 일대일 전문 컨설팅 및 맞춤형 서비스 제공",
+      "ctaSubtitleFr": "",
+      "ctaSubtitleAr": "سيقدم لك فريقنا الفني استشارة مهنية فردية وخدمات مخصصة",
+      "ctaButtonText": "立即咨询",
+      "ctaButtonTextEn": "Consult Now",
+      "ctaButtonTextJa": "今すぐご相談ください",
+      "ctaButtonTextKo": "지금 문의",
+      "ctaButtonTextFr": "",
+      "ctaButtonTextAr": "استشارة فورية",
+      "ctaButtonLink": "/contact",
+      "seoTitle": "",
+      "seoTitleEn": "",
+      "seoTitleJa": "",
+      "seoTitleKo": "",
+      "seoTitleFr": "",
+      "seoTitleAr": "",
+      "seoDesc": "",
+      "seoDescEn": "",
+      "seoDescJa": "",
+      "seoDescKo": "",
+      "seoDescFr": "",
+      "seoDescAr": "",
+      "seoKeywords": "",
+      "seoKeywordsEn": "",
+      "seoKeywordsJa": "",
+      "seoKeywordsKo": "",
+      "seoKeywordsFr": "",
+      "seoKeywordsAr": ""
+    }
+  ]
+}

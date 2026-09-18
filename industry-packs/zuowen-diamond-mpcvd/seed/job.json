@@ -1,0 +1,1464 @@
+{
+  "model": "job",
+  "rows": [
+    {
+      "id": "3",
+      "slug": "sales-engineer",
+      "title": "销售工程师",
+      "titleEn": "Sales Engineer",
+      "titleJa": "セールスエンジニア",
+      "titleKo": "영업 엔지니어",
+      "titleFr": "Ingénieur des ventes",
+      "titleAr": "مهندس مبيعات",
+      "department": "销售部",
+      "departmentEn": "Sales Department",
+      "departmentJa": "営業部従業員",
+      "departmentKo": "판매",
+      "departmentFr": "Département des ventes",
+      "departmentAr": "المبيعات",
+      "location": "深圳/全国",
+      "locationEn": "Shenzhen/Nationwide",
+      "locationJa": "深セン/全国",
+      "locationKo": "선전/국가",
+      "locationFr": "Shenzhen/à l'échelle nationale",
+      "locationAr": "Shenzhen/National",
+      "type": "全职",
+      "typeEn": "Full-time",
+      "typeJa": "フルタイム",
+      "typeKo": "풀타임",
+      "typeFr": "Temps plein",
+      "typeAr": "على أساس التفرغ",
+      "salary": "10K-25K+提成",
+      "salaryEn": "10K-25K+Commission",
+      "salaryJa": "10 K -25 K +コミッション",
+      "salaryKo": "10K-25K + 수수료",
+      "salaryFr": "10K-25K + commission",
+      "salaryAr": "10 آلاف - 25 ألف + عمولة",
+      "experience": "2-5年",
+      "experienceEn": "2-5 years",
+      "experienceJa": "2 ～ 5年",
+      "experienceKo": "2 ~ 5년",
+      "experienceFr": "2-5 ans",
+      "experienceAr": "2-5 سنوات",
+      "education": "本科及以上",
+      "educationEn": "Bachelor+",
+      "educationJa": "学部以上",
+      "educationKo": "학부 이상",
+      "educationFr": "Baccalauréat et supérieur",
+      "educationAr": "درجة بكالوريوس وما فوقها",
+      "tags": [
+        "工业销售",
+        "设备",
+        "半导体",
+        "客户开发"
+      ],
+      "tagsEn": [
+        "Industrial Sales",
+        "equipments",
+        "Semiconductor",
+        "BD"
+      ],
+      "tagsJa": [
+        "インダストリアルセールス",
+        "デバイス",
+        "半導体",
+        "カスタマーデベロップメント"
+      ],
+      "tagsKo": [
+        "산업 판매",
+        "장치",
+        "반도체",
+        "고객 개발"
+      ],
+      "tagsFr": null,
+      "tagsAr": [
+        "المبيعات الصناعية",
+        "المعدات.",
+        "شبه موصل",
+        "تطوير العملاء"
+      ],
+      "description": [
+        "负责金刚石材料与设备产品的市场推广和客户开发，维护客户关系，完成销售目标。"
+      ],
+      "descriptionEn": [
+        "Responsible for fluid control product marketing and customer development, maintaining customer relationships and achieving sales targets."
+      ],
+      "descriptionJa": [
+        "ダイヤモンド材料および機器製品のマーケティングおよび顧客開発、顧客関係の維持、および販売目標の達成を担当します。"
+      ],
+      "descriptionKo": [
+        "다이아몬드 소재 및 장비 제품의 마케팅 및 고객 개발, 고객 관계 유지 및 영업 목표 달성을 담당합니다."
+      ],
+      "descriptionFr": [
+        "Responsable de la promotion du marché et du développement client des matériaux et équipements diamantés, du maintien des relations avec les clients et de l'atteinte des objectifs de vente."
+      ],
+      "descriptionAr": [
+        "مسؤول عن التسويق وتطوير العملاء للمواد والمعدات الماسية، والحفاظ على علاقات العملاء، وتحقيق أهداف المبيعات."
+      ],
+      "responsibilities": [
+        "负责区域内客户开发和维护，完成销售目标",
+        "推广公司全系列金刚石材料与设备产品",
+        "为客户提供技术方案和产品选型建议",
+        "跟进订单执行，协调内部资源",
+        "收集市场信息和竞争对手动态"
+      ],
+      "responsibilitiesEn": [
+        "Responsible for customer development and maintenance in the region, achieving sales targets",
+        "Promote the company's full range of fluid control products",
+        "Provide technical solutions and product selection advice to customers",
+        "Follow up on order execution and coordinate internal resources",
+        "Collect market information and competitor dynamics"
+      ],
+      "responsibilitiesJa": [
+        "販売目標を達成するために、地域の顧客開発とメンテナンスを担当する",
+        "会社の全種類のダイヤモンド材料と機器製品を宣伝する",
+        "技術的ソリューションと製品の選択について顧客にアドバイスする",
+        "注文実行のフォローアップと社内リソースの調整",
+        "市場情報と競合他社の最新情報を収集する"
+      ],
+      "responsibilitiesKo": [
+        "영업 목표 달성을 위한 지역 내 고객 개발 및 유지보수 담당",
+        "회사의 모든 다이아몬드 소재 및 장비 제품 홍보",
+        "기술 솔루션 및 제품 선택에 대한 고객 자문",
+        "주문 실행에 대한 후속 조치 및 내부 리소스 조율",
+        "시장 정보 및 경쟁업체 업데이트 수집"
+      ],
+      "responsibilitiesFr": [
+        "Responsable du développement et de la maintenance des clients dans la région et de la réalisation des objectifs de vente",
+        "Promouvoir la gamme complète de produits de matériaux et d'équipements diamantés de l'entreprise",
+        "Fournir aux clients des solutions techniques et des suggestions de sélection de produits",
+        "Suivi de l'exécution des commandes et coordination des ressources internes",
+        "Recueillir des informations sur le marché et la dynamique des concurrents"
+      ],
+      "responsibilitiesAr": [
+        "مسؤول عن تطوير العملاء وصيانتهم في المنطقة لتحقيق أهداف المبيعات",
+        "الترويج للمجموعة الكاملة من مواد ومعدات الألماس الخاصة بالشركة",
+        "تقديم المشورة للعملاء بشأن الحلول التقنية واختيار المنتجات",
+        "متابعة تنفيذ الأوامر وتنسيق الموارد الداخلية",
+        "جمع معلومات السوق وتحديثات المنافسين"
+      ],
+      "requirements": [
+        "机械、自动化或相关专业本科及以上学历",
+        "2年以上工业产品销售经验，有设备或半导体行业经验优先",
+        "具备良好的沟通能力和客户服务意识",
+        "能够适应出差",
+        "有一定的英文沟通能力优先"
+      ],
+      "requirementsEn": [
+        "Bachelor+ degree in mechanical, automation or related field",
+        "2+ years of industrial product sales experience, equipment or semiconductor industry experience preferred",
+        "Good communication skills and customer service awareness",
+        "Able to travel for business",
+        "English communication skills preferred"
+      ],
+      "requirementsJa": [
+        "機械、自動化、または関連分野の学士号以上",
+        "工業製品の販売経験が2年以上あり、機器または半導体業界の経験があることが望ましい",
+        "優れたコミュニケーションスキルとカスタマーサービス意識",
+        "出張に適応する能力",
+        "特定の英語コミュニケーションスキルが望ましい"
+      ],
+      "requirementsKo": [
+        "기계, 자동화 또는 관련 분야의 학사 학위 이상",
+        "장비 또는 반도체 산업 경험자 우대, 산업 제품 영업 경력 2년 이상",
+        "우수한 의사소통 기술과 고객 서비스 인식",
+        "출장에 적응할 수 있는 능력",
+        "특정 영어 의사소통 능력 선호"
+      ],
+      "requirementsFr": [
+        "Baccalauréat ou supérieur en mécanique, automatisation ou spécialisation connexe",
+        "Plus de 2 ans d'expérience dans la vente de produits industriels, l'expérience dans l'équipement ou l'industrie des semi-conducteurs est préférée",
+        "Avoir de bonnes compétences en communication et sensibilisation au service client",
+        "Capable de s'adapter aux voyages d'affaires",
+        "Une certaine compétence en communication en anglais est préférée"
+      ],
+      "requirementsAr": [
+        "درجة البكالوريوس أو أعلى في التخصصات الميكانيكية أو الأتمتة أو التخصصات ذات الصلة",
+        "أكثر من عامين من الخبرة في المبيعات في المنتجات الصناعية، مع تفضيل الخبرة في صناعة المعدات أو أشباه الموصلات",
+        "مهارات تواصل جيدة وتوعية بخدمة العملاء",
+        "القدرة على التكيف مع رحلات العمل",
+        "يفضل استخدام بعض مهارات التواصل باللغة الإنجليزية"
+      ],
+      "benefits": [
+        "五险一金",
+        "带薪年假",
+        "销售提成",
+        "差旅补贴",
+        "节日福利"
+      ],
+      "benefitsEn": [
+        "Social Insurance",
+        "Paid Annual Leave",
+        "Sales Commission",
+        "Travel Allowance",
+        "Holiday Benefits"
+      ],
+      "benefitsJa": [
+        "五険一金",
+        "有給休暇",
+        "販売手数料",
+        "移動手当",
+        "ホリデー特典"
+      ],
+      "benefitsKo": [
+        "5개의 보험과 1개의 펀드",
+        "유급 연차 휴가",
+        "판매 수수료",
+        "출장 한도",
+        "연말연시 혜택"
+      ],
+      "benefitsFr": [
+        "Cinq assurances et un fonds",
+        "congé annuel payé",
+        "Commission des ventes",
+        "Indemnité de voyage",
+        "Avantages de vacances"
+      ],
+      "benefitsAr": [
+        "خمس تأمينات وصندوق واحد",
+        "إجازة سنوية مدفوعة الأجر",
+        "عمولة المبيعات",
+        "بدل سفر",
+        "امتيازات العطلة"
+      ],
+      "status": "open",
+      "sortOrder": 2,
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null
+    },
+    {
+      "id": "5",
+      "slug": "production-supervisor",
+      "title": "生产主管",
+      "titleEn": "Production Supervisor",
+      "titleJa": "製造責任者",
+      "titleKo": "생산 책임자",
+      "titleFr": "Superviseur de production",
+      "titleAr": "رئيس قسم الإنتاج",
+      "department": "生产部",
+      "departmentEn": "Production Department",
+      "departmentJa": "生産部",
+      "departmentKo": "생산부",
+      "departmentFr": "Département de production",
+      "departmentAr": "وزارة الإنتاج",
+      "location": "深圳",
+      "locationEn": "Shenzhen",
+      "locationJa": "深セン",
+      "locationKo": "Shenzhen",
+      "locationFr": "Shenzhen",
+      "locationAr": "شينزين",
+      "type": "全职",
+      "typeEn": "Full-time",
+      "typeJa": "フルタイム",
+      "typeKo": "풀타임",
+      "typeFr": "Temps plein",
+      "typeAr": "على أساس التفرغ",
+      "salary": "12K-22K",
+      "salaryEn": "12K-22K",
+      "salaryJa": "12 K -22 K",
+      "salaryKo": "12K-22K",
+      "salaryFr": "12K-22K",
+      "salaryAr": "12K -22K",
+      "experience": "5年以上",
+      "experienceEn": "5+ years",
+      "experienceJa": "５年超",
+      "experienceKo": "5년 이상",
+      "experienceFr": "Plus de 5 ans",
+      "experienceAr": "أكثر من 5 سنوات",
+      "education": "大专及以上",
+      "educationEn": "Associate+",
+      "educationJa": "大学以上",
+      "educationKo": "대학 이상",
+      "educationFr": "Diplôme universitaire et supérieur",
+      "educationAr": "الكلية وما فوقها",
+      "tags": [
+        "生产管理",
+        "精益生产",
+        "洁净车间",
+        "团队管理"
+      ],
+      "tagsEn": [
+        "Production Mgmt",
+        "Lean",
+        "Cleanroom",
+        "Team Mgmt"
+      ],
+      "tagsJa": [
+        "生産管理",
+        "リーン生産",
+        "清掃ワークショップ",
+        "チーム管理"
+      ],
+      "tagsKo": [
+        "생산 관리",
+        "린 (Lean) 생산",
+        "청소 워크숍",
+        "팀 관리"
+      ],
+      "tagsFr": null,
+      "tagsAr": [
+        "إدارة الإنتاج",
+        "الإنتاج الخالي من الهدر",
+        "ورشة تنظيف",
+        "إدارة الفريق"
+      ],
+      "description": [
+        "负责生产车间的日常管理，包括生产计划、人员安排、质量管控等。"
+      ],
+      "descriptionEn": [
+        "Responsible for daily workshop management including production planning, staffing and quality control."
+      ],
+      "descriptionJa": [
+        "生産計画、人員配置、品質管理など、生産工場の日常管理を担当する。"
+      ],
+      "descriptionKo": [
+        "생산 계획, 인력 배치, 품질 관리 등을 포함하여 생산 작업장의 일일 관리를 담당합니다."
+      ],
+      "descriptionFr": [
+        "Responsable de la gestion quotidienne de l'atelier de production, y compris la planification de production, l'organisation du personnel, le contrôle de la qualité, etc."
+      ],
+      "descriptionAr": [
+        "مسؤول عن الإدارة اليومية لورشة الإنتاج، بما في ذلك تخطيط الإنتاج، وترتيب الموظفين، ومراقبة الجودة، وما إلى ذلك."
+      ],
+      "responsibilities": [
+        "制定和执行生产计划，确保按时交付",
+        "管理生产团队，合理安排人员和设备",
+        "管控生产质量，降低不良率",
+        "推进精益生产，提高生产效率",
+        "负责车间安全管理和5S维护"
+      ],
+      "responsibilitiesEn": [
+        "Develop and execute production plans to ensure on-time delivery",
+        "Manage production team, arrange personnel and equipment reasonably",
+        "Control production quality and reduce defect rates",
+        "Promote lean production and improve efficiency",
+        "Responsible for workshop safety management and 5S maintenance"
+      ],
+      "responsibilitiesJa": [
+        "生産計画を策定して実行し、予定通りに納品できるようにする",
+        "生産チームを管理し、人員配置と設備を合理化する",
+        "生産品質を管理し、不良率を低減",
+        "リーン生産の促進と生産効率の向上",
+        "ワークショップの安全管理と5 Sメンテナンスを担当"
+      ],
+      "responsibilitiesKo": [
+        "납기 준수를 보장하기 위해 생산 계획을 수립하고 실행합니다.",
+        "생산팀 관리 및 인력 및 장비 합리화",
+        "생산 품질 관리 및 불량률 감소",
+        "린 (Lean) 생산 촉진 및 생산 효율성 향상",
+        "작업장 안전 관리 및 5S 유지 보수 담당"
+      ],
+      "responsibilitiesFr": [
+        "Élaborer et exécuter des plans de production pour assurer la livraison à temps",
+        "Gérer l'équipe de production et organiser raisonnablement le personnel et l'équipement",
+        "Contrôler la qualité de la production et réduire le taux de défauts",
+        "Promouvoir la production lean et améliorer l'efficacité de la production",
+        "Responsable de la gestion de la sécurité de l'atelier et de la maintenance 5S"
+      ],
+      "responsibilitiesAr": [
+        "تطوير وتنفيذ خطط الإنتاج لضمان التسليم في الوقت المحدد",
+        "إدارة فرق الإنتاج وترشيد التوظيف والمعدات",
+        "التحكم في جودة الإنتاج وتقليل المعدلات المعيبة",
+        "تعزيز الإنتاج الخالي من الدهون وتحسين كفاءة الإنتاج",
+        "مسؤول عن إدارة سلامة الورشة وصيانة 5S"
+      ],
+      "requirements": [
+        "机械或相关专业大专及以上学历",
+        "5年以上制造业生产管理经验",
+        "有洁净车间管理经验优先",
+        "熟悉精益生产理念和方法",
+        "具备良好的团队管理能力"
+      ],
+      "requirementsEn": [
+        "Associate+ degree in mechanical or related field",
+        "5+ years of production management experience in manufacturing",
+        "Cleanroom management experience preferred",
+        "Familiar with lean production concepts and methods",
+        "Good team management skills"
+      ],
+      "requirementsJa": [
+        "機械または関連する専攻大学学位以上",
+        "製造生産管理における5年以上の経験",
+        "清潔なワークショップ管理の経験が望ましい",
+        "リーン生産の概念と方法に精通している",
+        "優れたチーム管理スキル"
+      ],
+      "requirementsKo": [
+        "기계 또는 관련 전공 대학 학위 이상",
+        "제조업 생산관리 경력 5년 이상",
+        "청결한 작업장 관리 경험 우대",
+        "린 (lean) 생산 개념 및 방법에 대한 숙지",
+        "우수한 팀 관리 기술"
+      ],
+      "requirementsFr": [
+        "Diplôme universitaire ou supérieur en mécanique ou spécialisation connexe",
+        "Plus de 5 ans d'expérience dans la gestion de la production dans l'industrie manufacturière",
+        "Une expérience en gestion d'atelier propre est préférée",
+        "Familiarité avec les concepts et les méthodes de production Lean",
+        "Avoir de bonnes compétences en gestion d'équipe"
+      ],
+      "requirementsAr": [
+        "شهادة جامعية ميكانيكية أو ذات صلة أو أعلى",
+        "أكثر من 5 سنوات من الخبرة في إدارة الإنتاج الصناعي",
+        "يفضل الخبرة في إدارة ورش العمل النظيفة",
+        "الإلمام بمفاهيم وأساليب الإنتاج الرشيق",
+        "مهارات جيدة في إدارة الفريق"
+      ],
+      "benefits": [
+        "五险一金",
+        "带薪年假",
+        "绩效奖金",
+        "定期体检",
+        "节日福利"
+      ],
+      "benefitsEn": [
+        "Social Insurance",
+        "Paid Annual Leave",
+        "Performance Bonus",
+        "Regular Checkup",
+        "Holiday Benefits"
+      ],
+      "benefitsJa": [
+        "五険一金",
+        "有給休暇",
+        "パフォーマンスボーナス",
+        "定期健康診断",
+        "ホリデー特典"
+      ],
+      "benefitsKo": [
+        "5개의 보험과 1개의 펀드",
+        "유급 연차 휴가",
+        "성과 보너스",
+        "정기적인 건강 검진",
+        "연말연시 혜택"
+      ],
+      "benefitsFr": [
+        "Cinq assurances et un fonds",
+        "congé annuel payé",
+        "Primes de performance",
+        "Examen médical régulier",
+        "Avantages de vacances"
+      ],
+      "benefitsAr": [
+        "خمس تأمينات وصندوق واحد",
+        "إجازة سنوية مدفوعة الأجر",
+        "مكافأة الأداء",
+        "الفحوصات الطبية المنتظمة",
+        "امتيازات العطلة"
+      ],
+      "status": "open",
+      "sortOrder": 4,
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null
+    },
+    {
+      "id": "6",
+      "slug": "cnc-machinist",
+      "title": "机械加工技师",
+      "titleEn": "CNC Machinist",
+      "titleJa": "機械加工技術者",
+      "titleKo": "기계 가공 기술자",
+      "titleFr": "Technicien d'usinage",
+      "titleAr": "فني تصنيع آلي",
+      "department": "生产部",
+      "departmentEn": "Production Department",
+      "departmentJa": "生産部",
+      "departmentKo": "생산부",
+      "departmentFr": "Département de production",
+      "departmentAr": "وزارة الإنتاج",
+      "location": "深圳",
+      "locationEn": "Shenzhen",
+      "locationJa": "深セン",
+      "locationKo": "Shenzhen",
+      "locationFr": "Shenzhen",
+      "locationAr": "شينزين",
+      "type": "全职",
+      "typeEn": "Full-time",
+      "typeJa": "フルタイム",
+      "typeKo": "풀타임",
+      "typeFr": "Temps plein",
+      "typeAr": "على أساس التفرغ",
+      "salary": "8K-15K",
+      "salaryEn": "8K-15K",
+      "salaryJa": "8 K -15 K",
+      "salaryKo": "8K-15K",
+      "salaryFr": "8K-15K",
+      "salaryAr": "8K -15K",
+      "experience": "3年以上",
+      "experienceEn": "3+ years",
+      "experienceJa": "3年以上",
+      "experienceKo": "3년 이상",
+      "experienceFr": "Plus de 3 ans",
+      "experienceAr": "3 سنوات",
+      "education": "中专及以上",
+      "educationEn": "Vocational+",
+      "educationJa": "中等教育以上",
+      "educationKo": "중등 이상",
+      "educationFr": "Secondaire technique et supérieur",
+      "educationAr": "الثانوية وما فوقها",
+      "tags": [
+        "CNC",
+        "精密加工",
+        "车床",
+        "铣床"
+      ],
+      "tagsEn": [
+        "CNC",
+        "Precision Machining",
+        "Lathe",
+        "Milling"
+      ],
+      "tagsJa": [
+        "CNC",
+        "精密な作業",
+        "旋盤",
+        "フライス盤"
+      ],
+      "tagsKo": [
+        "CNC",
+        "정밀 기계 가공",
+        "선반",
+        "밀링 머신"
+      ],
+      "tagsFr": [],
+      "tagsAr": [
+        "CNC",
+        "الآلات الدقيقة",
+        "مخرطة",
+        "آلة التفريز"
+      ],
+      "description": [
+        "负责设备零件的精密加工，操作CNC和普通机床，保证加工精度。"
+      ],
+      "descriptionEn": [
+        "Responsible for precision machining of equipment parts, operating CNC and conventional machines, ensuring machining accuracy."
+      ],
+      "descriptionJa": [
+        "機械部品の精密加工、CNCおよび一般工作機械の操作を担当し、加工精度を確保します。"
+      ],
+      "descriptionKo": [
+        "기계 가공의 정확성을 보장하기 위해 장비 부품, 작동 CNC 및 일반 공작 기계의 정밀 가공을 담당합니다."
+      ],
+      "descriptionFr": [
+        "Responsable de l'usinage de précision des pièces d'équipement, l'exploitation des machines-outils CNC et ordinaires pour assurer la précision de l'usinage."
+      ],
+      "descriptionAr": [
+        "مسؤول عن المعالجة الدقيقة لقطع غيار المعدات، وتشغيل CNC وأدوات الآلات العامة لضمان دقة المعالجة."
+      ],
+      "responsibilities": [
+        "操作CNC加工中心和数控车床进行零件加工",
+        "根据图纸要求进行精密加工，保证尺寸精度",
+        "进行首件检验和过程自检",
+        "维护设备，进行日常保养",
+        "配合工艺改进，提高加工效率"
+      ],
+      "responsibilitiesEn": [
+        "Operate CNC machining centers and CNC lathes for part processing",
+        "Perform precision machining according to drawing requirements, ensuring dimensional accuracy",
+        "Conduct first article inspection and in-process self-inspection",
+        "Maintain equipment and perform daily maintenance",
+        "Cooperate with process improvement to increase machining efficiency"
+      ],
+      "responsibilitiesJa": [
+        "CNCマシニングセンタとCNC旋盤を操作して部品を加工する",
+        "寸法精度を確保するための図面要件に応じた精密加工",
+        "最初のピースの検査とプロセスの自己テストを実施する",
+        "日常的なメンテナンスのための機器のメンテナンス",
+        "プロセスの改善と組み合わせて、処理効率を向上させます"
+      ],
+      "responsibilitiesKo": [
+        "CNC 머시닝 센터 및 CNC 선반을 기계 부품으로 작동",
+        "치수 정확도를 보장하기 위해 도면 요구 사항에 따라 정밀 가공",
+        "일체형 검사 및 공정 자체 테스트 실시",
+        "일상적인 유지 보수를 위한 장비 유지 관리",
+        "공정 개선과 결합하여 처리 효율성 향상"
+      ],
+      "responsibilitiesFr": [
+        "Faire fonctionner le centre d'usinage CNC et le tour CNC pour l'usinage des pièces",
+        "Usinage de précision selon les exigences du dessin pour assurer la précision dimensionnelle",
+        "Effectuer l'inspection du premier article et l'auto-inspection du processus",
+        "Maintenance de l'équipement, entretien quotidien",
+        "Coopérer avec l'amélioration du processus pour améliorer l'efficacité du traitement"
+      ],
+      "responsibilitiesAr": [
+        "تشغيل مراكز التصنيع باستخدام الحاسب الآلي ومخارط التصنيع باستخدام الحاسب الآلي لقطع غيار الآلات",
+        "الآلات الدقيقة وفقًا لمتطلبات الرسم لضمان دقة الأبعاد",
+        "إجراء الفحص الأولي والاختبار الذاتي للعملية",
+        "صيانة المعدات للصيانة الروتينية",
+        "جنبا إلى جنب مع تحسين العملية لتحسين كفاءة المعالجة"
+      ],
+      "requirements": [
+        "中专及以上学历，机械加工相关专业",
+        "3年以上CNC操作经验",
+        "能独立识图和编程",
+        "熟悉不锈钢等难加工材料的加工",
+        "工作认真负责，有质量意识"
+      ],
+      "requirementsEn": [
+        "Vocational+ degree in machining related field",
+        "3+ years of CNC operation experience",
+        "Able to independently read drawings and program",
+        "Familiar with machining of difficult-to-machine materials such as stainless steel",
+        "Serious and responsible work with quality awareness"
+      ],
+      "requirementsJa": [
+        "中等学校以上の学位、機械加工を専攻",
+        "3年以上のCNC経験",
+        "独立してマッピングとプログラミングを行う能力",
+        "ステンレス鋼など加工が困難な材料の加工に精通している",
+        "真剣で責任ある仕事、品質重視"
+      ],
+      "requirementsKo": [
+        "중등학교 학위 이상, 기계 가공 전공",
+        "CNC 경력 3년 이상",
+        "독립적으로 매핑하고 프로그래밍할 수 있는 기능",
+        "스테인레스 스틸과 같이 가공하기 어려운 재료의 가공에 익숙함",
+        "진지하고 책임감 있는 업무, 양질의 업무"
+      ],
+      "requirementsFr": [
+        "Diplôme secondaire technique ou supérieur, spécialisation dans le traitement mécanique",
+        "Plus de 3 ans d'expérience dans l'opération CNC",
+        "Capable de reconnaître et de programmer de manière indépendante",
+        "Familier avec le traitement de matériaux difficiles à usiner tels que l'acier inoxydable",
+        "Travailler sérieusement et responsablement et avoir une conscience de la qualité"
+      ],
+      "requirementsAr": [
+        "شهادة الثانوية العامة أو أعلى، تخصص في المعالجة الميكانيكية",
+        "أكثر من 3 سنوات من الخبرة في استخدام الحاسب الآلي",
+        "القدرة على التخطيط والبرمجة بشكل مستقل",
+        "على دراية بمعالجة المواد التي يصعب معالجتها مثل الفولاذ المقاوم للصدأ",
+        "العمل الجاد والمسؤول والوعي بالجودة"
+      ],
+      "benefits": [
+        "五险一金",
+        "带薪年假",
+        "计件奖金",
+        "定期体检",
+        "节日福利"
+      ],
+      "benefitsEn": [
+        "Social Insurance",
+        "Paid Annual Leave",
+        "Piece-rate Bonus",
+        "Regular Checkup",
+        "Holiday Benefits"
+      ],
+      "benefitsJa": [
+        "五険一金",
+        "有給休暇",
+        "個数ボーナス",
+        "定期健康診断",
+        "ホリデー特典"
+      ],
+      "benefitsKo": [
+        "5개의 보험과 1개의 펀드",
+        "유급 연차 휴가",
+        "피스 카운트 보너스",
+        "정기적인 건강 검진",
+        "연말연시 혜택"
+      ],
+      "benefitsFr": [
+        "Cinq assurances et un fonds",
+        "congé annuel payé",
+        "Bonus par pièce",
+        "Examen médical régulier",
+        "Avantages de vacances"
+      ],
+      "benefitsAr": [
+        "خمس تأمينات وصندوق واحد",
+        "إجازة سنوية مدفوعة الأجر",
+        "مكافأة عدد القطع",
+        "الفحوصات الطبية المنتظمة",
+        "امتيازات العطلة"
+      ],
+      "status": "open",
+      "sortOrder": 5,
+      "seoTitle": "机械加工技师 - 左文科技专业MPCVD金刚石设备",
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": "[ \"负责设备零件的精密加工，操作CNC和普通机床，保证加工精度。\" ] 左文科技专注MPCVD金刚石材料制备设备研发、生产与服务，提供专业培育钻石与工业金刚石解决方案。",
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": "",
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": "",
+      "geoCity": ""
+    },
+    {
+      "id": "1",
+      "slug": "equipment-rd-engineer",
+      "title": "设备研发工程师",
+      "titleEn": "Equipment R&D Engineer",
+      "titleJa": "機器研究開発エンジニア",
+      "titleKo": "장비 R&D 엔지니어",
+      "titleFr": "Ingénieur R&D d'équipement",
+      "titleAr": "مهندس البحث والتطوير للمعدات",
+      "department": "研发部",
+      "departmentEn": "R&D Department",
+      "departmentJa": "研究開発部",
+      "departmentKo": "R&D 부서",
+      "departmentFr": "Département R & D",
+      "departmentAr": "قسم البحث والتطوير",
+      "location": "深圳",
+      "locationEn": "Shenzhen",
+      "locationJa": "深セン",
+      "locationKo": "Shenzhen",
+      "locationFr": "Shenzhen",
+      "locationAr": "شينزين",
+      "type": "全职",
+      "typeEn": "Full-time",
+      "typeJa": "フルタイム",
+      "typeKo": "풀타임",
+      "typeFr": "Temps plein",
+      "typeAr": "على أساس التفرغ",
+      "salary": "15K-30K",
+      "salaryEn": "15K-30K",
+      "salaryJa": "15 K -30 K",
+      "salaryKo": "15K-30K",
+      "salaryFr": "15K-30K",
+      "salaryAr": "15K -30K",
+      "experience": "3-5年",
+      "experienceEn": "3-5 years",
+      "experienceJa": "3 ～ 5年",
+      "experienceKo": "3 ~ 5년",
+      "experienceFr": "3-5 ans",
+      "experienceAr": "3 إلى 5 سنوات",
+      "education": "本科及以上",
+      "educationEn": "Bachelor+",
+      "educationJa": "学部以上",
+      "educationKo": "학부 이상",
+      "educationFr": "Baccalauréat et supérieur",
+      "educationAr": "درجة بكالوريوس وما فوقها",
+      "tags": [
+        "机械设计",
+        "金刚石材料与设备",
+        "CAD/SolidWorks"
+      ],
+      "tagsEn": [
+        "Mechanical Design",
+        "Fluid Control",
+        "CAD/SolidWorks"
+      ],
+      "tagsJa": [
+        "機械設計",
+        "ダイヤモンド素材と装備",
+        "CAD/SolidWorks"
+      ],
+      "tagsKo": [
+        "기계 설계",
+        "다이아몬드 재료 및 장비",
+        "CAD/SOLIDWORKS"
+      ],
+      "tagsFr": null,
+      "tagsAr": [
+        "التصميم الميكانيكي",
+        "مواد ومعدات الماس",
+        "CAD/SolidWorks"
+      ],
+      "description": [
+        "负责设备产品的设计开发，包括结构设计、材料选型、性能测试等。"
+      ],
+      "descriptionEn": [
+        "Responsible for equipment product design and development, including structural design, material selection and performance testing."
+      ],
+      "descriptionJa": [
+        "構造設計、材料選択、性能試験などを含む機器製品の設計と開発を担当する。"
+      ],
+      "descriptionKo": [
+        "구조 설계, 자재 선택, 성능 테스트 등을 포함한 장비 제품의 설계 및 개발을 담당합니다."
+      ],
+      "descriptionFr": [
+        "Responsable de la conception et du développement de produits d'équipements, y compris la conception structurelle, la sélection des matériaux, les tests de performances, etc."
+      ],
+      "descriptionAr": [
+        "مسؤول عن تصميم وتطوير منتجات المعدات، بما في ذلك التصميم الهيكلي، واختيار المواد، واختبار الأداء، وما إلى ذلك."
+      ],
+      "responsibilities": [
+        "负责设备新产品的结构设计和开发",
+        "进行产品性能测试和验证，编写技术文档",
+        "解决生产过程中的技术问题",
+        "与供应商沟通，跟进零部件加工进度",
+        "参与产品技术标准的制定和更新"
+      ],
+      "responsibilitiesEn": [
+        "Responsible for structural design and development of new equipment products",
+        "Conduct product performance testing and validation, write technical documentation",
+        "Solve technical problems in the production process",
+        "Communicate with suppliers and follow up on component processing progress",
+        "Participate in the formulation and updating of product technical standards"
+      ],
+      "responsibilitiesJa": [
+        "装置の新製品の構造設計と開発を担当",
+        "製品の性能テストと検証を実施し、技術文書を作成する",
+        "生産プロセスにおける技術的な問題の解決",
+        "サプライヤーとのコミュニケーションと部品加工の進捗状況のフォローアップ",
+        "製品技術基準の開発と更新に参加する"
+      ],
+      "responsibilitiesKo": [
+        "장비의 구조 설계 및 신제품 개발 담당",
+        "제품 성능 테스트 및 검증 수행, 기술 문서 작성",
+        "생산 공정의 기술적 문제 해결",
+        "공급업체와 소통하고 부품 처리 진행 상황에 대한 후속 조치",
+        "제품 기술 표준의 개발 및 업데이트에 참여"
+      ],
+      "responsibilitiesFr": [
+        "Responsable de la conception structurelle et du développement de nouveaux produits d'équipement",
+        "Effectuer des tests et des vérifications des performances des produits, rédiger des documents techniques",
+        "Résoudre les problèmes techniques dans le processus de production",
+        "Communiquer avec les fournisseurs et suivre l'avancement du traitement des pièces",
+        "Participer à l'élaboration et à la mise à jour des normes techniques des produits"
+      ],
+      "responsibilitiesAr": [
+        "مسؤول عن التصميم الهيكلي وتطوير منتجات جديدة للمعدات",
+        "إجراء اختبار أداء المنتج والتحقق من صحته، وكتابة الوثائق الفنية",
+        "حل المشكلات الفنية في عملية الإنتاج",
+        "التواصل مع الموردين ومتابعة تقدم معالجة قطع الغيار",
+        "المشاركة في تطوير وتحديث المعايير الفنية للمنتج"
+      ],
+      "requirements": [
+        "机械设计或相关专业本科及以上学历",
+        "3年以上设备或金刚石材料与设备产品研发经验",
+        "熟练使用SolidWorks、AutoCAD等设计软件",
+        "熟悉设备结构原理和流体力学基础知识",
+        "具备良好的沟通能力和团队协作精神"
+      ],
+      "requirementsEn": [
+        "Bachelor+ degree in mechanical design or related field",
+        "3+ years of R&D experience in equipments or fluid control products",
+        "Proficiency in SolidWorks, AutoCAD and other design software",
+        "Familiar with equipment structure principles and fluid mechanics basics",
+        "Good communication skills and teamwork spirit"
+      ],
+      "requirementsJa": [
+        "機械設計または関連する専攻の学士号以上",
+        "機器またはダイヤモンド材料および機器製品の研究開発における3年以上の経験",
+        "SolidWorks、AutoCAD、その他の設計ソフトウェアに精通している",
+        "装置構造と流体力学の基礎に精通している",
+        "優れたコミュニケーションスキルとチームスピリット"
+      ],
+      "requirementsKo": [
+        "기계설계 또는 관련 전공 학사 이상",
+        "장비 또는 다이아몬드 소재 및 장비 제품 연구개발 경력 3년 이상",
+        "SOLIDWORKS, AutoCAD 및 기타 설계 소프트웨어에 능숙",
+        "장비 구조 및 유체 역학의 기본 사항에 익숙함",
+        "훌륭한 의사소통 기술과 팀 정신"
+      ],
+      "requirementsFr": [
+        "Baccalauréat ou supérieur en conception mécanique ou spécialisation connexe",
+        "Plus de 3 ans d'expérience dans la recherche et le développement de produits d'équipement ou de matériaux diamantés et d'équipements",
+        "Compétence dans l'utilisation de SolidWorks, AutoCAD et d'autres logiciels de conception",
+        "Familiarité avec les principes structurels des équipements et les connaissances de base de la mécanique des fluides",
+        "Avoir de bonnes compétences en communication et esprit de travail d'équipe"
+      ],
+      "requirementsAr": [
+        "درجة البكالوريوس أو أعلى في التصميم الميكانيكي أو التخصصات ذات الصلة",
+        "أكثر من 3 سنوات من الخبرة في مجال البحث والتطوير للمعدات أو منتجات المواد والمعدات الماسية",
+        "بارع في SolidWorks و AutoCAD وبرامج التصميم الأخرى",
+        "على دراية بأساسيات هيكل المعدات وميكانيكا الموائع",
+        "مهارات تواصل جيدة وروح الفريق"
+      ],
+      "benefits": [
+        "五险一金",
+        "带薪年假",
+        "项目奖金",
+        "定期体检",
+        "节日福利"
+      ],
+      "benefitsEn": [
+        "Social Insurance",
+        "Paid Annual Leave",
+        "Project Bonus",
+        "Regular Checkup",
+        "Holiday Benefits"
+      ],
+      "benefitsJa": [
+        "五険一金",
+        "有給休暇",
+        "プロジェクトボーナス",
+        "定期健康診断",
+        "ホリデー特典"
+      ],
+      "benefitsKo": [
+        "5개의 보험과 1개의 펀드",
+        "유급 연차 휴가",
+        "프로젝트 보너스",
+        "정기적인 건강 검진",
+        "연말연시 혜택"
+      ],
+      "benefitsFr": [
+        "Cinq assurances et un fonds",
+        "congé annuel payé",
+        "Primes du projet",
+        "Examen médical régulier",
+        "Avantages de vacances"
+      ],
+      "benefitsAr": [
+        "خمس تأمينات وصندوق واحد",
+        "إجازة سنوية مدفوعة الأجر",
+        "مكافأة المشروع",
+        "الفحوصات الطبية المنتظمة",
+        "امتيازات العطلة"
+      ],
+      "status": "open",
+      "sortOrder": 0,
+      "seoTitle": "设备研发工程师 - 左文科技专业MPCVD金刚石设备",
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": "[ \"负责设备新产品的结构设计和开发\", \"进行产品性能测试和验证，编写技术文档\", \"解决生产过程中的技术问题\", \"与供应商沟通，跟进零部件加工进度\", \"参与产品技术标准的制定和更新\" ] [  左文科技专注MPCVD金刚石材料制备设备研发、生产与服务，提供专业培育钻石与工业金刚石解决方案。",
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": "",
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": "",
+      "geoCity": ""
+    },
+    {
+      "id": "2",
+      "slug": "mpcvd-process-engineer",
+      "title": "MPCVD工艺工程师",
+      "titleEn": "MPCVD Process Engineer",
+      "titleJa": "MPCVDプロセスエンジニア",
+      "titleKo": "MPCVD 프로세스 엔지니어",
+      "titleFr": "Ingénieur de processus MPCVD",
+      "titleAr": "مهندس معالجة MPCVD",
+      "department": "技术部",
+      "departmentEn": "Technical Department",
+      "departmentJa": "技術部",
+      "departmentKo": "기술 부서",
+      "departmentFr": "Département Technique",
+      "departmentAr": "الوزارات الفنية؛",
+      "location": "深圳",
+      "locationEn": "Shenzhen",
+      "locationJa": "深セン",
+      "locationKo": "Shenzhen",
+      "locationFr": "Shenzhen",
+      "locationAr": "شينزين",
+      "type": "全职",
+      "typeEn": "Full-time",
+      "typeJa": "フルタイム",
+      "typeKo": "풀타임",
+      "typeFr": "Temps plein",
+      "typeAr": "على أساس التفرغ",
+      "salary": "20K-40K",
+      "salaryEn": "20K-40K",
+      "salaryJa": "20 K -40 K",
+      "salaryKo": "20K-40K",
+      "salaryFr": "20K-40K",
+      "salaryAr": "20K -40K",
+      "experience": "3-5年",
+      "experienceEn": "3-5 years",
+      "experienceJa": "3 ～ 5年",
+      "experienceKo": "3 ~ 5년",
+      "experienceFr": "3-5 ans",
+      "experienceAr": "3 إلى 5 سنوات",
+      "education": "硕士及以上",
+      "educationEn": "Master+",
+      "educationJa": "修士号以上",
+      "educationKo": "석사 이상",
+      "educationFr": "Master et supérieur",
+      "educationAr": "درجة الماجستير وما فوقها",
+      "tags": [
+        "MPCVD",
+        "金刚石",
+        "等离子体",
+        "气路系统"
+      ],
+      "tagsEn": [
+        "MPCVD",
+        "Diamond",
+        "Plasma",
+        "Gas System"
+      ],
+      "tagsJa": [
+        "MPCVD",
+        "ダイヤモンド",
+        "プラズマ",
+        "空気圧システム"
+      ],
+      "tagsKo": [
+        "MPCVD",
+        "금강석",
+        "플라즈마",
+        "공압 시스템"
+      ],
+      "tagsFr": null,
+      "tagsAr": [
+        "MPCVD",
+        "الماسي",
+        "البلازما",
+        "نظام هوائي"
+      ],
+      "description": [
+        "负责MPCVD设备工艺开发和气路系统设计，支持客户技术需求。"
+      ],
+      "descriptionEn": [
+        "Responsible for MPCVD equipment process development and gas system design, supporting customer technical needs."
+      ],
+      "descriptionJa": [
+        "顧客の技術的ニーズをサポートするためのMPCVD機器プロセス開発と空気圧システム設計を担当します。"
+      ],
+      "descriptionKo": [
+        "고객 기술 요구를 지원하기 위해 MPCVD 장비 프로세스 개발 및 공압 시스템 설계를 담당합니다."
+      ],
+      "descriptionFr": [
+        "Responsable du développement du processus d'équipement MPCVD et de la conception du système de circuit de gaz pour soutenir les besoins techniques des clients."
+      ],
+      "descriptionAr": [
+        "مسؤول عن تطوير عملية معدات MPCVD وتصميم النظام الهوائي لدعم الاحتياجات الفنية للعملاء."
+      ],
+      "responsibilities": [
+        "负责MPCVD设备的工艺开发和优化",
+        "设计气路系统方案，满足客户工艺需求",
+        "为客户提供技术支持和现场调试服务",
+        "编写工艺文档和操作手册",
+        "跟踪行业技术发展，提出技术改进方案"
+      ],
+      "responsibilitiesEn": [
+        "Responsible for MPCVD equipment process development and optimization",
+        "Design gas system solutions to meet customer process requirements",
+        "Provide technical support and on-site commissioning services for customers",
+        "Write process documentation and operation manuals",
+        "Track industry technology development and propose technical improvement plans"
+      ],
+      "responsibilitiesJa": [
+        "MPCVD装置のプロセス開発と最適化を担当",
+        "顧客のプロセスニーズを満たすための空気圧システムソリューションの設計",
+        "顧客に技術サポートとオンサイト試運転サービスを提供する",
+        "プロセス文書と操作マニュアルを書く",
+        "業界の技術開発をフォローし、技術改善計画を提案する"
+      ],
+      "responsibilitiesKo": [
+        "MPCVD 장비의 공정 개발 및 최적화 담당",
+        "고객 프로세스 요구를 충족하는 공압 시스템 솔루션 설계",
+        "고객에게 기술 지원 및 현장 시운전 서비스 제공",
+        "프로세스 문서 및 운영 매뉴얼 작성",
+        "업계의 기술 개발을 따르고 기술 개선 계획을 제안합니다."
+      ],
+      "responsibilitiesFr": [
+        "Responsable du développement de processus et de l'optimisation des équipements MPCVD",
+        "Concevoir des solutions de système de circuit de gaz pour répondre aux besoins de processus des clients",
+        "Support technique et service de mise en service sur site pour les clients",
+        "Rédaction de la documentation du processus et des manuels d'exploitation",
+        "Suivre le développement technologique de l'industrie et proposer des plans d'amélioration technologique"
+      ],
+      "responsibilitiesAr": [
+        "مسؤول عن تطوير العملية وتحسين معدات MPCVD",
+        "تصميم حلول النظام الهوائي لتلبية احتياجات عملية العملاء",
+        "تقديم الدعم الفني وخدمات التشغيل في الموقع للعملاء",
+        "كتابة وثائق العملية وأدلة التشغيل",
+        "متابعة التطور التكنولوجي للصناعة واقتراح خطط التحسين الفني"
+      ],
+      "requirements": [
+        "材料、物理、化学或相关专业硕士及以上学历",
+        "3年以上MPCVD或CVD设备相关工作经验",
+        "熟悉金刚石制备工艺和等离子体技术",
+        "具备气路系统设计和调试经验",
+        "良好的英文读写能力，能阅读英文技术文献"
+      ],
+      "requirementsEn": [
+        "Master+ degree in materials, physics, chemistry or related field",
+        "3+ years of experience in MPCVD or CVD equipment",
+        "Familiar with diamond preparation process and plasma technology",
+        "Experience in gas system design and commissioning",
+        "Good English reading and writing skills, able to read English technical literature"
+      ],
+      "requirementsJa": [
+        "材料、物理、化学または関連分野の修士号以上",
+        "MPCVDまたはCVD機器で3年以上の実務経験",
+        "ダイヤモンドの製造プロセスとプラズマ技術に精通している",
+        "ガスシステムの設計と試運転の経験",
+        "英語の読み書き能力があり、英語の技術文献を読むことができます"
+      ],
+      "requirementsKo": [
+        "재료, 물리, 화학 또는 관련 분야의 석사 학위 이상",
+        "MPCVD 또는 CVD 장비 관련 경력 3년 이상",
+        "다이아몬드 제조 공정 및 플라즈마 기술에 대한 숙지",
+        "가스 시스템 설계 및 시운전 경험",
+        "우수한 영어 읽기 및 쓰기 능력, 영어 기술 문헌을 읽을 수 있음"
+      ],
+      "requirementsFr": [
+        "Master ou supérieur en matériaux, physique, chimie ou spécialisations connexes",
+        "Plus de 3 ans d'expérience de travail liée à l'équipement MPCVD ou CVD",
+        "Familier avec le processus de préparation du diamant et la technologie du plasma",
+        "Expérience dans la conception et la mise en service de systèmes de circuits de gaz",
+        "Bonnes compétences en littérature et écriture en anglais, capable de lire la littérature technique anglaise"
+      ],
+      "requirementsAr": [
+        "درجة الماجستير أو أعلى في المواد أو الفيزياء أو الكيمياء أو التخصصات ذات الصلة",
+        "أكثر من 3 سنوات من الخبرة العملية في معدات MPCVD أو CVD",
+        "الإلمام بعملية تحضير الألماس وتقنية البلازما",
+        "خبرة في تصميم وتشغيل نظام الغاز",
+        "قدرة جيدة على القراءة والكتابة باللغة الإنجليزية، وقادرة على قراءة الأدب الفني باللغة الإنجليزية"
+      ],
+      "benefits": [
+        "五险一金",
+        "带薪年假",
+        "项目奖金",
+        "定期体检",
+        "节日福利",
+        "股权激励"
+      ],
+      "benefitsEn": [
+        "Social Insurance",
+        "Paid Annual Leave",
+        "Project Bonus",
+        "Regular Checkup",
+        "Holiday Benefits",
+        "Equity Incentive"
+      ],
+      "benefitsJa": [
+        "五険一金",
+        "有給休暇",
+        "プロジェクトボーナス",
+        "定期健康診断",
+        "ホリデー特典",
+        "インセンティブストックオプション"
+      ],
+      "benefitsKo": [
+        "5개의 보험과 1개의 펀드",
+        "유급 연차 휴가",
+        "프로젝트 보너스",
+        "정기적인 건강 검진",
+        "연말연시 혜택",
+        "지분 인센티브"
+      ],
+      "benefitsFr": [
+        "Cinq assurances et un fonds",
+        "congé annuel payé",
+        "Primes du projet",
+        "Examen médical régulier",
+        "Avantages de vacances",
+        "Incentives en actions"
+      ],
+      "benefitsAr": [
+        "خمس تأمينات وصندوق واحد",
+        "إجازة سنوية مدفوعة الأجر",
+        "مكافأة المشروع",
+        "الفحوصات الطبية المنتظمة",
+        "امتيازات العطلة",
+        "حوافز حقوق الملكية"
+      ],
+      "status": "open",
+      "sortOrder": 1,
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null
+    },
+    {
+      "id": "4",
+      "slug": "quality-engineer",
+      "title": "质量工程师",
+      "titleEn": "Quality Engineer",
+      "titleJa": "品質エンジニア",
+      "titleKo": "품질 엔지니어",
+      "titleFr": "Ingénieur Qualité",
+      "titleAr": "مهندس جودة",
+      "department": "质量部",
+      "departmentEn": "Quality Department",
+      "departmentJa": "品質保証部",
+      "departmentKo": "품질 부서",
+      "departmentFr": "Département Qualité",
+      "departmentAr": "إدارة الجودة",
+      "location": "深圳",
+      "locationEn": "Shenzhen",
+      "locationJa": "深セン",
+      "locationKo": "Shenzhen",
+      "locationFr": "Shenzhen",
+      "locationAr": "شينزين",
+      "type": "全职",
+      "typeEn": "Full-time",
+      "typeJa": "フルタイム",
+      "typeKo": "풀타임",
+      "typeFr": "Temps plein",
+      "typeAr": "على أساس التفرغ",
+      "salary": "10K-20K",
+      "salaryEn": "10K-20K",
+      "salaryJa": "10 K ～ 20 K",
+      "salaryKo": "10K-20K",
+      "salaryFr": "10K-20K",
+      "salaryAr": "10K -20K",
+      "experience": "2-5年",
+      "experienceEn": "2-5 years",
+      "experienceJa": "2 ～ 5年",
+      "experienceKo": "2 ~ 5년",
+      "experienceFr": "2-5 ans",
+      "experienceAr": "2-5 سنوات",
+      "education": "本科及以上",
+      "educationEn": "Bachelor+",
+      "educationJa": "学部以上",
+      "educationKo": "학부 이상",
+      "educationFr": "Baccalauréat et supérieur",
+      "educationAr": "درجة بكالوريوس وما فوقها",
+      "tags": [
+        "质量管理",
+        "ISO9001",
+        "计量检测",
+        "SPC"
+      ],
+      "tagsEn": [
+        "Quality Mgmt",
+        "ISO9001",
+        "Metrology",
+        "SPC"
+      ],
+      "tagsJa": [
+        "品質管理",
+        "ISO 9001",
+        "計測試験",
+        "ＳＰＣ"
+      ],
+      "tagsKo": [
+        "품질 관리",
+        "ISO9001",
+        "계측 테스트",
+        "SPC"
+      ],
+      "tagsFr": null,
+      "tagsAr": [
+        "إدارة الجودة",
+        "ISO9001",
+        "الاختبار المترولوجي",
+        "SPC"
+      ],
+      "description": [
+        "负责产品质量管控，建立和维护质量管理体系，处理质量问题。"
+      ],
+      "descriptionEn": [
+        "Responsible for product quality control, establishing and maintaining quality management system, handling quality issues."
+      ],
+      "descriptionJa": [
+        "製品の品質管理、品質マネジメントシステムの確立と維持、品質問題の処理を担当する。"
+      ],
+      "descriptionKo": [
+        "제품 품질 관리, 품질 관리 시스템 구축 및 유지 관리, 품질 문제 처리를 담당합니다."
+      ],
+      "descriptionFr": [
+        "Responsable du contrôle de la qualité des produits, de l'établissement et de la maintenance du système de gestion de la qualité et de la gestion des problèmes de qualité."
+      ],
+      "descriptionAr": [
+        "مسؤول عن مراقبة جودة المنتج، وإنشاء وصيانة نظام إدارة الجودة، والتعامل مع قضايا الجودة."
+      ],
+      "responsibilities": [
+        "建立和维护ISO9001质量管理体系",
+        "制定产品检验标准和检验规范",
+        "处理客户投诉和内部质量问题",
+        "推进质量改进项目，降低不良率",
+        "负责计量器具管理和校准"
+      ],
+      "responsibilitiesEn": [
+        "Establish and maintain ISO9001 quality management system",
+        "Develop product inspection standards and specifications",
+        "Handle customer complaints and internal quality issues",
+        "Promote quality improvement projects and reduce defect rates",
+        "Responsible for measuring instrument management and calibration"
+      ],
+      "responsibilitiesJa": [
+        "ISO 9001品質マネジメントシステムの確立と維持",
+        "製品検査基準と検査仕様の策定",
+        "顧客の苦情や社内の品質問題への対応",
+        "不良率低減のための品質改善プロジェクトの推進",
+        "測定器の管理と校正を担当"
+      ],
+      "responsibilitiesKo": [
+        "ISO9001 품질경영시스템 구축 및 유지",
+        "제품 검사 표준 및 검사 사양 개발",
+        "고객 불만 및 내부 품질 문제 처리",
+        "불량률을 줄이기 위한 품질 개선 프로젝트 추진",
+        "계측기 관리 및 캘리브레이션 담당"
+      ],
+      "responsibilitiesFr": [
+        "Établir et maintenir le système de gestion de la qualité ISO9001",
+        "Élaborer des normes d'inspection des produits et des spécifications d'inspection",
+        "Traitement des plaintes des clients et des problèmes de qualité internes",
+        "Promouvoir des projets d'amélioration de la qualité et réduire les taux de défauts",
+        "Responsable de la gestion et de l'étalonnage des instruments de mesure"
+      ],
+      "responsibilitiesAr": [
+        "إنشاء والحفاظ على نظام إدارة الجودة ISO9001",
+        "تطوير معايير فحص المنتج ومواصفات الفحص",
+        "التعامل مع شكاوى العملاء وقضايا الجودة الداخلية",
+        "تعزيز مشاريع تحسين الجودة للحد من المعدلات السيئة",
+        "مسؤول عن قياس إدارة الأجهزة ومعايرتها"
+      ],
+      "requirements": [
+        "机械或相关专业本科及以上学历",
+        "2年以上制造业质量管理经验",
+        "熟悉ISO9001质量管理体系",
+        "掌握SPC、FMEA等质量工具",
+        "具备良好的分析和解决问题能力"
+      ],
+      "requirementsEn": [
+        "Bachelor+ degree in mechanical or related field",
+        "2+ years of quality management experience in manufacturing",
+        "Familiar with ISO9001 quality management system",
+        "Master SPC, FMEA and other quality tools",
+        "Good analytical and problem-solving skills"
+      ],
+      "requirementsJa": [
+        "機械または関連する専攻の学士号以上",
+        "製造品質管理における2年以上の経験",
+        "ISO 9001品質マネジメントシステムに精通している",
+        "マスターSPC、FMEAおよびその他の品質ツール",
+        "優れた分析能力と問題解決能力"
+      ],
+      "requirementsKo": [
+        "기계 또는 관련 전공 학사 학위 이상",
+        "제조 품질 관리 2년 이상 경력",
+        "ISO9001 품질경영시스템 숙지",
+        "마스터 SPC, FMEA 및 기타 품질 도구",
+        "우수한 분석 및 문제 해결 능력"
+      ],
+      "requirementsFr": [
+        "Baccalauréat ou supérieur en mécanique ou spécialisation connexe",
+        "Plus de 2 ans d'expérience dans la gestion de la qualité dans l'industrie manufacturière",
+        "Connaissance du système de gestion de la qualité ISO9001",
+        "Maîtrise des outils de qualité tels que SPC et FMEA",
+        "Avoir de bonnes compétences analytiques et de résolution de problèmes"
+      ],
+      "requirementsAr": [
+        "درجة البكالوريوس أو أعلى في التخصصات الميكانيكية أو ذات الصلة",
+        "أكثر من عامين من الخبرة في إدارة جودة التصنيع",
+        "الإلمام بنظام إدارة الجودة ISO9001",
+        "ماجستير SPC و FMEA وأدوات الجودة الأخرى",
+        "مهارات تحليلية جيدة ومهارات حل المشكلات"
+      ],
+      "benefits": [
+        "五险一金",
+        "带薪年假",
+        "绩效奖金",
+        "定期体检",
+        "节日福利"
+      ],
+      "benefitsEn": [
+        "Social Insurance",
+        "Paid Annual Leave",
+        "Performance Bonus",
+        "Regular Checkup",
+        "Holiday Benefits"
+      ],
+      "benefitsJa": [
+        "五険一金",
+        "有給休暇",
+        "パフォーマンスボーナス",
+        "定期健康診断",
+        "ホリデー特典"
+      ],
+      "benefitsKo": [
+        "5개의 보험과 1개의 펀드",
+        "유급 연차 휴가",
+        "성과 보너스",
+        "정기적인 건강 검진",
+        "연말연시 혜택"
+      ],
+      "benefitsFr": [
+        "Cinq assurances et un fonds",
+        "congé annuel payé",
+        "Primes de performance",
+        "Examen médical régulier",
+        "Avantages de vacances"
+      ],
+      "benefitsAr": [
+        "خمس تأمينات وصندوق واحد",
+        "إجازة سنوية مدفوعة الأجر",
+        "مكافأة الأداء",
+        "الفحوصات الطبية المنتظمة",
+        "امتيازات العطلة"
+      ],
+      "status": "open",
+      "sortOrder": 3,
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null
+    }
+  ]
+}

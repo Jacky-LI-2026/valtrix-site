@@ -1,0 +1,10 @@
+const fs = require('fs');
+const Z = 'D:/企业网站/';
+let s = fs.readFileSync(Z + 'app/products/[tab]/[id]/ProductDetailClient.tsx', 'utf8');
+const m = s.match(/href="tel:[^"]*"[\s\S]{0,120}/);
+console.log('== Product tel block:');
+console.log(m ? m[0].slice(0, 200) : 'NOT FOUND');
+const m2 = s.match(/<span>\{contactData\?\.phone \|\| "[^"]*"\}<\/span>/);
+console.log('== Product phone span:', m2 ? m2[0] : 'NOT FOUND');
+const m3 = s.match(/tel:\$\{[^\n]*/);
+console.log('== Product tel dynamic:', m3 ? m3[0] : 'none');

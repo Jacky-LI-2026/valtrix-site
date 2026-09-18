@@ -1,0 +1,6 @@
+UPDATE product_categories SET "nameJa"='VCRフェイスシール継手 Gシリーズ', "nameKo"='VCR 페이스실 피팅 G 시리즈', "nameFr"='Raccords VCR à joint facial série G', "nameAr"='وصلات VCR ذات الإحكام السطحي سلسلة G' WHERE id=7;
+UPDATE product_categories SET "nameJa"='マイクロ溶接継手Iシリーズ', "nameKo"='마이크로 용접 파이프 피팅 I', "nameFr"='Accessoires Micro soudés série I', "nameAr"='التركيبات الملحومة الصغيرة سلسلة I' WHERE id=8;
+UPDATE product_categories SET "nameJa"='ダイヤフラムバルブシリーズ', "nameKo"='다이어프램 밸브 시리즈', "nameFr"='Série de vannes à membrane', "nameAr"='سلسلة صمام الحجاب الحاجز' WHERE id=9;
+UPDATE product_categories SET "nameJa"='減圧器シリーズ', "nameKo"='압력 감소기 시리즈', "nameFr"='Série de réducteurs de pression', "nameAr"='سلسلة مخفض الضغط' WHERE id=10;
+UPDATE product_categories SET "nameJa"='チェック&メーターバルブ', "nameKo"='체크 밸브 및 계량 밸브', "nameFr"='Vannes de retour et de dosage', "nameAr"='صمامات الفحص والقياس' WHERE id=11;
+UPDATE product_categories SET "nameJa"='ガスフィルターシリーズ', "nameKo"='가스 필터 시리즈', "nameFr"='Série de filtres à gaz', "nameAr"='سلسلة فلتر الغاز' WHERE id=12;

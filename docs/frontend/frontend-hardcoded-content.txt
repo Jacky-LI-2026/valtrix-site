@@ -1,0 +1,133 @@
+﻿=== app\about\page.tsx ===
+23: { icon: Target, title: "创新驱动", titleEn: "Innovation-Driven", desc: "以技术创新为核心，持续投入研发，引领行业发展", descEn:...
+24: { icon: Eye, title: "标准引领", titleEn: "Standard-Led", desc: "建立严格的质量标准，以高标准要求每一个产品", descEn: "Strict ...
+25: { icon: Heart, title: "客户至上", titleEn: "Customer First", desc: "深入理解客户需求，提供超越期望的产品和服务", descEn: "Dee...
+26: { icon: Award, title: "品质第一", titleEn: "Quality First", desc: "从原材料到成品，全流程质量管控，确保卓越品质", descEn: "Ful...
+67: <div className="text-dark-400">加载中...</div>
+75: title="关于 左文科技"
+76: titleEn="About 左文科技"
+77: subtitle="专注半导体行业流体控制类核心产品，集研发、生产、销售、服务为一体"
+79: breadcrumb="关于我们"
+96: <h2 className="text-3xl font-bold text-dark mb-6">{isEn ? "Company Profile" : "公司简介"}</h2>
+106: 左文科技是一家专业从事金刚石新材料及MPCVD设备研发、生产、销售与服务的高新技术企业。
+121: <div className="text-dark-500 text-sm">{isEn ? "Tech Patents" : "技术专利"}</div>
+134: <h2 className="text-3xl font-bold text-dark mb-4">{isEn ? "Our Culture" : "企业文化"}</h2>
+135: <p className="text-dark-500">{isEn ? "Core values guiding our continuous progress" : "核心价值观指引我们不断前行"...
+160: <h2 className="text-3xl font-bold text-dark mb-4">{isEn ? "Our History" : "发展历程"}</h2>
+161: <p className="text-dark-500">{isEn ? "Every step witnesses our growth and breakthroughs" : "每一步都见证着我...
+190: <h2 className="text-3xl font-bold text-dark mb-4">{isEn ? "Learn More About Us" : "了解更多"}</h2>
+194: { slug: "profile", label: "公司简介", labelEn: "Company", desc: "企业概况与使命愿景", descEn: "Overview & Mission...
+195: { slug: "culture", label: "企业文化", labelEn: "Culture", desc: "核心价值观与理念", descEn: "Core Values" },
+196: { slug: "history", label: "发展历程", labelEn: "History", desc: "成长足迹", descEn: "Journey" },
+197: { slug: "honors", label: "资质荣誉", labelEn: "Honors", desc: "权威认证与专利", descEn: "Certs & Patents" },
+215: <h2 className="text-2xl lg:text-3xl font-bold text-white mb-4">{isEn ? "Want to Learn More?" : "想了解更...
+216: <p className="text-white/80 mb-8 max-w-2xl mx-auto">{isEn ? "Contact our team for more information a...
+218: {isEn ? "Contact Us" : "联系我们"}
+
+=== app\careers\page.tsx ===
+33: { icon: GraduationCap, title: "成长空间", titleEn: "Growth", desc: "完善的培训体系和晋升通道，助力职业发展", descEn: "Compr...
+34: { icon: Heart, title: "福利保障", titleEn: "Benefits", desc: "五险一金、带薪年假、节日福利、定期体检", descEn: "Social insu...
+35: { icon: TrendingUp, title: "有竞争力薪酬", titleEn: "Competitive Pay", desc: "行业领先的薪资水平，绩效奖金和项目奖励", descEn...
+36: { icon: Users, title: "团队氛围", titleEn: "Team Culture", desc: "专业、和谐、充满活力的团队氛围", descEn: "Professiona...
+60: title="加入我们"
+62: subtitle="左文科技 期待与优秀的您一起，推动流体控制技术的发展"
+63: subtitleEn="左文科技 looks forward to working with talented individuals like you to advance fluid contro...
+64: breadcrumb="加入我们"
+72: <h2 className="text-3xl font-bold text-dark mb-4">{isEn ? "Why Join 左文科技" : "为什么加入 左文科技"}</h2>
+73: <p className="text-dark-500">{isEn ? "We offer competitive compensation and broad development opport...
+97: <p className="text-dark-500">{isEn ? "Find the right position and start a new career chapter" : "找到适...
+101: <div className="text-center py-12 text-dark-400">加载中...</div>
+132: {isEn ? "View Details" : "查看详情"}
+146: <h2 className="text-2xl lg:text-3xl font-bold text-white mb-4">{isEn ? "Didn't find the right positi...
+147: <p className="text-white/80 mb-8">{isEn ? "Send us your resume and we'll match you with the right po...
+149: <a href="mailto:JACKY_LI@左文科技.COM" className="inline-flex items-center gap-2 bg-white text-primary h...
+151: {isEn ? "Send Resume" : "发送简历"}
+
+=== app\contact\page.tsx ===
+17: // 优先从API获取联系信息，失败时使用硬编码数据
+28: console.warn("获取联系信息失败，使用默认数据:", err);
+36: // 默认联系信息（回退）
+38: { icon: Phone, label: isEn ? "Phone" : "电话", value: "+86 177-2281-3298", sub: isEn ? "Mon-Fri 9:00-1...
+39: { icon: Mail, label: isEn ? "Email" : "邮箱", value: "info@zuowentech.com", sub: isEn ? "Reply within ...
+40: { icon: MapPin, label: isEn ? "Address" : "地址", value: isEn ? "8F, Bldg 2, Yard 1, No.29 Kechuang 13...
+41: { icon: Clock, label: isEn ? "Business Hours" : "工作时间", value: isEn ? "Mon-Fri 9:00-18:00" : "周一至周五 ...
+44: // 从API数据构建联系信息数组
+46: { icon: Phone, label: isEn ? "Phone" : "电话", value: contactData.phone || "+86 177-2281-3298", sub: i...
+47: { icon: Mail, label: isEn ? "Email" : "邮箱", value: contactData.email || "info@zuowentech.com", sub: ...
+48: { icon: MapPin, label: isEn ? "Address" : "地址", value: isEn ? (contactData.addressEn || "8F, Bldg 2,...
+49: { icon: Clock, label: isEn ? "Business Hours" : "工作时间", value: isEn ? (contactData.businessHoursEn |...
+53: ? (isEn ? (contactData.inquiryTypesEn || ["Product Inquiry", "ODM Customization", "MPCVD Solutions",...
+56: : ["产品咨询", "ODM定制", "MPCVD配套", "技术支持", "商务合作", "其他"]);
+61: title="联系我们"
+63: subtitle="无论您有产品咨询、技术支持还是合作意向，我们都期待与您沟通"
+65: breadcrumb="联系我们"
+93: {/* 高德地图 */}
+104: <input type="text" required className="w-full px-4 py-3 border border-dark-200 rounded-lg focus:outl...
+108: <input type="text" className="w-full px-4 py-3 border border-dark-200 rounded-lg focus:outline-none ...
+114: <input type="tel" required className="w-full px-4 py-3 border border-dark-200 rounded-lg focus:outli...
+118: <input type="email" required className="w-full px-4 py-3 border border-dark-200 rounded-lg focus:out...
+131: <textarea required rows={5} className="w-full px-4 py-3 border border-dark-200 rounded-lg focus:outl...
+
+=== app\industries\page.tsx ===
+43: title="行业应用"
+45: subtitle="左文科技MPCVD金刚石技术广泛应用于珠宝、半导体、精密加工、量子科技、光学、新能源等多个行业领域"
+47: breadcrumb="行业应用"
+54: <div className="text-center py-20 text-dark-400">加载中...</div>
+83: {isEn ? "Explore Solutions" : "探索解决方案"}
+
+=== app\news\page.tsx ===
+53: title="新闻资讯"
+55: subtitle="了解左文科技的最新动态、产品发布和技术文章"
+56: subtitleEn="Stay updated with 左文科技's latest news, product launches and technical articles"
+57: breadcrumb="新闻资讯"
+64: <div className="text-center py-20 text-dark-400">加载中...</div>
+76: <p className="text-sm">{isEn ? "Featured News" : "头条新闻配图"}</p>
+94: {isEn ? "Read Full Article" : "阅读全文"}
+128: {isEn ? "Read More" : "阅读更多"}
+137: <div className="text-center py-20 text-dark-400">暂无新闻</div>
+
+=== app\products\page.tsx ===
+11: // “全部设备”视图标识
+22: // 全部产品总数（动态计算）
+28: // 初始：若 URL 带有效 tab 参数则优先显示该二级目录，否则显示全部设备
+33: // 监听 URL 参数变化（如从导航下拉菜单点击带 ?tab= 跳转）
+41: // 切换 Tab：更新状态并同步 URL，保证导航下拉再次点击同一目录也能触发
+54: // 需要渲染的 Tab：全部视图遍历所有；否则仅当前目录
+65: title="产品中心"
+67: subtitle="覆盖MPCVD制备设备、培育钻石及金刚石功能材料三大产品体系，提供全产业链解决方案"
+69: breadcrumb="产品中心"
+73: {/* Tab Navigation：全部设备 + 各二级目录 */}
+82: {isEn ? "All Products" : "全部设备"}
+108: {/* 全部视图下：显示二级目录（大分类）标识 */}
+117: {isEn ? "models" : "款型号"}
+133: {category.models.length} {isEn ? "models" : "款型号"}
+
+=== app\resources\page.tsx ===
+58: title="资源中心"
+60: subtitle="产品样本、证书、图纸等技术资料下载，助力您快速了解和使用我们的产品"
+62: breadcrumb="资源中心"
+69: <div className="text-center py-20 text-dark-400">加载中...</div>
+81: <span className="text-sm text-primary font-medium">{category.items.length} {isEn ? "files" : "份"}</s...
+98: {isEn ? "View All" : "查看全部"}
+108: <h3 className="text-xl font-bold text-dark mb-3">{isEn ? "Need More Technical Resources?" : "需要更多技术资...
+112: : "如果您在资源中心没有找到需要的资料，或者需要定制化的技术文档，请联系我们的技术支持团队。"}
+118: {isEn ? "Contact Technical Support" : "联系技术支持"}
+
+=== app\services\page.tsx ===
+53: <div className="text-dark-400">加载中...</div>
+61: title="专业服务"
+63: subtitle="从产品定制到系统配套，从技术支持到售后服务，为客户提供全生命周期的专业服务"
+65: breadcrumb="服务支持"
+74: const isHighlight = index === 1; // MPCVD工艺服务高亮
+109: {isEn ? "Learn More" : "了解更多"}
+123: {isEn ? "Need Custom Service?" : "需要定制化服务？"}
+126: {isEn ? "Contact our team to discuss your specific requirements" : "联系我们的团队，讨论您的具体需求"}
+132: {isEn ? "Contact Us" : "联系我们"}
+
+=== app\not-found.tsx ===
+12: { label: isEn ? "Products" : "产品中心", href: "/products" },
+13: { label: isEn ? "Industries" : "行业应用", href: "/industries" },
+14: { label: isEn ? "Services" : "服务支持", href: "/services" },
+15: { label: isEn ? "About" : "关于我们", href: "/about" },
+16: { label: isEn ? "Contact" : "联系我们", href: "/contact" },
+

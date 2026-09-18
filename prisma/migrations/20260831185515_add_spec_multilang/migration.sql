@@ -1,0 +1,11 @@
+-- AlterTable
+ALTER TABLE "product_specs" ADD COLUMN "labelEn" VARCHAR(100),
+ADD COLUMN "labelJa" VARCHAR(100),
+ADD COLUMN "labelKo" VARCHAR(100),
+ADD COLUMN "labelFr" VARCHAR(100),
+ADD COLUMN "labelAr" VARCHAR(100),
+ADD COLUMN "valueEn" TEXT,
+ADD COLUMN "valueJa" TEXT,
+ADD COLUMN "valueKo" TEXT,
+ADD COLUMN "valueFr" TEXT,
+ADD COLUMN "valueAr" TEXT;

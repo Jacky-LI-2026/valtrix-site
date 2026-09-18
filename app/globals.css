@@ -1,0 +1,460 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 前台所有成段文本两端对齐 */
+p {
+  text-align: justify;
+}
+
+/* 居中容器内的段落保持居中（覆盖全局两端对齐，用于「标题+一句话」区块头等场景） */
+.text-center p,
+.text-center .text-center p {
+  text-align: center;
+}
+
+/* 富文本内容两端对齐 */
+.prose p,
+.rich-text p {
+  text-align: justify;
+}
+
+/* =====================================================
+   前台模板风格引擎（R4 深化）
+   由 app/layout.tsx 注入 CSS 变量 + data-template 属性，
+   驱动不同模板的圆角/阴影/间距/字号/按钮/卡片差异化。
+   -----------------------------------------------------
+   2026-09-15「接线」：钩子类名已真正挂到「默认模板」上 ——
+   components/sections/**（Hero/Products/Features/Stats/About/
+   Industries/CaseShowcase/Services/CTA）与 components/layout/
+   Header.tsx、Footer.tsx。此前这些规则一条都不会命中（死代码）。
+   ⚠️ 范围决定：components/theme-unilok/** 与
+   components/theme-kitzsct/** 是「整站版式模板」，自带完整设计
+   语言（KITZ 刻意做「直角 + 细线」），刻意 **不挂** 这些钩子，
+   以免皮肤的圆角/间距破坏其设计语言。
+   -----------------------------------------------------
+   派生规则一律用「属性选择器 + 字段真实取值」，不再写死模板 slug。
+   字段取值来源 lib/templates/presets.ts（12 条预设实测枚举）：
+     radius    sharp | medium | round        → 走 CSS 变量 --radius
+     shadow    soft | medium | hard          → 走 CSS 变量 --tpl-shadow
+     spacing   compact | normal | spacious   → 走 CSS 变量 --section-pad
+     fontScale normal | large                → 走 CSS 变量 --font-scale
+     hero      full | split | centered | overlay
+     header    solid | glass | transparent
+     card      bordered | elevated | flat | gradient
+     cta       solid | outline | gradient
+   （以上 4 个变量型字段无属性选择器，只由 layout.tsx 注入变量，
+     经下面的 .tpl-* 规则生效；后 4 个字段用属性选择器派发。）
+   ===================================================== */
+:root {
+  --radius: 10px;
+  --section-pad: 88px;
+  --font-scale: 1;
+  --tpl-shadow: 0 8px 24px rgba(0,0,0,0.10);
+  --tpl-font-family: 'Roboto', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* 模板字体（html 级覆盖，前台内容区） */
+html[data-template] body {
+  font-family: var(--tpl-font-family);
+}
+
+/* 模板圆角 / 阴影：按钮、卡片、输入框基础变量化 */
+[data-template] .btn-primary,
+[data-template] .tpl-btn,
+[data-template] .tpl-card,
+[data-template] .tpl-input {
+  border-radius: var(--radius);
+}
+[data-template] .tpl-card {
+  box-shadow: var(--tpl-shadow);
+}
+
+/* 区块间距（不同模板紧凑度不同） */
+[data-template] .tpl-section {
+  padding-top: var(--section-pad);
+  padding-bottom: var(--section-pad);
+}
+
+/* 字号缩放（大字号模板：高端/地产/文创） */
+[data-template] .tpl-scaled {
+  font-size: calc(1em * var(--font-scale));
+}
+
+/* -----------------------------------------------------
+   标题字重：对应字段 style.titleWeight（2026-09-15 由「写死 slug」升级为「真实字段」）
+   迁移前这里是三条**写死模板 slug** 的 .tpl-title 规则（选择器形如
+   `data-template="t3-carbon-black" .tpl-title`），给 t3/t8 设 300、给 t6 设 800。
+   删除理由仍然成立 —— 「字重」不在 style 的既有 8 个字段里，写死 slug 无法被配置驱动。
+   ⇒ 现在 style 新增 titleWeight 字段（lib/templates/presets.ts），由 app/layout.tsx
+     注入 html 的 `data-title-weight`，本处用属性选择器派发。
+   语义：light = 细体（高端 t3 / 地产 t8）；black = 特粗（电商 t6）；
+        normal = **不改变**组件自带字重。
+   ----------------------------------------------------- */
+[data-title-weight="light"] .tpl-title {
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+[data-title-weight="black"] .tpl-title {
+  font-weight: 800;
+}
+/* normal = 显式回落组件自带字重。
+   所有 .tpl-title 钩子都自带 Tailwind `font-bold`(700)，故 normal 等价于「不干预」；
+   写成显式规则而不是留空：这样每个真实取值都有一条可被
+   scripts/_test_style_wiring.js 「取值覆盖」逐条核对的 CSS 落点，不留隐式默认。 */
+[data-title-weight="normal"] .tpl-title {
+  font-weight: 700;
+}
+
+/* ============ 卡片风格派生：对应字段 style.card ============ */
+
+/* card = bordered → 描边、无阴影
+   （保留组件自带的 border/border-dark-* 描边，这里只清掉基础阴影） */
+[data-card-style="bordered"] .tpl-card {
+  box-shadow: none;
+}
+
+/* card = flat → 无边框、无阴影
+   用 border-color: transparent 而不是 border: none，
+   以保证边框宽度不变 ⇒ 盒模型尺寸零变化（不会引起布局位移） */
+[data-card-style="flat"] .tpl-card {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* card = elevated → 有阴影，取模板注入的 --tpl-shadow */
+[data-card-style="elevated"] .tpl-card {
+  box-shadow: var(--tpl-shadow);
+}
+
+/* card = gradient → 渐变描边
+   （原规则作用于写死 slug t6-ecommerce/t10-creative，语义等价搬过来） */
+[data-card-style="gradient"] .tpl-card {
+  border: 1px solid transparent;
+  background-image: linear-gradient(#fff, #fff), linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+/* ============ 按钮/CTA 风格派生：对应字段 style.cta ============ */
+
+/* cta = solid → 实心主色（显式写出默认态，防止被其它规则串味） */
+[data-cta-style="solid"] .btn-primary {
+  background: var(--color-primary);
+  border-color: transparent;
+  color: #fff;
+}
+/* solid 的 hover：保留可感知的反馈（比原 hover:bg-primary-600 更贴模板色） */
+[data-cta-style="solid"] .btn-primary:hover {
+  background: var(--color-primary-dark, var(--color-primary));
+  color: #fff;
+}
+
+/* cta = outline → 描边
+   （原规则作用于写死 slug t3-carbon-black/t8-realestate，语义等价搬过来） */
+[data-cta-style="outline"] .btn-primary {
+  background: transparent;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+}
+[data-cta-style="outline"] .btn-primary:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* cta = gradient → 主色→点缀色渐变底 */
+[data-cta-style="gradient"] .btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  border-color: transparent;
+  color: #fff;
+}
+[data-cta-style="gradient"] .btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* ============ Hero 区差异：对应字段 style.hero ============ */
+
+/* hero = centered → 文字与按钮组居中（只改对齐，不改 DOM/栅格） */
+[data-hero-style="centered"] .tpl-hero .container {
+  justify-content: center;
+}
+[data-hero-style="centered"] .tpl-hero .container > div {
+  text-align: center;
+}
+/* 全局 `p { text-align: justify }` 是元素选择器，会压过继承的居中 ⇒ 必须直接命中 p */
+[data-hero-style="centered"] .tpl-hero p {
+  text-align: center;
+}
+/* Hero 的 CTA 按钮行（flex flex-wrap）需要显式居中 */
+[data-hero-style="centered"] .tpl-hero .container > div > .flex {
+  justify-content: center;
+}
+
+/* hero = overlay → 给 Hero 整体再叠加一层更深的遮罩
+   注：z-index 分层保证只压暗背景层，文字层（.container）被抬到其上；
+   pointer-events: none 保证不拦截轮播按钮/链接的交互。 */
+[data-hero-style="overlay"] .tpl-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+[data-hero-style="overlay"] .tpl-hero > .container {
+  z-index: 2;
+}
+
+/* hero = full → 全幅 Hero（默认态）。
+   写成「显式默认态」而不是留空：这样该取值有自己的一条规则，
+   不会被 centered/overlay 的规则串味，也便于将来审计哪些取值已实现。 */
+[data-hero-style="full"] .tpl-hero .container {
+  justify-content: flex-start;
+}
+
+/* hero = split → 左右分栏（**纯 CSS 实现，不改 Hero.tsx 的 DOM 结构**）
+   Hero.tsx 的实际结构（本次硬约束：一个字都不改）：
+     <section.tpl-hero>
+       <div.absolute.inset-0 …>                 ← 媒体层（图片 + 遮罩），每张 slide 一个
+       <div.container.relative.py-20 …>         ← 内容容器（badge / h1 / p / 按钮 / 指标）
+   做法：
+     · 媒体层只占**行尾**那一半 —— 用逻辑属性 `inset-inline-start: 50%`，
+       Tailwind 的 `inset: 0` 仍提供 top/right/bottom 三个方向 ⇒ 结果正好是右半边；
+       `dir=rtl` 时 inset-inline-start 自动映射到 right ⇒ 自动镜像到左半边，无需额外规则。
+     · 内容容器只占**行首**那一半 —— width: 50% + 解除 max-width:1280px 限制
+       + 取消 .container 的居中（margin-inline-start: 0），否则会横跨中线压到媒体层上。
+     · section 本身铺底色 var(--color-dark)：否则空掉的那半边会透出页面白底。
+     · 窄屏（≤1024px）**退回全宽**：手机上分栏会把标题挤成一条窄柱。 */
+[data-hero-style="split"] .tpl-hero {
+  background-color: var(--color-dark, #111111);
+}
+[data-hero-style="split"] .tpl-hero > .absolute.inset-0 {
+  inset-inline-start: 50%;
+}
+[data-hero-style="split"] .tpl-hero > .container {
+  width: 50%;
+  max-width: none;
+  margin-inline-start: 0;
+  margin-inline-end: auto;
+  justify-content: flex-start;
+}
+@media (max-width: 1024px) {
+  /* 窄屏退回全宽：媒体层恢复铺满，内容容器恢复居中容器行为 */
+  [data-hero-style="split"] .tpl-hero > .absolute.inset-0 {
+    inset-inline-start: 0;
+  }
+  [data-hero-style="split"] .tpl-hero > .container {
+    width: 100%;
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+  }
+}
+
+/* ============ 页头差异：对应字段 style.header ============ */
+
+/* header = solid → 不透明页头（与 glass 的「半透明+模糊」相对）。
+   组件默认是 bg-white/95 + backdrop-blur（更接近 glass），故 solid 显式改为纯不透明。 */
+[data-header-style="solid"] .tpl-header {
+  background-color: #fff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* header = transparent → 顶部透明页头（叠在深色 Hero 上）
+   2026-09-15 补齐可读性：Header.tsx 新增滚动状态，滚动 > 8px 时给 <header> 加 `.is-scrolled`。
+     · 未滚动（页面顶部）：背景透明 + 去边框 + **顶部栏**文字/图标转白
+       —— 否则 text-gray-700 深灰字压在深色 Hero 图上读不清。
+     · 已滚动：恢复实色白底（见下方 .is-scrolled 规则），文字回到组件自带的深色。
+   ⚠️ 白字只作用于 `> .container`（顶部栏那一条）且排除 `.absolute` 容器内的元素：
+      语言下拉 / 导航二级菜单 / 搜索结果面板 / 移动端菜单都**内联在 <header> 里**
+      且自带白底，若一并转白会变成「白底白字」。
+   ⚠️ 本组规则全部以 [data-header-style="transparent"] 打头 ⇒ solid / glass 零影响。 */
+[data-header-style="transparent"] .tpl-header:not(.is-scrolled) {
+  background-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  /* 去边框：用 transparent 而不是 border: none，保证盒模型尺寸零变化（不引起布局位移） */
+  border-color: transparent;
+}
+[data-header-style="transparent"] .tpl-header:not(.is-scrolled) > .container a:not(.absolute a),
+[data-header-style="transparent"] .tpl-header:not(.is-scrolled) > .container button:not(.absolute button),
+[data-header-style="transparent"] .tpl-header:not(.is-scrolled) > .container span:not(.absolute span),
+[data-header-style="transparent"] .tpl-header:not(.is-scrolled) > .container svg:not(.absolute svg) {
+  color: #ffffff;
+}
+/* 透明态下保留 hover 反馈（否则 hover:text-primary 会被上面的白字规则整体压掉，
+   深色主色压在深色 Hero 上等于没有反馈） */
+[data-header-style="transparent"] .tpl-header:not(.is-scrolled) > .container a:hover,
+[data-header-style="transparent"] .tpl-header:not(.is-scrolled) > .container button:hover {
+  color: var(--color-accent, #ffffff);
+}
+/* 🔴 logo 必须一起转白 —— 否则透明页头下 logo 会「消失」。
+   这不是猜测，是**量出来的**：`node scripts/_audit_logo_luminance.js` 实测
+   `public/images/logo.png` 为「深色 + 透明底」（可见像素 100% 深色、平均亮度 0.064、透明占比 73.3%），
+   压在深色 Hero 上对比度仅 **1.62**（WCAG 非文本元素可辨阈值为 3）⇒ 基本看不见。
+   因为该 logo 是**单色深色**（无彩色像素），`brightness(0) invert(1)` 得到的是纯白剪影，
+   **不损失任何色彩信息**，正是「白色版本 logo」的等价物。
+   ⚠️ 若站点在后台换成了**彩色** logo，这条会把彩色压成白色剪影 —— 那是"可读"与"保色"的取舍，
+      如不接受，删掉本条即可（代价：透明页头下彩色 logo 压在深色图上同样难读）。
+   作用域刻意收在「顶部栏里指向首页的那个链接内的 img」，不波及下拉面板/其它图片。 */
+[data-header-style="transparent"] .tpl-header:not(.is-scrolled) > .container a[href="/"] img,
+[data-header-style="transparent"] .tpl-header:not(.is-scrolled) > .container a[href=""] img {
+  filter: brightness(0) invert(1);
+}
+/* 已滚动 → 恢复实色白底 + 模糊，脱离 Hero 后回到常规站点页头观感 */
+[data-header-style="transparent"] .tpl-header.is-scrolled {
+  background-color: #ffffff;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-color: #e5e7eb;
+}
+
+/* header = glass → 半透明 + 背景模糊 */
+[data-header-style="glass"] .tpl-header {
+  background-color: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+
+:root {
+  --foreground-rgb: 26, 26, 26;
+  --background-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #9B1B1B;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7A1616;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* RTL 适配：阿拉伯语页面 */
+[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+
+
+/* =====================================================
+   后台管理（admin-shell）细节样式完善 2026-09-07
+   作用域限定在 .admin-shell 内，不影响前台
+   ===================================================== */
+/* 后台中性滚动条（替换前台的红色滚动条在后台的显示） */
+.admin-shell ::-webkit-scrollbar { width: 8px; height: 8px; }
+.admin-shell ::-webkit-scrollbar-track { background: transparent; }
+.admin-shell ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+.admin-shell ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+.admin-shell ::-webkit-scrollbar-corner { background: transparent; }
+
+/* 后台选区颜色 */
+.admin-shell ::selection { background: rgba(204, 0, 0, 0.12); color: inherit; }
+
+/* 后台键盘焦点环（无障碍 + 细节统一） */
+.admin-shell a:focus-visible,
+.admin-shell button:focus-visible,
+.admin-shell input:focus-visible,
+.admin-shell select:focus-visible,
+.admin-shell textarea:focus-visible,
+.admin-shell [tabindex]:focus-visible {
+  outline: 2px solid rgba(204, 0, 0, 0.45);
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+
+/* 详情弹窗过渡动画 */
+@keyframes admin-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes admin-modal-in { from { opacity: 0; transform: translateY(10px) scale(0.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.admin-modal-mask { animation: admin-fade-in 0.16s ease-out; }
+.admin-modal-panel { animation: admin-modal-in 0.2s cubic-bezier(0.2, 0.8, 0.3, 1); }
+
+/* 表格行过渡 */
+.admin-table tr { transition: background-color 0.12s ease; }
+
+/* 统计卡 hover 提升 */
+.admin-stat-card { transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
+.admin-stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07); border-color: rgba(204, 0, 0, 0.35); }
+
+/* =====================================================
+   前台交互细节增强（2026-09-07）：
+   焦点可见性 / 链接过渡 / 卡片与按钮动效 / 平滑滚动
+   仅增强交互质感，不改布局与既有配色
+   ===================================================== */
+html { scroll-behavior: smooth; }
+
+/* 键盘焦点环（无障碍）：前台红 / 后台 admin-shell 红环优先级更高 */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--color-primary, #9B1B1B);
+  outline-offset: 2px;
+}
+
+/* 链接与图标按钮平滑过渡 */
+a,
+button {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
+}
+
+/* 卡片 hover 阴影提升（模板卡片 + 通用白卡） */
+.tpl-card,
+.card-hover {
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+.tpl-card:hover,
+.card-hover:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* 主按钮 hover 微上浮 */
+.btn-primary:hover,
+.tpl-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* 弹层/下拉统一入场动画 */
+@keyframes front-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.header-dropdown,
+[class*="dropdown"],
+[class*="popover"] {
+  animation: front-fade-in 0.18s ease-out;
+}

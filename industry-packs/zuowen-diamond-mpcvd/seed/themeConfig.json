@@ -1,0 +1,17 @@
+{
+  "model": "themeConfig",
+  "rows": [
+    {
+      "id": "1",
+      "primary": "#CC0000",
+      "primaryLight": "#E53935",
+      "primaryDark": "#990000",
+      "accent": "#C0C0C0",
+      "dark": "#111111",
+      "darkLight": "#1F1F1F",
+      "fontFamily": "'Roboto', 'PingFang SC', 'Microsoft YaHei', sans-serif",
+      "templateSlug": "t2-industrial",
+      "remark": "模板「工业智造风」(t2-industrial) 应用"
+    }
+  ]
+}

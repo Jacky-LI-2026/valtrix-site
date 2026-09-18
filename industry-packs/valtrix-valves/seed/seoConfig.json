@@ -1,0 +1,24 @@
+{
+  "model": "seoConfig",
+  "rows": [
+    {
+      "id": "1",
+      "siteName": "VALTRIX",
+      "siteNameEn": "VALTRIX",
+      "defaultTitle": "VALTRIX - Ultra-High-Purity Fluid Control Components",
+      "defaultDesc": "VALTRIX designs and manufactures ultra-high-purity VCR fittings, diaphragm valves, pressure reducers, check valves and gas filters for semiconductor, biopharmaceutical, LED/display, solar and hydrogen industries.",
+      "keywords": "VALTRIX, ultra-high-purity, VCR fittings, diaphragm valves, pressure reducers, check valves, gas filters, UHP fluid control, 316L stainless steel",
+      "companyName": "阀门科技有限公司",
+      "companyAddress": "",
+      "phone": "",
+      "email": "sales@valtrix.com",
+      "latitude": null,
+      "longitude": null,
+      "geoRegion": "",
+      "socialLinks": null,
+      "baiduSiteUrl": null,
+      "baiduPushToken": null,
+      "indexnowKey": null
+    }
+  ]
+}

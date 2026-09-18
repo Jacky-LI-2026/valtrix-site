@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="use-iframe" content="true">
+  <meta name="html-box-height-mode" content="auto">
+  <meta name="description" content="AI接入企业官网的五场景生产力提升闭环：内容供给-智能承接-智能获客-数据回流-反哺内容，由统一AI编排层支撑">
+  <title>AI 生产力提升闭环</title>
+</head>
+<body style="margin:0;padding:0;background:transparent;font-family:'PingFang SC','Microsoft YaHei',sans-serif;color:#1A2B4A;box-sizing:border-box;width:100%;max-width:100%;">
+  <div style="box-sizing:border-box;width:100%;max-width:100%;">
+
+    <div style="padding:16px;background:linear-gradient(135deg,#EFF3F9,#FFFFFF);border:1px solid #DDE0E4;border-radius:16px;box-sizing:border-box;">
+      <div style="font-size:16px;font-weight:600;color:#1A2B4A;margin-bottom:2px;">AI 接入官网 · 生产力提升闭环</div>
+      <div style="font-size:12px;color:#758092;margin-bottom:14px;">内容供给 → 智能承接 → 智能获客 → 数据回流 → 反哺内容，由统一 AI 编排层支撑</div>
+
+      <!-- SVG 闭环图 -->
+      <svg viewBox="0 0 820 360" style="width:100%;height:auto;display:block;" role="img" aria-label="AI生产力提升闭环示意">
+        <defs>
+          <linearGradient id="coreGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#1A2B4A"/>
+            <stop offset="1" stop-color="#3D5A80"/>
+          </linearGradient>
+        </defs>
+
+        <!-- 环形连线 -->
+        <g fill="none" stroke="#BABFC9" stroke-width="2" stroke-dasharray="6 5">
+          <path d="M 460 90 Q 700 90 700 200 Q 700 300 520 300"/>
+          <path d="M 300 300 Q 120 300 120 200 Q 120 90 360 90"/>
+        </g>
+
+        <!-- 节点 -->
+        <g font-family="'PingFang SC','Microsoft YaHei',sans-serif" text-anchor="middle">
+          <!-- 中心 AI 编排层 -->
+          <circle cx="410" cy="195" r="86" fill="url(#coreGrad)"/>
+          <text x="410" y="180" fill="#FFFFFF" font-size="17" font-weight="600">AI 编排层</text>
+          <text x="410" y="202" fill="#DDE0E4" font-size="12">Agent · Skills</text>
+          <text x="410" y="220" fill="#DDE0E4" font-size="12">MCP · RAG</text>
+
+          <!-- 节点1 内容供给 -->
+          <rect x="560" y="40" width="160" height="86" rx="12" fill="#FFFFFF" stroke="#1A2B4A" stroke-width="1.5"/>
+          <circle cx="590" cy="64" r="9" fill="#3D5A80"/>
+          <text x="590" y="68" fill="#FFFFFF" font-size="10" font-weight="600">1</text>
+          <text x="640" y="68" fill="#1A2B4A" font-size="13" font-weight="600">内容供给</text>
+          <text x="640" y="88" fill="#758092" font-size="10.5">企业素材入库</text>
+          <text x="640" y="104" fill="#758092" font-size="10.5">产品库·案例·FAQ</text>
+
+          <!-- 节点2 智能承接 -->
+          <rect x="560" y="236" width="160" height="86" rx="12" fill="#FFFFFF" stroke="#1A2B4A" stroke-width="1.5"/>
+          <circle cx="590" cy="260" r="9" fill="#3D5A80"/>
+          <text x="590" y="264" fill="#FFFFFF" font-size="10" font-weight="600">2</text>
+          <text x="640" y="264" fill="#1A2B4A" font-size="13" font-weight="600">智能承接</text>
+          <text x="640" y="284" fill="#758092" font-size="10.5">AI 客服·知识库问答</text>
+          <text x="640" y="300" fill="#758092" font-size="10.5">7×24·留资·转人工</text>
+
+          <!-- 节点3 智能获客 -->
+          <rect x="60" y="236" width="160" height="86" rx="12" fill="#FFFFFF" stroke="#1A2B4A" stroke-width="1.5"/>
+          <circle cx="90" cy="260" r="9" fill="#3D5A80"/>
+          <text x="90" y="264" fill="#FFFFFF" font-size="10" font-weight="600">3</text>
+          <text x="140" y="264" fill="#1A2B4A" font-size="13" font-weight="600">智能获客</text>
+          <text x="140" y="284" fill="#758092" font-size="10.5">GEO·AEO·个性化落地页</text>
+          <text x="140" y="300" fill="#758092" font-size="10.5">被大模型优先引用</text>
+
+          <!-- 节点4 数据回流 -->
+          <rect x="60" y="40" width="160" height="86" rx="12" fill="#FFFFFF" stroke="#1A2B4A" stroke-width="1.5"/>
+          <circle cx="90" cy="64" r="9" fill="#3D5A80"/>
+          <text x="90" y="68" fill="#FFFFFF" font-size="10" font-weight="600">4</text>
+          <text x="140" y="68" fill="#1A2B4A" font-size="13" font-weight="600">数据回流</text>
+          <text x="140" y="88" fill="#758092" font-size="10.5">行为·转化·咨询分析</text>
+          <text x="140" y="104" fill="#758092" font-size="10.5">归因·漏斗·画像</text>
+        </g>
+
+        <!-- 方向箭头标注 -->
+        <g fill="#1A2B4A" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" text-anchor="middle">
+          <text x="730" y="170">① AI 批量生成内容 / 多语言</text>
+          <text x="620" y="358">② 访客咨询 → 即时应答</text>
+          <text x="130" y="358">③ 内容被 AI 搜索引用获客</text>
+          <text x="40" y="170">④ 数据回流反哺内容策略</text>
+        </g>
+      </svg>
+
+      <div style="font-size:11px;color:#758092;margin-top:8px;">示意：环形方向为「素材 → 生成 → 承接 → 获客 → 回流」的持续运转，中心为统一 AI 编排层，避免各功能重复建设 AI 能力。</div>
+    </div>
+
+    <!-- 五大场景卡片 -->
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;box-sizing:border-box;">
+
+      <div style="flex:1 1 190px;min-width:0;box-sizing:border-box;padding:12px;background:#FFFFFF;border:1px solid #DDE0E4;border-radius:12px;">
+        <div style="font-size:12px;font-weight:600;color:#1A2B4A;">内容生产</div>
+        <div style="font-size:11.5px;color:#758092;margin-top:4px;line-height:1.6;">AI 写作、配图、批量 TDK、多语言翻译，内容产能提升 5—10 倍（行业口径）</div>
+      </div>
+
+      <div style="flex:1 1 190px;min-width:0;box-sizing:border-box;padding:12px;background:#FFFFFF;border:1px solid #DDE0E4;border-radius:12px;">
+        <div style="font-size:12px;font-weight:600;color:#1A2B4A;">智能客服</div>
+        <div style="font-size:11.5px;color:#758092;margin-top:4px;line-height:1.6;">RAG 知识库问答，7×24 应答，可信引用、留资、转人工一体化</div>
+      </div>
+
+      <div style="flex:1 1 190px;min-width:0;box-sizing:border-box;padding:12px;background:#FFFFFF;border:1px solid #DDE0E4;border-radius:12px;">
+        <div style="font-size:12px;font-weight:600;color:#1A2B4A;">智能获客</div>
+        <div style="font-size:11.5px;color:#758092;margin-top:4px;line-height:1.6;">GEO/AEO 结构化、Schema 标记，让官网被豆包、DeepSeek 等 AI 搜索优先推荐</div>
+      </div>
+
+      <div style="flex:1 1 190px;min-width:0;box-sizing:border-box;padding:12px;background:#FFFFFF;border:1px solid #DDE0E4;border-radius:12px;">
+        <div style="font-size:12px;font-weight:600;color:#1A2B4A;">运营分析</div>
+        <div style="font-size:11.5px;color:#758092;margin-top:4px;line-height:1.6;">访问归因、转化漏斗、AI 周报，让运营决策有数据支撑</div>
+      </div>
+
+      <div style="flex:1 1 190px;min-width:0;box-sizing:border-box;padding:12px;background:#FFFFFF;border:1px solid #DDE0E4;border-radius:12px;">
+        <div style="font-size:12px;font-weight:600;color:#1A2B4A;">AI 建站与改版</div>
+        <div style="font-size:11.5px;color:#758092;margin-top:4px;line-height:1.6;">对话生成官网、智能装修、一键改版，交付周期从天级压缩到小时级</div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

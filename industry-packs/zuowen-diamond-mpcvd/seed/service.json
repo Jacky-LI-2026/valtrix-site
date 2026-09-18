@@ -1,0 +1,1393 @@
+{
+  "model": "service",
+  "rows": [
+    {
+      "id": "3",
+      "slug": "technical-support",
+      "title": "技术支持",
+      "titleEn": "Technical Support",
+      "titleJa": "ビジネス",
+      "titleKo": "기술 지원",
+      "titleFr": "Soutien technique",
+      "titleAr": "2 - الدعم التكنولوجي",
+      "subtitle": "专业的技术团队，全方位的技术支持服务",
+      "subtitleEn": "Professional technical team, comprehensive technical support services",
+      "subtitleJa": "プロフェッショナルなテクニカルチーム、包括的なテクニカルサポートサービス",
+      "subtitleKo": "전문 기술팀, 종합 기술 지원 서비스",
+      "subtitleFr": null,
+      "subtitleAr": "فريق فني محترف، خدمات دعم فني شاملة",
+      "description": "左文科技拥有专业的技术支持团队，提供从设备安装、操作培训到故障排除的全方位技术支持服务。我们的技术工程师具有丰富的现场经验，能够快速响应客户需求，确保设备稳定运行和客户生产顺利进行。",
+      "descriptionEn": "ZUO WEN TECHNOLOGY has a professional technical support team, providing comprehensive technical support services from equipment installation, operation training to troubleshooting.",
+      "descriptionJa": "Zuowen Technologyにはプロフェッショナルなテクニカルサポートチームがあり、機器の設置、操作トレーニングからトラブルシューティングまで、あらゆる種類のテクニカルサポートサービスを提供しています。当社の技術エンジニアは、豊富な現場経験を持ち、お客様のニーズに迅速に対応することができ、機器の安定した稼働とお客様の生産の円滑な進行を保証します。",
+      "descriptionKo": "Zuowen Technology에는 전문 기술 지원 팀이 있어 장비 설치, 운영 교육에서 문제 해결에 이르기까지 모든 범위의 기술 지원 서비스를 제공합니다. 당사의 기술 엔지니어는 광범위한 현장 경험을 보유하고 있으며 고객의 요구에 신속하게 대응할 수 있어 장비의 안정적인 작동과 고객 생산의 원활한 진행을 보장합니다.",
+      "descriptionFr": "Zuwen Tech dispose d'une équipe de support technique professionnelle qui fournit une gamme complète de services de support technique, de l'installation de l'équipement, de la formation opérationnelle au dépannage. Nos ingénieurs techniques ont une vaste expérience sur le terrain et sont en mesure de répondre rapidement aux besoins des clients, assurant un fonctionnement stable de l'équipement et le bon déroulement de la production du client.",
+      "descriptionAr": "لدى Zuowen Technology فريق دعم فني محترف، يقدم مجموعة كاملة من خدمات الدعم الفني من تركيب المعدات والتدريب على التشغيل إلى استكشاف الأخطاء وإصلاحها. يتمتع مهندسونا الفنيون بخبرة ميدانية واسعة وقادرون على الاستجابة بسرعة لاحتياجات العملاء، مما يضمن التشغيل المستقر للمعدات والتقدم السلس في إنتاج العملاء.",
+      "features": [
+        {
+          "desc": "专业的设备安装调试服务，确保设备正常运行",
+          "title": "设备安装"
+        },
+        {
+          "desc": "全面的操作人员培训，确保客户能够独立操作",
+          "title": "操作培训"
+        },
+        {
+          "desc": "快速响应的故障排除服务，减少设备停机时间",
+          "title": "故障排除"
+        },
+        {
+          "desc": "远程技术支持，快速解决常见问题",
+          "title": "远程支持"
+        },
+        {
+          "desc": "专业工程师现场服务，解决复杂问题",
+          "title": "现场服务"
+        },
+        {
+          "desc": "长期的技术咨询和工艺优化建议",
+          "title": "技术咨询"
+        }
+      ],
+      "featuresEn": [
+        {
+          "desc": "Professional equipment installation and debugging services to ensure the normal operation of the equipment",
+          "title": "Equipment installation"
+        },
+        {
+          "desc": "Comprehensive operator training to ensure customers can operate independently",
+          "title": "Operation Training"
+        },
+        {
+          "desc": "Quick response troubleshooting services to reduce equipment downtime",
+          "title": "troubleshooting"
+        },
+        {
+          "desc": "Remote technical support to quickly solve common problems",
+          "title": "remote support"
+        },
+        {
+          "desc": "Professional engineers provide on-site services to solve complex problems",
+          "title": "on-site service"
+        },
+        {
+          "desc": "Long term technical consultation and process optimization suggestions",
+          "title": "Technical Consulting"
+        }
+      ],
+      "featuresJa": [
+        {
+          "desc": "機器の正常な動作を確保するための専門的な機器の設置および試運転サービス",
+          "title": "設備据付"
+        },
+        {
+          "desc": "顧客が独立して操作できるようにするための包括的なオペレータートレーニング",
+          "title": "運用訓練"
+        },
+        {
+          "desc": "機器のダウンタイムを短縮する迅速なトラブルシューティングサービス",
+          "title": "トラブルシューティング"
+        },
+        {
+          "desc": "一般的な問題を迅速に解決するためのリモートテクニカルサポート",
+          "title": "リモートサポート"
+        },
+        {
+          "desc": "複雑な問題を解決するプロフェッショナルエンジニアフィールドサービス",
+          "title": "フィールドサービス"
+        },
+        {
+          "desc": "長期的な技術アドバイスとプロセス最適化の提案",
+          "title": "技術相談"
+        }
+      ],
+      "featuresKo": [
+        {
+          "desc": "장비의 정상적인 작동을 보장하기 위한 전문 장비 설치 및 시운전 서비스",
+          "title": "장비 설치"
+        },
+        {
+          "desc": "고객이 독립적으로 운영할 수 있도록 보장하는 포괄적인 운영자 교육",
+          "title": "운영 교육"
+        },
+        {
+          "desc": "장비 가동 중지 시간을 줄이기 위한 신속한 문제 해결 서비스",
+          "title": "문제 해결"
+        },
+        {
+          "desc": "일반적인 문제를 신속하게 해결하기 위한 원격 기술 지원",
+          "title": "원격 지원"
+        },
+        {
+          "desc": "복잡한 문제를 해결하기 위한 전문 엔지니어 현장 서비스",
+          "title": "현장 서비스"
+        },
+        {
+          "desc": "장기적인 기술 자문 및 프로세스 최적화 제안",
+          "title": "기술 컨설팅"
+        }
+      ],
+      "featuresFr": null,
+      "featuresAr": [
+        {
+          "desc": "خدمات تركيب وتشغيل المعدات المهنية لضمان التشغيل العادي للمعدات",
+          "title": "تركيب المعدات"
+        },
+        {
+          "desc": "تدريب شامل للمشغلين لضمان قدرة العملاء على العمل بشكل مستقل",
+          "title": "التدريب التشغيلي"
+        },
+        {
+          "desc": "خدمات استكشاف الأخطاء وإصلاحها سريعة الاستجابة لتقليل وقت تعطل المعدات",
+          "title": "استكشاف الأخطاء وإصلاحها"
+        },
+        {
+          "desc": "الدعم الفني عن بعد لحل المشكلات الشائعة بسرعة",
+          "title": "الدعم عن بعد"
+        },
+        {
+          "desc": "مهندس خدمة ميدانية محترف لحل المشكلات المعقدة",
+          "title": "الخدمة الميدانية"
+        },
+        {
+          "desc": "المشورة الفنية طويلة الأجل واقتراحات تحسين العملية",
+          "title": "المشورة التقنية"
+        }
+      ],
+      "process": [
+        {
+          "desc": "客户提交技术问题或服务需求",
+          "step": "01",
+          "title": "问题提交"
+        },
+        {
+          "desc": "技术团队评估问题和解决方案",
+          "step": "02",
+          "title": "问题评估"
+        },
+        {
+          "desc": "远程技术支持和指导",
+          "step": "03",
+          "title": "远程支持"
+        },
+        {
+          "desc": "必要时派遣工程师现场服务",
+          "step": "04",
+          "title": "现场服务"
+        },
+        {
+          "desc": "解决问题并验证设备运行",
+          "step": "05",
+          "title": "问题解决"
+        },
+        {
+          "desc": "后续跟踪和客户满意度调查",
+          "step": "06",
+          "title": "跟踪反馈"
+        }
+      ],
+      "processEn": [
+        {
+          "desc": "Customers submit technical questions or service requirements",
+          "step": "01",
+          "title": "Problem Submission"
+        },
+        {
+          "desc": "Technical team evaluates problems and solutions",
+          "step": "02",
+          "title": "Problem Evaluation"
+        },
+        {
+          "desc": "Remote technical support and guidance",
+          "step": "03",
+          "title": "remote support"
+        },
+        {
+          "desc": "Dispatch engineers to provide on-site services when necessary",
+          "step": "04",
+          "title": "on-site service"
+        },
+        {
+          "desc": "Resolve issues and verify device operation",
+          "step": "05",
+          "title": "problem solving"
+        },
+        {
+          "desc": "Follow up tracking and customer satisfaction survey",
+          "step": "06",
+          "title": "Tracking feedback"
+        }
+      ],
+      "processJa": [
+        {
+          "desc": "顧客が技術的な問題またはサービスリクエストを提出する",
+          "step": "01",
+          "title": "質問の送信"
+        },
+        {
+          "desc": "技術チームが問題と解決策を評価する",
+          "step": "02",
+          "title": "問題の評価"
+        },
+        {
+          "desc": "リモートテクニカルサポートとガイダンス",
+          "step": "03",
+          "title": "リモートサポート"
+        },
+        {
+          "desc": "必要に応じて派遣エンジニアのオンサイトサービス",
+          "step": "04",
+          "title": "フィールドサービス"
+        },
+        {
+          "desc": "問題を解決し、デバイスの動作を確認する",
+          "step": "05",
+          "title": "問題の解決"
+        },
+        {
+          "desc": "フォローアップと顧客満足度調査",
+          "step": "06",
+          "title": "フィードバックを追跡"
+        }
+      ],
+      "processKo": [
+        {
+          "desc": "고객이 기술 문제 또는 서비스 요청을 제출함",
+          "step": "01",
+          "title": "질문 제출"
+        },
+        {
+          "desc": "기술팀이 문제 및 해결책을 평가합니다.",
+          "step": "02",
+          "title": "문제 평가"
+        },
+        {
+          "desc": "원격 기술 지원 및 지침",
+          "step": "03",
+          "title": "원격 지원"
+        },
+        {
+          "desc": "필요한 경우 엔지니어 현장 서비스 파견",
+          "step": "연결된 고리에 접촉을 하면",
+          "title": "현장 서비스"
+        },
+        {
+          "desc": "문제 해결 및 기기 작동 확인",
+          "step": "0. 05",
+          "title": "문제 해결"
+        },
+        {
+          "desc": "후속 조치 및 고객 만족도 설문조사",
+          "step": "06",
+          "title": "피드백 추적"
+        }
+      ],
+      "processFr": null,
+      "processAr": [
+        {
+          "desc": "يقدم العميل مشكلة فنية أو طلب خدمة",
+          "step": "01)&#10;",
+          "title": "تقديم السؤال"
+        },
+        {
+          "desc": "يقوم الفريق الفني بتقييم المشكلات والحلول",
+          "step": "02",
+          "title": "تقييم المشكلة"
+        },
+        {
+          "desc": "الدعم الفني والتوجيه عن بعد",
+          "step": "03",
+          "title": "الدعم عن بعد"
+        },
+        {
+          "desc": "إرسال مهندس خدمة في الموقع عند الضرورة",
+          "step": "04",
+          "title": "الخدمة الميدانية"
+        },
+        {
+          "desc": "حل المشكلات والتحقق من تشغيل الجهاز",
+          "step": "05",
+          "title": "حل المشكلات"
+        },
+        {
+          "desc": "استطلاعات المتابعة ورضا العملاء",
+          "step": "06",
+          "title": "تتبع الملاحظات"
+        }
+      ],
+      "icon": "Headphones",
+      "video": null,
+      "sortOrder": 3,
+      "status": "published",
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null,
+      "solutionFile": null,
+      "solutionFileName": null,
+      "solutionFileNameEn": null,
+      "solutionFileNameJa": null,
+      "solutionFileNameKo": null,
+      "solutionFileNameFr": null,
+      "solutionFileNameAr": null,
+      "relatedProductSlugs": null,
+      "relatedServiceSlugs": null
+    },
+    {
+      "id": "4",
+      "slug": "after-sales",
+      "title": "售后服务",
+      "titleEn": "After-sales Service",
+      "titleJa": "アフターセールス",
+      "titleKo": "애프터 서비스",
+      "titleFr": "Service après - vente",
+      "titleAr": "خدمات ما بعد البيع",
+      "subtitle": "完善的售后服务体系，让客户无后顾之忧",
+      "subtitleEn": "Comprehensive after-sales service system, worry-free for customers",
+      "subtitleJa": "完璧なアフターサービスシステムにより、お客様に安心してご利用いただけます",
+      "subtitleKo": "고객이 걱정할 필요가 없는 완벽한 애프터 서비스 시스템",
+      "subtitleFr": null,
+      "subtitleAr": "نظام خدمة ما بعد البيع مثالي، بحيث لا يشعر العملاء بالقلق",
+      "description": "左文科技建立了完善的售后服务体系，提供从质保服务、备件供应到设备维护的全流程售后服务。我们承诺为客户提供高质量的产品和服务，确保客户在使用过程中无后顾之忧。",
+      "descriptionEn": "ZUO WEN TECHNOLOGY has established a comprehensive after-sales service system, providing full-process after-sales service from warranty service, spare parts supply to equipment maintenance.",
+      "descriptionJa": "Zuowen Technologyは、品質保証サービス、スペアパーツの供給から機器のメンテナンスまでのアフターサービスの全プロセスを提供する完璧なアフターサービスシステムを確立しています。私たちは、顧客が使用中に心配することがないように、高品質の製品とサービスを顧客に提供することにコミットしています。",
+      "descriptionKo": "Zuowen Technology는 품질 보증 서비스, 예비 부품 공급에서 장비 유지 보수에 이르는 애프터 서비스의 전 과정을 제공하기 위해 완벽한 애프터 서비스 시스템을 구축했습니다. 당사는 고객이 사용 중에 걱정하지 않도록 고품질의 제품과 서비스를 제공하기 위해 최선을 다하고 있습니다.",
+      "descriptionFr": "La technologie de zuwen a établi un système de service après - vente parfait, fournissant un service après - vente complet du processus, du Service d'assurance de la qualité, de la fourniture de pièces de rechange à la maintenance de l'équipement. Nous nous engageons à fournir à nos clients des produits et des services de haute qualité, en veillant à ce que les clients ne se soucient pas de leur utilisation.",
+      "descriptionAr": "أنشأت Zuowen Technology نظام خدمة ما بعد البيع المثالي لتوفير العملية الكاملة لخدمة ما بعد البيع من خدمة ضمان الجودة وتوريد قطع الغيار إلى صيانة المعدات. نحن ملتزمون بتزويد العملاء بمنتجات وخدمات عالية الجودة لضمان عدم قلق العملاء أثناء الاستخدام.",
+      "features": [
+        {
+          "desc": "产品质保期内免费维修和更换服务",
+          "title": "质保服务"
+        },
+        {
+          "desc": "充足的备件库存，快速响应备件需求",
+          "title": "备件供应"
+        },
+        {
+          "desc": "定期的设备维护保养服务，延长设备寿命",
+          "title": "设备维护"
+        },
+        {
+          "desc": "设备升级和改造服务，提升设备性能",
+          "title": "升级服务"
+        },
+        {
+          "desc": "24小时内响应，48小时内现场服务",
+          "title": "响应承诺"
+        },
+        {
+          "desc": "定期的客户回访和满意度调查",
+          "title": "客户关怀"
+        }
+      ],
+      "featuresEn": [
+        {
+          "desc": "Free repair and replacement services during the product warranty period",
+          "title": "warranty service"
+        },
+        {
+          "desc": "Adequate spare parts inventory, quick response to spare parts demand",
+          "title": "spare parts supply"
+        },
+        {
+          "desc": "Regular equipment maintenance services to extend equipment lifespan",
+          "title": "Equipment maintenance"
+        },
+        {
+          "desc": "Equipment upgrade and renovation services to enhance equipment performance",
+          "title": "upgrade service"
+        },
+        {
+          "desc": "Response within 24 hours, on-site service within 48 hours",
+          "title": "Response commitment"
+        },
+        {
+          "desc": "Regular customer follow-up and satisfaction surveys",
+          "title": "Customer care"
+        }
+      ],
+      "featuresJa": [
+        {
+          "desc": "製品保証期間中の無料修理および交換サービス",
+          "title": "保証サービス"
+        },
+        {
+          "desc": "スペアパーツのニーズに迅速に対応するための適切なスペアパーツインベントリ",
+          "title": "スペアパーツ供給"
+        },
+        {
+          "desc": "機器の寿命を延ばすための定期的な機器メンテナンスサービス",
+          "title": "設備メンテナンス"
+        },
+        {
+          "desc": "機器の性能を向上させるための機器のアップグレードと改造サービス",
+          "title": "カスタマーサービスのアップグレード"
+        },
+        {
+          "desc": "24時間以内に返答、48時間以内にオンサイトサービス",
+          "title": "回答のコミットメント"
+        },
+        {
+          "desc": "定期的な顧客返品訪問と満足度調査",
+          "title": "カスタマーケア"
+        }
+      ],
+      "featuresKo": [
+        {
+          "desc": "제품 보증 기간 동안 무상 수리 및 교체 서비스",
+          "title": "보증 서비스"
+        },
+        {
+          "desc": "예비 부품 수요에 신속하게 대응할 수 있는 적절한 예비 부품 재고",
+          "title": "예비 부품 공급"
+        },
+        {
+          "desc": "장비의 수명 연장을 위한 정기적인 장비 유지보수 서비스",
+          "title": "장비 유지 보수"
+        },
+        {
+          "desc": "장비 성능 향상을 위한 장비 업그레이드 및 개조 서비스",
+          "title": "업그레이드 서비스"
+        },
+        {
+          "desc": "24시간 이내 응답, 48시간 이내 현장 서비스",
+          "title": "응답 약속"
+        },
+        {
+          "desc": "정기적인 고객 재방문 및 만족도 설문조사",
+          "title": "고객 관리"
+        }
+      ],
+      "featuresFr": null,
+      "featuresAr": [
+        {
+          "desc": "خدمة إصلاح واستبدال مجانية خلال فترة ضمان المنتج",
+          "title": "خدمة الضمان"
+        },
+        {
+          "desc": "مخزون كاف من قطع الغيار للاستجابة السريعة لاحتياجات قطع الغيار",
+          "title": "توريد قطع الغيار"
+        },
+        {
+          "desc": "خدمات صيانة المعدات العادية لإطالة عمر المعدات",
+          "title": "صيانة المعدات"
+        },
+        {
+          "desc": "خدمات ترقية المعدات وتعديلها لتحسين أداء المعدات",
+          "title": "ترقية الخدمة"
+        },
+        {
+          "desc": "الرد في غضون 24 ساعة، الخدمة في الموقع في غضون 48 ساعة",
+          "title": "الالتزام بالاستجابة"
+        },
+        {
+          "desc": "زيارات عودة العملاء المنتظمة واستطلاعات الرضا",
+          "title": "خدمة العملاء"
+        }
+      ],
+      "process": [
+        {
+          "desc": "客户提交售后服务申请",
+          "step": "01",
+          "title": "服务申请"
+        },
+        {
+          "desc": "24小时内响应客户需求",
+          "step": "02",
+          "title": "服务响应"
+        },
+        {
+          "desc": "远程或现场诊断问题",
+          "step": "03",
+          "title": "问题诊断"
+        },
+        {
+          "desc": "提供维修或更换服务",
+          "step": "04",
+          "title": "维修服务"
+        },
+        {
+          "desc": "客户验收并确认服务完成",
+          "step": "05",
+          "title": "验收确认"
+        },
+        {
+          "desc": "后续跟踪和客户满意度调查",
+          "step": "06",
+          "title": "跟踪回访"
+        }
+      ],
+      "processEn": [
+        {
+          "desc": "Customer submits after-sales service application",
+          "step": "01",
+          "title": "Service Request"
+        },
+        {
+          "desc": "Respond to customer needs within 24 hours",
+          "step": "02",
+          "title": "service response"
+        },
+        {
+          "desc": "Remote or on-site diagnosis of issues",
+          "step": "03",
+          "title": "Problem Diagnosis"
+        },
+        {
+          "desc": "Provide repair or replacement services",
+          "step": "04",
+          "title": "Repair Service"
+        },
+        {
+          "desc": "Customer acceptance and confirmation of service completion",
+          "step": "05",
+          "title": "Acceptance Confirmation"
+        },
+        {
+          "desc": "Follow up tracking and customer satisfaction survey",
+          "step": "06",
+          "title": "Follow up and follow-up"
+        }
+      ],
+      "processJa": [
+        {
+          "desc": "顧客がアフターサービスリクエストを提出する",
+          "step": "01",
+          "title": "サービスリクエスト"
+        },
+        {
+          "desc": "24時間以内に顧客のニーズに対応",
+          "step": "02",
+          "title": "サービスレスポンス"
+        },
+        {
+          "desc": "リモートまたはオンサイトで問題のトラブルシューティングを行う",
+          "step": "03",
+          "title": "問題の診断"
+        },
+        {
+          "desc": "修理または交換サービスを提供する",
+          "step": "04",
+          "title": "修理サービス"
+        },
+        {
+          "desc": "顧客の承認とサービス完了の確認",
+          "step": "05",
+          "title": "承認確認"
+        },
+        {
+          "desc": "フォローアップと顧客満足度調査",
+          "step": "06",
+          "title": "再訪のフォローアップ"
+        }
+      ],
+      "processKo": [
+        {
+          "desc": "고객이 애프터 서비스 요청을 제출합니다.",
+          "step": "01",
+          "title": "서비스 요청"
+        },
+        {
+          "desc": "24시간 이내에 고객 니즈에 대응",
+          "step": "02",
+          "title": "서비스 응답"
+        },
+        {
+          "desc": "원격 또는 현장 문제 해결",
+          "step": "03",
+          "title": "문제 진단"
+        },
+        {
+          "desc": "수리 또는 교체 서비스 제공",
+          "step": "연결된 고리에 접촉을 하면",
+          "title": "수리 서비스"
+        },
+        {
+          "desc": "고객 수락 및 서비스 완료 확인",
+          "step": "0. 05",
+          "title": "수락 확인"
+        },
+        {
+          "desc": "후속 조치 및 고객 만족도 설문조사",
+          "step": "06",
+          "title": "재방문 시 후속 조치"
+        }
+      ],
+      "processFr": null,
+      "processAr": [
+        {
+          "desc": "يقدم العميل طلب خدمة ما بعد البيع",
+          "step": "01)&#10;",
+          "title": "طلبات الخدمات"
+        },
+        {
+          "desc": "الاستجابة لاحتياجات العملاء في غضون 24 ساعة",
+          "step": "02",
+          "title": "الاستجابة للخدمة"
+        },
+        {
+          "desc": "استكشاف الأخطاء وإصلاحها عن بُعد أو في الموقع",
+          "step": "03",
+          "title": "تشخيص المشكلة"
+        },
+        {
+          "desc": "تقديم خدمات الإصلاح أو الاستبدال",
+          "step": "04",
+          "title": "خدمات الصيانة"
+        },
+        {
+          "desc": "قبول العميل وتأكيد إنجاز الخدمة",
+          "step": "05",
+          "title": "تأكيد القبول"
+        },
+        {
+          "desc": "استطلاعات المتابعة ورضا العملاء",
+          "step": "06",
+          "title": "متابعة الزيارات العائدة"
+        }
+      ],
+      "icon": "ShieldCheck",
+      "video": null,
+      "sortOrder": 4,
+      "status": "published",
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null,
+      "solutionFile": null,
+      "solutionFileName": null,
+      "solutionFileNameEn": null,
+      "solutionFileNameJa": null,
+      "solutionFileNameKo": null,
+      "solutionFileNameFr": null,
+      "solutionFileNameAr": null,
+      "relatedProductSlugs": null,
+      "relatedServiceSlugs": null
+    },
+    {
+      "id": "2",
+      "slug": "mpcvd",
+      "title": "MPCVD工艺服务",
+      "titleEn": "MPCVD Process Service",
+      "titleJa": "MPCVDプロセスサービス",
+      "titleKo": "MPCVD 프로세스 서비스",
+      "titleFr": "MPCVD Process services",
+      "titleAr": "خدمات معالجة MPCVD",
+      "subtitle": "专业的MPCVD金刚石制备工艺解决方案",
+      "subtitleEn": "Professional MPCVD diamond preparation process solutions",
+      "subtitleJa": "プロフェッショナルなMPCVDダイヤモンド調製プロセスソリューション",
+      "subtitleKo": "전문 MPCVD 다이아몬드 제조 공정 솔루션",
+      "subtitleFr": null,
+      "subtitleAr": "حلول عملية تحضير الألماس الاحترافية MPCVD",
+      "description": "左文科技拥有多年MPCVD金刚石制备工艺经验，提供从工艺开发、参数优化到量产支持的全流程工艺服务。我们的工艺专家团队能够帮助客户快速掌握MPCVD设备的操作和工艺优化，提高金刚石材料的质量和生产效率。",
+      "descriptionEn": "ZUO WEN TECHNOLOGY has years of experience in MPCVD diamond preparation process, providing full-process process services from process development, parameter optimization to mass production support.",
+      "descriptionJa": "Zuowen Technologyは、MPCVDダイヤモンド調製プロセスで長年の経験を持ち、プロセス開発、パラメータ最適化、量産サポートまでのフルプロセスサービスを提供しています。当社のプロセスエキスパートチームは、お客様がMPCVD装置の操作とプロセス最適化を迅速に把握し、ダイヤモンド材料の品質と生産効率を向上させるのに役立ちます。",
+      "descriptionKo": "Zuowen Technology는 MPCVD 다이아몬드 제조 공정에서 다년간의 경험을 보유하고 있으며 공정 개발, 매개 변수 최적화에서 대량 생산 지원에 이르는 전체 공정 서비스를 제공합니다. 당사의 공정 전문가 팀은 고객이 MPCVD 장비의 작동 및 공정 최적화를 신속하게 파악하여 다이아몬드 재료의 품질과 생산 효율을 향상시킬 수 있도록 지원합니다.",
+      "descriptionFr": "Avec de nombreuses années d'expérience dans le processus de préparation de diamant MPCVD, zuwen Technology fournit des services de processus complets allant du développement de processus, de l'optimisation des paramètres au soutien de la production en série. Notre équipe d'experts en processus est en mesure d'aider les clients à maîtriser rapidement le fonctionnement et l'optimisation des processus des équipements MPCVD, améliorant ainsi la qualité et l'efficacité de la production des matériaux diamantés.",
+      "descriptionAr": "تتمتع Zuowen Technology بسنوات عديدة من الخبرة في عملية تحضير الألماس MPCVD، حيث تقدم خدمات معالجة كاملة من تطوير العملية، وتحسين المعلمات إلى دعم الإنتاج الضخم. يمكن لفريقنا من خبراء العمليات مساعدة العملاء على فهم التشغيل بسرعة وتحسين عملية معدات MPCVD لتحسين جودة وكفاءة إنتاج المواد الماسية.",
+      "features": [
+        {
+          "desc": "根据客户需求开发定制化的MPCVD金刚石制备工艺",
+          "title": "工艺开发"
+        },
+        {
+          "desc": "优化生长参数，提高金刚石质量和生长效率",
+          "title": "参数优化"
+        },
+        {
+          "desc": "专业的设备安装调试服务，确保设备稳定运行",
+          "title": "设备调试"
+        },
+        {
+          "desc": "提供全面的操作人员培训，确保客户能够独立操作",
+          "title": "人员培训"
+        },
+        {
+          "desc": "长期的技术支持和工艺咨询服务",
+          "title": "技术支持"
+        },
+        {
+          "desc": "从实验室到量产的全流程技术支持",
+          "title": "量产支持"
+        }
+      ],
+      "featuresEn": [
+        {
+          "desc": "Develop customized MPCVD diamond preparation process based on customer needs",
+          "title": "Process Development"
+        },
+        {
+          "desc": "Optimize growth parameters to improve diamond quality and growth efficiency",
+          "title": "parameter optimization"
+        },
+        {
+          "desc": "Professional equipment installation and debugging services to ensure stable operation of the equipment",
+          "title": "equipment debugging"
+        },
+        {
+          "desc": "Provide comprehensive operator training to ensure that customers can operate independently",
+          "title": "personnel training"
+        },
+        {
+          "desc": "Long term technical support and process consulting services",
+          "title": "Technical Support"
+        },
+        {
+          "desc": "Full process technical support from laboratory to mass production",
+          "title": "Mass production support"
+        }
+      ],
+      "featuresJa": [
+        {
+          "desc": "顧客のニーズに応じてカスタマイズされたMPCVDダイヤモンド調製プロセスを開発する",
+          "title": "プロセス開発"
+        },
+        {
+          "desc": "成長パラメータを最適化して、ダイヤモンドの品質と成長効率を向上させます",
+          "title": "パラメータの最適化"
+        },
+        {
+          "desc": "機器の安定した稼働を確保するためのプロフェッショナルな機器の設置と試運転サービス",
+          "title": "設備試運転"
+        },
+        {
+          "desc": "顧客が独立して操作できるように、包括的なオペレータートレーニングを提供する",
+          "title": "スタッフの研修"
+        },
+        {
+          "desc": "長期的な技術サポートとプロセスコンサルティングサービス",
+          "title": "ビジネス"
+        },
+        {
+          "desc": "ラボから生産までのフルプロセステクニカルサポート",
+          "title": "量産支援"
+        }
+      ],
+      "featuresKo": [
+        {
+          "desc": "고객 요구에 따라 맞춤형 MPCVD 다이아몬드 준비 프로세스 개발",
+          "title": "프로세스 개발"
+        },
+        {
+          "desc": "성장 매개변수를 최적화하여 다이아몬드 품질 및 성장 효율성 개선",
+          "title": "매개변수 최적화"
+        },
+        {
+          "desc": "장비의 안정적인 작동을 보장하기 위한 전문 장비 설치 및 시운전 서비스",
+          "title": "장비 시운전"
+        },
+        {
+          "desc": "고객이 독립적으로 운영할 수 있도록 포괄적인 운영자 교육 제공",
+          "title": "인력 교육"
+        },
+        {
+          "desc": "장기적인 기술 지원 및 프로세스 컨설팅 서비스",
+          "title": "기술 지원"
+        },
+        {
+          "desc": "랩에서 프로덕션에 이르기까지 전체 프로세스 기술 지원",
+          "title": "양산지원"
+        }
+      ],
+      "featuresFr": null,
+      "featuresAr": [
+        {
+          "desc": "تطوير عملية تحضير ألماس MPCVD مخصصة وفقًا لاحتياجات العملاء",
+          "title": "تطوير العملية"
+        },
+        {
+          "desc": "تحسين معايير النمو لتحسين جودة الماس وكفاءة النمو",
+          "title": "تحسين المعلمة"
+        },
+        {
+          "desc": "تركيب المعدات المهنية وخدمات التشغيل لضمان التشغيل المستقر للمعدات",
+          "title": "تشغيل المعدات"
+        },
+        {
+          "desc": "توفير تدريب شامل للمشغلين لضمان قدرة العملاء على العمل بشكل مستقل",
+          "title": "تدريب الموظفين"
+        },
+        {
+          "desc": "الدعم الفني طويل الأجل والخدمات الاستشارية للعمليات",
+          "title": "2 - الدعم التكنولوجي"
+        },
+        {
+          "desc": "الدعم الفني الكامل للعملية من المختبر إلى الإنتاج",
+          "title": "دعم الإنتاج الضخم"
+        }
+      ],
+      "process": [
+        {
+          "desc": "评估客户需求和现有工艺",
+          "step": "01",
+          "title": "工艺评估"
+        },
+        {
+          "desc": "制定工艺优化和开发方案",
+          "step": "02",
+          "title": "方案制定"
+        },
+        {
+          "desc": "实验室工艺验证和参数优化",
+          "step": "03",
+          "title": "实验验证"
+        },
+        {
+          "desc": "设备安装调试和工艺导入",
+          "step": "04",
+          "title": "设备调试"
+        },
+        {
+          "desc": "操作人员培训和技术交底",
+          "step": "05",
+          "title": "人员培训"
+        },
+        {
+          "desc": "量产工艺优化和持续支持",
+          "step": "06",
+          "title": "量产支持"
+        }
+      ],
+      "processEn": [
+        {
+          "desc": "Evaluate customer needs and existing processes",
+          "step": "01",
+          "title": "Process Evaluation"
+        },
+        {
+          "desc": "Develop process optimization and development plans",
+          "step": "02",
+          "title": "Plan formulation"
+        },
+        {
+          "desc": "Laboratory process validation and parameter optimization",
+          "step": "03",
+          "title": "experimental verification"
+        },
+        {
+          "desc": "Equipment installation, debugging, and process import",
+          "step": "04",
+          "title": "equipment debugging"
+        },
+        {
+          "desc": "Operator training and technical briefing",
+          "step": "05",
+          "title": "personnel training"
+        },
+        {
+          "desc": "Optimization of mass production process and continuous support",
+          "step": "06",
+          "title": "Mass production support"
+        }
+      ],
+      "processJa": [
+        {
+          "desc": "顧客のニーズと既存のプロセスを評価する",
+          "step": "01",
+          "title": "プロセス評価"
+        },
+        {
+          "desc": "プロセスの最適化と開発計画の策定",
+          "step": "02",
+          "title": "プログラム開発"
+        },
+        {
+          "desc": "検査室プロセスの検証とパラメータの最適化",
+          "step": "03",
+          "title": "実験的検証"
+        },
+        {
+          "desc": "機器の設置、試運転、プロセスのインポート",
+          "step": "04",
+          "title": "設備試運転"
+        },
+        {
+          "desc": "オペレーターのトレーニングと技術的な開示",
+          "step": "05",
+          "title": "スタッフの研修"
+        },
+        {
+          "desc": "量産プロセスの最適化と継続的なサポート",
+          "step": "06",
+          "title": "量産支援"
+        }
+      ],
+      "processKo": [
+        {
+          "desc": "고객 니즈 및 기존 프로세스 평가",
+          "step": "01",
+          "title": "프로세스 평가"
+        },
+        {
+          "desc": "프로세스 최적화 및 개발 계획 수립",
+          "step": "02",
+          "title": "프로그램 개발"
+        },
+        {
+          "desc": "실험실 공정 검증 및 매개변수 최적화",
+          "step": "03",
+          "title": "실험적 검증"
+        },
+        {
+          "desc": "장비 설치, 시운전 및 공정 가져오기",
+          "step": "연결된 고리에 접촉을 하면",
+          "title": "장비 시운전"
+        },
+        {
+          "desc": "운영자 교육 및 기술 공개",
+          "step": "0. 05",
+          "title": "인력 교육"
+        },
+        {
+          "desc": "양산 공정 최적화 및 지속적인 지원",
+          "step": "06",
+          "title": "양산지원"
+        }
+      ],
+      "processFr": null,
+      "processAr": [
+        {
+          "desc": "تقييم احتياجات العملاء والعمليات الحالية",
+          "step": "01)&#10;",
+          "title": "تقييم العملية"
+        },
+        {
+          "desc": "وضع خطة لتحسين العملية وتطويرها",
+          "step": "02",
+          "title": "تطوير البرنامج"
+        },
+        {
+          "desc": "التحقق من صحة العملية المعملية وتحسين المعلمة",
+          "step": "03",
+          "title": "التحقق التجريبي"
+        },
+        {
+          "desc": "تركيب المعدات والتشغيل التجريبي واستيراد العمليات",
+          "step": "04",
+          "title": "تشغيل المعدات"
+        },
+        {
+          "desc": "تدريب المشغل والإفصاح الفني",
+          "step": "05",
+          "title": "تدريب الموظفين"
+        },
+        {
+          "desc": "تحسين عملية الإنتاج الضخم والدعم المستمر",
+          "step": "06",
+          "title": "دعم الإنتاج الضخم"
+        }
+      ],
+      "icon": "FlaskConical",
+      "video": null,
+      "sortOrder": 2,
+      "status": "published",
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null,
+      "solutionFile": null,
+      "solutionFileName": null,
+      "solutionFileNameEn": null,
+      "solutionFileNameJa": null,
+      "solutionFileNameKo": null,
+      "solutionFileNameFr": null,
+      "solutionFileNameAr": null,
+      "relatedProductSlugs": null,
+      "relatedServiceSlugs": null
+    },
+    {
+      "id": "1",
+      "slug": "odm",
+      "title": "ODM定制服务",
+      "titleEn": "ODM customization service",
+      "titleJa": "ODMカスタマイズサービス",
+      "titleKo": "ODM 맞춤형 서비스",
+      "titleFr": "ODM service personnalisé",
+      "titleAr": "التصميم حسب الطلب خدمة",
+      "subtitle": "从需求到量产，全流程定制化服务",
+      "subtitleEn": "Customized services throughout the entire process from demand to mass production",
+      "subtitleJa": "需要から量産まで、プロセス全体がカスタマイズされたサービスです",
+      "subtitleKo": "수요에서 양산까지 전 과정 맞춤형 서비스",
+      "subtitleFr": "",
+      "subtitleAr": "من الطلب على الإنتاج الضخم ، كامل عملية التخصيص",
+      "description": "<p>左文科技提供专业的ODM定制服务，根据客户需求提供从产品设计、研发、生产到交付的全流程定制化解决方案。我们拥有专业的研发团队和先进的生产设备，能够满足客户在MPCVD设备、金刚石材料、培育钻石等领域的定制化需求。</p>",
+      "descriptionEn": "<p>Zuowen Technology provides professional ODM customization services, offering customized solutions for the entire process from product design, research and development, production to delivery according to customer needs. We have a professional R&D team and advanced production equipment, which can meet the customized needs of customers in MPCVD equipment, diamond materials, diamond cultivation and other fields. </p>",
+      "descriptionJa": "<p>左文科学技術は専門的なODMカスタマイズサービスを提供し、顧客のニーズに応じて製品設計、研究開発、生産から納品までの全プロセスカスタマイズソリューションを提供する。私たちは専門的な研究開発チームと先進的な生産設備を持っていて、お客様のMPCVD設備、ダイヤモンド材料、育成ダイヤモンドなどの分野でのカスタマイズニーズを満たすことができます。</p>",
+      "descriptionKo": "<p>좌문과학기술은 전문적인 ODM맞춤형서비스를 제공하여 고객의 수요에 따라 제품설계, 연구개발, 생산에서 교부에 이르는 전반 과정맞춤형해결방안을 제공한다.우리는 전문적인 연구개발팀과 선진적인 생산설비를 갖고있어 MPCVD설비, 금강석재료, 다이아몬드육성 등 분야에서의 고객의 맞춤화수요를 만족시킬수 있다.</p>",
+      "descriptionFr": "< p > zuwentech fournit des services professionnels de personnalisation ODM, fournissant des solutions personnalisées pour l'ensemble du processus, de la conception du produit, de la recherche et du développement, de la production à la livraison, en fonction des besoins des clients. Nous avons une équipe professionnelle de R & D et des équipements de production avancés, capables de répondre aux besoins personnalisés des clients dans les domaines de l'équipement MPCVD, des matériaux diamantés, des diamants cultivés, etc. </p>",
+      "descriptionAr": "نحن نقدم المهنية تصنيع التصميم الشخصي خدمة مخصصة ، وفقا لمتطلبات العملاء ، وتوفير كامل عملية التخصيص من تصميم المنتجات ، والبحث والتطوير والإنتاج والتسليم . نحن نتلقّى محترفة [ ر & د ] فريق و [ برودوكأيشن قويبمنت ] يتقدّم , أيّ يستطيع التقيت زبونات ' صنع وفقا لطلب الزّبون متطلبات في مجالات مثل mpcvd المعدات ، مواد الماس ، زراعة الماس ، الخ .</p>",
+      "features": [
+        {
+          "desc": "深入了解客户需求，提供专业的技术咨询和方案设计",
+          "title": "需求分析"
+        },
+        {
+          "desc": "专业研发团队，提供从概念到原型的全流程研发服务",
+          "title": "产品研发"
+        },
+        {
+          "desc": "万级洁净车间，精密加工设备，确保产品质量",
+          "title": "生产制造"
+        },
+        {
+          "desc": "完善的质量管理体系，从原材料到成品全流程检测",
+          "title": "质量管控"
+        },
+        {
+          "desc": "高效的供应链管理，确保产品按时交付",
+          "title": "交付服务"
+        },
+        {
+          "desc": "专业的技术支持团队，提供全方位的售后服务",
+          "title": "售后支持"
+        }
+      ],
+      "featuresEn": [
+        {
+          "desc": "Deeply understand customer needs, provide professional technical consultation and solution design",
+          "title": "Requirements Analysis"
+        },
+        {
+          "desc": "Professional R&D team, providing full process R&D services from concept to prototype",
+          "title": "Product Development"
+        },
+        {
+          "desc": "Ten thousand level clean workshop, precision machining equipment, ensuring product quality",
+          "title": "manufacturing"
+        },
+        {
+          "desc": "A comprehensive quality management system, with full process testing from raw materials to finished products",
+          "title": "quality control"
+        },
+        {
+          "desc": "Efficient supply chain management ensures timely delivery of products",
+          "title": "Delivery Service"
+        },
+        {
+          "desc": "Professional technical support team, providing comprehensive after-sales service",
+          "title": "after-sales support"
+        }
+      ],
+      "featuresJa": [
+        {
+          "desc": "顧客のニーズを深く理解し、専門的な技術的アドバイスとプログラム設計を提供する",
+          "title": "要求分析"
+        },
+        {
+          "desc": "専門の研究開発チームは、概念から原型までの全プロセスの研究開発サービスを提供する",
+          "title": "製品開発"
+        },
+        {
+          "desc": "万級クリーン工場、精密加工設備、製品品質確保",
+          "title": "生産製造"
+        },
+        {
+          "desc": "完全な品質管理システム、原材料から完成品までの全プロセス検査",
+          "title": "品質管理"
+        },
+        {
+          "desc": "効率的なサプライチェーン管理により、製品の納期どおりの納入を確保",
+          "title": "デリバリサービス"
+        },
+        {
+          "desc": "プロのテクニカルサポートチームが、包括的なアフターサービスを提供",
+          "title": "アフターサポート"
+        }
+      ],
+      "featuresKo": [
+        {
+          "desc": "고객의 요구 사항을 이해하고 전문적인 기술 자문 및 시나리오 설계 제공",
+          "title": "요구 사항 분석"
+        },
+        {
+          "desc": "전문 연구 개발 팀, 개념에서 프로토타입에 이르는 전 과정 연구 개발 서비스 제공",
+          "title": "제품 개발"
+        },
+        {
+          "desc": "만급 청정 작업장, 정밀 가공 설비, 제품 품질 확보",
+          "title": "생산 제조"
+        },
+        {
+          "desc": "완벽한 품질 관리 체계, 원자재부터 완제품까지 전 과정 검측",
+          "title": "품질 관리"
+        },
+        {
+          "desc": "효율적인 공급망 관리로 제품을 적시에 공급",
+          "title": "제공 서비스"
+        },
+        {
+          "desc": "전문 기술 지원 팀, 광범위한 애프터서비스 제공",
+          "title": "판매 후 지원"
+        }
+      ],
+      "featuresFr": [],
+      "featuresAr": [
+        {
+          "desc": "فهم متعمق لاحتياجات العملاء، وتقديم المشورة الفنية المهنية وتصميم البرنامج",
+          "title": "تحليل الطلب"
+        },
+        {
+          "desc": "المهنية فريق البحث والتطوير ، وتوفير كامل عملية البحث والتطوير من مفهوم النموذج",
+          "title": "تطوير المنتجات"
+        },
+        {
+          "desc": "10000 ورشة عمل نظيفة ، ومعدات الآلات الدقيقة ، وضمان جودة المنتج",
+          "title": "تصنيع"
+        },
+        {
+          "desc": "الكمال نظام إدارة الجودة ، من المواد الخام إلى المنتج النهائي في عملية التفتيش",
+          "title": "مراقبة الجودة"
+        },
+        {
+          "desc": "كفاءة إدارة سلسلة التوريد لضمان التسليم في الوقت المحدد",
+          "title": "تقديم الخدمات"
+        },
+        {
+          "desc": "المهنية فريق الدعم الفني ، وتوفير مجموعة كاملة من خدمات ما بعد البيع",
+          "title": "دعم ما بعد البيع"
+        }
+      ],
+      "process": [
+        {
+          "desc": "了解客户需求和应用场景",
+          "step": "01",
+          "title": "需求沟通"
+        },
+        {
+          "desc": "提供技术方案和报价",
+          "step": "02",
+          "title": "方案设计"
+        },
+        {
+          "desc": "产品设计和原型制作",
+          "step": "03",
+          "title": "原型开发"
+        },
+        {
+          "desc": "产品测试和性能验证",
+          "step": "04",
+          "title": "测试验证"
+        },
+        {
+          "desc": "量产和质量管控",
+          "step": "05",
+          "title": "批量生产"
+        },
+        {
+          "desc": "产品交付和售后支持",
+          "step": "06",
+          "title": "交付售后"
+        }
+      ],
+      "processEn": [
+        {
+          "desc": "Understand customer needs and application scenarios",
+          "step": "01",
+          "title": "requirements communication"
+        },
+        {
+          "desc": "Provide technical solutions and quotations",
+          "step": "02",
+          "title": "conceptual design"
+        },
+        {
+          "desc": "Product design and prototype production",
+          "step": "03",
+          "title": "Prototyping"
+        },
+        {
+          "desc": "Product testing and performance validation",
+          "step": "04",
+          "title": "Test verification"
+        },
+        {
+          "desc": "Mass production and quality control",
+          "step": "05",
+          "title": "mass production"
+        },
+        {
+          "desc": "Product delivery and after-sales support",
+          "step": "06",
+          "title": "Delivery and after-sales service"
+        }
+      ],
+      "processJa": [
+        {
+          "desc": "顧客のニーズとシナリオを理解する",
+          "step": "01",
+          "title": "コミュニケーションが必要"
+        },
+        {
+          "desc": "技術方案と見積もりを提供する",
+          "step": "02",
+          "title": "スキーマ設計"
+        },
+        {
+          "desc": "製品設計とプロトタイプ作成",
+          "step": "03",
+          "title": "プロトタイプ開発"
+        },
+        {
+          "desc": "製品テストとパフォーマンス検証",
+          "step": "04",
+          "title": "テスト検証"
+        },
+        {
+          "desc": "量産と品質管理制御",
+          "step": "05",
+          "title": "大量生産"
+        },
+        {
+          "desc": "製品の提供とアフターサービスのサポート",
+          "step": "06",
+          "title": "納入後"
+        }
+      ],
+      "processKo": [
+        {
+          "desc": "고객 요구 사항 및 어플리케이션 시나리오 이해",
+          "step": "01",
+          "title": "요구 사항 커뮤니케이션"
+        },
+        {
+          "desc": "기술 시나리오 및 견적 제공",
+          "step": "02",
+          "title": "시나리오 설계"
+        },
+        {
+          "desc": "제품 디자인 및 프로토타입 제작",
+          "step": "03",
+          "title": "원형 개발"
+        },
+        {
+          "desc": "제품 테스트 및 성능 검증",
+          "step": "04",
+          "title": "테스트 검증"
+        },
+        {
+          "desc": "양산 및 품질 관리",
+          "step": "05",
+          "title": "대량 생산"
+        },
+        {
+          "desc": "제품 제공 및 사후 지원",
+          "step": "06",
+          "title": "판매 후 제공"
+        }
+      ],
+      "processFr": [],
+      "processAr": [
+        {
+          "desc": "فهم متطلبات العملاء وتطبيق السيناريوهات",
+          "step": "01",
+          "title": "الطلب على الاتصالات"
+        },
+        {
+          "desc": "تقديم اقتراح التقنية والاقتباس",
+          "step": "ق",
+          "title": "تصميم مخطط"
+        },
+        {
+          "desc": "تصميم المنتجات والنماذج",
+          "step": "ص",
+          "title": "نموذج التنمية"
+        },
+        {
+          "desc": "اختبار المنتج والتحقق من الأداء",
+          "step": "ص",
+          "title": "اختبار التحقق"
+        },
+        {
+          "desc": "الإنتاج الضخم ومراقبة الجودة",
+          "step": "ص",
+          "title": "الإنتاج الضخم"
+        },
+        {
+          "desc": "تسليم المنتج ودعم ما بعد البيع",
+          "step": "ق",
+          "title": "التسليم بعد البيع"
+        }
+      ],
+      "icon": "Settings",
+      "video": null,
+      "sortOrder": 1,
+      "status": "published",
+      "seoTitle": "ODM定制服务 - 左文科技专业MPCVD金刚石设备",
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": "左文科技提供专业的ODM定制服务，根据客户需求提供从产品设计、研发、生产到交付的全流程定制化解决方案。我们拥有专业的研发团队和先进的生产设备，能够满足客户在MPCVD设备、金刚石材料、培育钻石等领域的 左文科技专注MPCVD金刚石材料制备设备研发、生产与服务，提供专业培育钻石与工业金刚石解决方案。",
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": "",
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": "",
+      "geoCity": "",
+      "solutionFile": null,
+      "solutionFileName": null,
+      "solutionFileNameEn": null,
+      "solutionFileNameJa": null,
+      "solutionFileNameKo": null,
+      "solutionFileNameFr": null,
+      "solutionFileNameAr": null,
+      "relatedProductSlugs": null,
+      "relatedServiceSlugs": null
+    }
+  ]
+}

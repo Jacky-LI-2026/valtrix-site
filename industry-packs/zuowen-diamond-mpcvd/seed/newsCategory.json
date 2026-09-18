@@ -1,0 +1,33 @@
+{
+  "model": "newsCategory",
+  "rows": [
+    {
+      "id": "1",
+      "name": "公司新闻",
+      "nameEn": "Company News",
+      "slug": "公司新闻",
+      "sortOrder": 0
+    },
+    {
+      "id": "2",
+      "name": "产品动态",
+      "nameEn": "Product News",
+      "slug": "产品动态",
+      "sortOrder": 1
+    },
+    {
+      "id": "3",
+      "name": "技术动态",
+      "nameEn": "Technology News",
+      "slug": "技术动态",
+      "sortOrder": 2
+    },
+    {
+      "id": "4",
+      "name": "行业动态",
+      "nameEn": "Industry News",
+      "slug": "行业动态",
+      "sortOrder": 3
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "model": "themeConfig",
+  "rows": [
+    {
+      "id": "1",
+      "primary": "#CC0000",
+      "primaryLight": "#FF3333",
+      "primaryDark": "#990000",
+      "accent": "#C0C0C0",
+      "dark": "#111111",
+      "darkLight": "#333333",
+      "fontFamily": null,
+      "templateSlug": null,
+      "remark": "默认主题（左文科技红色系）"
+    }
+  ]
+}

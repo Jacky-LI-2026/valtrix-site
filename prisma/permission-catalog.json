@@ -1,0 +1,527 @@
+{
+  "$comment": "后台权限码**单一真源**。prisma/seed.ts 与 scripts/seed-permissions.js 都必须读本文件，禁止再各自维护清单。",
+  "$why": "2026-09-16 发现两个 seed 口径严重不一致（23/11 vs 41/27），且中间件引用了两个任何 seed 都不创建的码（edm:view / visit-booking:view）⇒ 全新环境会出现「入口对所有人（含 admin）静默消失」。",
+  "$generatedFrom": "实库全量导出（77 条）—— diff 证明「seed 有库没有 = 0」，故实库是完整超集，导出无损。",
+  "$editorNote": "editorCodes 为「内容编辑」角色的默认权限口径。新码默认只给 admin，若要给 editor 请加进本数组。",
+  "$noCounts": "⚠️ 2026-09-16 删除 permissionCount / editorCount 两个计数字段：它们与数组实长会各自漂移（实测：editorCount 写着 27 而 editorCodes 已是 32），且**没有任何代码消费它们**。真源只能是数组本身 —— 条数请用 .permissions.length / .editorCodes.length。",
+  "$sharedCapabilityNote": "2026-09-16 新增 3 个**跨模块共用能力码**：file:upload（上传文件）/ translate:use（机器翻译）/ content:view（动态内容类型兜底）。口径：上传与翻译是**共用能力**，不按模块各配一个码（否则码爆炸 + 同一能力多处授权 = 双源）；三者**只进 API_PERMISSION、不进 PATH_PERMISSION** —— 它们没有对应页面，因此不会产生「入口对所有人静默消失」的幽灵码事故。",
+  "permissions": [
+    {
+      "code": "about:manage",
+      "name": "管理关于",
+      "module": "about",
+      "action": "manage"
+    },
+    {
+      "code": "about:view",
+      "name": "查看关于",
+      "module": "about",
+      "action": "view"
+    },
+    {
+      "code": "ai:config",
+      "name": "大模型配置",
+      "module": "ai",
+      "action": "config"
+    },
+    {
+      "code": "analytics:view",
+      "name": "查看访客统计",
+      "module": "analytics",
+      "action": "view"
+    },
+    {
+      "code": "auto-collection:manage",
+      "name": "管理自动采集",
+      "module": "auto-collection",
+      "action": "manage"
+    },
+    {
+      "code": "auto-collection:view",
+      "name": "查看自动采集",
+      "module": "auto-collection",
+      "action": "view"
+    },
+    {
+      "code": "backlink-page:batch",
+      "name": "批量生成",
+      "module": "backlink-pages",
+      "action": "batch"
+    },
+    {
+      "code": "backlink-page:create",
+      "name": "创建回链页面",
+      "module": "backlink-pages",
+      "action": "create"
+    },
+    {
+      "code": "backlink-page:delete",
+      "name": "删除回链页面",
+      "module": "backlink-pages",
+      "action": "delete"
+    },
+    {
+      "code": "backlink-page:edit",
+      "name": "编辑回链页面",
+      "module": "backlink-pages",
+      "action": "edit"
+    },
+    {
+      "code": "backlink-page:view",
+      "name": "查看回链页面",
+      "module": "backlink-pages",
+      "action": "view"
+    },
+    {
+      "code": "career:manage",
+      "name": "管理职位",
+      "module": "career",
+      "action": "manage"
+    },
+    {
+      "code": "career:view",
+      "name": "查看职位",
+      "module": "career",
+      "action": "view"
+    },
+    {
+      "code": "case:edit",
+      "name": "管理案例",
+      "module": "case",
+      "action": "edit"
+    },
+    {
+      "code": "case:view",
+      "name": "查看案例",
+      "module": "case",
+      "action": "view"
+    },
+    {
+      "code": "collect:manage",
+      "name": "采集管理",
+      "module": "collect",
+      "action": "manage"
+    },
+    {
+      "code": "config:home",
+      "name": "首页配置",
+      "module": "config",
+      "action": "home"
+    },
+    {
+      "code": "config:site",
+      "name": "站点配置",
+      "module": "config",
+      "action": "site"
+    },
+    {
+      "code": "config:theme",
+      "name": "主题配色",
+      "module": "config",
+      "action": "theme"
+    },
+    {
+      "code": "content:view",
+      "name": "查看动态内容类型（通用兜底）",
+      "module": "content",
+      "action": "view"
+    },
+    {
+      "code": "deploy:manage",
+      "name": "执行部署",
+      "module": "deploy",
+      "action": "manage"
+    },
+    {
+      "code": "deploy:view",
+      "name": "查看部署",
+      "module": "deploy",
+      "action": "view"
+    },
+    {
+      "code": "download-lead:manage",
+      "name": "管理下载留资",
+      "module": "download-lead",
+      "action": "manage"
+    },
+    {
+      "code": "download-lead:view",
+      "name": "查看下载留资",
+      "module": "download-lead",
+      "action": "view"
+    },
+    {
+      "code": "edm:view",
+      "name": "EDM邮件营销",
+      "module": "edm",
+      "action": "view"
+    },
+    {
+      "code": "faq:view",
+      "name": "常见问题管理",
+      "module": "faq",
+      "action": "view"
+    },
+    {
+      "code": "file:upload",
+      "name": "上传文件",
+      "module": "file",
+      "action": "upload"
+    },
+    {
+      "code": "guide:view",
+      "name": "查看说明书",
+      "module": "guide",
+      "action": "view"
+    },
+    {
+      "code": "industry:manage",
+      "name": "管理行业",
+      "module": "industry",
+      "action": "manage"
+    },
+    {
+      "code": "industry:view",
+      "name": "查看行业",
+      "module": "industry",
+      "action": "view"
+    },
+    {
+      "code": "landing-page:create",
+      "name": "创建落地页",
+      "module": "landing-pages",
+      "action": "create"
+    },
+    {
+      "code": "landing-page:delete",
+      "name": "删除落地页",
+      "module": "landing-pages",
+      "action": "delete"
+    },
+    {
+      "code": "landing-page:edit",
+      "name": "编辑落地页",
+      "module": "landing-pages",
+      "action": "edit"
+    },
+    {
+      "code": "landing-page:view",
+      "name": "查看落地页",
+      "module": "landing-pages",
+      "action": "view"
+    },
+    {
+      "code": "language:manage",
+      "name": "管理语种",
+      "module": "language",
+      "action": "manage"
+    },
+    {
+      "code": "language:view",
+      "name": "查看语种",
+      "module": "language",
+      "action": "view"
+    },
+    {
+      "code": "lead:manage",
+      "name": "管理留言",
+      "module": "lead",
+      "action": "manage"
+    },
+    {
+      "code": "lead:view",
+      "name": "查看留言",
+      "module": "lead",
+      "action": "view"
+    },
+    {
+      "code": "license:manage",
+      "name": "管理授权",
+      "module": "license",
+      "action": "manage"
+    },
+    {
+      "code": "license:view",
+      "name": "查看授权",
+      "module": "license",
+      "action": "view"
+    },
+    {
+      "code": "member-level:view",
+      "name": "查看会员等级",
+      "module": "member-level",
+      "action": "view"
+    },
+    {
+      "code": "member:view",
+      "name": "查看会员",
+      "module": "member",
+      "action": "view"
+    },
+    {
+      "code": "menu:manage",
+      "name": "管理菜单",
+      "module": "menu",
+      "action": "manage"
+    },
+    {
+      "code": "menu:view",
+      "name": "查看菜单",
+      "module": "menu",
+      "action": "view"
+    },
+    {
+      "code": "news:create",
+      "name": "创建新闻",
+      "module": "news",
+      "action": "create"
+    },
+    {
+      "code": "news:delete",
+      "name": "删除新闻",
+      "module": "news",
+      "action": "delete"
+    },
+    {
+      "code": "news:edit",
+      "name": "编辑新闻",
+      "module": "news",
+      "action": "edit"
+    },
+    {
+      "code": "news:publish",
+      "name": "发布新闻",
+      "module": "news",
+      "action": "publish"
+    },
+    {
+      "code": "news:view",
+      "name": "查看新闻",
+      "module": "news",
+      "action": "view"
+    },
+    {
+      "code": "notification:view",
+      "name": "查看通知",
+      "module": "notification",
+      "action": "view"
+    },
+    {
+      "code": "order:view",
+      "name": "查看商城订单",
+      "module": "order",
+      "action": "view"
+    },
+    {
+      "code": "page-hero:manage",
+      "name": "管理页面头部",
+      "module": "page-hero",
+      "action": "manage"
+    },
+    {
+      "code": "page-hero:view",
+      "name": "查看页面头部",
+      "module": "page-hero",
+      "action": "view"
+    },
+    {
+      "code": "plugin:view",
+      "name": "插件管理",
+      "module": "system",
+      "action": "view"
+    },
+    {
+      "code": "product:create",
+      "name": "创建产品",
+      "module": "product",
+      "action": "create"
+    },
+    {
+      "code": "product:delete",
+      "name": "删除产品",
+      "module": "product",
+      "action": "delete"
+    },
+    {
+      "code": "product:edit",
+      "name": "编辑产品",
+      "module": "product",
+      "action": "edit"
+    },
+    {
+      "code": "product:view",
+      "name": "查看产品",
+      "module": "product",
+      "action": "view"
+    },
+    {
+      "code": "quote:view",
+      "name": "查看报价单",
+      "module": "quote",
+      "action": "view"
+    },
+    {
+      "code": "resource:edit",
+      "name": "编辑资源",
+      "module": "resource",
+      "action": "edit"
+    },
+    {
+      "code": "resource:view",
+      "name": "查看资源",
+      "module": "resource",
+      "action": "view"
+    },
+    {
+      "code": "seo:manage",
+      "name": "管理SEO配置",
+      "module": "seo",
+      "action": "manage"
+    },
+    {
+      "code": "seo:view",
+      "name": "查看SEO配置",
+      "module": "seo",
+      "action": "view"
+    },
+    {
+      "code": "service:manage",
+      "name": "管理服务",
+      "module": "service",
+      "action": "manage"
+    },
+    {
+      "code": "service:view",
+      "name": "查看服务",
+      "module": "service",
+      "action": "view"
+    },
+    {
+      "code": "setup:view",
+      "name": "查看初始化",
+      "module": "setup",
+      "action": "view"
+    },
+    {
+      "code": "smtp:manage",
+      "name": "管理SMTP",
+      "module": "smtp",
+      "action": "manage"
+    },
+    {
+      "code": "smtp:view",
+      "name": "查看SMTP",
+      "module": "smtp",
+      "action": "view"
+    },
+    {
+      "code": "system:backup",
+      "name": "数据备份",
+      "module": "system",
+      "action": "backup"
+    },
+    {
+      "code": "system:log",
+      "name": "操作日志",
+      "module": "system",
+      "action": "log"
+    },
+    {
+      "code": "system:role",
+      "name": "角色管理",
+      "module": "system",
+      "action": "role"
+    },
+    {
+      "code": "system:update",
+      "name": "系统更新",
+      "module": "system",
+      "action": "update"
+    },
+    {
+      "code": "system:user",
+      "name": "用户管理",
+      "module": "system",
+      "action": "user"
+    },
+    {
+      "code": "template:manage",
+      "name": "管理模板",
+      "module": "template",
+      "action": "manage"
+    },
+    {
+      "code": "template:view",
+      "name": "查看模板",
+      "module": "template",
+      "action": "view"
+    },
+    {
+      "code": "ticket:view",
+      "name": "查看客服工单",
+      "module": "ticket",
+      "action": "view"
+    },
+    {
+      "code": "translate-config:manage",
+      "name": "管理翻译配置",
+      "module": "translate-config",
+      "action": "manage"
+    },
+    {
+      "code": "translate-config:view",
+      "name": "查看翻译配置",
+      "module": "translate-config",
+      "action": "view"
+    },
+    {
+      "code": "translate:use",
+      "name": "使用机器翻译",
+      "module": "translate",
+      "action": "use"
+    },
+    {
+      "code": "visit-booking:view",
+      "name": "考察预约",
+      "module": "visit-booking",
+      "action": "view"
+    }
+  ],
+  "editorCodes": [
+    "about:manage",
+    "about:view",
+    "analytics:view",
+    "career:manage",
+    "career:view",
+    "case:view",
+    "content:view",
+    "download-lead:view",
+    "faq:view",
+    "file:upload",
+    "guide:view",
+    "industry:manage",
+    "industry:view",
+    "lead:view",
+    "menu:manage",
+    "menu:view",
+    "news:create",
+    "news:delete",
+    "news:edit",
+    "news:publish",
+    "news:view",
+    "product:create",
+    "product:delete",
+    "product:edit",
+    "product:view",
+    "resource:edit",
+    "resource:view",
+    "service:manage",
+    "service:view",
+    "member:view",
+    "member-level:view",
+    "order:view",
+    "quote:view",
+    "ticket:view",
+    "translate:use"
+  ]
+}

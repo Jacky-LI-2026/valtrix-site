@@ -1,0 +1,46 @@
+{
+  "_source": "lib/templates/presets.ts",
+  "_generatedAt": "2026-09-15T02:16:10.883Z",
+  "slug": "kitz-clean",
+  "name": "洁净科技风",
+  "nameEn": "Clean Tech",
+  "category": "工业",
+  "description": "深蓝主色 + 青碧点缀，白底洁净室质感，日式精密工业风：全宽 Hero、大字标题 + 小字 eyebrow、L 形角标装饰、线框图标能力卡片、产品参数表，适合半导体、流体控制、洁净室设备、精密制造、新材料企业。",
+  "descriptionEn": "Deep blue with teal accent, white cleanroom aesthetic, Japanese precision-industrial style: full-width hero, large headlines with small eyebrow text, L-shaped corner accents, line-icon capability cards, product spec tables. Ideal for semiconductor, fluid control, cleanroom equipment, precision manufacturing and new materials.",
+  "theme": {
+    "primary": "#123A6B",
+    "primaryLight": "#2A5C99",
+    "primaryDark": "#0B2748",
+    "accent": "#0E7C86",
+    "dark": "#111827",
+    "darkLight": "#374151",
+    "fontFamily": "'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif"
+  },
+  "style": {
+    "radius": "sharp",
+    "shadow": "soft",
+    "spacing": "spacious",
+    "visual": "白底洁净室质感、深蓝主色、青碧点缀、细线条、L 形角标、线框图标、大字标题、技术图纸叠加",
+    "fontScale": "normal",
+    "hero": "full",
+    "header": "solid",
+    "card": "bordered",
+    "cta": "solid"
+  },
+  "industries": [
+    "半导体",
+    "流体控制",
+    "洁净室设备",
+    "精密制造",
+    "新材料"
+  ],
+  "sections": [
+    "hero",
+    "whoweare",
+    "capabilities",
+    "products",
+    "industries",
+    "news",
+    "cta"
+  ]
+}

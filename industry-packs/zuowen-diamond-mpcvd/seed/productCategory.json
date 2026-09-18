@@ -1,0 +1,101 @@
+{
+  "model": "productCategory",
+  "rows": [
+    {
+      "id": "1",
+      "tabId": "1",
+      "slug": "mpcvd",
+      "name": "MPCVD长晶设备",
+      "nameEn": "MPCVD Growth Systems",
+      "nameJa": "MPCVD長結晶装置",
+      "nameKo": "MPCVD 장결정 장치",
+      "nameFr": "MPCVD longcrystal Équipement",
+      "nameAr": "mpcvd معدات الكريستال النمو",
+      "sortOrder": 0
+    },
+    {
+      "id": "2",
+      "tabId": "2",
+      "slug": "qc",
+      "name": "QC检测设备",
+      "nameEn": "QC Inspection Equipment",
+      "nameJa": "QC検出装置",
+      "nameKo": "QC 검사 장치",
+      "nameFr": "Équipement de détection QC",
+      "nameAr": "معدات مراقبة الجودة",
+      "sortOrder": 0
+    },
+    {
+      "id": "3",
+      "tabId": "2",
+      "slug": "laser",
+      "name": "激光切割机",
+      "nameEn": "Laser Cutting Machines",
+      "nameJa": "レーザ切断機",
+      "nameKo": "레이저 절단기",
+      "nameFr": "Découpeuse laser",
+      "nameAr": "آلة قطع الليزر",
+      "sortOrder": 0
+    },
+    {
+      "id": "4",
+      "tabId": "3",
+      "slug": "rough",
+      "name": "培育钻石毛坯",
+      "nameEn": "Rough Diamonds",
+      "nameJa": "ダイヤモンドブランクを育成する",
+      "nameKo": "다이아몬드 반제품을 재배하다.",
+      "nameFr": "Cultiver le diamant brut",
+      "nameAr": "زراعة الماس الخام",
+      "sortOrder": 0
+    },
+    {
+      "id": "5",
+      "tabId": "3",
+      "slug": "polished",
+      "name": "培育钻石裸石",
+      "nameEn": "Polished Diamonds",
+      "nameJa": "ダイヤモンド裸石を育成する",
+      "nameKo": "다이아 나석을 재배",
+      "nameFr": "Cultiver la pierre nue de diamant",
+      "nameAr": "زراعة الماس حجر العارية",
+      "sortOrder": 0
+    },
+    {
+      "id": "6",
+      "tabId": "4",
+      "slug": "heat-spreader",
+      "name": "金刚石散热片",
+      "nameEn": "Diamond Heat Spreaders",
+      "nameJa": "ダイヤモンドフィン",
+      "nameKo": "금강석 방열편",
+      "nameFr": "Radiateur diamant",
+      "nameAr": "الماس بالوعة الحرارة",
+      "sortOrder": 0
+    },
+    {
+      "id": "7",
+      "tabId": "4",
+      "slug": "quantum",
+      "name": "量子晶体材料",
+      "nameEn": "Quantum Crystal Materials",
+      "nameJa": "量子結晶材料",
+      "nameKo": "양자결정 재료",
+      "nameFr": "Matériaux cristallins quantiques",
+      "nameAr": "المواد البلورية الكم",
+      "sortOrder": 0
+    },
+    {
+      "id": "8",
+      "tabId": "4",
+      "slug": "cutter",
+      "name": "金刚石刀具",
+      "nameEn": "Diamond Cutting Tools",
+      "nameJa": "ダイヤモンドカッタ",
+      "nameKo": "금강석 공구",
+      "nameFr": "Outils diamantés",
+      "nameAr": "قطع الماس",
+      "sortOrder": 0
+    }
+  ]
+}

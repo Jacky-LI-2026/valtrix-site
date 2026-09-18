@@ -1,0 +1,382 @@
+{
+  "model": "aboutSection",
+  "rows": [
+    {
+      "id": "4",
+      "slug": "contact",
+      "title": "Contact Us",
+      "titleEn": "Contact Us",
+      "titleJa": null,
+      "titleKo": null,
+      "titleFr": null,
+      "titleAr": null,
+      "subtitle": "欢迎洽谈合作",
+      "subtitleEn": "Welcome to contact us",
+      "subtitleJa": null,
+      "subtitleKo": null,
+      "subtitleFr": null,
+      "subtitleAr": null,
+      "image": null,
+      "content": [
+        {
+          "heading": "Contact Us",
+          "paragraphs": [
+            "For product inquiries, selection support, OEM/ODM projects or business cooperation, please contact the VALTRIX team anytime. We respond within one business day."
+          ]
+        }
+      ],
+      "contentEn": [
+        {
+          "heading": "Contact Us",
+          "paragraphs": [
+            "For product inquiries, selection support, OEM/ODM projects or business cooperation, please contact the VALTRIX team anytime. We respond within one business day."
+          ]
+        }
+      ],
+      "contentJa": null,
+      "contentKo": null,
+      "contentFr": null,
+      "contentAr": null,
+      "highlights": null,
+      "timeline": null,
+      "certifications": null,
+      "sortOrder": 3,
+      "status": "published",
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null
+    },
+    {
+      "id": "1",
+      "slug": "profile",
+      "title": "About VALTRIX",
+      "titleEn": "About VALTRIX",
+      "titleJa": null,
+      "titleKo": null,
+      "titleFr": null,
+      "titleAr": null,
+      "subtitle": "专注精密阀门与流体控制元件",
+      "subtitleEn": "Focus on precision valves and fluid control components",
+      "subtitleJa": null,
+      "subtitleKo": null,
+      "subtitleFr": null,
+      "subtitleAr": null,
+      "image": "/placeholders/industry-machining.webp",
+      "content": [
+        {
+          "heading": "About VALTRIX",
+          "paragraphs": [
+            "VALTRIX is a precision manufacturer of ultra-high-purity fluid control components for semiconductor, biopharmaceutical, LED/display, solar and hydrogen energy industries. Our product range covers VCR face seal fittings, welded fittings, diaphragm valves, pressure reducers, check valves and gas filters — all manufactured from 316L stainless steel with electro-polished surface options.",
+            "Every component is produced with full material traceability, assembled in an ISO Class 4/5 cleanroom, and 100% helium leak tested before double-bagged packaging. This discipline, rooted in years of OEM manufacturing experience, is what allows VALTRIX components to meet the contamination-control demands of advanced semiconductor fabs.",
+            "From a single fitting to complete gas panels, VALTRIX provides engineering support, custom manufacturing and fast, reliable delivery worldwide."
+          ]
+        }
+      ],
+      "contentEn": [
+        {
+          "heading": "About VALTRIX",
+          "paragraphs": [
+            "VALTRIX is a precision manufacturer of ultra-high-purity fluid control components for semiconductor, biopharmaceutical, LED/display, solar and hydrogen energy industries. Our product range covers VCR face seal fittings, welded fittings, diaphragm valves, pressure reducers, check valves and gas filters — all manufactured from 316L stainless steel with electro-polished surface options.",
+            "Every component is produced with full material traceability, assembled in an ISO Class 4/5 cleanroom, and 100% helium leak tested before double-bagged packaging. This discipline, rooted in years of OEM manufacturing experience, is what allows VALTRIX components to meet the contamination-control demands of advanced semiconductor fabs.",
+            "From a single fitting to complete gas panels, VALTRIX provides engineering support, custom manufacturing and fast, reliable delivery worldwide."
+          ]
+        }
+      ],
+      "contentJa": null,
+      "contentKo": null,
+      "contentFr": null,
+      "contentAr": null,
+      "highlights": [
+        {
+          "label": "Product Series",
+          "value": "6 series",
+          "labelEn": "Product Series",
+          "valueEn": "6 series"
+        },
+        {
+          "label": "Industries Served",
+          "value": "6+ industries",
+          "labelEn": "Industries Served",
+          "valueEn": "6+ industries"
+        },
+        {
+          "label": "100% He Leak Tested",
+          "value": "Every unit",
+          "labelEn": "100% He Leak Tested",
+          "valueEn": "Every unit"
+        },
+        {
+          "label": "Cleanroom",
+          "value": "ISO Class 4/5",
+          "labelEn": "Cleanroom",
+          "valueEn": "ISO Class 4/5"
+        }
+      ],
+      "timeline": [
+        {
+          "desc": "Precision machining base established",
+          "year": "2016",
+          "title": "Founded",
+          "descEn": "Precision machining base established",
+          "titleEn": "Founded"
+        },
+        {
+          "desc": "Launched VCR fittings and diaphragm valve lines",
+          "year": "2020",
+          "title": "UHP Product Line",
+          "descEn": "Launched VCR fittings and diaphragm valve lines",
+          "titleEn": "UHP Product Line"
+        },
+        {
+          "desc": "ISO Class 4/5 cleanroom assembly commissioned",
+          "year": "2024",
+          "title": "Cleanroom Upgrade",
+          "descEn": "ISO Class 4/5 cleanroom assembly commissioned",
+          "titleEn": "Cleanroom Upgrade"
+        },
+        {
+          "desc": "Unified VALTRIX brand for global UHP markets",
+          "year": "2026",
+          "title": "VALTRIX Brand",
+          "descEn": "Unified VALTRIX brand for global UHP markets",
+          "titleEn": "VALTRIX Brand"
+        }
+      ],
+      "certifications": [
+        {
+          "desc": "Quality management system certified",
+          "title": "ISO 9001",
+          "descEn": "Quality management system certified",
+          "titleEn": "ISO 9001"
+        },
+        {
+          "desc": "100% MSLD to 1x10-9 scc/s He",
+          "title": "He Leak Test",
+          "descEn": "100% MSLD to 1x10-9 scc/s He",
+          "titleEn": "He Leak Test"
+        },
+        {
+          "desc": "Electro-polished surface, Ra <= 0.25 um",
+          "title": "EP Surface",
+          "descEn": "Electro-polished surface, Ra <= 0.25 um",
+          "titleEn": "EP Surface"
+        }
+      ],
+      "sortOrder": 0,
+      "status": "published",
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null
+    },
+    {
+      "id": "3",
+      "slug": "honors",
+      "title": "Quality & Certifications",
+      "titleEn": "Quality & Certifications",
+      "titleJa": null,
+      "titleKo": null,
+      "titleFr": null,
+      "titleAr": null,
+      "subtitle": "权威认证，品质保证",
+      "subtitleEn": "Certified quality assurance",
+      "subtitleJa": null,
+      "subtitleKo": null,
+      "subtitleFr": null,
+      "subtitleAr": null,
+      "image": null,
+      "content": [
+        {
+          "heading": "Quality & Certifications",
+          "paragraphs": [
+            "VALTRIX operates an ISO 9001 certified quality management system covering design, machining, assembly, testing and delivery of high-purity fluid control components.",
+            "Each production lot is 100% helium mass spectrometer leak tested (sensitivity to 1x10-10 scc/s), with surface roughness measurement and particle control at every stage. Materials carry full mill certificate traceability, and assemblies are packaged in ISO Class 4/5 cleanroom conditions."
+          ]
+        }
+      ],
+      "contentEn": [
+        {
+          "heading": "Quality & Certifications",
+          "paragraphs": [
+            "VALTRIX operates an ISO 9001 certified quality management system covering design, machining, assembly, testing and delivery of high-purity fluid control components.",
+            "Each production lot is 100% helium mass spectrometer leak tested (sensitivity to 1x10-10 scc/s), with surface roughness measurement and particle control at every stage. Materials carry full mill certificate traceability, and assemblies are packaged in ISO Class 4/5 cleanroom conditions."
+          ]
+        }
+      ],
+      "contentJa": null,
+      "contentKo": null,
+      "contentFr": null,
+      "contentAr": null,
+      "highlights": null,
+      "timeline": null,
+      "certifications": [
+        {
+          "desc": "质量管理体系认证",
+          "name": "ISO 9001:2015",
+          "descEn": "Quality Management System",
+          "nameEn": "ISO 9001:2015"
+        },
+        {
+          "desc": "管线阀门产品认证",
+          "name": "API 6D",
+          "descEn": "Pipeline valve certification",
+          "nameEn": "API 6D"
+        },
+        {
+          "desc": "欧盟安全认证",
+          "name": "CE",
+          "descEn": "EU safety certification",
+          "nameEn": "CE"
+        }
+      ],
+      "sortOrder": 2,
+      "status": "published",
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null
+    },
+    {
+      "id": "2",
+      "slug": "history",
+      "title": "Milestones",
+      "titleEn": "Milestones",
+      "titleJa": null,
+      "titleKo": null,
+      "titleFr": null,
+      "titleAr": null,
+      "subtitle": "一步一个脚印，稳健发展",
+      "subtitleEn": "Steady growth step by step",
+      "subtitleJa": null,
+      "subtitleKo": null,
+      "subtitleFr": null,
+      "subtitleAr": null,
+      "image": null,
+      "content": [
+        {
+          "heading": "Milestones",
+          "paragraphs": [
+            "VALTRIX grew from a precision machining workshop serving international OEM customers into a dedicated manufacturer of ultra-high-purity fluid control components.",
+            "Through continuous investment in CNC machining, electro-polishing and cleanroom assembly, VALTRIX now supplies VCR face seal fittings, diaphragm valves and regulators to semiconductor and high-purity process industries worldwide."
+          ]
+        }
+      ],
+      "contentEn": [
+        {
+          "heading": "Milestones",
+          "paragraphs": [
+            "VALTRIX grew from a precision machining workshop serving international OEM customers into a dedicated manufacturer of ultra-high-purity fluid control components.",
+            "Through continuous investment in CNC machining, electro-polishing and cleanroom assembly, VALTRIX now supplies VCR face seal fittings, diaphragm valves and regulators to semiconductor and high-purity process industries worldwide."
+          ]
+        }
+      ],
+      "contentJa": null,
+      "contentKo": null,
+      "contentFr": null,
+      "contentAr": null,
+      "highlights": null,
+      "timeline": [
+        {
+          "desc": "阀门科技成立，专注阀门制造",
+          "year": "2016",
+          "title": "公司成立",
+          "descEn": "VALVE TECH established",
+          "titleEn": "Founded"
+        },
+        {
+          "desc": "通过 ISO 9001 质量管理体系认证",
+          "year": "2019",
+          "title": "ISO 认证",
+          "descEn": "Passed ISO 9001 certification",
+          "titleEn": "ISO Certified"
+        },
+        {
+          "desc": "二期生产基地投产，年产能 30 万台",
+          "year": "2022",
+          "title": "产能扩充",
+          "descEn": "Phase II plant online, 300K units capacity",
+          "titleEn": "Capacity Expansion"
+        },
+        {
+          "desc": "数字化新基地投产，年产能 50 万台",
+          "year": "2026",
+          "title": "新基地投产",
+          "descEn": "Digital base online, 500K units capacity",
+          "titleEn": "New Base Online"
+        }
+      ],
+      "certifications": null,
+      "sortOrder": 1,
+      "status": "published",
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null
+    }
+  ]
+}

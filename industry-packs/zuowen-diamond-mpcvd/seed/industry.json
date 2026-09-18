@@ -1,0 +1,1517 @@
+{
+  "model": "industry",
+  "rows": [
+    {
+      "id": "4",
+      "slug": "quantum-technology",
+      "name": "量子科技",
+      "nameEn": "Quantum Technology",
+      "nameJa": "量子技術",
+      "nameKo": "양자 기술",
+      "nameFr": "Technologie quantique",
+      "nameAr": "تكنولوجيا الكم",
+      "tagline": "金刚石量子晶体，赋能量子计算与精密传感",
+      "taglineEn": "Diamond quantum crystals empowering quantum computing and precision sensing",
+      "taglineJa": "量子コンピューティングと精密センシングを可能にするダイヤモンド量子クリスタル",
+      "taglineKo": "다이아몬드 양자 결정, 양자 컴퓨팅 및 정밀 감지 지원",
+      "taglineFr": "Les cristaux quantiques de diamant permettent l'informatique quantique et la détection de précision",
+      "taglineAr": "بلورات الماس الكمومية، تمكين الحوسبة الكمومية والاستشعار الدقيق",
+      "description": "金刚石中的氮-空位（NV）色心是目前最具应用前景的固态量子体系之一，在量子计算、量子精密测量、生物医学成像等领域具有重要应用价值。左文科技提供高品质金刚石量子晶体，为直流和交流磁场传感仪器、微波激射器、射频检测仪和量子演示器提供理想的NV色心载体。",
+      "descriptionEn": "Nitrogen-vacancy (NV) centers in diamond are one of the most promising solid-state quantum systems, with important applications in quantum computing, quantum precision measurement, and biomedical imaging. ZUO WEN TECHNOLOGY provides high-quality diamond quantum crystals, offering ideal NV color center carriers for DC and AC magnetic field sensing instruments, masers, RF detectors and quantum demonstrators.",
+      "descriptionJa": "ダイヤモンドの窒素空孔（ NV ）カラーセンターは、最も有望な固体量子システムの1つであり、量子コンピューティング、量子精度測定、生物医学イメージングなどの分野で重要なアプリケーション価値があります。Zuowen Technologyは、高品質のダイヤモンド量子結晶を提供し、DCおよびAC磁場センシング機器、マイクロ波レーザー、RF検出器、および量子デモンストレータに理想的なNVカラーセンターキャリアを提供します。",
+      "descriptionKo": "다이아몬드의 질소 빈도 (NV) 컬러 센터는 가장 유망한 고체 양자 시스템 중 하나이며 양자 컴퓨팅, 양자 정밀 측정, 생물의학 이미징 및 기타 분야에서 중요한 응용 가치를 가지고 있습니다. Zuowen Technology는 고품질 다이아몬드 양자 결정을 제공하여 DC 및 AC 자기장 감지 장비, 마이크로파 레이저, RF 검출기 및 양자 시연기에 이상적인 NV 컬러 센터 캐리어를 제공합니다.",
+      "descriptionFr": "Le centre de couleur des vacances d'azote (NV) dans le diamant est actuellement l'un des systèmes quantiques à l'état solide les plus prometteurs et a une valeur d'application importante dans l'informatique quantique, la mesure quantique de précision, l'imagerie biomédicale et d'autres domaines. Zuowen Technology fournit des cristaux quantiques de diamant de haute qualité, fournissant un support idéal de centre de couleur NV pour les instruments de détection de champ magnétique DC et AC, les masers, les détecteurs RF et les démonstrateurs quantiques.",
+      "descriptionAr": "يعد مركز ألوان شواغر النيتروجين (NV) في الماس أحد أكثر الأنظمة الكمومية الواعدة في الحالة الصلبة وله قيمة تطبيقية مهمة في الحوسبة الكمومية وقياس الدقة الكمومية والتصوير الطبي الحيوي وغيرها من المجالات. توفر تقنية Zuowen بلورات كمومية ماسية عالية الجودة، مما يوفر حاملات مركز ألوان NV مثالية لأدوات استشعار المجال المغناطيسي DC و AC، وأشعة الليزر بالموجات الدقيقة، وأجهزة الكشف عن الترددات اللاسلكية، والعرض الكمومي.",
+      "challenges": [
+        "NV色心浓度和一致性控制难度大",
+        "金刚石晶体纯度要求极高",
+        "量子退相干时间需要最大化",
+        "规模化制备高品质量子晶体困难"
+      ],
+      "challengesEn": [
+        "Difficult control of NV center concentration and consistency",
+        "Extremely high diamond crystal purity requirements",
+        "Need to maximize quantum decoherence time",
+        "Difficult scaled production of high-quality quantum crystals"
+      ],
+      "challengesJa": [
+        "NVカラーセンターの濃度と一貫性の制御が困難",
+        "ダイヤモンドクリスタルの純度要件は非常に高いです",
+        "量子退干渉時間を最大化する必要がある",
+        "高品質のサブクリスタルを大規模に調製するのが難しい"
+      ],
+      "challengesKo": [
+        "NV 색상 중심 농도 및 일관성 제어의 어려움",
+        "다이아몬드 크리스탈 순도 요건이 매우 높음",
+        "양자결합 시간을 극대화해야 합니다",
+        "대규모로 고품질의 서브 크리스탈을 준비하기 어려움"
+      ],
+      "challengesFr": [
+        "Il est difficile de contrôler la concentration et la cohérence du centre de couleur NV",
+        "Les cristaux de diamant exigent une pureté extrêmement élevée",
+        "Le temps de décohérence quantique doit être maximisé",
+        "Difficulté de préparer des cristaux quantiques de haute qualité à grande échelle"
+      ],
+      "challengesAr": [
+        "صعوبة في التحكم في تركيز مركز ألوان NV واتساقه",
+        "متطلبات نقاء الكريستال الماسي عالية للغاية",
+        "يجب زيادة وقت فك الترابط الكمي إلى الحد الأقصى",
+        "صعوبة إعداد بلورات فرعية عالية الجودة على نطاق واسع"
+      ],
+      "solutions": [
+        {
+          "desc": "为磁场传感、微波激射器、射频检测和量子演示提供理想NV色心载体",
+          "title": "金刚石量子晶体"
+        },
+        {
+          "desc": "自主研发设备，精准控制金刚石生长工艺，实现量子级晶体制备",
+          "title": "MPCVD长晶设备"
+        }
+      ],
+      "solutionsEn": [
+        {
+          "desc": "Ideal NV color center carrier for magnetic sensing, masers, RF detection and quantum demonstrators",
+          "title": "Diamond Quantum Crystal"
+        },
+        {
+          "desc": "Self-developed equipment with precise diamond growth process control for quantum-grade crystal preparation",
+          "title": "MPCVD Equipment"
+        }
+      ],
+      "solutionsJa": [
+        {
+          "desc": "磁界センシング、マイクロ波レーザー、RF検出、量子デモンストレーションに最適なNVカラーセンターキャリア",
+          "title": "ダイヤモンド量子クリスタル"
+        },
+        {
+          "desc": "独立した研究開発装置により、ダイヤモンドの成長プロセスを正確に制御し、量子グレードの結晶調製を実現",
+          "title": "MPCVD成長クリスタル装備"
+        }
+      ],
+      "solutionsKo": [
+        {
+          "desc": "자기장 감지, 마이크로파 레이저, RF 감지 및 양자 실증을 위한 이상적인 NV 컬러 센터 캐리어",
+          "title": "다이아몬드 양자 크리스탈"
+        },
+        {
+          "desc": "양자급 결정 제조를 달성하기 위해 다이아몬드 성장 공정을 정밀하게 제어하기 위한 독립적인 연구 및 개발 장비",
+          "title": "MPCVD 성장 크리스탈 장비"
+        }
+      ],
+      "solutionsFr": [
+        {
+          "desc": "Fournit un support idéal de centre de couleur NV pour la détection de champ magnétique, les masers, la détection RF et la démonstration quantique",
+          "title": "Cristal quantique de diamant"
+        },
+        {
+          "desc": "Équipement développé indépendamment pour contrôler avec précision le processus de croissance du diamant et réaliser la préparation de cristaux au niveau quantique",
+          "title": "Équipement de croissance de cristaux MPCVD"
+        }
+      ],
+      "solutionsAr": [
+        {
+          "desc": "حامل مركز ألوان NV مثالي لاستشعار المجال المغناطيسي، وأشعة الليزر بالموجات الدقيقة، وكشف الترددات اللاسلكية، والعروض الكمية",
+          "title": "الكريستال الكمومي الماسي"
+        },
+        {
+          "desc": "معدات البحث والتطوير المستقلة للتحكم بدقة في عملية نمو الماس لتحقيق تحضير الكريستال الكمومي",
+          "title": "معدات بلورات النمو MPCVD"
+        }
+      ],
+      "products": [
+        "金刚石量子晶体",
+        "MPCVD长晶设备"
+      ],
+      "productsEn": [
+        "Diamond Quantum Crystal",
+        "MPCVD Equipment"
+      ],
+      "productsJa": [
+        "ダイヤモンド量子クリスタル",
+        "MPCVD成長クリスタル装備"
+      ],
+      "productsKo": [
+        "다이아몬드 양자 크리스탈",
+        "MPCVD 성장 크리스탈 장비"
+      ],
+      "productsFr": [
+        "Cristal quantique de diamant",
+        "Équipement de croissance de cristaux MPCVD"
+      ],
+      "productsAr": [
+        "الكريستال الكمومي الماسي",
+        "معدات بلورات النمو MPCVD"
+      ],
+      "cases": [
+        {
+          "desc": "为科研机构提供金刚石量子晶体，用于高灵敏度磁场传感研究",
+          "title": "量子精密测量研究"
+        },
+        {
+          "desc": "为高校和科普机构提供量子演示器用金刚石晶体",
+          "title": "量子教育演示设备"
+        }
+      ],
+      "casesEn": [
+        {
+          "desc": "Diamond quantum crystals for research institutions in high-sensitivity magnetic field sensing",
+          "title": "Quantum Precision Measurement Research"
+        },
+        {
+          "desc": "Diamond crystals for quantum demonstrators in universities and science education",
+          "title": "Quantum Education Demonstration"
+        }
+      ],
+      "casesJa": [
+        {
+          "desc": "高感度磁場センシング研究のための科学機関へのダイヤモンド量子結晶の提供",
+          "title": "量子精密計測研究"
+        },
+        {
+          "desc": "大学や人気のある科学機関のための量子デモンストレーターのためのダイヤモンドクリスタル",
+          "title": "量子教育実証装置"
+        }
+      ],
+      "casesKo": [
+        {
+          "desc": "고감도 자기장 감지 연구를 위해 과학 기관에 다이아몬드 양자 결정 제공",
+          "title": "양자 정밀 측정 연구"
+        },
+        {
+          "desc": "대학 및 인기 과학 기관용 양자 시연기용 다이아몬드 크리스탈",
+          "title": "양자교육 실증장비"
+        }
+      ],
+      "casesFr": [
+        {
+          "desc": "Fournir des cristaux quantiques de diamant aux institutions de recherche scientifique pour la recherche sur la détection de champ magnétique hautement sensible",
+          "title": "Recherche sur la mesure de précision quantique"
+        },
+        {
+          "desc": "Fournir des cristaux de diamant pour des démonstrateurs quantiques aux universités et aux institutions de vulgarisation scientifique",
+          "title": "Équipement de démonstration éducative quantique"
+        }
+      ],
+      "casesAr": [
+        {
+          "desc": "توفير بلورات الماس الكمومية للمؤسسات العلمية لأبحاث استشعار المجال المغناطيسي عالية الحساسية",
+          "title": "أبحاث قياس الدقة الكمية"
+        },
+        {
+          "desc": "بلورات الماس لمتظاهري الكم للجامعات والمؤسسات العلمية الشعبية",
+          "title": "معدات العرض التوضيحي للتعليم الكمومي"
+        }
+      ],
+      "image": null,
+      "video": null,
+      "icon": null,
+      "sortOrder": 3,
+      "status": "published",
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null,
+      "solutionFile": null,
+      "solutionFileName": null,
+      "solutionFileNameEn": null,
+      "solutionFileNameJa": null,
+      "solutionFileNameKo": null,
+      "solutionFileNameFr": null,
+      "solutionFileNameAr": null,
+      "relatedProductSlugs": null,
+      "relatedIndustrySlugs": null
+    },
+    {
+      "id": "6",
+      "slug": "new-energy",
+      "name": "新能源",
+      "nameEn": "New Energy",
+      "nameJa": "新エネルギー",
+      "nameKo": "새로운 에너지",
+      "nameFr": "Nouvelles énergies",
+      "nameAr": "طاقة جديدة",
+      "tagline": "金刚石材料助力新能源技术突破",
+      "taglineEn": "Diamond materials empowering new energy technology breakthroughs",
+      "taglineJa": "ダイヤモンド素材は、新しいエネルギー技術のブレークスルーに役立ちます",
+      "taglineKo": "다이아몬드 소재는 새로운 에너지 기술의 혁신을 돕습니다",
+      "taglineFr": "Les matériaux diamantés contribuent à la percée des nouvelles technologies énergétiques",
+      "taglineAr": "تساعد المواد الماسية على تحقيق اختراقات في تقنيات الطاقة الجديدة",
+      "description": "在新能源领域，功率器件、储能系统、电动汽车等对散热材料和电子器件性能提出了更高要求。金刚石凭借超高热导率和优异的电学性能，在新能源功率模块散热、超级电容、辐射探测等方面展现出巨大应用潜力。左文科技提供金刚石散热片、金刚石超级电容材料等解决方案。",
+      "descriptionEn": "In the new energy field, power devices, energy storage systems, and electric vehicles impose higher requirements on thermal materials and electronic device performance. With ultra-high thermal conductivity and excellent electrical properties, diamond shows great application potential in new energy power module cooling, supercapacitors, and radiation detection. ZUO WEN TECHNOLOGY provides diamond heat spreaders, diamond supercapacitor materials and other solutions.",
+      "descriptionJa": "新エネルギーの分野では、パワーデバイス、エネルギー貯蔵システム、電気自動車などが、放熱材料と電子デバイスの性能に対してより高い要件を提示しています。超高熱伝導性と優れた電気特性により、ダイヤモンドは放熱、超静電容量、放射線検出、および新エネルギー電源モジュールの他の側面で大きな応用可能性を示しています。Zuowen Technologyは、ダイヤモンドヒートシンクやダイヤモンドスーパーキャパシタ材料などのソリューションを提供しています。",
+      "descriptionKo": "신에너지 분야에서는 전력기기, 에너지저장시스템, 전기자동차 등 방열재 및 전자기기 성능에 대한 요구사항이 높아졌다. 다이아몬드는 초고열 전도성과 우수한 전기적 특성으로 방열, 슈퍼 커패시턴스, 방사선 검출 및 새로운 에너지 전력 모듈의 다른 측면에서 큰 응용 가능성을 보여주었습니다. Zuowen Technology는 다이아몬드 방열판 및 다이아몬드 슈퍼 커패시터 재료와 같은 솔루션을 제공합니다.",
+      "descriptionFr": "Dans le domaine des nouvelles énergies, les dispositifs électriques, les systèmes de stockage d'énergie, les véhicules électriques, etc. imposent des exigences plus élevées en matière de performances des matériaux de dissipation thermique et des dispositifs Avec sa conductivité thermique ultra-élevée et ses excellentes propriétés électriques, le diamant a montré un énorme potentiel d'application dans la dissipation thermique des nouveaux modules d'énergie, les supercondensateurs, la détection des rayonnements, etc. Zuowen Technology fournit des solutions telles que des dissipateurs thermiques diamantés et des matériaux de supercondensateurs diamantés.",
+      "descriptionAr": "في مجال الطاقة الجديدة، تطرح أجهزة الطاقة وأنظمة تخزين الطاقة والمركبات الكهربائية وما إلى ذلك متطلبات أعلى لمواد تبديد الحرارة وأداء الأجهزة الإلكترونية. بفضل الموصلية الحرارية الفائقة والخصائص الكهربائية الممتازة، أظهر الماس إمكانات تطبيق كبيرة في تبديد الحرارة والسعة الفائقة والكشف عن الإشعاع والجوانب الأخرى لوحدات طاقة الطاقة الجديدة. توفر تقنية Zuowen حلولًا مثل أحواض الحرارة الماسية ومواد المكثفات الفائقة الماسية.",
+      "challenges": [
+        "新能源功率模块散热需求持续增长",
+        "电动汽车逆变器功率密度提升带来热管理挑战",
+        "储能系统对安全性和寿命要求高",
+        "新型储能材料需要突破性能瓶颈"
+      ],
+      "challengesEn": [
+        "Growing cooling demand for new energy power modules",
+        "Thermal management challenges from EV inverter power density increase",
+        "High safety and lifespan requirements for energy storage systems",
+        "New energy storage materials need performance breakthroughs"
+      ],
+      "challengesJa": [
+        "新能源功率模块散热需求持续增长",
+        "电动汽车逆变器功率密度提升带来热管理挑战",
+        "储能系统对安全性和寿命要求高",
+        "新型储能材料需要突破性能瓶颈"
+      ],
+      "challengesKo": [
+        "新能源功率模块散热需求持续增长",
+        "电动汽车逆变器功率密度提升带来热管理挑战",
+        "储能系统对安全性和寿命要求高",
+        "新型储能材料需要突破性能瓶颈"
+      ],
+      "challengesFr": [
+        "La demande de dissipation thermique de nouveaux modules d'énergie continue de croître",
+        "L'augmentation de la densité de puissance des onduleurs des véhicules électriques pose des défis de gestion thermique",
+        "Les systèmes de stockage d'énergie ont des exigences élevées en matière de sécurité et de durée",
+        "Les nouveaux matériaux de stockage d'énergie doivent surmonter les goulots d'étranglement des"
+      ],
+      "challengesAr": [
+        "新能源功率模块散热需求持续增长",
+        "电动汽车逆变器功率密度提升带来热管理挑战",
+        "储能系统对安全性和寿命要求高",
+        "新型储能材料需要突破性能瓶颈"
+      ],
+      "solutions": [
+        {
+          "desc": "超高热导率，为新能源功率模块提供高效散热解决方案",
+          "title": "金刚石散热片"
+        },
+        {
+          "desc": "金刚石薄膜在电容上的应用，提升储能器件性能",
+          "title": "金刚石超级电容"
+        },
+        {
+          "desc": "自主研发设备，支持新能源领域金刚石材料的规模化制备",
+          "title": "MPCVD长晶设备"
+        }
+      ],
+      "solutionsEn": [
+        {
+          "desc": "Ultra-high thermal conductivity for efficient cooling of new energy power modules",
+          "title": "Diamond Heat Spreader"
+        },
+        {
+          "desc": "Diamond thin film application in capacitors, improving energy storage device performance",
+          "title": "Diamond Supercapacitor"
+        },
+        {
+          "desc": "Self-developed equipment for scaled diamond material production in new energy",
+          "title": "MPCVD Equipment"
+        }
+      ],
+      "solutionsJa": [
+        {
+          "desc": "超高热导率，为新能源功率模块提供高效散热解决方案",
+          "title": "金刚石散热片"
+        },
+        {
+          "desc": "金刚石薄膜在电容上的应用，提升储能器件性能",
+          "title": "金刚石超级电容"
+        },
+        {
+          "desc": "自主研发设备，支持新能源领域金刚石材料的规模化制备",
+          "title": "MPCVD长晶设备"
+        }
+      ],
+      "solutionsKo": [
+        {
+          "desc": "超高热导率，为新能源功率模块提供高效散热解决方案",
+          "title": "金刚石散热片"
+        },
+        {
+          "desc": "金刚石薄膜在电容上的应用，提升储能器件性能",
+          "title": "金刚石超级电容"
+        },
+        {
+          "desc": "自主研发设备，支持新能源领域金刚石材料的规模化制备",
+          "title": "MPCVD长晶设备"
+        }
+      ],
+      "solutionsFr": [
+        {
+          "desc": "Conductivité thermique ultra-élevée, offrant des solutions de dissipation thermique efficaces pour les nouveaux modules d'énergie",
+          "title": "Dissipateur de chaleur en diamant"
+        },
+        {
+          "desc": "L'application de films diamantés dans les condensateurs améliore les performances des dispositifs de stockage d'énergie",
+          "title": "Supercondensateur en diamant"
+        },
+        {
+          "desc": "Équipements de recherche et de développement indépendants pour soutenir la préparation à grande échelle de matériaux diamantés dans le domaine des nouvelles énergies",
+          "title": "Équipement de croissance de cristaux MPCVD"
+        }
+      ],
+      "solutionsAr": [
+        {
+          "desc": "超高热导率，为新能源功率模块提供高效散热解决方案",
+          "title": "金刚石散热片"
+        },
+        {
+          "desc": "金刚石薄膜在电容上的应用，提升储能器件性能",
+          "title": "金刚石超级电容"
+        },
+        {
+          "desc": "自主研发设备，支持新能源领域金刚石材料的规模化制备",
+          "title": "MPCVD长晶设备"
+        }
+      ],
+      "products": [
+        "金刚石散热片",
+        "多晶金刚石晶圆",
+        "MPCVD长晶设备"
+      ],
+      "productsEn": [
+        "Diamond Heat Spreader",
+        "Poly Diamond Wafer",
+        "MPCVD Equipment"
+      ],
+      "productsJa": [
+        "金刚石散热片",
+        "多晶金刚石晶圆",
+        "MPCVD长晶设备"
+      ],
+      "productsKo": [
+        "金刚石散热片",
+        "多晶金刚石晶圆",
+        "MPCVD长晶设备"
+      ],
+      "productsFr": [
+        "Dissipateur de chaleur en diamant",
+        "Gaffe de diamant polycristallin",
+        "Équipement de croissance de cristaux MPCVD"
+      ],
+      "productsAr": [
+        "金刚石散热片",
+        "多晶金刚石晶圆",
+        "MPCVD长晶设备"
+      ],
+      "cases": [
+        {
+          "desc": "为新能源汽车企业提供金刚石散热解决方案，提升逆变器功率密度",
+          "title": "电动汽车逆变器散热"
+        },
+        {
+          "desc": "为储能系统功率模块提供金刚石散热片，提升系统可靠性和寿命",
+          "title": "储能功率模块"
+        }
+      ],
+      "casesEn": [
+        {
+          "desc": "Diamond cooling solutions for NEV companies, improving inverter power density",
+          "title": "EV Inverter Cooling"
+        },
+        {
+          "desc": "Diamond heat spreaders for energy storage power modules, improving system reliability and lifespan",
+          "title": "Energy Storage Power Module"
+        }
+      ],
+      "casesJa": [
+        {
+          "desc": "为新能源汽车企业提供金刚石散热解决方案，提升逆变器功率密度",
+          "title": "电动汽车逆变器散热"
+        },
+        {
+          "desc": "为储能系统功率模块提供金刚石散热片，提升系统可靠性和寿命",
+          "title": "储能功率模块"
+        }
+      ],
+      "casesKo": [
+        {
+          "desc": "为新能源汽车企业提供金刚石散热解决方案，提升逆变器功率密度",
+          "title": "电动汽车逆变器散热"
+        },
+        {
+          "desc": "为储能系统功率模块提供金刚石散热片，提升系统可靠性和寿命",
+          "title": "储能功率模块"
+        }
+      ],
+      "casesFr": [
+        {
+          "desc": "Fournir des solutions de dissipation thermique diamantées aux entreprises de véhicules à énergie nouvelle pour augmenter la densité de puissance des onduleurs",
+          "title": "Dissipation thermique des onduleurs pour véhicules électriques"
+        },
+        {
+          "desc": "Fournir des dissipateurs de chaleur en diamant pour les modules de puissance des systèmes de stockage d'énergie pour améliorer la fiabilité et la durée de vie du système",
+          "title": "Module de puissance de stockage d'énergie"
+        }
+      ],
+      "casesAr": [
+        {
+          "desc": "为新能源汽车企业提供金刚石散热解决方案，提升逆变器功率密度",
+          "title": "电动汽车逆变器散热"
+        },
+        {
+          "desc": "为储能系统功率模块提供金刚石散热片，提升系统可靠性和寿命",
+          "title": "储能功率模块"
+        }
+      ],
+      "image": null,
+      "video": null,
+      "icon": null,
+      "sortOrder": 5,
+      "status": "published",
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null,
+      "solutionFile": null,
+      "solutionFileName": null,
+      "solutionFileNameEn": null,
+      "solutionFileNameJa": null,
+      "solutionFileNameKo": null,
+      "solutionFileNameFr": null,
+      "solutionFileNameAr": null,
+      "relatedProductSlugs": null,
+      "relatedIndustrySlugs": null
+    },
+    {
+      "id": "3",
+      "slug": "precision-machining",
+      "name": "精密加工",
+      "nameEn": "Precision Machining",
+      "nameJa": "精密な作業",
+      "nameKo": "정밀 기계 가공",
+      "nameFr": "Usinage de précision",
+      "nameAr": "الآلات الدقيقة",
+      "tagline": "单晶金刚石刀具，实现超精密加工",
+      "taglineEn": "Single crystal diamond tools for ultra-precision machining",
+      "taglineJa": "超精密加工用単結晶ダイヤモンド工具",
+      "taglineKo": "초정밀 가공을 위한 단결정 다이아몬드 공구",
+      "taglineFr": "Outil diamant monocristallin pour un usinage ultra-précis",
+      "taglineAr": "أداة ماسية بلورية واحدة للتشغيل الآلي فائق الدقة",
+      "description": "在航空航天、汽车、光学等高端制造领域，对加工精度和表面质量的要求日益严苛。单晶金刚石刀具凭借超高硬度、耐磨性和极低的摩擦系数，成为超精密加工的首选工具。左文科技采用自主MPCVD技术生长高品质单晶金刚石，制备高性能金刚石刀具，满足精密加工场景需求。",
+      "descriptionEn": "In high-end manufacturing fields such as aerospace, automotive and optics, requirements for machining precision and surface quality are increasingly stringent. Single crystal diamond tools, with ultra-high hardness, wear resistance and extremely low friction coefficient, have become the preferred tools for ultra-precision machining. ZUO WEN TECHNOLOGY grows high-quality single crystal diamonds using self-developed MPCVD technology to produce high-performance diamond tools for precision machining.",
+      "descriptionJa": "航空宇宙、自動車、光学などのハイエンド製造分野では、加工精度と表面品質がますます要求されています。単結晶ダイヤモンドツールは、超高硬度、耐摩耗性、摩擦係数が極めて低いため、超精密加工に最適なツールです。Zuowen Technologyは、独立したMPCVD技術を使用して、高品質の単結晶ダイヤモンドを成長させ、精密加工シナリオのニーズを満たす高性能ダイヤモンドツールを準備します。",
+      "descriptionKo": "항공우주, 자동차, 광학과 같은 하이엔드 제조 분야에서 기계 가공의 정확성과 표면 품질은 점점 더 요구되고 있습니다. 단결정 다이아몬드 공구는 초고경도, 내마모성 및 매우 낮은 마찰 계수로 초정밀 가공에 적합한 공구입니다. Zuowen Technology는 독립적인 MPCVD 기술을 사용하여 고품질의 단결정 다이아몬드를 재배하고 정밀 가공 시나리오의 요구를 충족하는 고성능 다이아몬드 도구를 준비합니다.",
+      "descriptionFr": "Dans les domaines de la fabrication haut de gamme tels que l'aérospatiale, l'automobile et l'optique, la précision d'usinage et la qualité de surface sont de plus en plus exigeantes. L'outil diamant monocristallin est l'outil de choix pour l'usinage ultra-précis avec sa dureté ultra-élevée, sa résistance à l'usure et son coefficient de frottement extrêmement faible. Zuowen Technology utilise la technologie indépendante MPCVD pour cultiver des diamants monocristallins de haute qualité et préparer des outils diamantés haute performance pour répondre aux besoins des scénarios d'usinage de précision.",
+      "descriptionAr": "في مجالات التصنيع المتطورة مثل الطيران والسيارات والبصريات، أصبحت دقة الآلات وجودة السطح مطلوبة بشكل متزايد. الأداة الماسية أحادية الكريستال هي الأداة المفضلة للتشغيل فائق الدقة بصلابتها الفائقة ومقاومتها للتآكل ومعامل الاحتكاك المنخفض للغاية. تستخدم Zuowen Technology تقنية MPCVD المستقلة لزراعة الماس أحادي الكريستال عالي الجودة وإعداد أدوات الماس عالية الأداء لتلبية احتياجات سيناريوهات الآلات الدقيقة.",
+      "challenges": [
+        "传统刀具寿命短，加工精度难以保持",
+        "难加工材料（如碳纤维、陶瓷）加工困难",
+        "超精密加工对刀具刃口质量要求极高",
+        "刀具成本高，需要更长使用寿命"
+      ],
+      "challengesEn": [
+        "Short tool life of traditional tools, difficult to maintain precision",
+        "Difficult-to-machine materials (carbon fiber, ceramics) challenging",
+        "Ultra-precision machining demands extremely high cutting edge quality",
+        "High tool cost requiring longer service life"
+      ],
+      "challengesJa": [
+        "従来の工具寿命が短く、加工精度の維持が困難",
+        "加工が困難な材料（炭素繊維、セラミックなど）加工が困難",
+        "超精密加工には、非常に高品質な刃先が必要です",
+        "切削工具は高価であり、より長い耐用年数を必要とします"
+      ],
+      "challengesKo": [
+        "기존의 공구 수명이 짧고 기계 가공 정확도를 유지하기가 어렵습니다.",
+        "재료 가공이 어려움 (예: 탄소 섬유, 세라믹) 가공이 어려움",
+        "초정밀 가공에는 매우 높은 품질의 커팅 에지가 필요합니다",
+        "절삭 공구는 비용이 많이 들고 수명이 더 깁니다."
+      ],
+      "challengesFr": [
+        "La durée de vie de l'outil traditionnel est courte, la précision d'usinage est difficile à maintenir",
+        "Matériaux difficiles à traiter (par exemple, fibre de carbone, céramique) Difficile à traiter",
+        "L'usinage ultra-précis nécessite des tranchants de très haute qualité",
+        "Les outils de coupe sont coûteux et nécessitent une durée de vie plus longue"
+      ],
+      "challengesAr": [
+        "عمر الأداة التقليدية قصير، ومن الصعب الحفاظ على دقة التشغيل الآلي",
+        "صعوبة في معالجة المواد (مثل ألياف الكربون والسيراميك) صعوبة في المعالجة",
+        "تتطلب الآلات فائقة الدقة حواف قطع عالية الجودة",
+        "أدوات القطع مكلفة وتتطلب عمر خدمة أطول"
+      ],
+      "solutions": [
+        {
+          "desc": "超高硬度与耐磨性，适用于精密加工、超精密车削等高端制造场景",
+          "title": "单晶金刚石刀具"
+        },
+        {
+          "desc": "自主研发设备，支持高品质单晶金刚石的稳定生长",
+          "title": "MPCVD长晶设备"
+        }
+      ],
+      "solutionsEn": [
+        {
+          "desc": "Ultra-high hardness and wear resistance for precision machining and ultra-precision turning",
+          "title": "Single Crystal Diamond Tool"
+        },
+        {
+          "desc": "Self-developed equipment for stable high-quality single crystal diamond growth",
+          "title": "MPCVD Equipment"
+        }
+      ],
+      "solutionsJa": [
+        {
+          "desc": "超高硬度・耐摩耗性で、精密加工や超精密旋削加工などのハイエンドな製造シーンに適しています",
+          "title": "単結晶ダイヤモンドツール"
+        },
+        {
+          "desc": "高品質の単結晶ダイヤモンドの安定した成長をサポートする独立した研究開発設備",
+          "title": "MPCVD成長クリスタル装備"
+        }
+      ],
+      "solutionsKo": [
+        {
+          "desc": "정밀 가공 및 초정밀 터닝과 같은 하이엔드 제조 시나리오에 적합한 초고경도 및 내마모성",
+          "title": "단결정 다이아몬드 도구"
+        },
+        {
+          "desc": "고품질 단결정 다이아몬드의 안정적인 성장을 지원하는 독립적인 연구 개발 장비",
+          "title": "MPCVD 성장 크리스탈 장비"
+        }
+      ],
+      "solutionsFr": [
+        {
+          "desc": "Dureté et résistance à l'usure ultra-élevées, adaptées aux scénarios de fabrication haut de gamme tels que l'usinage de précision et le tournage ultra-précis",
+          "title": "outil diamant monocristallin"
+        },
+        {
+          "desc": "Équipement de recherche et développement indépendant pour soutenir la croissance stable de diamants monocristallins de haute qualité",
+          "title": "Équipement de cristaux de croissance MPCVD"
+        }
+      ],
+      "solutionsAr": [
+        {
+          "desc": "صلابة فائقة ومقاومة للتآكل، ومناسبة لسيناريوهات التصنيع المتطورة مثل الآلات الدقيقة والدوران فائق الدقة",
+          "title": "أداة ماسية أحادية البلورة"
+        },
+        {
+          "desc": "معدات البحث والتطوير المستقلة لدعم النمو المستقر للماس أحادي البلورة عالي الجودة",
+          "title": "معدات بلورات النمو MPCVD"
+        }
+      ],
+      "products": [
+        "单晶金刚石刀具",
+        "MPCVD长晶设备"
+      ],
+      "productsEn": [
+        "Single Crystal Diamond Tool",
+        "MPCVD Equipment"
+      ],
+      "productsJa": [
+        "単結晶ダイヤモンドツール",
+        "MPCVD成長クリスタル装備"
+      ],
+      "productsKo": [
+        "단결정 다이아몬드 도구",
+        "MPCVD 성장 크리스탈 장비"
+      ],
+      "productsFr": [
+        "outil diamant monocristallin",
+        "Équipement de cristaux de croissance MPCVD"
+      ],
+      "productsAr": [
+        "أداة ماسية أحادية البلورة",
+        "معدات بلورات النمو MPCVD"
+      ],
+      "cases": [
+        {
+          "desc": "为光学企业提供单晶金刚石刀具，实现光学镜面纳米级表面粗糙度",
+          "title": "光学元件超精密车削"
+        },
+        {
+          "desc": "为航空航天企业提供金刚石刀具，加工碳纤维复合材料寿命提升10倍",
+          "title": "碳纤维复合材料加工"
+        }
+      ],
+      "casesEn": [
+        {
+          "desc": "Single crystal diamond tools for optical companies, achieving nanometer surface roughness",
+          "title": "Optical Element Ultra-Precision Turning"
+        },
+        {
+          "desc": "Diamond tools for aerospace companies, 10x lifespan improvement in CFRP machining",
+          "title": "CFRP Machining"
+        }
+      ],
+      "casesJa": [
+        {
+          "desc": "光学ミラーのナノスケール表面粗さを達成するために、光学企業向けの単結晶ダイヤモンドツールを提供",
+          "title": "光学部品の超精密旋削加工"
+        },
+        {
+          "desc": "航空宇宙企業にダイヤモンドツールを提供し、炭素繊維複合材料の寿命を10倍に延ばす",
+          "title": "炭素繊維複合加工"
+        }
+      ],
+      "casesKo": [
+        {
+          "desc": "광학 기업에서 광학 미러 나노 스케일 표면 거칠기를 달성하기 위한 단일 크리스탈 다이아몬드 도구 제공",
+          "title": "광학 부품의 초정밀 선삭"
+        },
+        {
+          "desc": "항공우주 회사에 탄소 섬유 복합재의 수명을 10배 늘릴 수 있는 다이아몬드 도구 제공",
+          "title": "탄소섬유 복합가공"
+        }
+      ],
+      "casesFr": [
+        {
+          "desc": "Fournir des outils en diamant monocristallin aux entreprises d'optique pour obtenir une rugosité de surface à l'échelle nanométrique du miroir optique",
+          "title": "Tournage ultra-précis des composants optiques"
+        },
+        {
+          "desc": "Fournir des outils diamantés aux entreprises aérospatiales pour augmenter la durée de vie des composites en fibre de carbone de 10 fois",
+          "title": "Traitement des composites en fibre de carbone"
+        }
+      ],
+      "casesAr": [
+        {
+          "desc": "توفير أدوات ألماس بلورية واحدة للمؤسسات البصرية لتحقيق خشونة سطح المرآة الضوئية بحجم النانو",
+          "title": "الدوران فائق الدقة للمكونات البصرية"
+        },
+        {
+          "desc": "توفير أدوات الألماس لشركات الطيران لزيادة عمر مركبات ألياف الكربون بمقدار 10 أضعاف",
+          "title": "معالجة ألياف الكربون المركبة"
+        }
+      ],
+      "image": null,
+      "video": null,
+      "icon": null,
+      "sortOrder": 2,
+      "status": "published",
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null,
+      "solutionFile": null,
+      "solutionFileName": null,
+      "solutionFileNameEn": null,
+      "solutionFileNameJa": null,
+      "solutionFileNameKo": null,
+      "solutionFileNameFr": null,
+      "solutionFileNameAr": null,
+      "relatedProductSlugs": null,
+      "relatedIndustrySlugs": null
+    },
+    {
+      "id": "1",
+      "slug": "jewelry",
+      "name": "珠宝首饰",
+      "nameEn": "Fine Jewelry",
+      "nameJa": "ジュエリー",
+      "nameKo": "쥬얼리",
+      "nameFr": "Bijoux",
+      "nameAr": "المجوهرات",
+      "tagline": "高品质培育钻石，点亮极致奢华",
+      "taglineEn": "High quality cultivated diamonds to light up the ultimate in luxury",
+      "taglineJa": "究極のラグジュアリーを照らす高品質の栽培ダイヤモンド",
+      "taglineKo": "고급 스러움의 극치를 밝히는 고품질의 재배 다이아몬드",
+      "taglineFr": "Des diamants cultivés de haute qualité illuminent le luxe ultime",
+      "taglineAr": "ماس مزروع عالي الجودة لإضاءة أقصى درجات الرفاهية",
+      "description": "<p>培育钻石作为天然钻石的可持续替代品，在珠宝首饰领域的应用日益广泛。左文科技采用自主MPCVD设备生产高品质培育钻石，颜色覆盖DEF/GH级，净度达VVS-VS，重量1-12ct，切工包含圆钻3EX及异形钻，为珠宝品牌提供稳定、可追溯的钻石供应。</p>",
+      "descriptionEn": "<p>Cultured diamonds, as a sustainable alternative to natural diamonds, are increasingly being used in the jewelry industry. Zuowen Technology uses its own MPCVD equipment to produce high-quality lab-grown diamonds with color coverage of DEF/GH grade, clarity of VVS-VS, weight of 1-12ct, and cutting including 3EX round diamonds and irregular-shaped diamonds, providing jewelry brands with a stable and traceable diamond supply.</p>",
+      "descriptionJa": "<p>天然ダイヤモンドの持続可能な代替品としてのダイヤモンドの栽培は、ジュエリーの分野でますます使用されています。Zuowen Technologyは、独立したMPCVD装置を使用して高品質の培養ダイヤモンドを製造しています。色はDEF/GHグレードをカバーし、透明度はVVS - VSに達し、重量は1〜12カラットで、カットプロセスにはラウンドダイヤモンド3 EXと特殊形状のダイヤモンドが含まれ、ジュエリーブランドに安定した追跡可能なダイヤモンド供給を提供します。</p>",
+      "descriptionKo": "<p>천연 다이아몬드의 지속 가능한 대안으로 다이아몬드를 재배하는 것이 주얼리 분야에서 점점 더 많이 사용되고 있습니다. Zuowen Technology는 독립적인 MPCVD 장비를 사용하여 고품질의 배양 다이아몬드를 생산하고, 색상은 DEF/GH 등급을 커버하며, 선명도는 VVS-VS에 도달하고, 무게는 1-12ct이며, 절단 공정에는 라운드 다이아몬드 3EX와 특수 모양 다이아몬드가 포함되어 주얼리 브랜드에 안정적이고 추적 가능한 다이아몬드 공급을 제공합니다.</p>",
+      "descriptionFr": "<p>En tant que substitut durable aux diamants naturels, les diamants cultivés sont de plus en plus utilisés dans le domaine des bijoux. Zuowen Technology utilise son propre équipement MPCVD pour produire des diamants cultivés de haute qualité. La couleur couvre le niveau DEF/GH, la clarté atteint VVS-VS et le poids est de 1 à 12 ct. La coupe comprend des diamants ronds 3EX et des diamants de forme spéciale, fournissant des diamants stables et traçables pour les marques de bijoux. fourniture de diamants.</p>",
+      "descriptionAr": "<p>يتم استخدام زراعة الماس كبديل مستدام للماس الطبيعي بشكل متزايد في مجال المجوهرات. تستخدم Zuowen Technology معدات MPCVD مستقلة لإنتاج الماس المستنبت عالي الجودة، ويغطي اللون درجة DEF/GH، ويصل النقاء إلى VVS - VS، والوزن من 1 إلى 12 قيراطًا، وتشمل عملية القطع الماس المستدير 3EX والماس على شكل خاص، مما يوفر إمدادًا مستقرًا ويمكن تتبعه من الماس لماركات المجوهرات.</p>",
+      "challenges": [
+        "天然钻石供应受限，价格波动大",
+        "消费者对培育钻石认知度有待提升",
+        "高品质大颗粒培育钻石量产难度高",
+        "珠宝品牌对钻石品质一致性要求严苛"
+      ],
+      "challengesEn": [
+        "Limited natural diamond supply with price volatility",
+        "Consumer awareness of lab-grown diamonds needs improvement",
+        "High difficulty in mass-producing high-quality large diamonds",
+        "Jewelry brands demand strict diamond quality consistency"
+      ],
+      "challengesJa": [
+        "天然ダイヤモンドの供給が限られており、価格のボラティリティが高い",
+        "消費者のダイヤモンド栽培意識を高める必要がある",
+        "高品質大粒培養ダイヤモンド量産難易度高",
+        "ジュエリーブランドは、ダイヤモンドの品質に一貫性を求めています"
+      ],
+      "challengesKo": [
+        "천연 다이아몬드의 제한된 공급과 높은 가격 변동성",
+        "다이아몬드 재배에 대한 소비자의 인식 개선 필요",
+        "고품질 대형 곡물 배양 다이아몬드 대량 생산의 높은 난이도",
+        "주얼리 브랜드는 다이아몬드 품질의 일관성을 요구하고 있습니다"
+      ],
+      "challengesFr": [
+        "L'offre de diamants naturels est limitée et les prix fluctuent fortement",
+        "La sensibilisation des consommateurs aux diamants cultivés doit être améliorée",
+        "La production de masse de diamants cultivés à gros grains de haute qualité est difficile",
+        "Les marques de bijoux ont des exigences strictes en matière de cohérence de la qualité des diamants"
+      ],
+      "challengesAr": [
+        "محدودية المعروض من الماس الطبيعي وارتفاع تقلبات الأسعار",
+        "يجب تحسين وعي المستهلكين بزراعة الماس",
+        "ماس مزروع كبير الحبوب عالي الجودة صعوبة عالية في الإنتاج الضخم",
+        "تطالب العلامات التجارية للمجوهرات بالاتساق في جودة الماس"
+      ],
+      "solutions": [
+        {
+          "desc": "DEF/GH色，VVS-VS净度，圆钻3EX及异形钻切工，1-12ct全规格覆盖",
+          "title": "无色培育钻石"
+        },
+        {
+          "desc": "黄色、粉色、红色等彩色系列，满足个性化珠宝设计需求",
+          "title": "彩色培育钻石"
+        },
+        {
+          "desc": "提供CVD毛坯及半成品裸石，支持珠宝商自行切割定制",
+          "title": "毛坯与裸石"
+        }
+      ],
+      "solutionsEn": [
+        {
+          "desc": "DEF/GH color, VVS-VS clarity, round 3EX and fancy cuts, full 1-12ct coverage",
+          "title": "Colorless Lab-Grown Diamond"
+        },
+        {
+          "desc": "Yellow, pink, red and other fancy colors for personalized jewelry design",
+          "title": "Fancy Color Diamond"
+        },
+        {
+          "desc": "CVD rough and semi-finished diamonds for jewelers' custom cutting",
+          "title": "Rough & Processed"
+        }
+      ],
+      "solutionsJa": [
+        {
+          "desc": "DEF/GHカラー、VVS - VSクラリティ、ラウンドドリル3 EXとプロファイルドリルカッター、1 -12 ctフル仕様カバレッジ",
+          "title": "無色の養殖ダイヤモンド"
+        },
+        {
+          "desc": "パーソナライズされたジュエリーデザインのニーズを満たすイエロー、ピンク、レッドなどのカラフルなコレクション",
+          "title": "カラーカルチャーダイヤモンド"
+        },
+        {
+          "desc": "CVDラフと半仕上げのベアストーンを提供して、宝石商がカットしてカスタマイズできるようにします",
+          "title": "粗い石とむき出しの石"
+        }
+      ],
+      "solutionsKo": [
+        {
+          "desc": "DEF/GH 색상, VVS-VS 선명도, 원형 드릴 3EX 및 프로파일 드릴 커터, 1-12ct 전체 사양 범위",
+          "title": "무색 배양 다이아몬드"
+        },
+        {
+          "desc": "맞춤 주얼리 디자인의 요구를 충족시키는 옐로우, 핑크, 레드 및 기타 다채로운 컬렉션",
+          "title": "컬러 배양 다이아몬드"
+        },
+        {
+          "desc": "CVD 러프 및 반제품 베어 스톤을 제공하여 주얼러가 커팅 및 커스터마이징할 수 있도록 지원합니다.",
+          "title": "로우 & 베어 스톤"
+        }
+      ],
+      "solutionsFr": [
+        {
+          "desc": "Couleur DEF/GH, clarté VVS-VS, perçage rond 3EX et coupe de perçage profilée, couverture complète de 1 à 12 ct",
+          "title": "Diamant cultivé incolore"
+        },
+        {
+          "desc": "Jaune, rose, rouge et autres séries de couleurs pour répondre aux besoins de conception de bijoux personnalisés",
+          "title": "Diamants cultivés en couleur"
+        },
+        {
+          "desc": "Fournir des pierres brutes CVD et semi-finies nues, soutenant les bijoutiers à découper et à personnaliser eux-mêmes",
+          "title": "Pierre brute et nue"
+        }
+      ],
+      "solutionsAr": [
+        {
+          "desc": "لون DEF/GH، وضوح VVS - VS، حفر مستدير 3EX وقاطع حفر جانبي، تغطية مواصفات كاملة 1-12 ct",
+          "title": "ماسة مزروعة عديمة اللون"
+        },
+        {
+          "desc": "مجموعات الأصفر والوردي والأحمر وغيرها من المجموعات الملونة لتلبية احتياجات تصميم المجوهرات المخصصة",
+          "title": "ماس مزخرف بالألوان"
+        },
+        {
+          "desc": "توفير الحجر العاري الخشن ونصف النهائي للأمراض القلبية الوعائية لدعم صائغي المجوهرات لقطعه وتخصيصه",
+          "title": "الحجر الخام والعاري"
+        }
+      ],
+      "products": [
+        "无色培育钻石",
+        "彩色培育钻石",
+        "培育钻石毛坯",
+        "半成品裸石"
+      ],
+      "productsEn": [
+        "Colorless Diamond",
+        "Fancy Color Diamond",
+        "Diamond Rough",
+        "Processed Diamond"
+      ],
+      "productsJa": [
+        "無色の養殖ダイヤモンド",
+        "カラーカルチャーダイヤモンド",
+        "ダイヤモンドブランクを栽培する",
+        "半仕上げのベアストーン"
+      ],
+      "productsKo": [
+        "무색 배양 다이아몬드",
+        "컬러 배양 다이아몬드",
+        "다이아몬드 블랭크 육성",
+        "반제품 맨돌"
+      ],
+      "productsFr": [
+        "Diamant cultivé incolore",
+        "Diamants cultivés en couleur",
+        "Cultiver des diamants brus",
+        "Pierre nue semi-finie"
+      ],
+      "productsAr": [
+        "ماسة مزروعة عديمة اللون",
+        "ماس مزخرف بالألوان",
+        "الماس الخام المصنّع في المختبر",
+        "حجر مكشوف نصف تشطيب"
+      ],
+      "cases": [
+        {
+          "desc": "为国内知名珠宝品牌提供稳定培育钻石供应，年供货量超万克拉",
+          "title": "知名珠宝品牌战略合作"
+        },
+        {
+          "desc": "为高端定制珠宝品牌提供大颗粒彩色培育钻石，打造独特设计系列",
+          "title": "高端定制珠宝系列"
+        }
+      ],
+      "casesEn": [
+        {
+          "desc": "Stable lab-grown diamond supply for a well-known domestic jewelry brand, exceeding 10,000 carats annually",
+          "title": "Strategic Partnership with Jewelry Brand"
+        },
+        {
+          "desc": "Large fancy-color lab-grown diamonds for high-end custom jewelry brands",
+          "title": "High-End Custom Jewelry Series"
+        }
+      ],
+      "casesJa": [
+        {
+          "desc": "国内の有名ジュエリーブランドに、年間1万カラット以上の栽培ダイヤモンドを安定供給",
+          "title": "有名ジュエリーブランドとの戦略的提携"
+        },
+        {
+          "desc": "ハイエンドカスタムジュエリーブランドのためのカラー加工ダイヤモンドの大きなペレットを備えたユニークなデザインコレクション",
+          "title": "ハイエンドカスタムジュエリーコレクション"
+        }
+      ],
+      "casesKo": [
+        {
+          "desc": "국내 유명 주얼리 브랜드에 연간 10,000캐럿 이상의 경작 다이아몬드를 안정적으로 공급합니다.",
+          "title": "유명 주얼리 브랜드의 전략적 협력"
+        },
+        {
+          "desc": "고급 커스텀 주얼리 브랜드를 위한 커다란 유색 배양 다이아몬드가 있는 독특한 디자인 컬렉션",
+          "title": "고급 맞춤 주얼리 컬렉션"
+        }
+      ],
+      "casesFr": [
+        {
+          "desc": "Fournir une approvisionnement stable en diamants cultivés pour des marques de bijoux nationales bien connues, avec une approvisionnement annuelle de plus de 10 000 carats",
+          "title": "Coopération stratégique avec des marques de bijoux bien connues"
+        },
+        {
+          "desc": "Fournir de gros grains de diamants cultivés colorés pour les marques de bijoux personnalisés haut de gamme pour créer une série de design unique",
+          "title": "Collection de bijoux personnalisés haut de gamme"
+        }
+      ],
+      "casesAr": [
+        {
+          "desc": "توفير إمدادات مستقرة من الماس المزروع لماركات المجوهرات المحلية المعروفة، مع إمدادات سنوية تزيد عن 10000 قيراط",
+          "title": "التعاون الاستراتيجي لماركات المجوهرات المعروفة"
+        },
+        {
+          "desc": "مجموعات تصميم فريدة من نوعها مع كريات كبيرة من الماس المستنبت الملون لماركات المجوهرات المخصصة الراقية",
+          "title": "مجموعة مجوهرات مخصصة راقية"
+        }
+      ],
+      "image": null,
+      "video": null,
+      "icon": null,
+      "sortOrder": 0,
+      "status": "published",
+      "seoTitle": "珠宝首饰 - 左文科技专业MPCVD金刚石设备",
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": "培育钻石作为天然钻石的可持续替代品，在珠宝首饰领域的应用日益广泛。左文科技采用自主MPCVD设备生产高品质培育钻石，颜色覆盖DEF/GH级，净度达VVS-VS，重量1-12ct，切工包含圆钻3EX及异 左文科技专注MPCVD金刚石材料制备设备研发、生产与服务，提供专业培育钻石与工业金刚石解决方案。",
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": "",
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": "",
+      "geoCity": "",
+      "solutionFile": null,
+      "solutionFileName": null,
+      "solutionFileNameEn": null,
+      "solutionFileNameJa": null,
+      "solutionFileNameKo": null,
+      "solutionFileNameFr": null,
+      "solutionFileNameAr": null,
+      "relatedProductSlugs": null,
+      "relatedIndustrySlugs": null
+    },
+    {
+      "id": "2",
+      "slug": "semiconductor",
+      "name": "半导体",
+      "nameEn": "Semiconductor",
+      "nameJa": "半導体",
+      "nameKo": "반도체",
+      "nameFr": "semiconducteur",
+      "nameAr": "شبه موصل",
+      "tagline": "金刚石散热解决方案，突破芯片热管理瓶颈",
+      "taglineEn": "Diamond thermal solutions breaking chip thermal management bottlenecks",
+      "taglineJa": "ダイヤモンド冷却ソリューションがチップの熱管理のボトルネックを解消",
+      "taglineKo": "다이아몬드 냉각 솔루션으로 칩 열 관리 병목 현상 해소",
+      "taglineFr": "La solution de dissipation thermique diamantée brise le goulot d'étranglement de la gestion thermique des puces",
+      "taglineAr": "حل التبريد الماسي يكسر رقاقة الإدارة الحرارية عنق الزجاجة",
+      "description": "随着半导体芯片功率密度不断提升，传统铜铝散热材料已难以满足极端散热需求。金刚石热导率超2000 W/m·K，是铜的5倍，成为第三代/第四代半导体器件的理想散热材料。左文科技提供金刚石散热片、多晶金刚石晶圆等产品，专为高功率密度芯片、激光及半导体器件设计。",
+      "descriptionEn": "As semiconductor chip power density continues to increase, traditional Cu/Al thermal materials can no longer meet extreme cooling needs. Diamond thermal conductivity exceeds 2000 W/m·K, 5 times that of copper, making it an ideal thermal material for 3rd/4th generation semiconductor devices. ZUO WEN TECHNOLOGY provides diamond heat spreaders, polycrystalline diamond wafers and other products designed for high-power density chips, lasers and semiconductor devices.",
+      "descriptionJa": "半導体チップの電力密度の増加に伴い、従来の銅アルミニウム放熱材料は、極端な放熱要件を満たすことが困難になっている。ダイヤモンドの熱伝導率は、銅の5倍である2000 W/m・Kを超えるため、第3世代/第4世代の半導体デバイスに理想的な放熱材料となっています。Zuowen Technologyは、高電力密度チップ、レーザー、半導体デバイス向けに設計されたダイヤモンドヒートシンク、多結晶ダイヤモンドウェハ、その他の製品を提供しています。",
+      "descriptionKo": "반도체 칩의 전력 밀도가 증가함에 따라 기존의 구리-알루미늄 방열 재료는 극단적인 방열 요구 사항을 충족하기가 어려워졌습니다. 다이아몬드의 열전도율은 구리의 5배인 2000W/m · K를 초과하여 3세대/4세대 반도체 소자에 이상적인 방열 재료입니다. Zuowen Technology는 고출력 밀도 칩, 레이저 및 반도체 장치를 위해 설계된 다이아몬드 방열판, 다결정 다이아몬드 웨이퍼 및 기타 제품을 제공합니다.",
+      "descriptionFr": "À mesure que la densité de puissance des puces semi-conductrices continue d'augmenter, les matériaux traditionnels de dissipation thermique en cuivre et en aluminium ne peuvent plus répondre aux besoins extrêmes de dissipation thermique. La conductivité thermique du diamant dépasse 2000 W/m·K, soit cinq fois celle du cuivre, ce qui en fait un matériau de dissipation thermique idéal pour les dispositifs semi-conducteurs de troisième/quatrième génération. Zuowen Technology fournit des dissipateurs de chaleur en diamant, des plaquettes en diamant polycristallin et d'autres produits, spécialement conçus pour les puces à haute densité de puissance, les dispositifs laser et semi-conducteurs.",
+      "descriptionAr": "مع زيادة كثافة الطاقة لرقائق أشباه الموصلات، أصبحت مواد تبديد الحرارة التقليدية المصنوعة من النحاس والألومنيوم صعبة لتلبية متطلبات تبديد الحرارة الشديدة. تتجاوز الموصلية الحرارية للماس 2000 واط/م · كلفن، وهو ما يعادل 5 أضعاف النحاس، مما يجعلها مادة مثالية لتبديد الحرارة لأجهزة أشباه الموصلات من الجيل الثالث/الرابع. توفر تقنية Zuowen أحواض حرارية ماسية، ورقائق ماسية متعددة البلورات وغيرها من المنتجات، المصممة لشرائح كثافة الطاقة العالية والليزر وأجهزة أشباه الموصلات.",
+      "challenges": [
+        "芯片功率密度激增，传统散热材料达到极限",
+        "高功率器件结温过高，可靠性下降",
+        "金刚石材料加工难度大，成本高",
+        "散热片与芯片界面热阻控制困难"
+      ],
+      "challengesEn": [
+        "Surging chip power density pushing traditional thermal materials to limits",
+        "High junction temperature reducing device reliability",
+        "Diamond material processing difficulty and high cost",
+        "Difficult thermal interface resistance control between spreader and chip"
+      ],
+      "challengesJa": [
+        "チップの電力密度が急増し、従来の放熱材料は限界に達します",
+        "高出力デバイスの接合温度が高すぎ、信頼性が低下する",
+        "ダイヤモンド素材は加工が難しく、高価です",
+        "ヒートシンクとチップ間のインターフェースの熱抵抗制御が難しい"
+      ],
+      "challengesKo": [
+        "칩 전력 밀도 서지, 전통적인 방열 재료 한계에 도달",
+        "고전력 장치 접합 온도가 너무 높으면 신뢰성이 떨어집니다",
+        "다이아몬드 재료는 가공이 어렵고 비용이 많이 듭니다.",
+        "방열판과 칩 사이의 계면의 열 저항 제어가 어렵습니다."
+      ],
+      "challengesFr": [
+        "La densité de puissance des puces augmente, les matériaux de dissipation thermique traditionnels atteignent leur limite",
+        "La température de jonction des dispositifs haute puissance est trop élevée et la fiabilité diminue",
+        "Les matériaux diamantés sont difficiles à traiter et coûteux",
+        "Difficulté de contrôler la résistance thermique de l'interface entre le dissipateur thermique et la"
+      ],
+      "challengesAr": [
+        "ترتفع كثافة طاقة الرقاقة، وتصل مواد تبديد الحرارة التقليدية إلى الحدود القصوى",
+        "درجة حرارة تقاطع جهاز الطاقة العالية مرتفعة للغاية، وتقل الموثوقية",
+        "المواد الماسية صعبة المعالجة ومكلفة",
+        "من الصعب التحكم في المقاومة الحرارية للواجهة بين المشتت الحراري والرقاقة"
+      ],
+      "solutions": [
+        {
+          "desc": "热导率>2000 W/m·K，厚度低至0.05mm，专为高功率密度芯片设计",
+          "title": "金刚石散热片"
+        },
+        {
+          "desc": "3寸金刚石多晶晶圆，0.5~1mm厚度，可在硅晶圆上集成",
+          "title": "多晶金刚石晶圆"
+        },
+        {
+          "desc": "自主研发MPCVD设备，支持金刚石散热材料的规模化制备",
+          "title": "MPCVD设备"
+        }
+      ],
+      "solutionsEn": [
+        {
+          "desc": "Thermal conductivity >2000 W/m·K, thickness as low as 0.05mm, designed for high-power density chips",
+          "title": "Diamond Heat Spreader"
+        },
+        {
+          "desc": "3-inch polycrystalline diamond wafer, 0.5~1mm thickness, integrable on Si wafer",
+          "title": "Poly Diamond Wafer"
+        },
+        {
+          "desc": "Self-developed MPCVD equipment for scaled diamond thermal material production",
+          "title": "MPCVD Equipment"
+        }
+      ],
+      "solutionsJa": [
+        {
+          "desc": "熱伝導率> 2000 W/m・K、厚さは0.05 mmと低く、高電力密度チップ用に設計されています",
+          "title": "ダイヤモンドフィン"
+        },
+        {
+          "desc": "3インチダイヤモンド多結晶ウェーハ、厚さ0.5〜1 mm、シリコンウェーハに統合可能",
+          "title": "多結晶ダイヤモンドウェハ"
+        },
+        {
+          "desc": "ダイヤモンド放熱材料の大規模調製を支援するMPCVD装置の自主研究開発",
+          "title": "MPCVD機器"
+        }
+      ],
+      "solutionsKo": [
+        {
+          "desc": "열전도도 > 2000 W/m · K, 두께 0.05 mm, 고출력 밀도 칩용으로 설계",
+          "title": "다이아몬드 핀"
+        },
+        {
+          "desc": "3 인치 다이아몬드 다결정 웨이퍼, 0.5~1mm 두께, 실리콘 웨이퍼에 통합 가능",
+          "title": "다결정 다이아몬드 웨이퍼"
+        },
+        {
+          "desc": "다이아몬드 방열 재료의 대규모 제조를 지원하기 위한 MPCVD 장비의 독립적인 연구 및 개발",
+          "title": "MPCVD 장비"
+        }
+      ],
+      "solutionsFr": [
+        {
+          "desc": "Conductivité thermique> 2000 W/m·K, épaisseur aussi basse que 0,05 mm, conçue pour les puces à haute densité de puissance",
+          "title": "Dissipateur de chaleur en diamant"
+        },
+        {
+          "desc": "Plaquette polycristalline de diamant de 3 pouces, 0,5~1 mm d'épaisseur, intégrable sur plaquette de silicium",
+          "title": "Gaffe de diamant polycristallin"
+        },
+        {
+          "desc": "Équipement MPCVD développé de manière indépendante pour soutenir la préparation à grande échelle de matériaux de dissipation thermique diamantés",
+          "title": "Équipement MPCVD"
+        }
+      ],
+      "solutionsAr": [
+        {
+          "desc": "الموصلية الحرارية > 2000 واط/م · كلفن، سماكة منخفضة تصل إلى 0.05 مم، مصممة لرقائق كثافة الطاقة العالية",
+          "title": "زعانف ماسية"
+        },
+        {
+          "desc": "3 بوصة رقاقة متعددة البلورات من الألماس، بسماكة 0.5 ~ 1 مم، يمكن دمجها على رقاقة السيليكون",
+          "title": "رقاقة ألماس متعددة البلورات"
+        },
+        {
+          "desc": "البحث والتطوير المستقلين لمعدات MPCVD لدعم التحضير واسع النطاق لمواد تبديد حرارة الماس",
+          "title": "معدات MPCVD"
+        }
+      ],
+      "products": [
+        "金刚石散热片",
+        "多晶金刚石晶圆",
+        "MPCVD长晶设备"
+      ],
+      "productsEn": [
+        "Diamond Heat Spreader",
+        "Poly Diamond Wafer",
+        "MPCVD Equipment"
+      ],
+      "productsJa": [
+        "ダイヤモンドフィン",
+        "多結晶ダイヤモンドウェハ",
+        "MPCVD成長クリスタル装備"
+      ],
+      "productsKo": [
+        "다이아몬드 핀",
+        "다결정 다이아몬드 웨이퍼",
+        "MPCVD 성장 크리스탈 장비"
+      ],
+      "productsFr": [
+        "Dissipateur de chaleur en diamant",
+        "Gaffe de diamant polycristallin",
+        "Équipement de croissance de cristaux MPCVD"
+      ],
+      "productsAr": [
+        "زعانف ماسية",
+        "رقاقة ألماس متعددة البلورات",
+        "معدات بلورات النمو MPCVD"
+      ],
+      "cases": [
+        {
+          "desc": "为某功率半导体企业提供金刚石散热片，器件结温降低30%以上",
+          "title": "功率半导体器件散热"
+        },
+        {
+          "desc": "为高功率激光二极管提供金刚石热沉，提升输出功率和使用寿命",
+          "title": "激光二极管热管理"
+        }
+      ],
+      "casesEn": [
+        {
+          "desc": "Diamond heat spreaders for a power semiconductor company, junction temperature reduced by over 30%",
+          "title": "Power Semiconductor Cooling"
+        },
+        {
+          "desc": "Diamond heat sinks for high-power laser diodes, improving output power and lifespan",
+          "title": "Laser Diode Thermal Management"
+        }
+      ],
+      "casesJa": [
+        {
+          "desc": "パワー半導体会社にダイヤモンドヒートシンクを提供し、デバイスの接合温度を30 ％以上低減",
+          "title": "パワー半導体デバイスの熱放散"
+        },
+        {
+          "desc": "高出力レーザーダイオード用のダイヤモンドヒートシンクを提供し、出力電力と寿命を向上",
+          "title": "レーザーダイオード熱管理"
+        }
+      ],
+      "casesKo": [
+        {
+          "desc": "전력 반도체 회사를 위한 다이아몬드 히트싱크를 제공하고 장치의 접합 온도를 30% 이상 낮춥니다.",
+          "title": "전력 반도체 소자의 열 방출"
+        },
+        {
+          "desc": "고출력 레이저 다이오드를 위한 다이아몬드 히트싱크를 제공하여 출력 전력과 수명을 늘립니다.",
+          "title": "레이저 다이오드 열 관리"
+        }
+      ],
+      "casesFr": [
+        {
+          "desc": "Fournir des dissipateurs de chaleur en diamant à une entreprise de semi-conducteurs de puissance, réduisant ainsi la température de jonction de l'appareil de plus de 30 %",
+          "title": "Dissipation thermique des dispositifs semi-conducteurs de puissance"
+        },
+        {
+          "desc": "Fournir un dissipateur de chaleur en diamant pour les diodes laser haute puissance, améliorant la puissance de sortie et la durée de vie",
+          "title": "Gestion thermique des diodes laser"
+        }
+      ],
+      "casesAr": [
+        {
+          "desc": "توفير بالوعة حرارية ماسية لشركة أشباه موصلات طاقة، وتقليل درجة حرارة تقاطع الجهاز بأكثر من 30%",
+          "title": "التبديد الحراري لأجهزة أشباه موصلات الطاقة"
+        },
+        {
+          "desc": "يوفر أحواض حرارية ماسية لصمامات ليزر ثنائية عالية الطاقة، مما يزيد من طاقة الخرج والعمر",
+          "title": "الإدارة الحرارية للصمام الثنائي بالليزر"
+        }
+      ],
+      "image": null,
+      "video": null,
+      "icon": null,
+      "sortOrder": 1,
+      "status": "published",
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null,
+      "solutionFile": null,
+      "solutionFileName": null,
+      "solutionFileNameEn": null,
+      "solutionFileNameJa": null,
+      "solutionFileNameKo": null,
+      "solutionFileNameFr": null,
+      "solutionFileNameAr": null,
+      "relatedProductSlugs": null,
+      "relatedIndustrySlugs": null
+    },
+    {
+      "id": "5",
+      "slug": "optics",
+      "name": "光学",
+      "nameEn": "Optics",
+      "nameJa": "光学",
+      "nameKo": "광학",
+      "nameFr": "optique",
+      "nameAr": "بصري",
+      "tagline": "金刚石光学窗口，极端环境下的光学解决方案",
+      "taglineEn": "Diamond optical windows for extreme environment optical solutions",
+      "taglineJa": "ダイヤモンドオプティカルウィンドウ、極端な環境のためのオプティカルソリューション",
+      "taglineKo": "다이아몬드 광학 창, 극한 환경을 위한 광학 솔루션",
+      "taglineFr": "Fenêtre optique diamantée, une solution optique pour les environnements extrêmes",
+      "taglineAr": "نافذة بصرية ماسية، حلول بصرية للبيئات القاسية",
+      "description": "金刚石具有宽光谱透过范围（从紫外到远红外）、超高硬度、优异的热导率和化学稳定性，是极端环境下光学窗口的理想材料。左文科技依托自主MPCVD技术，可制备高品质多晶金刚石光学窗口，适用于高功率激光、红外探测、极端环境光学等领域。",
+      "descriptionEn": "Diamond features wide spectral transmission range (UV to far-IR), ultra-high hardness, excellent thermal conductivity and chemical stability, making it an ideal material for optical windows in extreme environments. Leveraging self-developed MPCVD technology, ZUO WEN TECHNOLOGY can produce high-quality polycrystalline diamond optical windows for high-power lasers, infrared detection, and extreme environment optics.",
+      "descriptionJa": "ダイヤモンドは、広いスペクトル透過範囲（紫外線から遠赤外線まで）、超高硬度、優れた熱伝導性、化学的安定性を備えており、極端な環境での光学窓に理想的な材料です。Zuowen Technologyは、独立したMPCVD技術に依存して、高出力レーザー、赤外線検出、極端な周囲光学などの分野に適した高品質の多結晶ダイヤモンド光学ウィンドウを準備しています。",
+      "descriptionKo": "다이아몬드는 넓은 스펙트럼 전송 범위 (자외선에서 원적외선까지), 초고경도, 우수한 열 전도성 및 화학적 안정성을 갖추고 있어 극한 환경의 광학 창문에 이상적인 소재입니다. Zuowen Technology는 독립적인 MPCVD 기술에 의존하여 고출력 레이저, 적외선 감지, 극한 주변 광학 및 기타 분야에 적합한 고품질 다결정 다이아몬드 광학 창을 준비합니다.",
+      "descriptionFr": "Avec une large plage de transmission spectrale (de l'UV à l'infrarouge lointain), une dureté ultra-élevée, une excellente conductivité thermique et une stabilité chimique, le diamant est un matériau idéal pour les fenêtres optiques dans des environnements extrêmes. Zuowen Technology s'appuie sur sa technologie MPCVD indépendante pour préparer des fenêtres optiques en diamant polycristallin de haute qualité, adaptées aux lasers haute puissance, à la détection infrarouge, à l'optique environnementale extrême et à d'autres domaines.",
+      "descriptionAr": "يتمتع Diamond بنطاق انتقال طيفي واسع (من الأشعة فوق البنفسجية إلى الأشعة تحت الحمراء البعيدة)، وصلابة فائقة، وموصلية حرارية ممتازة واستقرار كيميائي، مما يجعله مادة مثالية للنوافذ البصرية في البيئات القاسية. تعتمد تقنية Zuowen على تقنية MPCVD المستقلة لإعداد نوافذ بصرية ماسية متعددة البلورات عالية الجودة، وهي مناسبة لأشعة الليزر عالية الطاقة، وكشف الأشعة تحت الحمراء، والبصريات المحيطة الشديدة وغيرها من المجالات.",
+      "challenges": [
+        "高功率激光系统窗口热透镜效应严重",
+        "极端环境（高温、高压、腐蚀）下窗口材料受限",
+        "大尺寸金刚石光学窗口制备困难",
+        "窗口表面平整度和光学质量要求高"
+      ],
+      "challengesEn": [
+        "Severe thermal lensing in high-power laser system windows",
+        "Limited window materials in extreme environments (high temp, pressure, corrosion)",
+        "Difficult preparation of large-size diamond optical windows",
+        "High requirements for window surface flatness and optical quality"
+      ],
+      "challengesJa": [
+        "高功率激光系统窗口热透镜效应严重",
+        "极端环境（高温、高压、腐蚀）下窗口材料受限",
+        "大尺寸金刚石光学窗口制备困难",
+        "窗口表面平整度和光学质量要求高"
+      ],
+      "challengesKo": [
+        "高功率激光系统窗口热透镜效应严重",
+        "极端环境（高温、高压、腐蚀）下窗口材料受限",
+        "大尺寸金刚石光学窗口制备困难",
+        "窗口表面平整度和光学质量要求高"
+      ],
+      "challengesFr": [
+        "L'effet de lentille thermique de la fenêtre du système laser haute puissance est grave",
+        "Matériaux de fenêtre limités dans des environnements extrêmes (haute température, haute pression, corrosion)",
+        "Difficulté de préparer des fenêtres optiques en diamant de grande taille",
+        "Exigences élevées en matière de planéité de surface et de qualité optique des fenêtres"
+      ],
+      "challengesAr": [
+        "高功率激光系统窗口热透镜效应严重",
+        "极端环境（高温、高压、腐蚀）下窗口材料受限",
+        "大尺寸金刚石光学窗口制备困难",
+        "窗口表面平整度和光学质量要求高"
+      ],
+      "solutions": [
+        {
+          "desc": "宽光谱透过，超高热导率，适用于高功率激光和极端环境光学",
+          "title": "多晶金刚石窗口"
+        },
+        {
+          "desc": "自主研发设备，支持大尺寸多晶金刚石光学窗口的制备",
+          "title": "MPCVD长晶设备"
+        }
+      ],
+      "solutionsEn": [
+        {
+          "desc": "Wide spectral transmission, ultra-high thermal conductivity for high-power lasers and extreme environment optics",
+          "title": "Poly Diamond Window"
+        },
+        {
+          "desc": "Self-developed equipment for large-size polycrystalline diamond optical window preparation",
+          "title": "MPCVD Equipment"
+        }
+      ],
+      "solutionsJa": [
+        {
+          "desc": "宽光谱透过，超高热导率，适用于高功率激光和极端环境光学",
+          "title": "多晶金刚石窗口"
+        },
+        {
+          "desc": "自主研发设备，支持大尺寸多晶金刚石光学窗口的制备",
+          "title": "MPCVD长晶设备"
+        }
+      ],
+      "solutionsKo": [
+        {
+          "desc": "宽光谱透过，超高热导率，适用于高功率激光和极端环境光学",
+          "title": "多晶金刚石窗口"
+        },
+        {
+          "desc": "自主研发设备，支持大尺寸多晶金刚石光学窗口的制备",
+          "title": "MPCVD长晶设备"
+        }
+      ],
+      "solutionsFr": [
+        {
+          "desc": "Transmission à large spectre, conductivité thermique ultra-élevée, adaptée aux lasers de haute puissance et à l'optique ambiante extrême",
+          "title": "Fenêtre en diamant polycristallin"
+        },
+        {
+          "desc": "Équipement de recherche et de développement indépendant pour soutenir la préparation de fenêtres optiques en diamant polycristallin de grande taille",
+          "title": "Équipement de croissance de cristaux MPCVD"
+        }
+      ],
+      "solutionsAr": [
+        {
+          "desc": "宽光谱透过，超高热导率，适用于高功率激光和极端环境光学",
+          "title": "多晶金刚石窗口"
+        },
+        {
+          "desc": "自主研发设备，支持大尺寸多晶金刚石光学窗口的制备",
+          "title": "MPCVD长晶设备"
+        }
+      ],
+      "products": [
+        "多晶金刚石晶圆",
+        "MPCVD长晶设备"
+      ],
+      "productsEn": [
+        "Poly Diamond Wafer",
+        "MPCVD Equipment"
+      ],
+      "productsJa": [
+        "多晶金刚石晶圆",
+        "MPCVD长晶设备"
+      ],
+      "productsKo": [
+        "多晶金刚石晶圆",
+        "MPCVD长晶设备"
+      ],
+      "productsFr": [
+        "Gaffe de diamant polycristallin",
+        "Équipement de croissance de cristaux MPCVD"
+      ],
+      "productsAr": [
+        "多晶金刚石晶圆",
+        "MPCVD长晶设备"
+      ],
+      "cases": [
+        {
+          "desc": "为高功率激光系统提供金刚石窗口，有效解决热透镜效应",
+          "title": "高功率激光窗口"
+        },
+        {
+          "desc": "为红外探测设备提供金刚石光学窗口，适应恶劣工作环境",
+          "title": "红外探测系统"
+        }
+      ],
+      "casesEn": [
+        {
+          "desc": "Diamond windows for high-power laser systems, effectively solving thermal lensing",
+          "title": "High-Power Laser Window"
+        },
+        {
+          "desc": "Diamond optical windows for IR detection equipment in harsh operating environments",
+          "title": "IR Detection System"
+        }
+      ],
+      "casesJa": [
+        {
+          "desc": "为高功率激光系统提供金刚石窗口，有效解决热透镜效应",
+          "title": "高功率激光窗口"
+        },
+        {
+          "desc": "为红外探测设备提供金刚石光学窗口，适应恶劣工作环境",
+          "title": "红外探测系统"
+        }
+      ],
+      "casesKo": [
+        {
+          "desc": "为高功率激光系统提供金刚石窗口，有效解决热透镜效应",
+          "title": "高功率激光窗口"
+        },
+        {
+          "desc": "为红外探测设备提供金刚石光学窗口，适应恶劣工作环境",
+          "title": "红外探测系统"
+        }
+      ],
+      "casesFr": [
+        {
+          "desc": "Fournir une fenêtre en diamant pour les systèmes laser haute puissance pour résoudre efficacement l'effet de lentille thermique",
+          "title": "Fenêtre laser haute puissance"
+        },
+        {
+          "desc": "Fourniture de fenêtres optiques en diamant pour les équipements de détection infrarouge, adaptés aux environnements de travail difficiles",
+          "title": "Système de détection infrarouge"
+        }
+      ],
+      "casesAr": [
+        {
+          "desc": "为高功率激光系统提供金刚石窗口，有效解决热透镜效应",
+          "title": "高功率激光窗口"
+        },
+        {
+          "desc": "为红外探测设备提供金刚石光学窗口，适应恶劣工作环境",
+          "title": "红外探测系统"
+        }
+      ],
+      "image": null,
+      "video": null,
+      "icon": null,
+      "sortOrder": 4,
+      "status": "published",
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null,
+      "solutionFile": null,
+      "solutionFileName": null,
+      "solutionFileNameEn": null,
+      "solutionFileNameJa": null,
+      "solutionFileNameKo": null,
+      "solutionFileNameFr": null,
+      "solutionFileNameAr": null,
+      "relatedProductSlugs": null,
+      "relatedIndustrySlugs": null
+    }
+  ]
+}

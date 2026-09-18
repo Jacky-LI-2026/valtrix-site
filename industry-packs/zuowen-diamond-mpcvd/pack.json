@@ -1,0 +1,49 @@
+{
+  "key": "zuowen-diamond-mpcvd",
+  "name": "左文科技 MPCVD 金刚石行业包",
+  "nameEn": "ZUOWEN Diamond MPCVD Industry Pack",
+  "version": "1.0.0",
+  "category": "diamond-mpcvd",
+  "description": "MPCVD 金刚石设备与培育钻石行业官网内容资产：17 个产品型号（长晶/切割/分级/材料）、6 大行业方案、6 条新闻、15 条资源、6 个职位、4 项服务、6 条 FAQ、39 项导航、六语种预设与设计令牌。",
+  "requiresPlugins": [
+    "content-product", "content-news", "content-resource", "content-industry",
+    "content-service", "content-case", "content-faq", "content-career", "content-about",
+    "content-menu", "mall", "quote", "lead", "visit-booking", "download-leads"
+  ],
+  "optionalPlugins": [
+    "ai-translate", "ai-customer-service", "analytics", "form-builder", "email-marketing", "seo"
+  ],
+  "languages": {
+    "default": "zh",
+    "enabled": ["zh", "en", "ja", "ko", "fr", "ar"]
+  },
+  "designTokens": {
+    "primary": "#CC0000",
+    "primaryLight": "#FF4D4D",
+    "accent": "#0B3D91",
+    "fontFamily": "Roboto, PingFang SC, Segoe UI, Arial, sans-serif"
+  },
+  "seedData": [
+    { "model": "language", "file": "seed/language.json" },
+    { "model": "themeConfig", "file": "seed/themeConfig.json" },
+    { "model": "menu", "file": "seed/menu.json" },
+    { "model": "productTab", "file": "seed/productTab.json" },
+    { "model": "productCategory", "file": "seed/productCategory.json" },
+    { "model": "product", "file": "seed/product.json" },
+    { "model": "productSpec", "file": "seed/productSpec.json" },
+    { "model": "shopProduct", "file": "seed/shopProduct.json" },
+    { "model": "newsCategory", "file": "seed/newsCategory.json" },
+    { "model": "news", "file": "seed/news.json" },
+    { "model": "resourceCategory", "file": "seed/resourceCategory.json" },
+    { "model": "resourceItem", "file": "seed/resourceItem.json" },
+    { "model": "industry", "file": "seed/industry.json" },
+    { "model": "aboutSection", "file": "seed/aboutSection.json" },
+    { "model": "job", "file": "seed/job.json" },
+    { "model": "service", "file": "seed/service.json" },
+    { "model": "case", "file": "seed/case.json" },
+    { "model": "faq", "file": "seed/faq.json" },
+    { "model": "homeConfig", "file": "seed/homeConfig.json" }
+  ],
+  "assets": [],
+  "uiPreset": "backend-lang: zh | frontend-preset: industrial"
+}

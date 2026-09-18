@@ -1,0 +1,77 @@
+{
+  "model": "productTab",
+  "rows": [
+    {
+      "id": "35",
+      "slug": "vcr-fittings",
+      "name": "VCR 面密封接头",
+      "nameEn": "VCR Face Seal Fittings",
+      "nameJa": "VCRフェイスシール継手",
+      "nameKo": "VCR 페이스실 피팅",
+      "nameFr": "Raccords VCR à joint facial",
+      "nameAr": "وصلات VCR ذات الإحكام السطحي",
+      "purchaseMode": "quote",
+      "sortOrder": 1
+    },
+    {
+      "id": "36",
+      "slug": "welded-fittings",
+      "name": "焊接接头",
+      "nameEn": "Welded Fittings",
+      "nameJa": "溶接継手",
+      "nameKo": "용접 피팅",
+      "nameFr": "Raccords soudés",
+      "nameAr": "وصلات ملحومة",
+      "purchaseMode": "quote",
+      "sortOrder": 2
+    },
+    {
+      "id": "37",
+      "slug": "diaphragm-valves",
+      "name": "隔膜阀",
+      "nameEn": "Diaphragm Valves",
+      "nameJa": "ダイヤフラム弁",
+      "nameKo": "다이어프램 밸브",
+      "nameFr": "Vannes à membrane",
+      "nameAr": "صمامات غشائية",
+      "purchaseMode": "quote",
+      "sortOrder": 3
+    },
+    {
+      "id": "38",
+      "slug": "pressure-reducers",
+      "name": "减压阀",
+      "nameEn": "Pressure Reducers",
+      "nameJa": "減圧弁",
+      "nameKo": "감압 밸브",
+      "nameFr": "Détendeurs",
+      "nameAr": "منظمات الضغط",
+      "purchaseMode": "quote",
+      "sortOrder": 4
+    },
+    {
+      "id": "39",
+      "slug": "check-valves",
+      "name": "单向阀",
+      "nameEn": "Check Valves",
+      "nameJa": "逆止弁",
+      "nameKo": "체크 밸브",
+      "nameFr": "Clapets anti-retour",
+      "nameAr": "صمامات عدم الرجوع",
+      "purchaseMode": "quote",
+      "sortOrder": 5
+    },
+    {
+      "id": "40",
+      "slug": "filters",
+      "name": "气体过滤器",
+      "nameEn": "Gas Filters",
+      "nameJa": "ガスフィルタ",
+      "nameKo": "가스 필터",
+      "nameFr": "Filtres à gaz",
+      "nameAr": "مرشحات الغاز",
+      "purchaseMode": "quote",
+      "sortOrder": 6
+    }
+  ]
+}

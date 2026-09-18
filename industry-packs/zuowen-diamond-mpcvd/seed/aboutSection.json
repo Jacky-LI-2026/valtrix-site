@@ -1,0 +1,1095 @@
+{
+  "model": "aboutSection",
+  "rows": [
+    {
+      "id": "1",
+      "slug": "profile",
+      "title": "公司简介",
+      "titleEn": "Corporate Profile",
+      "titleJa": "会社概要",
+      "titleKo": "회사소개서",
+      "titleFr": "Présentation de la société",
+      "titleAr": "ملف الشركة",
+      "subtitle": "专注金刚石新材料与MPCVD设备，碳寻未来",
+      "subtitleEn": "Focus on new diamond materials and MPCVD equipment, carbon for the future",
+      "subtitleJa": "新しいダイヤモンド材料とMPCVD機器、将来のカーボンに焦点を当てる",
+      "subtitleKo": "새로운 다이아몬드 소재와 MPCVD 장비, 미래를 위한 탄소 소재에 집중",
+      "subtitleFr": "Focus sur les nouveaux matériaux diamantaires et les équipements MPCVD, le carbone pour l'avenir",
+      "subtitleAr": "التركيز على مواد الماس الجديدة ومعدات MPCVD، والكربون للمستقبل",
+      "image": null,
+      "content": [
+        {
+          "lang": "zh",
+          "blockId": "block-1",
+          "heading": "关于左文科技",
+          "paragraphs": [
+            "北京左文科技有限公司（以下简称\"左文科技\"）成立于2018年5月，是一家总部位于北京市经济技术开发区的高科技企业。公司产品围绕金刚石材料制备的核心工艺流程开发，目前包括MPCVD系统以及工艺辅助设备、自动化上料系统、整体解决方案等。公司在深圳设有量产车间，制备大尺寸人造金刚石产品，包括培育钻石以及多晶片。",
+            "左文科技是一家专注于以金刚石为核心的新材料及其制备设备研发、生产与服务的科技创新型企业。公司致力于推动新材料技术的突破与应用，为客户提供高性能材料解决方案及配套设备服务。公司产品覆盖金刚石材料、培育钻石以及相关制备设备，广泛应用于高端制造、电子、光学、精密加工、新能源及珠宝等领域。",
+            "左文科技以金刚石材料的研究与开发为核心，聚焦新材料领域的创新与应用，拥有一支高素质的研发团队和先进的技术平台。公司通过自主研发的金刚石材料、培育钻石及其制备设备，为客户提供高质量的产品和技术支持，满足多元化市场需求。"
+          ]
+        },
+        {
+          "lang": "zh",
+          "blockId": "block-2",
+          "heading": "核心业务",
+          "paragraphs": [
+            "金刚石新材料研发与生产：专注于金刚石材料的合成、加工与应用，提供高性能金刚石薄膜、金刚石颗粒、金刚石复合材料等产品。",
+            "培育钻石生产与加工：采用先进的化学气相沉积（MPCVD）技术，生产高品质培育钻石，广泛应用于珠宝、工业及科技领域。",
+            "制备设备设计与制造：自主研发金刚石材料及培育钻石的制备设备，包括MPCVD设备、配套产线设备、整体解决方案等，满足客户定制化需求。",
+            "技术解决方案与服务：为客户提供从材料选型、工艺设计到设备配套的全流程技术服务，助力客户实现技术升级与产品创新。"
+          ]
+        },
+        {
+          "lang": "zh",
+          "blockId": "block-3",
+          "heading": "企业使命",
+          "paragraphs": [
+            "为客户提供高性能材料与设备，助力其在高端制造与科技领域实现卓越发展。"
+          ]
+        },
+        {
+          "lang": "zh",
+          "blockId": "block-4",
+          "heading": "企业愿景",
+          "paragraphs": [
+            "通过新材料技术的突破与应用，推动产业升级与社会进步，成为全球领先的新材料技术与服务提供商。"
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            ""
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            ""
+          ]
+        }
+      ],
+      "contentEn": [
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            ""
+          ]
+        }
+      ],
+      "contentJa": [
+        {
+          "blockId": "block-1",
+          "heading": "Zuowen Technologyについて",
+          "paragraphs": [
+            "Beijing Zuowen Technology Co., Ltd .（以下「Zuowen Technology」）は、2018年5月に設立され、北京経済技術開発区に本社を置くハイテク企業です。同社の製品は、ダイヤモンド材料調製のコアプロセスを中心に開発されており、現在はMPCVDシステムだけでなく、プロセス補助装置、自動供給システム、および全体的なソリューションが含まれています。同社は、栽培されたダイヤモンドやポリチップを含む大型合成ダイヤモンド製品を調製するために、深センに量産工場を持っています。",
+            "Zuowen Technologyは、ダイヤモンドをコアとする新素材とその調製装置の研究開発、生産、サービスに焦点を当てた科学技術革新企業です。同社は、新しい材料技術のブレークスルーと応用を促進し、顧客に高性能材料ソリューションと支援機器サービスを提供することにコミットしています。同社の製品は、ダイヤモンド材料、栽培ダイヤモンドおよび関連する調製装置をカバーし、ハイエンド製造、エレクトロニクス、光学、精密加工、新エネルギー、ジュエリーで広く使用されています。",
+            "Zuowen Technologyは、ダイヤモンド材料の研究開発に焦点を当て、新材料分野のイノベーションと応用に焦点を当てており、高品質の研究開発チームと高度な技術プラットフォームを持っています。自社開発のダイヤモンド材料、栽培ダイヤモンドおよびその調製装置を通じて、同社は多様な市場ニーズを満たすために高品質の製品と技術サポートを顧客に提供しています。"
+          ]
+        },
+        {
+          "blockId": "block-2",
+          "heading": "コア業務",
+          "paragraphs": [
+            "新しいダイヤモンド材料の研究開発と生産：ダイヤモンド材料の合成、加工、応用に焦点を当て、高性能ダイヤモンドフィルム、ダイヤモンド粒子、ダイヤモンド複合材料などの製品を提供しています。",
+            "栽培ダイヤモンドの製造と加工：高度な化学蒸着（ MPCVD ）技術は、ジュエリー、産業、科学技術で広く使用されている高品質の栽培ダイヤモンドを製造するために使用されています。",
+            "準備装置の設計と製造：顧客のカスタマイズされたニーズを満たすために、MPCVD装置、サポート生産ライン装置、全体的なソリューションなど、ダイヤモンド材料を独自に研究開発し、ダイヤモンド準備装置を育成する。",
+            "テクニカルソリューションとサービス：材料選択、プロセス設計から機器サポートまでのフルプロセスのテクニカルサービスを顧客に提供し、顧客が技術アップグレードと製品革新を達成するのを支援します。"
+          ]
+        },
+        {
+          "blockId": "block-3",
+          "heading": "コーポレートミッション",
+          "paragraphs": [
+            "ハイエンドの製造と技術で卓越性を達成するために、顧客に高性能の材料と機器を提供します。"
+          ]
+        },
+        {
+          "blockId": "block-4",
+          "heading": "企業ビジョン",
+          "paragraphs": [
+            "新しい材料技術のブレークスルーと応用を通じて、産業のアップグレードと社会の進歩を促進し、世界をリードする新しい材料技術とサービスプロバイダーになります。"
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            ""
+          ]
+        }
+      ],
+      "contentKo": [
+        {
+          "blockId": "block-1",
+          "heading": "Zuowen Technology 소개",
+          "paragraphs": [
+            "Beijing Zuowen Technology Co., Ltd. (이하 \"Zuowen Technology\") 는 2018년 5월에 설립되었으며 베이징 경제 기술 개발구에 본사를 둔 첨단 기술 기업입니다. 이 회사의 제품은 다이아몬드 재료 제조의 핵심 공정을 중심으로 개발되었으며, 현재 MPCVD 시스템뿐만 아니라 공정 보조 장비, 자동 공급 시스템 및 전체 솔루션을 포함합니다. 이 회사는 경작 다이아몬드와 폴리칩을 포함한 대형 합성 다이아몬드 제품을 준비하기 위해 심천에 대량 생산 워크샵을 가지고 있습니다.",
+            "Zuowen Technology는 다이아몬드를 핵심으로 하는 신소재의 연구 개발, 생산 및 서비스와 준비 장비에 중점을 둔 과학 기술 혁신 기업입니다. 당사는 신소재 기술의 혁신과 적용을 촉진하고 고객에게 고성능 소재 솔루션 및 지원 장비 서비스를 제공하기 위해 최선을 다하고 있습니다. 이 회사의 제품은 다이아몬드 소재, 경작 다이아몬드 및 관련 준비 장비를 다루며 하이 엔드 제조, 전자, 광학, 정밀 가공, 새로운 에너지 및 보석에 널리 사용됩니다.",
+            "Zuowen Technology는 신소재 분야의 혁신과 응용에 중점을 두고 다이아몬드 소재 연구 개발에 주력하고 있으며, 고품질의 R&D 팀과 첨단 기술 플랫폼을 보유하고 있습니다. 당사는 자체 개발한 다이아몬드 소재, 재배 다이아몬드 및 준비 장비를 통해 고객에게 다양한 시장 요구를 충족할 수 있는 고품질 제품과 기술 지원을 제공합니다."
+          ]
+        },
+        {
+          "blockId": "block-2",
+          "heading": "핵심 비즈니스",
+          "paragraphs": [
+            "새로운 다이아몬드 재료의 R&D 및 생산: 다이아몬드 재료의 합성, 가공 및 응용에 중점을 두고 고성능 다이아몬드 필름, 다이아몬드 입자, 다이아몬드 복합재 및 기타 제품을 제공합니다.",
+            "배양 다이아몬드 생산 및 가공: 고급 화학 증착 (MPCVD) 기술은 보석, 산업 및 과학 기술에 널리 사용되는 고품질 배양 다이아몬드를 생산하는 데 사용됩니다.",
+            "준비 장비 설계 및 제조: 다이아몬드 재료를 독립적으로 연구 및 개발하고 MPCVD 장비, 지원 생산 라인 장비, 전체 솔루션 등을 포함한 다이아몬드 준비 장비를 육성하여 고객 맞춤형 요구를 충족시킵니다.",
+            "기술 솔루션 및 서비스: 고객이 기술 업그레이드 및 제품 혁신을 달성할 수 있도록 재료 선택, 프로세스 설계에서 장비 지원에 이르는 전체 프로세스 기술 서비스를 고객에게 제공합니다."
+          ]
+        },
+        {
+          "blockId": "block-3",
+          "heading": "기업 사명",
+          "paragraphs": [
+            "고객에게 하이엔드 제조 및 기술의 우수성을 달성할 수 있도록 고성능 재료 및 장비를 제공합니다."
+          ]
+        },
+        {
+          "blockId": "block-4",
+          "heading": "기업 비전",
+          "paragraphs": [
+            "새로운 소재 기술의 혁신과 적용을 통해 산업 업그레이드와 사회 진보를 촉진하고 세계 최고의 신소재 기술 및 서비스 제공 업체가 될 수 있습니다."
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            ""
+          ]
+        }
+      ],
+      "contentFr": [
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            ""
+          ]
+        }
+      ],
+      "contentAr": [
+        {
+          "blockId": "block-1",
+          "heading": "حول Zuowen Technology",
+          "paragraphs": [
+            "تأسست شركة Beijing Zuowen Technology Co., Ltd. (المشار إليها فيما يلي باسم \"Zuowen Technology \") في مايو 2018 وهي شركة ذات تقنية عالية مقرها في منطقة بكين للتنمية الاقتصادية والتكنولوجية. يتم تطوير منتجات الشركة حول العملية الأساسية لإعداد المواد الماسية، وتشمل حاليًا أنظمة MPCVD بالإضافة إلى المعدات المساعدة للعملية وأنظمة التغذية الآلية والحلول الشاملة. تمتلك الشركة ورشة إنتاج ضخمة في شنتشن لإعداد منتجات الماس الصناعي كبيرة الحجم، بما في ذلك الماس المزروع والرقائق المتعددة.",
+            "Zuowen Technology هي مؤسسة ابتكار علمي وتكنولوجي تركز على البحث والتطوير والإنتاج وخدمة المواد الجديدة مع الماس كنواة ومعدات تحضيرها. تلتزم الشركة بتعزيز اختراق وتطبيق تكنولوجيا المواد الجديدة وتزويد العملاء بحلول المواد عالية الأداء وخدمات المعدات الداعمة. تغطي منتجات الشركة مواد الماس والماس المزروع ومعدات التحضير ذات الصلة، وتستخدم على نطاق واسع في التصنيع الراقي والإلكترونيات والبصريات والمعالجة الدقيقة والطاقة الجديدة والمجوهرات.",
+            "تركز Zuowen Technology على البحث والتطوير للمواد الماسية، مع التركيز على الابتكار والتطبيق في مجال المواد الجديدة، ولديها فريق بحث وتطوير عالي الجودة ومنصة تقنية متقدمة. من خلال مواد الماس المطورة ذاتيًا والماس المزروع ومعدات تحضيرها، توفر الشركة للعملاء منتجات عالية الجودة ودعمًا فنيًا لتلبية احتياجات السوق المتنوعة."
+          ]
+        },
+        {
+          "blockId": "block-2",
+          "heading": "الأعمال الأساسية",
+          "paragraphs": [
+            "البحث والتطوير وإنتاج مواد الماس الجديدة: مع التركيز على تخليق ومعالجة وتطبيق مواد الماس، نقدم أفلام الماس عالية الأداء وجزيئات الماس ومركبات الماس وغيرها من المنتجات.",
+            "إنتاج الماس المزروع ومعالجته: تُستخدم تقنية ترسيب البخار الكيميائي المتقدمة (MPCVD) لإنتاج الماس المزروع عالي الجودة، والذي يستخدم على نطاق واسع في المجوهرات والصناعة والعلوم والتكنولوجيا.",
+            "تصميم وتصنيع معدات التحضير: البحث بشكل مستقل وتطوير مواد الماس وزراعة معدات تحضير الماس، بما في ذلك معدات MPCVD، ودعم معدات خط الإنتاج، والحلول الشاملة، وما إلى ذلك، لتلبية احتياجات العملاء المخصصة.",
+            "الحلول والخدمات التقنية: تزويد العملاء بخدمات تقنية كاملة العملية من اختيار المواد، وتصميم العمليات إلى دعم المعدات، لمساعدة العملاء على تحقيق الترقيات التكنولوجية وابتكار المنتجات."
+          ]
+        },
+        {
+          "blockId": "block-3",
+          "heading": "رسالة الشركة",
+          "paragraphs": [
+            "تزويد العملاء بمواد ومعدات عالية الأداء لمساعدتهم على تحقيق التميز في التصنيع والتكنولوجيا المتطورة."
+          ]
+        },
+        {
+          "blockId": "block-4",
+          "heading": "الرؤية المؤسسية",
+          "paragraphs": [
+            "من خلال اختراق وتطبيق تكنولوجيا المواد الجديدة، تعزيز التطوير الصناعي والتقدم الاجتماعي، وأن تصبح الشركة الرائدة في مجال تكنولوجيا المواد الجديدة ومزود الخدمات في العالم."
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            ""
+          ]
+        },
+        {
+          "blockId": "",
+          "heading": "",
+          "paragraphs": [
+            ""
+          ]
+        }
+      ],
+      "highlights": [
+        {
+          "label": "成立时间",
+          "value": "2018年",
+          "labelAr": "وقت التأسيس",
+          "labelEn": "Founded",
+          "labelFr": "Temps de fondation",
+          "labelJa": "成立時間",
+          "labelKo": "설립 기간",
+          "valueAr": "سنة 2018",
+          "valueEn": "2018",
+          "valueFr": "Année 2018",
+          "valueJa": "2018年",
+          "valueKo": "2018년"
+        },
+        {
+          "label": "总部",
+          "value": "北京",
+          "labelAr": "المقر",
+          "labelEn": "HQ",
+          "labelFr": "Siège social",
+          "labelJa": "本社",
+          "labelKo": "본부",
+          "valueAr": "بكين",
+          "valueEn": "Beijing",
+          "valueFr": "Pékin",
+          "valueJa": "北京（ペキン）",
+          "valueKo": "베이징"
+        },
+        {
+          "label": "量产基地",
+          "value": "深圳",
+          "labelAr": "قاعدة الإنتاج الضخم",
+          "labelEn": "Production Base",
+          "labelFr": "Base de production de masse",
+          "labelJa": "量産基地",
+          "labelKo": "양산기지",
+          "valueAr": "شنتشن",
+          "valueEn": "Shenzhen",
+          "valueFr": "Shenzhen",
+          "valueJa": "深セン",
+          "valueKo": "선전"
+        },
+        {
+          "label": "专利技术",
+          "value": "53+",
+          "labelAr": "براءة اختراع التكنولوجيا",
+          "labelEn": "Patents",
+          "labelFr": "Technologie brevetée",
+          "labelJa": "特許技術",
+          "labelKo": "특허 기술",
+          "valueEn": "53+"
+        }
+      ],
+      "timeline": null,
+      "certifications": null,
+      "sortOrder": 0,
+      "status": "published",
+      "seoTitle": "公司简介 - 左文科技专业MPCVD金刚石设备",
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": "[ { \"heading\": \"关于左文科技\", \"headingEn\": \"About ZUO WEN TECHNOLOGY\", \"paragraphs\": [ \"北京左文科技有限公司（以下简称\\\" 左文科技专注MPCVD金刚石材料制备设备研发、生产与服务，提供专业培育钻石与工业金刚石解决方案。",
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": "",
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": "",
+      "geoCity": ""
+    },
+    {
+      "id": "2",
+      "slug": "culture",
+      "title": "企业文化",
+      "titleEn": "Corporate Culture",
+      "titleJa": "企業文化",
+      "titleKo": "회사 문화",
+      "titleFr": null,
+      "titleAr": "ثقافة الشركة",
+      "subtitle": "诚信、创新、服务，以人为本，碳寻未来",
+      "subtitleEn": "Integrity, Innovation, Service, people-oriented, paving the diamond road to future",
+      "subtitleJa": "インテグリティ、イノベーション、サービス、人を重視した、未来のカーボン",
+      "subtitleKo": "무결성, 혁신, 서비스, 사람 중심, 미래를 위한 탄소",
+      "subtitleFr": null,
+      "subtitleAr": "النزاهة والابتكار والخدمة والتوجه نحو الناس والكربون للمستقبل",
+      "image": null,
+      "content": [
+        {
+          "lang": "zh",
+          "blockId": "block-1",
+          "heading": "核心价值观",
+          "paragraphs": [
+            "诚信：守诚促进合作，满意实现共赢。坚持诚实守信，对客户、员工、合作伙伴负责。",
+            "创新：以专业成就卓越，以创新引领潮流。持续技术创新，引领金刚石新材料行业发展。",
+            "服务：倾听客户声音，关注客户需求，以卓越服务赢得客户信赖。"
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "block-1",
+          "heading": "Core Values",
+          "paragraphs": [
+            "Integrity: Honesty promotes cooperation, satisfaction achieves win-win. Adhere to honesty and trustworthiness, be responsible to customers, employees and partners.",
+            "Innovation: Professionalism achieves excellence, innovation leads the trend. Continuous technological innovation, leading the diamond new materials industry.",
+            "Service: Listen to customers' voices, focus on customer needs, win customer trust with excellent service."
+          ]
+        },
+        {
+          "lang": "zh",
+          "blockId": "block-2",
+          "heading": "品牌理念",
+          "paragraphs": [
+            "碳寻未来（The Diamond Paving Road To Future）——左文科技以金刚石为核心，探索新材料技术的无限可能，为人类社会的可持续发展贡献力量。",
+            "以人为本——尊重每一位员工的价值，营造开放、创新、协作的工作氛围，与员工共同成长。"
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "block-2",
+          "heading": "Brand Philosophy",
+          "paragraphs": [
+            "The Diamond Paving Road To Future — ZUO WEN TECHNOLOGY takes diamond as the core, exploring infinite possibilities of new material technology, contributing to the sustainable development of human society.",
+            "People-oriented — Respect the value of every employee, create an open, innovative and collaborative work atmosphere, grow together with employees."
+          ]
+        }
+      ],
+      "contentEn": [
+        {
+          "blockId": "block-1",
+          "heading": "core values",
+          "paragraphs": [
+            "Integrity: Adhere to honesty to promote cooperation and achieve win-win results with satisfaction. Adhere to honesty and trustworthiness, and be responsible to customers, employees, and partners.",
+            "Innovation: Achieving excellence through professionalism and leading the trend through innovation. Continuous technological innovation leads the development of the diamond new materials industry.",
+            "Service: Listen to customer voices, pay attention to customer needs, and win customer trust with excellent service."
+          ]
+        },
+        {
+          "blockId": "block-1",
+          "heading": "Core Values",
+          "paragraphs": [
+            "Integrity: Honesty promotes cooperation, satisfaction achieves win-win. Adhere to honesty and trustworthiness, be responsible to customers, employees and partners.",
+            "Innovation: Professionalism achieves excellence, innovation leads the trend. Continuous technological innovation, leading the diamond new materials industry.",
+            "Service: Listen to customers' voices, focus on customer needs, win customer trust with excellent service."
+          ]
+        },
+        {
+          "blockId": "block-2",
+          "heading": "Brand Philosophy",
+          "paragraphs": [
+            "The Diamond Paving Road To Future - With diamond as its core, Zuo Wen Technology explores the infinite possibilities of new material technology and contributes to the sustainable development of human society.",
+            "Putting people first - respecting the value of every employee, creating an open, innovative, and collaborative work atmosphere, and growing together with employees."
+          ]
+        },
+        {
+          "blockId": "block-2",
+          "heading": "Brand Philosophy",
+          "paragraphs": [
+            "The Diamond Paving Road To Future — ZUO WEN TECHNOLOGY takes diamond as the core, exploring infinite possibilities of new material technology, contributing to the sustainable development of human society.",
+            "People-oriented — Respect the value of every employee, create an open, innovative and collaborative work atmosphere, grow together with employees."
+          ]
+        }
+      ],
+      "contentJa": [
+        {
+          "lang": "zh",
+          "blockId": "block-1",
+          "heading": "コアバリュー",
+          "paragraphs": [
+            "誠実さ：誠実さは協力と満足を促進し、ウィンウィンの結果を達成します。誠実さと信頼性を堅持し、顧客、従業員、パートナーに責任を持ちます。",
+            "イノベーション：専門的に卓越性を達成し、イノベーションでリードします。継続的な技術革新は、新しいダイヤモンド材料産業の発展をリードしています。",
+            "サービス：顧客の声に耳を傾け、顧客のニーズに焦点を当て、優れたサービスで顧客の信頼を勝ち取ります。"
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "block-1",
+          "heading": "コアバリュー",
+          "paragraphs": [
+            "誠実さ：誠実さは協力を促進し、満足度はウィンウィンを達成します。誠実さと信頼性を堅持し、顧客、従業員、パートナーに責任を負う。",
+            "イノベーション：プロフェッショナリズムは卓越性を達成し、イノベーションはトレンドをリードします。ダイヤモンド新素材業界をリードする継続的な技術革新。",
+            "サービス：顧客の声に耳を傾け、顧客のニーズに焦点を当て、優れたサービスで顧客の信頼を勝ち取ります。"
+          ]
+        },
+        {
+          "lang": "zh",
+          "blockId": "block-2",
+          "heading": "品牌理念",
+          "paragraphs": [
+            "ダイヤモンド舗装未来への道- Zuowenテクノロジーは、ダイヤモンドをコアとし、新しい材料技術の無限の可能性を探求し、人類社会の持続可能な発展に貢献します。",
+            "人指向-各従業員の価値を尊重し、オープンで革新的で協力的な職場環境を作り、従業員と一緒に成長します。"
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "block-2",
+          "heading": "ブランド哲学",
+          "paragraphs": [
+            "ダイヤモンド舗装の未来への道— Zuo Wenテクノロジーは、ダイヤモンドをコアとし、新しい材料技術の無限の可能性を探求し、人類社会の持続可能な発展に貢献します。",
+            "人指向—すべての従業員の価値を尊重し、オープンで革新的で協力的な職場環境を作り、従業員と共に成長します。"
+          ]
+        }
+      ],
+      "contentKo": [
+        {
+          "lang": "zh",
+          "blockId": "block-1",
+          "heading": "핵심 가치",
+          "paragraphs": [
+            "청렴성: 정직은 협조와 만족을 증진하여 윈윈 결과를 달성합니다. 정직과 신뢰를 지키고 고객, 직원 및 파트너를 책임집니다.",
+            "혁신: 전문적으로 우수성을 달성하고 혁신으로 선도합니다. 지속적인 기술 혁신은 새로운 다이아몬드 소재 산업의 발전을 주도합니다.",
+            "서비스: 고객의 목소리에 귀 기울이고 고객의 니즈에 집중하며 탁월한 서비스로 고객의 신뢰를 얻습니다."
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "block-1",
+          "heading": "핵심 가치",
+          "paragraphs": [
+            "진실성: 정직은 협력을 촉진하고 만족은 윈윈을 달성합니다. 정직과 신뢰를 지키고 고객, 직원 및 파트너를 책임집니다.",
+            "혁신: 전문성이 탁월함을 달성하고 혁신이 트렌드를 주도합니다. 다이아몬드 신소재 산업을 선도하는 지속적인 기술 혁신.",
+            "서비스: 고객의 목소리에 귀 기울이고, 고객의 니즈에 집중하며, 탁월한 서비스로 고객 신뢰를 얻습니다."
+          ]
+        },
+        {
+          "lang": "zh",
+          "blockId": "block-2",
+          "heading": "브랜드 철학",
+          "paragraphs": [
+            "미래를 향한 다이아몬드 포장 도로 - Zuowen Technology는 다이아몬드를 핵심으로 삼고 새로운 소재 기술의 무한한 가능성을 탐구하고 인류 사회의 지속 가능한 발전에 기여합니다.",
+            "사람 지향적 - 각 직원의 가치를 존중하고, 개방적이고 혁신적이며 협력적인 근무 환경을 조성하며, 직원과 함께 성장합니다."
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "block-2",
+          "heading": "브랜드 철학",
+          "paragraphs": [
+            "Diamond Paving Road To Future — Zuo Wen 기술은 다이아몬드를 핵심으로 삼아 신소재 기술의 무한한 가능성을 탐구하고 인류 사회의 지속 가능한 발전에 기여합니다.",
+            "사람 지향적 — 모든 직원의 가치를 존중하고, 개방적이고 혁신적이며 협력적인 업무 분위기를 조성하며, 직원과 함께 성장합니다."
+          ]
+        }
+      ],
+      "contentFr": null,
+      "contentAr": [
+        {
+          "lang": "zh",
+          "blockId": "block-1",
+          "heading": "أما قيمها الأساسية فهي:",
+          "paragraphs": [
+            "النزاهة: الصدق يعزز التعاون والرضا لتحقيق نتائج مربحة للجانبين. الالتزام بالصدق والجدارة بالثقة، وتحمل المسؤولية تجاه العملاء والموظفين والشركاء.",
+            "الابتكار: تحقيق التميز مهنيًا والريادة بالابتكار. يقود الابتكار التكنولوجي المستمر تطوير صناعة مواد الماس الجديدة.",
+            "الخدمة: الاستماع إلى صوت العميل، والتركيز على احتياجات العميل، وكسب ثقة العميل بالخدمة الممتازة."
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "block-1",
+          "heading": "القيم الأساسية",
+          "paragraphs": [
+            "النزاهة: الصدق يعزز التعاون، والرضا يحقق الفوز للجانبين. الالتزام بالصدق والجدارة بالثقة، وتحمل المسؤولية تجاه العملاء والموظفين والشركاء.",
+            "الابتكار: الاحتراف يحقق التميز، والابتكار يقود الاتجاه. الابتكار التكنولوجي المستمر، مما يؤدي إلى صناعة مواد الماس الجديدة.",
+            "الخدمة: الاستماع إلى أصوات العملاء، والتركيز على احتياجات العملاء، وكسب ثقة العملاء من خلال الخدمة الممتازة."
+          ]
+        },
+        {
+          "lang": "zh",
+          "blockId": "block-2",
+          "heading": "فلسفة العلامة التجارية",
+          "paragraphs": [
+            "رصف الماس الطريق إلى المستقبل - تأخذ Zuowen Technology الماس كنواة، وتستكشف الإمكانيات اللانهائية لتقنيات المواد الجديدة، وتساهم في التنمية المستدامة للمجتمع البشري.",
+            "موجهة نحو الناس - احترام قيمة كل موظف، وخلق جو عمل مفتوح ومبتكر وتعاوني، والنمو مع الموظفين."
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "block-2",
+          "heading": "فلسفة العلامة التجارية",
+          "paragraphs": [
+            "طريق الرصف الماسي إلى المستقبل — تأخذ تقنية زو ون الماس كنواة، وتستكشف إمكانيات لا حصر لها لتكنولوجيا المواد الجديدة، مما يساهم في التنمية المستدامة للمجتمع البشري.",
+            "موجهة نحو الناس — احترام قيمة كل موظف، وخلق جو عمل مفتوح ومبتكر وتعاوني، والنمو مع الموظفين."
+          ]
+        }
+      ],
+      "highlights": [
+        {
+          "label": "创新驱动",
+          "value": "以技术创新为核心，持续投入研发，引领行业发展",
+          "labelAr": "الابتكار يقود",
+          "labelEn": "Innovation-Driven",
+          "labelFr": "Innovation motrice",
+          "labelJa": "イノベーション主導",
+          "labelKo": "혁신 주도",
+          "valueAr": "الابتكار التقني في الصميم، استثمار مستمر في البحث والتطوير، وقيادة القطاع",
+          "valueEn": "Technology innovation at core, continuous R&D investment, industry leadership",
+          "valueFr": "L'innovation technologique au cœur, investissement continu en R&D, leadership du secteur",
+          "valueJa": "技術革新を核とし、研究開発への継続的な投資で業界をリード",
+          "valueKo": "기술 혁신을 핵심으로 지속적인 R&D 투자로 업계를 선도합니다"
+        },
+        {
+          "label": "标准引领",
+          "value": "建立严格的质量标准，以高标准要求每一个产品",
+          "labelAr": "المعايير الرائدة",
+          "labelEn": "Standard-Led",
+          "labelFr": "Normes pionnières",
+          "labelJa": "標準主導",
+          "labelKo": "표준 선도",
+          "valueAr": "معايير جودة صارمة ومتطلبات عالية لكل منتج",
+          "valueEn": "Strict quality standards, high requirements for every product",
+          "valueFr": "Normes de qualité strictes, exigences élevées pour chaque produit",
+          "valueJa": "厳格な品質基準を確立し、すべての製品に高い基準を要求",
+          "valueKo": "엄격한 품질 기준을 확립하고 모든 제품에 높은 기준을 요구합니다"
+        },
+        {
+          "label": "客户至上",
+          "value": "深入理解客户需求，提供超越期望的产品和服务",
+          "labelAr": "العميل أولاً",
+          "labelEn": "Customer First",
+          "labelFr": "Client d'abord",
+          "labelJa": "顧客第一",
+          "labelKo": "고객 우선",
+          "valueAr": "فهم عميق لاحتياجات العملاء، منتجات وخدمات تفوق التوقعات",
+          "valueEn": "Deep understanding of customer needs, products and services beyond expectations",
+          "valueFr": "Compréhension profonde des besoins clients, produits et services au-delà des attentes",
+          "valueJa": "お客様のニーズを深く理解し、期待を超える製品とサービスを提供",
+          "valueKo": "고객의 요구를 깊이 이해하고 기대를 뛰어넘는 제품과 서비스를 제공합니다"
+        },
+        {
+          "label": "品质第一",
+          "value": "从原材料到成品，全流程质量管控，确保卓越品质",
+          "labelAr": "الجودة أولاً",
+          "labelEn": "Quality First",
+          "labelFr": "Qualité d'abord",
+          "labelJa": "品質第一",
+          "labelKo": "품질 우선",
+          "valueAr": "مراقبة جودة شاملة من المواد الخام إلى المنتجات النهائية لضمان جودة ممتازة",
+          "valueEn": "Full-process quality control from raw materials to finished products",
+          "valueFr": "Contrôle qualité de bout en bout, des matières premières aux produits finis",
+          "valueJa": "原材料から完成品まで全工程の品質管理で卓越した品質を確保",
+          "valueKo": "원자재부터 완제품까지 전 공정 품질 관리로 탁월한 품질을 보장합니다"
+        }
+      ],
+      "timeline": null,
+      "certifications": null,
+      "sortOrder": 1,
+      "status": "published",
+      "seoTitle": "企业文化 - 左文科技专业MPCVD金刚石设备",
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": "[ { \"heading\": \"核心价值观\", \"headingEn\": \"Core Values\", \"paragraphs\": [ \"诚信：守诚促进合作，满意实现共赢。坚持诚实守信，对客户、员工、 左文科技专注MPCVD金刚石材料制备设备研发、生产与服务，提供专业培育钻石与工业金刚石解决方案。",
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": "",
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": "",
+      "geoCity": ""
+    },
+    {
+      "id": "4",
+      "slug": "honors",
+      "title": "荣誉资质",
+      "titleEn": "Benefit",
+      "titleJa": "名誉資格",
+      "titleKo": "명예 자격",
+      "titleFr": "Qualifications honorifiques",
+      "titleAr": "المؤهلات الفخرية",
+      "subtitle": "权威认证，品质保障",
+      "subtitleEn": "Authoritative certification, quality assurance",
+      "subtitleJa": "権威ある認証、品質保証",
+      "subtitleKo": "권위 있는 인증, 품질 보증",
+      "subtitleFr": "Certification faisant autorité, assurance qualité",
+      "subtitleAr": "الاعتماد الرسمي وضمان الجودة",
+      "image": null,
+      "content": [
+        {
+          "lang": "zh",
+          "blockId": "block-1",
+          "heading": "企业荣誉",
+          "paragraphs": [
+            "左文科技凭借持续的技术创新和卓越的产品品质，获得了多项国家级和市级荣誉认证。这些荣誉既是对公司技术实力和创新能力的认可，也是对产品品质和服务水平的有力保障。"
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "block-1",
+          "heading": "Enterprise Honors",
+          "paragraphs": [
+            "With continuous technological innovation and excellent product quality, ZUO WEN TECHNOLOGY has received multiple national and municipal honors. These honors recognize the company's technical strength and innovation capability, and also guarantee product quality and service level."
+          ]
+        }
+      ],
+      "contentEn": [
+        {
+          "blockId": "block-1",
+          "heading": "Enterprise Honors",
+          "paragraphs": [
+            "With continuous technological innovation and excellent product quality, ZUO WEN TECHNOLOGY has received multiple national and municipal honors. These honors recognize the company's technical strength and innovation capability, and also guarantee product quality and service level."
+          ]
+        }
+      ],
+      "contentJa": [
+        {
+          "blockId": "block-1",
+          "heading": "企業の栄誉",
+          "paragraphs": [
+            "継続的な技術革新と優れた製品品質により、Zuowen Technologyは多くの国家および地方自治体の名誉認証を取得しています。これらの栄誉は、同社の技術力と革新的な能力を裏付けるものであり、製品の品質とサービスレベルの強力な保証でもあります。"
+          ]
+        },
+        {
+          "blockId": "block-1",
+          "heading": "エンタープライズオナーズ",
+          "paragraphs": [
+            "継続的な技術革新と優れた製品品質により、Zuo Wenテクノロジーは複数の国家および地方自治体の栄誉を受けています。これらの栄誉は、同社の技術力とイノベーション能力を認め、製品の品質とサービスレベルを保証します。"
+          ]
+        }
+      ],
+      "contentKo": [
+        {
+          "blockId": "block-1",
+          "heading": "기업 명예",
+          "paragraphs": [
+            "지속적인 기술 혁신과 우수한 제품 품질로 Zuowen Technology는 다수의 국가 및 지자체 명예 인증을 획득했습니다. 이러한 영예는 회사의 기술적 강점과 혁신적인 역량을 보증하고 제품 품질과 서비스 수준을 강력하게 보장하는 것입니다."
+          ]
+        },
+        {
+          "blockId": "block-1",
+          "heading": "Enterprise Honors",
+          "paragraphs": [
+            "지속적인 기술 혁신과 우수한 제품 품질로 Zuo Wen 기술은 여러 국가 및 지방 자치 단체의 영예를 안았습니다. 이러한 영예는 회사의 기술력과 혁신 역량을 인정하고 제품 품질과 서비스 수준을 보장합니다."
+          ]
+        }
+      ],
+      "contentFr": [],
+      "contentAr": [
+        {
+          "blockId": "block-1",
+          "heading": "مرتبة الشرف للشركات",
+          "paragraphs": [
+            "مع الابتكار التكنولوجي المستمر وجودة المنتج الممتازة، حصلت Zuowen Technology على عدد من الشهادات الفخرية الوطنية والبلدية. هذه التكريمات هي تأييد للقوة التكنولوجية للشركة وقدراتها المبتكرة، بالإضافة إلى ضمان قوي لجودة المنتج ومستويات الخدمة."
+          ]
+        },
+        {
+          "blockId": "block-1",
+          "heading": "مرتبة الشرف للمؤسسة",
+          "paragraphs": [
+            "مع الابتكار التكنولوجي المستمر وجودة المنتج الممتازة، حصلت تقنية Zuo Wen على العديد من الأوسمة الوطنية والبلدية. تعترف هذه الأوسمة بالقوة التقنية للشركة وقدرتها على الابتكار، وتضمن أيضًا جودة المنتج ومستوى الخدمة."
+          ]
+        }
+      ],
+      "highlights": [],
+      "timeline": null,
+      "certifications": [
+        {
+          "name": "国家级高新技术企业",
+          "year": "2023",
+          "issuer": "北京市科学技术委员会等",
+          "nameEn": "National High-Tech Enterprise",
+          "issuerEn": "Beijing Municipal Science & Technology Commission"
+        },
+        {
+          "name": "中关村高新技术企业",
+          "year": "2023",
+          "issuer": "中关村科技园区管理委员会",
+          "nameEn": "Zhongguancun High-Tech Enterprise",
+          "issuerEn": "Zhongguancun Science Park Admin Committee"
+        },
+        {
+          "name": "北京市专精特新中小企业",
+          "year": "2024",
+          "issuer": "北京市经济和信息化局",
+          "nameEn": "Beijing Specialized & Innovative SME",
+          "issuerEn": "Beijing Municipal Bureau of Economy & IT"
+        },
+        {
+          "name": "北京市创新型中小企业",
+          "year": "2024",
+          "issuer": "北京市经济和信息化局",
+          "nameEn": "Beijing Innovative SME",
+          "issuerEn": "Beijing Municipal Bureau of Economy & IT"
+        },
+        {
+          "name": "北京市知识产权试点单位",
+          "year": "2024",
+          "issuer": "北京市知识产权局",
+          "nameEn": "Beijing IP Pilot Unit",
+          "issuerEn": "Beijing Municipal IP Administration"
+        },
+        {
+          "name": "ISO9001质量管理体系认证",
+          "year": "2023",
+          "issuer": "第三方认证机构",
+          "nameEn": "ISO9001 Quality Management System",
+          "issuerEn": "Third-Party Certification Body"
+        }
+      ],
+      "sortOrder": 3,
+      "status": "published",
+      "seoTitle": "荣誉资质 - 左文科技专业MPCVD金刚石设备",
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": "",
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": "",
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": "",
+      "geoCity": ""
+    },
+    {
+      "id": "3",
+      "slug": "history",
+      "title": "发展历程",
+      "titleEn": "Our History",
+      "titleJa": "履歴",
+      "titleKo": "히스토리",
+      "titleFr": null,
+      "titleAr": "تاريخ التنمية",
+      "subtitle": "从创立到全产业链布局，持续创新突破",
+      "subtitleEn": "From founding to full industry chain layout, continuous innovation and breakthroughs",
+      "subtitleJa": "産業チェーン全体の確立からレイアウトまでの継続的なイノベーションとブレークスルー",
+      "subtitleKo": "설립부터 전체 산업 체인의 레이아웃에 이르기까지 지속적인 혁신과 혁신",
+      "subtitleFr": null,
+      "subtitleAr": "الابتكار المستمر والاختراقات من التأسيس إلى تخطيط السلسلة الصناعية بأكملها",
+      "image": null,
+      "content": [
+        {
+          "lang": "zh",
+          "blockId": "block-1",
+          "heading": "发展里程碑",
+          "paragraphs": [
+            "左文科技自2018年成立以来，专注于微波等离子体应用技术研发及金刚石材料生产。与多数依赖进口设备的企业不同，左文科技自主研发并量产了2.45GHz频段15kW及915MHz频段30-100kW MPCVD设备，掌握了从设备制造到金刚石产品应用的全链条核心技术，实现了\"自己造炉子、自己长晶体\"。"
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "block-1",
+          "heading": "Milestones",
+          "paragraphs": [
+            "Since its founding in 2018, ZUO WEN TECHNOLOGY has focused on microwave plasma application technology R&D and diamond material production. Unlike most companies relying on imported equipment, ZUO WEN independently developed and mass-produced 2.45GHz 15kW and 915MHz 30-100kW MPCVD equipment, mastering the full-chain core technology from equipment manufacturing to diamond product application, achieving \"building our own furnaces and growing our own crystals\"."
+          ]
+        }
+      ],
+      "contentEn": [
+        {
+          "blockId": "block-1",
+          "heading": "Development Milestone",
+          "paragraphs": [
+            "Since its establishment in 2018, Zuowen Technology has focused on the research and development of microwave plasma application technology and the production of diamond materials. Unlike most companies that rely on imported equipment, Zuowen Technology has independently developed and mass-produced 15kW MPCVD equipment in the 2.45GHz frequency band and 30-100kW MPCVD equipment in the 915MHz frequency band. It has mastered the core technology of the entire chain from equipment manufacturing to diamond product application, and has achieved the goal of \"making furnaces and growing crystals on its own\"."
+          ]
+        },
+        {
+          "blockId": "block-1",
+          "heading": "Milestones",
+          "paragraphs": [
+            "Since its founding in 2018, ZUO WEN TECHNOLOGY has focused on microwave plasma application technology R&D and diamond material production. Unlike most companies relying on imported equipment, ZUO WEN independently developed and mass-produced 2.45GHz 15kW and 915MHz 30-100kW MPCVD equipment, mastering the full-chain core technology from equipment manufacturing to diamond product application, achieving \"building our own furnaces and growing our own crystals\"."
+          ]
+        }
+      ],
+      "contentJa": [
+        {
+          "lang": "zh",
+          "blockId": "block-1",
+          "heading": "開発マイルストーン",
+          "paragraphs": [
+            "Zuowen Technologyは、2018年の設立以来、マイクロ波プラズマ応用技術とダイヤモンド材料の研究開発に注力してきました。輸入機器に依存するほとんどの企業とは異なり、Zuowen Technologyは、2.45 GHz帯で15 kW、915 MHz帯で30 -100 kWのMPCVD機器を独自に開発・量産し、機器製造からダイヤモンド製品のアプリケーションまでのチェーンコア技術全体を習得し、「自作炉と自社製長結晶」を実現しました。"
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "block-1",
+          "heading": "マイルストーン",
+          "paragraphs": [
+            "Zuo Wen技術は、2018年の創業以来、マイクロ波プラズマ応用技術の研究開発とダイヤモンド材料の製造に重点を置いてきました。Zuo Wenは、輸入機器に依存するほとんどの企業とは異なり、2.45 GHzの15 kWおよび915 MHzの30 -100 kW MPCVD機器を独自に開発および量産し、機器製造からダイヤモンド製品のアプリケーションまでのフルチェーンコアテクノロジーを習得し、「独自の炉を構築し、独自の結晶を成長させる」ことを達成しました。"
+          ]
+        }
+      ],
+      "contentKo": [
+        {
+          "lang": "zh",
+          "blockId": "block-1",
+          "heading": "개발 이정표",
+          "paragraphs": [
+            "Zuowen Technology는 2018년에 설립된 이래 마이크로파 플라즈마 응용 기술 및 다이아몬드 소재 생산의 연구 개발에 주력해 왔습니다. Zuowen Technology는 수입 장비에 의존하는 대부분의 기업과 달리 2.45 GHz 대역에서 15kW, 915MHz 대역에서 30-100kW MPCVD 장비를 독자적으로 개발하고 대량 생산했으며 장비 제조에서 다이아몬드 제품 적용에 이르는 전체 체인 핵심 기술을 습득하고 \"자체 제작 용광로 및 자체 제작 긴 크리스탈\" 을 실현했습니다."
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "block-1",
+          "heading": "마일스톤",
+          "paragraphs": [
+            "Zuo Wen 기술은 2018년 창립 이래 마이크로파 플라즈마 응용 기술 R&D 및 다이아몬드 소재 생산에 주력해 왔습니다. Zuo Wen은 수입 장비에 의존하는 대부분의 회사와 달리 2.45 GHz 15kW 및 915MHz 30-100kW MPCVD 장비를 독립적으로 개발 및 대량 생산하여 장비 제조에서 다이아몬드 제품 적용에 이르는 풀 체인 핵심 기술을 습득하고 \"자체 용광로를 구축하고 자체 크리스탈을 성장\" 시켰습니다."
+          ]
+        }
+      ],
+      "contentFr": null,
+      "contentAr": [
+        {
+          "lang": "zh",
+          "blockId": "block-1",
+          "heading": "معالم التنمية",
+          "paragraphs": [
+            "منذ تأسيسها في عام 2018، ركزت Zuowen Technology على البحث والتطوير في تكنولوجيا تطبيق بلازما الميكروويف وإنتاج مواد الماس. على عكس معظم الشركات التي تعتمد على المعدات المستوردة، طورت Zuowen Technology بشكل مستقل وأنتجت 15 كيلو واط بكميات كبيرة في النطاق 2.45 جيجا هرتز ومعدات MPCVD 30-100 كيلو واط في النطاق 915 ميجا هرتز، وأتقنت تقنية السلسلة الأساسية بأكملها من تصنيع المعدات إلى تطبيق منتج الماس، وأدركت \"الأفران ذاتية الصنع والبلورات الطويلة الخاصة\"."
+          ]
+        },
+        {
+          "lang": "en",
+          "blockId": "block-1",
+          "heading": "المراحل الرئيسية",
+          "paragraphs": [
+            "منذ تأسيسها في عام 2018، ركزت تقنية Zuo Wen على البحث والتطوير في تكنولوجيا تطبيق البلازما الميكروويف وإنتاج المواد الماسية. على عكس معظم الشركات التي تعتمد على المعدات المستوردة، قامت Zuo Wen بشكل مستقل بتطوير وإنتاج 2.45 جيجا هرتز 15 كيلو واط و 915 ميجا هرتز 30-100 كيلو واط من معدات MPCVD، وإتقان التكنولوجيا الأساسية كاملة السلسلة من تصنيع المعدات إلى تطبيق منتجات الماس، وتحقيق \"بناء أفراننا الخاصة وتنمية بلوراتنا الخاصة\"."
+          ]
+        }
+      ],
+      "highlights": null,
+      "timeline": [
+        {
+          "desc": "北京左文科技有限公司在北京经济技术开发区成立，专注MPCVD金刚石技术研发",
+          "year": "2018",
+          "title": "公司成立",
+          "descEn": "Beijing Zuo Wen Technology Co., Ltd. founded in Beijing E-Town, focusing on MPCVD diamond technology R&D",
+          "titleEn": "Company Founded"
+        },
+        {
+          "desc": "自主研发的首台2.45GHz MPCVD设备成功下线并完成工艺验证",
+          "year": "2019",
+          "title": "首台设备下线",
+          "descEn": "First self-developed 2.45GHz MPCVD equipment successfully offline and process validated",
+          "titleEn": "First Equipment Offline"
+        },
+        {
+          "desc": "在深圳龙岗设立量产车间，开始培育钻石规模化生产",
+          "year": "2020",
+          "title": "深圳量产基地",
+          "descEn": "Established mass-production workshop in Longgang, Shenzhen, starting scaled lab-grown diamond production",
+          "titleEn": "Shenzhen Production Base"
+        },
+        {
+          "desc": "推出ZW-10C/10D/15D全系列MPCVD设备，覆盖6-15kW功率段",
+          "year": "2021",
+          "title": "产品系列完善",
+          "descEn": "Launched ZW-10C/10D/15D full MPCVD equipment series, covering 6-15kW power range",
+          "titleEn": "Product Series Complete"
+        },
+        {
+          "desc": "915MHz频段30-100kW大功率MPCVD设备研发成功，支持大尺寸金刚石制备",
+          "year": "2022",
+          "title": "大功率设备突破",
+          "descEn": "915MHz 30-100kW high-power MPCVD equipment R&D successful, supporting large-size diamond preparation",
+          "titleEn": "High-Power Breakthrough"
+        },
+        {
+          "desc": "获评国家级高新技术企业、中关村高新技术企业，通过ISO9001认证",
+          "year": "2023",
+          "title": "高新技术企业",
+          "descEn": "Awarded National High-Tech Enterprise, Zhongguancun High-Tech Enterprise, ISO9001 certified",
+          "titleEn": "High-Tech Enterprise"
+        },
+        {
+          "desc": "获评北京市专精特新中小企业、知识产权试点单位，专利数量持续增长",
+          "year": "2024",
+          "title": "专精特新认证",
+          "descEn": "Awarded Beijing Specialized & Innovative SME, IP Pilot Unit, patent count continues to grow",
+          "titleEn": "Specialized & Innovative SME"
+        },
+        {
+          "desc": "形成从MPCVD设备、工艺辅助设备到金刚石材料产品的全产业链布局",
+          "year": "2025",
+          "title": "全产业链布局",
+          "descEn": "Formed full industry chain from MPCVD equipment, auxiliary equipment to diamond material products",
+          "titleEn": "Full Industry Chain"
+        }
+      ],
+      "certifications": null,
+      "sortOrder": 2,
+      "status": "published",
+      "seoTitle": null,
+      "seoTitleEn": null,
+      "seoTitleJa": null,
+      "seoTitleKo": null,
+      "seoTitleFr": null,
+      "seoTitleAr": null,
+      "seoDescription": null,
+      "seoDescriptionEn": null,
+      "seoDescriptionJa": null,
+      "seoDescriptionKo": null,
+      "seoDescriptionFr": null,
+      "seoDescriptionAr": null,
+      "seoKeywords": null,
+      "seoKeywordsEn": null,
+      "seoKeywordsJa": null,
+      "seoKeywordsKo": null,
+      "seoKeywordsFr": null,
+      "seoKeywordsAr": null,
+      "geoRegion": null,
+      "geoCity": null
+    }
+  ]
+}

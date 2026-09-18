@@ -1,0 +1,77 @@
+{
+  "model": "productCategory",
+  "rows": [
+    {
+      "id": "7",
+      "tabId": "35",
+      "slug": "vcr-g-series",
+      "name": "VCR 面密封接头 G 系列",
+      "nameEn": "VCR Face Seal Fittings G Series",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "sortOrder": 0
+    },
+    {
+      "id": "8",
+      "tabId": "36",
+      "slug": "micro-weld-i",
+      "name": "微焊接接头 I 系列",
+      "nameEn": "Micro Welded Fittings I Series",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "sortOrder": 0
+    },
+    {
+      "id": "9",
+      "tabId": "37",
+      "slug": "dv-series",
+      "name": "隔膜阀系列",
+      "nameEn": "Diaphragm Valve Series",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "sortOrder": 0
+    },
+    {
+      "id": "10",
+      "tabId": "38",
+      "slug": "pre-prt-series",
+      "name": "减压阀系列",
+      "nameEn": "Pressure Reducer Series",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "sortOrder": 0
+    },
+    {
+      "id": "11",
+      "tabId": "39",
+      "slug": "cv-bsm-series",
+      "name": "单向阀与计量阀",
+      "nameEn": "Check & Metering Valves",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "sortOrder": 0
+    },
+    {
+      "id": "12",
+      "tabId": "40",
+      "slug": "ft-series",
+      "name": "气体过滤器系列",
+      "nameEn": "Gas Filter Series",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "sortOrder": 0
+    }
+  ]
+}

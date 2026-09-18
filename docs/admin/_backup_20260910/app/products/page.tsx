@@ -1,0 +1,254 @@
+﻿"use client";
+
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import PageHero from "@/components/ui/PageHero";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import { createLocalizedGetter } from "@/lib/localized";
+import { useProductTabs } from "@/lib/api/useProducts";
+import { useActiveTemplate } from "@/lib/templates/active-theme";
+import UnilokProductsPage from "@/components/theme-unilok/ProductsPage";
+
+// “全部设备”视图标识
+const ALL = "all";
+
+function ProductsContent() {
+  const { t, locale } = useI18n();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { productTabs } = useProductTabs();
+  const tabParam = searchParams.get("tab");
+  const loc = createLocalizedGetter(locale);
+  const [pageConfig, setPageConfig] = useState<any>(null);
+
+  // 获取页面配置
+  useEffect(() => {
+    fetch("/api/public/page-config?page=products")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && data.data) {
+          setPageConfig(data.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // 全部产品总数（动态计算）
+  const totalModels = productTabs.reduce(
+    (sum, tab) => sum + tab.categories.reduce((s, c) => s + c.models.length, 0),
+    0
+  );
+
+  // 初始：若 URL 带有效 tab 参数则优先显示该二级目录，否则显示全部设备
+  const initialTab =
+    tabParam && productTabs.some((tab) => tab.id === tabParam) ? tabParam : ALL;
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
+
+  // 监听 URL 参数变化（如从导航下拉菜单点击带 ?tab= 跳转）
+  useEffect(() => {
+    const p = searchParams.get("tab");
+    setActiveTab(
+      p && productTabs.some((tab) => tab.id === p) ? p : ALL
+    );
+  }, [searchParams]);
+
+  // 切换 Tab：更新状态并同步 URL，保证导航下拉再次点击同一目录也能触发
+  function selectTab(id: string) {
+    setActiveTab(id);
+    router.replace(id === ALL ? "/products" : `/products?tab=${id}`, {
+      scroll: false,
+    });
+  }
+
+  const showAll = activeTab === ALL;
+  const currentTab = showAll
+    ? null
+    : productTabs.find((tab) => tab.id === activeTab) || productTabs[0];
+
+  // 需要渲染的 Tab：全部视图遍历所有；否则仅当前目录
+  const tabsToRender = showAll ? productTabs : [currentTab as (typeof productTabs)[number]];
+
+  const tabBtnBase =
+    "px-6 py-2.5 rounded-lg font-medium text-sm whitespace-nowrap transition-all ";
+  const tabBtnActive = "bg-primary text-white shadow-md";
+  const tabBtnIdle = "bg-dark-50 text-dark-600 hover:bg-dark-100";
+
+  return (
+    <>
+      <PageHero
+        title={pageConfig?.title || t("productsPageTitle")}
+        titleEn={pageConfig?.titleEn || "Products"}
+        subtitle={pageConfig?.subtitle || t("productsPageSubtitle")}
+        subtitleEn={pageConfig?.subtitleEn || "Covering gate, ball, butterfly, check, safety and regulating valve series with complete fluid control solutions"}
+        breadcrumb={pageConfig?.breadcrumb || t("productsPageTitle")}
+        breadcrumbEn={pageConfig?.breadcrumbEn || "Products"}
+      />
+
+      {/* Tab Navigation：全部设备 + 各二级目录 */}
+      <section className="sticky top-16 z-40 bg-white border-b border-dark-100 shadow-sm">
+        <div className="container">
+          <div className="flex gap-1 overflow-x-auto py-3">
+            <button
+              key={ALL}
+              onClick={() => selectTab(ALL)}
+              className={`${tabBtnBase} ${showAll ? tabBtnActive : tabBtnIdle}`}
+            >
+              {t("allProducts")}
+              <span className="ms-2 text-xs opacity-70">{totalModels}</span>
+            </button>
+            {productTabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => selectTab(tab.id)}
+                className={`${tabBtnBase} ${
+                  activeTab === tab.id ? tabBtnActive : tabBtnIdle
+                }`}
+              >
+                {loc.get(tab, "name")}
+                <span className="ms-2 text-xs opacity-70">
+                  {tab.categories.reduce((sum, c) => sum + c.models.length, 0)}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Product Content */}
+      <section className="py-12 lg:py-16 bg-white">
+        <div className="container">
+          {tabsToRender.map((tab) => (
+            <div key={tab.id}>
+              {/* 全部视图下：显示二级目录（大分类）标识 */}
+              {showAll && (
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-1 h-8 bg-primary rounded" />
+                  <h2 className="text-2xl font-bold text-dark">
+                    {loc.get(tab, "name")}
+                  </h2>
+                  <span className="text-sm text-dark-400 bg-dark-50 px-2 py-0.5 rounded">
+                    {tab.categories.reduce((sum, c) => sum + c.models.length, 0)}{" "}
+                    {t("modelsCount")}
+                  </span>
+                </div>
+              )}
+
+              {tab.categories.map((category) => (
+                <div key={category.id} className="mb-16 last:mb-0">
+                  {/* Category Header */}
+                  <div className="flex items-end justify-between mb-8 pb-4 border-b border-dark-100">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-1 h-8 bg-primary rounded" />
+                        <h3 className="text-2xl font-bold text-dark">
+                          {loc.get(category, "name")}
+                        </h3>
+                        <span className="text-sm text-dark-400 bg-dark-50 px-2 py-0.5 rounded">
+                          {category.models.length} {t("modelsCount")}
+                        </span>
+                      </div>
+                      <p className="text-dark-500 text-sm max-w-3xl ms-4">
+                        {loc.get(category, "description")}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Models Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {category.models.map((model) => (
+                      <Link
+                        key={model.id}
+                        href={`/products/${tab.id}/${model.id}`}
+                        className="group bg-white border border-dark-100 rounded-lg overflow-hidden hover:border-primary hover:shadow-xl transition-all duration-300"
+                      >
+                        {/* Model Image */}
+                        <div className="aspect-[4/3] bg-dark-50 relative overflow-hidden">
+                          {model.image ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={model.image}
+                              alt={model.name}
+                              className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src="/placeholders/generic-tech.webp"
+                                alt={model.name}
+                                className="w-full h-full object-cover opacity-80"
+                              />
+                            </div>
+                          )}
+                          <div className="absolute top-3 left-3 bg-primary text-white text-xs font-bold px-2.5 py-1 rounded">
+                            {model.model}
+                          </div>
+                        </div>
+
+                        {/* Model Info */}
+                        <div className="p-6">
+                          <h4 className="text-lg font-bold text-dark mb-2 group-hover:text-primary transition-colors">
+                            {loc.get(model, "name")}
+                          </h4>
+                          <p className="text-dark-500 text-sm leading-relaxed mb-4 line-clamp-2">
+                            {loc.get(model, "description")}
+                          </p>
+
+                          {/* Key Specs */}
+                          <div className="space-y-1.5 mb-4">
+                            {model.specs.slice(0, 3).map((spec) => (
+                              <div key={spec.label} className="flex justify-between text-xs">
+                                <span className="text-dark-400">
+                                  {loc.get(spec, "label")}
+                                </span>
+                                <span className="text-dark-700 font-medium">
+                                  {loc.get(spec, "value")}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <span className="inline-flex items-center gap-1 text-primary text-sm font-medium group-hover:gap-2 transition-all">
+                              {t("viewDetails")}
+                              <ArrowRight size={14} className="rtl-flip" />
+                            </span>
+                            {model.purchaseMode === "shop" && model.shopSlug && (
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  router.push(`/shop/${model.shopSlug}`);
+                                }}
+                                className="inline-flex items-center gap-1 bg-primary text-white text-xs font-bold px-3 py-1.5 rounded group-hover:bg-primary-dark transition-colors"
+                                title={t("buyNow")}
+                              >
+                                {t("buyNow")}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+export default function ProductsPage() {
+  const { isUnilok } = useActiveTemplate();
+  if (isUnilok) return <UnilokProductsPage />;
+  return (
+    <Suspense fallback={null}>
+      <ProductsContent />
+    </Suspense>
+  );
+}

@@ -1,0 +1,65 @@
+{
+  "model": "language",
+  "rows": [
+    {
+      "id": "1",
+      "code": "zh",
+      "name": "中文",
+      "nameEn": "Chinese",
+      "flag": "🇨🇳",
+      "isDefault": true,
+      "isActive": true,
+      "sortOrder": 1
+    },
+    {
+      "id": "2",
+      "code": "en",
+      "name": "英文",
+      "nameEn": "English",
+      "flag": "🇺🇸",
+      "isDefault": false,
+      "isActive": true,
+      "sortOrder": 2
+    },
+    {
+      "id": "3",
+      "code": "ja",
+      "name": "日文",
+      "nameEn": "Japanese",
+      "flag": "🇯🇵",
+      "isDefault": false,
+      "isActive": true,
+      "sortOrder": 3
+    },
+    {
+      "id": "4",
+      "code": "ko",
+      "name": "韩文",
+      "nameEn": "Korean",
+      "flag": "🇰🇷",
+      "isDefault": false,
+      "isActive": true,
+      "sortOrder": 4
+    },
+    {
+      "id": "6",
+      "code": "ar",
+      "name": "阿拉伯文",
+      "nameEn": "Arabic",
+      "flag": "🇸🇦",
+      "isDefault": false,
+      "isActive": true,
+      "sortOrder": 6
+    },
+    {
+      "id": "5",
+      "code": "fr",
+      "name": "法文",
+      "nameEn": "French",
+      "flag": "🇫🇷",
+      "isDefault": false,
+      "isActive": true,
+      "sortOrder": 5
+    }
+  ]
+}

@@ -1,0 +1,676 @@
+"use client"
+
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import {
+  TrendingUp,
+  Package,
+  Settings,
+  RefreshCw,
+  BookOpen,
+  Building2,
+  ChevronDown,
+  ChevronRight,
+  Bell,
+  ShieldCheck,
+  Megaphone,
+  Sparkles,
+  BarChart3,
+} from 'lucide-react'
+
+interface MenuChild {
+  label: string
+  href: string
+  permission?: string
+  /** 依赖插件 key：插件停用时隐藏（/api/admin/plugins?mode=enabled 控制） */
+  plugin?: string
+  /** 二级子项（如 询价报价→报价单模板、会员中心→等级权益）；仅用于带子页的菜单项 */
+  children?: { label: string; href: string }[]
+}
+
+interface MenuItem {
+  label: string
+  href: string
+  icon: React.ReactNode
+  permission?: string
+  /** 依赖插件 key：插件停用时隐藏（/api/admin/plugins?mode=enabled 控制） */
+  plugin?: string
+  /** 分组标识：动态插件入口按 category 归入对应分组（仅分组父项设置） */
+  groupKey?: string
+  children?: MenuChild[]
+}
+
+/** 插件侧边栏元信息（/api/admin/plugins?mode=enabled 返回） */
+interface PluginSidebarMeta {
+  key: string
+  name: string
+  showInSidebar: boolean
+  adminUrl?: string | null
+  adminUrls?: { label: string; href: string }[] | null
+  isContentSection?: boolean
+  planned?: boolean
+  category?: string
+}
+
+/** 动态插件入口（按 category 归入对应分组） */
+interface DynamicPluginChild {
+  label: string
+  href: string
+  plugin?: string
+  pluginKey?: string
+  children?: { label: string; href: string }[]
+}
+
+/** 动态插件入口权限映射：插件 key → 所需权限码；不在映射表中的插件不做权限过滤（保持可见） */
+const PLUGIN_PERMISSION_MAP: Record<string, string> = {
+  'ai-customer-service': 'ai:config',
+  'ai-translate': 'translate-config:view',
+  'ai-text': 'ai:config',
+  'ai-image': 'ai:config',
+  'seo': 'seo:view',
+  'backlink': 'seo:view',
+  'analytics': 'analytics:view',
+  'content-collector': 'auto-collection:view',
+  'lead': 'lead:view',
+  'quote': 'lead:view',
+  'download-leads': 'download-lead:view',
+  'email-marketing': 'lead:view',
+  'member': 'config:site',
+  'mall': 'config:site',
+  'multi-site': 'config:site',
+  'white-label': 'config:site',
+  'form-builder': 'config:site',
+  'content-types': 'product:view',
+  'visit-booking': 'lead:view',
+  'customer-portal': 'lead:view',
+}
+
+/** 插件 category → 侧边栏分组标识；无映射的分类（其他/无 category）不显示动态入口 */
+const PLUGIN_CATEGORY_GROUP: Record<string, string> = {
+  ai: 'ai',
+  marketing: 'marketing',
+  seo: 'seo-data',
+  data: 'seo-data',
+  system: 'system',
+  content: 'content',
+}
+
+/**
+ * 已在静态菜单中拥有固定入口的插件 key：
+ * 内容管理分组（content-* / content-types）、营销与商机分组（lead/quote/...）、
+ * AI 能力中心分组（ai-autopilot / ai-customer-service / ai-translate / content-collector / ai-text）、
+ * SEO 与数据分组（seo / backlink / analytics）、站点设置分组（site-config/home-config/page-hero/theme/template/language/smtp/white-label）、
+ * 系统运维分组（multi-site）。
+ * 这些不参与动态追加；动态生成处另有 href 去重作为双保险。
+ */
+const STATIC_SIDEBAR_PLUGIN_KEYS = new Set([
+  // 内容管理
+  'content-product', 'content-news', 'content-resource', 'content-industry',
+  'content-service', 'content-case', 'content-faq', 'content-career', 'content-about',
+  'content-menu', 'content-types',
+  // 营销与商机
+  'lead', 'quote', 'download-leads', 'email-marketing', 'member', 'mall',
+  'visit-booking', 'form-builder',
+  // AI 能力中心
+  'ai-autopilot', 'ai-customer-service', 'ai-translate', 'content-collector', 'ai-text',
+  // SEO 与数据
+  'seo', 'backlink', 'analytics',
+  // 站点设置
+  'site-config', 'home-config', 'page-hero', 'theme', 'template', 'language', 'smtp', 'white-label',
+  // 系统运维
+  'multi-site',
+])
+
+const menuItems: MenuItem[] = [
+  {
+    label: '工作台',
+    href: '#',
+    icon: <TrendingUp size={18} />,
+    groupKey: 'workspace',
+    children: [
+      { label: '控制台', href: '/admin' },
+      { label: '运营驾驶舱', href: '/admin/operations' },
+    ],
+  },
+  {
+    label: '内容管理',
+    href: '#',
+    icon: <Package size={18} />,
+    groupKey: 'content',
+    children: [
+      { label: '产品管理', href: '/admin/content/products', permission: 'product:view', plugin: 'content-product' },
+      { label: '新闻管理', href: '/admin/content/news', permission: 'news:view', plugin: 'content-news' },
+      { label: '资源管理', href: '/admin/resources', permission: 'resource:view', plugin: 'content-resource' },
+      { label: '行业方案', href: '/admin/content/industries', permission: 'industry:view', plugin: 'content-industry' },
+      { label: '服务内容', href: '/admin/content/services', permission: 'service:view', plugin: 'content-service' },
+      { label: '成功案例', href: '/admin/content/case', permission: 'case:view', plugin: 'content-case' },
+      { label: '常见问题', href: '/admin/content/faq', permission: 'faq:view', plugin: 'content-faq' },
+      { label: '招聘职位', href: '/admin/careers', permission: 'career:view', plugin: 'content-career' },
+      { label: '关于我们', href: '/admin/about', permission: 'about:view', plugin: 'content-about' },
+      { label: '菜单管理', href: '/admin/menus', permission: 'menu:view', plugin: 'content-menu' },
+      { label: '通用内容模型', href: '/admin/content-types', permission: 'product:view', plugin: 'content-types' },
+      { label: '产品分类', href: '/admin/product-categories', permission: 'product:view', plugin: 'content-product' },
+      { label: '资源分类', href: '/admin/resource-categories', permission: 'resource:view', plugin: 'content-resource' },
+    ],
+  },
+  {
+    label: '营销与商机',
+    href: '#',
+    icon: <Megaphone size={18} />,
+    groupKey: 'marketing',
+    children: [
+      { label: '询盘线索', href: '/admin/leads', permission: 'lead:view', plugin: 'lead' },
+      {
+        label: '询价报价',
+        href: '/admin/quotes',
+        permission: 'lead:view',
+        plugin: 'quote',
+        children: [
+          { label: '报价询价单', href: '/admin/quotes' },
+          { label: '报价单模板', href: '/admin/quotes/template' },
+        ],
+      },
+      { label: '下载留资', href: '/admin/download-leads', permission: 'download-lead:view', plugin: 'download-leads' },
+      { label: 'EDM 邮件营销', href: '/admin/email-marketing', permission: 'lead:view', plugin: 'email-marketing' },
+      {
+        label: '会员中心',
+        href: '/admin/members',
+        permission: 'config:site',
+        plugin: 'member',
+        children: [
+          { label: '会员中心', href: '/admin/members' },
+          { label: '等级与权益', href: '/admin/member-levels' },
+        ],
+      },
+      { label: '客户分类', href: '/admin/customer-types', permission: 'config:site', plugin: 'site-config' },
+      { label: '通用表单', href: '/admin/forms', permission: 'config:site', plugin: 'form-builder' },
+      {
+        label: '在线商城',
+        href: '/admin/shop',
+        permission: 'config:site',
+        plugin: 'mall',
+        children: [
+          { label: '商品管理', href: '/admin/shop' },
+          { label: '商品分类', href: '/admin/shop/categories' },
+          { label: '订单管理', href: '/admin/shop/orders' },
+          { label: '销售统计', href: '/admin/shop/stats' },
+          { label: '优惠券管理', href: '/admin/shop/coupons' },
+        ],
+      },
+      { label: '考察预约', href: '/admin/visit-bookings', permission: 'lead:view', plugin: 'visit-booking' },
+    ],
+  },
+  {
+    label: 'AI 能力中心',
+    href: '#',
+    icon: <Sparkles size={18} />,
+    groupKey: 'ai',
+    children: [
+      { label: 'AI 开关矩阵', href: '/admin/ai-features', permission: 'ai:config' },
+      { label: 'AI 自动运营', href: '/admin/ai-autopilot', permission: 'ai:config', plugin: 'ai-autopilot' },
+      { label: 'AI 建站向导', href: '/admin/ai-site-wizard', permission: 'ai:config', plugin: 'ai-autopilot' },
+      {
+        label: 'AI 智能客服',
+        href: '/admin/settings/ai',
+        permission: 'ai:config',
+        plugin: 'ai-customer-service',
+        children: [
+          { label: 'AI 客服设置', href: '/admin/settings/ai' },
+          { label: '知识库管理', href: '/admin/ai-knowledge' },
+        ],
+      },
+      {
+        label: 'AI 多语言翻译',
+        href: '/admin/translate-batch',
+        permission: 'translate-config:view',
+        plugin: 'ai-translate',
+        children: [
+          { label: '批量翻译', href: '/admin/translate-batch' },
+          { label: '翻译配置', href: '/admin/settings/translate' },
+        ],
+      },
+      {
+        label: '内容采集',
+        href: '/admin/collection',
+        permission: 'auto-collection:view',
+        plugin: 'content-collector',
+        children: [
+          { label: '采集配置', href: '/admin/collection' },
+          { label: '自动采集任务', href: '/admin/auto-collection-tasks' },
+        ],
+      },
+    ],
+  },
+  {
+    label: 'SEO 与数据',
+    href: '#',
+    icon: <BarChart3 size={18} />,
+    groupKey: 'seo-data',
+    children: [
+      { label: 'SEO 优化', href: '/admin/settings/seo', permission: 'seo:view', plugin: 'seo' },
+      { label: 'SEO 批量补全', href: '/admin/seo-audit', permission: 'seo:view' },
+      {
+        label: '外链营销',
+        href: '/admin/backlinks',
+        permission: 'seo:view',
+        plugin: 'backlink',
+        children: [
+          { label: '外链台账', href: '/admin/backlinks' },
+          { label: '软文营销', href: '/admin/backlinks/posts' },
+        ],
+      },
+      {
+        label: '数据统计',
+        href: '/admin/analytics',
+        permission: 'analytics:view',
+        plugin: 'analytics',
+        children: [
+          { label: '访客统计', href: '/admin/analytics' },
+          { label: '销售漏斗', href: '/admin/funnel' },
+          { label: '访客热力图', href: '/admin/heatmap' },
+        ],
+      },
+    ],
+  },
+  {
+    label: '站点设置',
+    href: '/admin/settings/site',
+    icon: <Settings size={18} />,
+    children: [
+      { label: '站点配置', href: '/admin/settings/site', permission: 'config:site', plugin: 'site-config' },
+      { label: '首页配置', href: '/admin/settings/home', permission: 'config:home', plugin: 'home-config' },
+      { label: '页面头部', href: '/admin/page-hero', permission: 'page-hero:view', plugin: 'page-hero' },
+      { label: '主题配色', href: '/admin/settings/theme', permission: 'config:theme', plugin: 'theme' },
+      { label: '模板管理', href: '/admin/templates', permission: 'template:view', plugin: 'template' },
+      { label: '语种管理', href: '/admin/languages', permission: 'language:view', plugin: 'language' },
+      { label: '语种设置', href: '/admin/settings/languages', permission: 'language:view' },
+      { label: '定价与价格显示', href: '/admin/settings/pricing', permission: 'config:site', plugin: 'site-config' },
+      { label: '品牌 OEM', href: '/admin/settings/oem', permission: 'config:site', plugin: 'white-label' },
+      { label: 'SMTP 邮件', href: '/admin/settings/smtp', permission: 'smtp:view', plugin: 'smtp' },
+      { label: '行业包管理', href: '/admin/industry-packs', permission: 'config:site' },
+    ],
+  },
+  {
+    label: '系统运维',
+    href: '/admin/deploy',
+    icon: <RefreshCw size={18} />,
+    groupKey: 'system',
+    children: [
+      { label: '插件启停中心', href: '/admin/plugins', permission: 'plugin:view' },
+      { label: 'API 网关', href: '/admin/gateway', permission: 'plugin:view' },
+      {
+        label: '多站点/租户',
+        href: '/admin/tenants',
+        permission: 'config:site',
+        plugin: 'multi-site',
+        children: [
+          { label: '租户管理', href: '/admin/tenants' },
+          { label: '站点管理', href: '/admin/sites' },
+        ],
+      },
+      { label: '一键部署', href: '/admin/deploy', permission: 'deploy:view' },
+      { label: '系统更新', href: '/admin/system-update', permission: 'system:update' },
+      { label: '服务器管理', href: '/admin/servers', permission: 'deploy:view' },
+      { label: '数据库备份', href: '/admin/backup', permission: 'system:backup' },
+      { label: '操作日志', href: '/admin/logs', permission: 'system:log' },
+      { label: '授权管理', href: '/admin/license', permission: 'license:view' },
+    ],
+  },
+  {
+    label: '权限管理',
+    href: '/admin/users',
+    icon: <ShieldCheck size={18} />,
+    children: [
+      { label: '用户管理', href: '/admin/users', permission: 'system:user' },
+      { label: '角色权限', href: '/admin/roles', permission: 'system:role' },
+    ],
+  },
+  { label: '通知中心', href: '/admin/notifications', icon: <Bell size={18} />, permission: 'notification:view' },
+  {
+    label: '使用说明书',
+    href: '/admin/guide',
+    icon: <BookOpen size={18} />,
+    permission: 'guide:view',
+  },
+]
+
+export default function AdminSidebar({ user }: { user: any }) {
+  const pathname = usePathname()
+  const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set())
+  /** 插件多二级页组的展开状态（key=插件 key 或静态子项的 href） */
+  const [expandedPlugins, setExpandedPlugins] = useState<Set<string>>(new Set())
+  const [sysVersion, setSysVersion] = useState("")
+  /** 插件侧边栏元数据：key → { name(自定义名称), showInSidebar, 入口 }（API 仅返回已启用插件） */
+  const [pluginMeta, setPluginMeta] = useState<Map<string, PluginSidebarMeta> | null>(null)
+  /** 后台站点视角：站点列表 + 当前站点（多租户 R4） */
+  const [siteScope, setSiteScope] = useState<{ sites: any[]; currentSiteId: string | null } | null>(null)
+  /** 白标 OEM 品牌信息 */
+  const [brand, setBrand] = useState<{ brandName: string; adminTitle: string; loginLogo: string } | null>(null)
+
+  const userPerms: string[] = (user?.permissions as string[]) || []
+
+  // 权限判断（无 permission 声明的菜单项默认可见）
+  const hasPerm = (p?: string) => {
+    if (!p) return true
+    return userPerms.includes(p)
+  }
+
+  // 插件启停 + 侧边栏显隐过滤（加载失败则全部显示，不阻塞）
+  useEffect(() => {
+    fetch("/api/admin/plugins?mode=enabled")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d && Array.isArray(d.enabled)) {
+          setPluginMeta(new Map(d.enabled.map((e: any) => [e.key, e as PluginSidebarMeta])))
+        }
+      })
+      .catch(() => setPluginMeta(null))
+  }, [])
+
+  useEffect(() => {
+    fetch("/api/admin/version")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d && d.version) setSysVersion(d.version)
+      })
+      .catch(() => {})
+  }, [])
+
+  // 站点视角：加载站点列表 + 当前站点
+  useEffect(() => {
+    fetch("/api/admin/site-scope")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d && d.ok) {
+          setSiteScope({ sites: d.sites || [], currentSiteId: d.currentSiteId })
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  // 白标品牌：登录页/侧边栏统一走公开品牌 API
+  useEffect(() => {
+    fetch("/api/public/brand")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d && d.ok) setBrand({ brandName: d.brandName, adminTitle: d.adminTitle, loginLogo: d.loginLogo })
+      })
+      .catch(() => {})
+  }, [])
+
+  // 切换后台站点视角（写 cookie 后刷新）
+  const switchSite = async (siteId: string) => {
+    try {
+      await fetch("/api/admin/site-scope", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ siteId }),
+      })
+    } catch (e) {
+      console.error(e)
+    }
+    window.location.reload()
+  }
+
+  // 插件菜单项是否显示：插件已启用 且 允许显示在侧边栏
+  const pluginOn = (p?: string) => {
+    if (pluginMeta === null || !p) return true
+    const m = pluginMeta.get(p)
+    return !!m && m.showInSidebar !== false
+  }
+
+  // 插件菜单项显示名称（优先自定义名称）
+  const pluginLabel = (label: string, p?: string) => {
+    if (!p || pluginMeta === null) return label
+    const m = pluginMeta.get(p)
+    return m?.name || label
+  }
+
+  // 收集全部静态菜单 href（含所有分组子项与二级子项），用于动态入口去重
+  const staticHrefs = new Set<string>()
+  menuItems.forEach((item) => {
+    if (item.href && item.href !== '#') staticHrefs.add(item.href)
+    item.children?.forEach((c) => {
+      staticHrefs.add(c.href)
+      c.children?.forEach((cc) => staticHrefs.add(cc.href))
+    })
+  })
+
+  /** 动态插件入口按 category 归入对应分组：分组标识 → 动态子项列表 */
+  const dynamicByGroup = new Map<string, DynamicPluginChild[]>()
+  if (pluginMeta) {
+    pluginMeta.forEach((m) => {
+      if (m.showInSidebar === false) return
+      if (m.isContentSection || m.planned) return
+      // 已有静态入口的插件跳过（双保险：href 去重 + 静态 key 集合）
+      if (STATIC_SIDEBAR_PLUGIN_KEYS.has(m.key)) return
+      // 按 category 决定归属分组；其他/无 category → 不显示
+      const groupKey = PLUGIN_CATEGORY_GROUP[m.category || '']
+      if (!groupKey) return
+      const firstHref = m.adminUrls && m.adminUrls.length > 0 ? m.adminUrls[0].href : m.adminUrl
+      if (!firstHref || staticHrefs.has(firstHref)) return
+      // 权限过滤：映射表内的插件按所需权限码过滤
+      const perm = PLUGIN_PERMISSION_MAP[m.key]
+      if (perm && !userPerms.includes(perm)) return
+      let entry: DynamicPluginChild
+      if (m.adminUrls && m.adminUrls.length > 0) {
+        // 多二级页：父菜单 = 插件名（可展开），子项 = 各管理入口（子项 href 同样去重）
+        const children = m.adminUrls
+          .filter((u) => !staticHrefs.has(u.href))
+          .map((u) => ({ label: u.label, href: u.href }))
+        entry = { label: m.name, href: m.adminUrls[0].href, pluginKey: m.key, children }
+      } else {
+        entry = { label: m.name, href: firstHref, pluginKey: m.key }
+      }
+      const list = dynamicByGroup.get(groupKey)
+      if (list) list.push(entry)
+      else dynamicByGroup.set(groupKey, [entry])
+      // 无任何后台入口（能力型插件如 AI 文本/图像、验证码）→ 不生成菜单项
+    })
+  }
+
+  const visibleMenu = menuItems.map((item) => {
+    if (item.children) {
+      const visChildren = item.children.filter((c) => hasPerm(c.permission) && pluginOn(c.plugin))
+      // 动态插件入口按分组追加到对应分组末尾
+      const extra = item.groupKey ? (dynamicByGroup.get(item.groupKey) || []) : []
+      if (extra.length > 0) {
+        return { ...item, children: [...visChildren, ...extra.map((c) => ({ ...c }))] }
+      }
+      return { ...item, children: visChildren }
+    }
+    return item
+  }).filter((item) => {
+    if (item.children) return item.children.length > 0
+    return hasPerm(item.permission) && pluginOn(item.plugin)
+  })
+
+  // 初始化：默认展开包含当前路径的子菜单，路由变化时重新计算
+  useEffect(() => {
+    const expanded = new Set<string>()
+    visibleMenu.forEach((item) => {
+      if (item.children) {
+        // 如果当前路径匹配任一子菜单，或匹配父菜单路径，则展开
+        const matchChild = item.children.some((child) => pathname.startsWith(child.href))
+        const matchParent = pathname.startsWith(item.href) && pathname !== item.href
+        if (matchChild || matchParent) {
+          expanded.add(item.href)
+        }
+      }
+    })
+    setExpandedMenus(expanded)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname])
+
+  const toggleMenu = (href: string) => {
+    setExpandedMenus((prev) => {
+      const next = new Set(prev)
+      if (next.has(href)) {
+        next.delete(href)
+      } else {
+        next.add(href)
+      }
+      return next
+    })
+  }
+
+  const togglePlugin = (key: string) => {
+    setExpandedPlugins((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+
+  const isActive = (href: string) => {
+    if (href === '/admin') return pathname === '/admin'
+    return pathname.startsWith(href)
+  }
+
+  const isChildActive = (href: string) => {
+    return pathname === href || pathname.startsWith(href + '/')
+  }
+
+  return (
+    <aside className="w-60 bg-gray-900 text-gray-300 flex flex-col h-screen sticky top-0 flex-shrink-0">
+      {/* Logo */}
+      <div className="h-16 flex items-center px-5 border-b border-gray-800">
+        {brand?.loginLogo ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={brand.loginLogo} alt="logo" className="h-8 w-8 object-contain mr-2 rounded" />
+        ) : (
+          <Building2 size={24} className="text-red-500 mr-2" />
+        )}
+        <span className="text-white font-bold text-lg truncate">{brand?.brandName || 'VALTRIX'}</span>
+      </div>
+
+      {/* 站点视角切换（多租户） */}
+      {siteScope && siteScope.sites.length > 0 && (
+        <div className="px-3 py-2 border-b border-gray-800 bg-gray-800/40">
+          <div className="text-[11px] text-gray-500 mb-1 px-1">站点视角</div>
+          <select
+            value={siteScope.currentSiteId || ""}
+            onChange={(e) => switchSite(e.target.value)}
+            className="w-full bg-gray-700 text-gray-200 text-xs rounded px-2 py-1.5 outline-none border border-gray-600 focus:border-red-500"
+            title="切换后台内容管理的站点归属与过滤"
+          >
+            <option value="">全部站点（全局）</option>
+            {siteScope.sites.map((s: any) => (
+              <option key={s.id} value={String(s.id)}>
+                {s.name}
+                {s.isDefault ? "（默认）" : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Menu */}
+      <nav className="flex-1 py-4 overflow-y-auto admin-scroll">
+        {visibleMenu.map((item) => (
+          <div key={item.href}>
+            {item.children ? (
+              // 有子菜单的父菜单：点击切换展开/收起
+              <button
+                onClick={() => toggleMenu(item.href)}
+                className={`relative w-full flex items-center justify-between px-5 py-2.5 text-sm transition-colors ${
+                  isActive(item.href)
+                    ? 'bg-red-600 text-white'
+                    : 'hover:bg-gray-800 hover:text-white'
+                }`}
+              >
+                {isActive(item.href) && <span className="absolute left-0 top-1/2 h-4 w-1 -translate-y-1/2 rounded-r bg-white/90" />}
+                <span className="flex items-center">
+                  <span className="mr-3">{item.icon}</span>
+                  {item.label}
+                </span>
+                {expandedMenus.has(item.href) ? (
+                  <ChevronDown size={16} className="text-gray-400" />
+                ) : (
+                  <ChevronRight size={16} className="text-gray-400" />
+                )}
+              </button>
+            ) : (
+              // 无子菜单的菜单项：直接链接
+              <Link
+                href={item.href}
+                className={`relative flex items-center px-5 py-2.5 text-sm transition-colors ${
+                  isActive(item.href)
+                    ? 'bg-red-600 text-white'
+                    : 'hover:bg-gray-800 hover:text-white'
+                }`}
+              >
+                {isActive(item.href) && <span className="absolute left-0 top-1/2 h-4 w-1 -translate-y-1/2 rounded-r bg-white/90" />}
+                <span className="mr-3">{item.icon}</span>
+                {pluginLabel(item.label, item.plugin)}
+              </Link>
+            )}
+            {item.children && expandedMenus.has(item.href) && (
+              <div className="bg-gray-950">
+                {item.children.filter((c) => hasPerm((c as any).permission) && pluginOn((c as any).plugin)).map((child) => {
+                  // 多二级页子项（静态如 询价报价→模板；动态插件如 数据统计）：父项可展开，子项为链接
+                  const childAny = child as any
+                  if (childAny.children && Array.isArray(childAny.children)) {
+                    const openKey = childAny.pluginKey || child.href
+                    const open = expandedPlugins.has(openKey)
+                    return (
+                      <div key={openKey}>
+                        <button
+                          onClick={() => togglePlugin(openKey)}
+                          className={`w-full flex items-center justify-between pl-14 pr-5 py-2 text-xs transition-colors ${
+                            isChildActive(child.href) ? 'text-red-400' : 'text-gray-400 hover:text-white hover:bg-gray-800/30'
+                          }`}
+                        >
+                          <span>{child.label}</span>
+                          {open ? <ChevronDown size={12} className="text-gray-500" /> : <ChevronRight size={12} className="text-gray-500" />}
+                        </button>
+                        {open && (
+                          <div className="bg-black/25">
+                            {childAny.children.map((s: { label: string; href: string }) => (
+                              <Link
+                                key={s.href}
+                                href={s.href}
+                                className={`block pl-20 pr-5 py-1.5 text-xs transition-colors ${
+                                  isChildActive(s.href)
+                                    ? 'text-red-400 bg-gray-800/40'
+                                    : 'text-gray-500 hover:text-white hover:bg-gray-800/30'
+                                }`}
+                              >
+                                {s.label}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  }
+                  return (
+                    <Link
+                      key={child.href}
+                      href={child.href}
+                      className={`relative block pl-14 pr-5 py-2 text-xs transition-colors ${
+                        isChildActive(child.href)
+                          ? 'text-red-400 bg-gray-800/50'
+                          : 'text-gray-400 hover:text-white hover:bg-gray-800/30'
+                      }`}
+                    >
+                      {isChildActive(child.href) && <span className="absolute left-10 top-1/2 h-3 w-0.5 -translate-y-1/2 rounded-r bg-red-400" />}
+                      {child.label}
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        ))}
+      </nav>
+
+      {/* Footer */}
+      <div className="p-4 border-t border-gray-800 text-xs text-gray-500">
+        {sysVersion ? `v${sysVersion}` : "..."} · 后台管理系统
+      </div>
+    </aside>
+  )
+}

@@ -1,0 +1,26 @@
+{
+  "model": "newsCategory",
+  "rows": [
+    {
+      "id": "1",
+      "name": "公司动态",
+      "nameEn": "Company News",
+      "slug": "company",
+      "sortOrder": 0
+    },
+    {
+      "id": "2",
+      "name": "产品发布",
+      "nameEn": "Product Launch",
+      "slug": "product",
+      "sortOrder": 0
+    },
+    {
+      "id": "3",
+      "name": "行业资讯",
+      "nameEn": "Industry Insights",
+      "slug": "industry",
+      "sortOrder": 0
+    }
+  ]
+}

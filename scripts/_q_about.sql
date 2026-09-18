@@ -1,0 +1,1 @@
+SELECT slug, COALESCE((content::text)::jsonb->0->>'heading','') AS zh_h0, COALESCE((content::text)::jsonb->0->>'lang','') AS zh_lang, COALESCE("contentEn"::text,'') AS en_raw FROM about_sections ORDER BY id;

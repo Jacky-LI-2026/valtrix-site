@@ -1,0 +1,10 @@
+{
+  "version": "1.1.0",
+  "releaseNotes": "1. 新增系统升级功能\n2. 修复多语言显示问题\n3. 优化后台管理体验",
+  "files": [
+    "app/page.tsx",
+    "components/sections/Products.tsx",
+    "lib/upgrade.ts"
+  ],
+  "migration": "scripts/migrate.js"
+}

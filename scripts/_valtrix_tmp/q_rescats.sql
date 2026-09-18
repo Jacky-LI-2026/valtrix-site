@@ -1,0 +1,2 @@
+\pset pager off
+SELECT id, type, title, COALESCE("titleEn",'') AS titleEn, COALESCE("titleJa",'') AS titleJa, COALESCE("titleKo",'') AS titleKo, COALESCE("titleFr",'') AS titleFr, COALESCE("titleAr",'') AS titleAr, COALESCE(description,'') AS description, COALESCE("descriptionEn",'') AS descriptionEn, COALESCE("descriptionJa",'') AS descriptionJa, COALESCE("descriptionKo",'') AS descriptionKo, COALESCE("descriptionFr",'') AS descriptionFr, COALESCE("descriptionAr",'') AS descriptionAr, icon, "sortOrder" FROM resource_categories ORDER BY "sortOrder", id;

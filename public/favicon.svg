@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  
+  <!-- 地球本体 -->
+  <circle cx="32" cy="32" r="30" fill="#CC0000"/>
+  <!-- 地球经纬线（纹理，低透明度，全部在盘内） -->
+  <g fill="none" stroke="#FFFFFF" stroke-opacity="0.30" stroke-width="1.6">
+    <ellipse cx="32" cy="32" rx="27" ry="10.5"/>
+    <ellipse cx="32" cy="32" rx="10.5" ry="27"/>
+  </g>
+  <!-- 网络：三节点三角（质心 ≈(32.3,31.7)，与盘心对齐；第一版整体偏上 3 个单位） -->
+  <path d="M19 25 L44 23 L34 47 Z" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#FFFFFF">
+    <circle cx="19" cy="25" r="3.7"/>
+    <circle cx="44" cy="23" r="3.7"/>
+    <circle cx="34" cy="47" r="3.7"/>
+  </g>
+</svg>

@@ -1,0 +1,12 @@
+const fs = require('fs');
+const c = fs.readFileSync('D:/企业网站/app/contact/page.tsx', 'utf8');
+const i = c.indexOf('item.sub');
+console.log('CONTACT render:', JSON.stringify(c.slice(i - 280, i + 100)));
+const s = fs.readFileSync('D:/企业网站/app/services/[slug]/ServiceDetailClient.tsx', 'utf8');
+const n = s.indexOf('服务不存在');
+console.log('NOTFOUND:', JSON.stringify(s.slice(n - 120, n + 90)));
+const h = fs.readFileSync('D:/企业网站/components/layout/Header.tsx', 'utf8');
+const cnt = (h.match(/desc: locale === "en"/g) || []).length;
+console.log('HEADER desc count:', cnt);
+const d = h.indexOf('desc: locale');
+console.log('HEADER first:', JSON.stringify(h.slice(d - 30, d + 130)));

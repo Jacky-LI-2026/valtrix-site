@@ -1,0 +1,134 @@
+{
+  "key": "valtrix-valves",
+  "name": "VALTRIX Valves Industry Pack",
+  "nameEn": "VALTRIX Valves Industry Pack",
+  "version": "1.0.0",
+  "category": "valves",
+  "description": "VALTRIX valve industry official website content assets: instrument valve series products, industry solutions, news, resources, careers, services, FAQ, multilingual presets and design tokens.",
+  "requiresPlugins": [
+    "content-product",
+    "content-news",
+    "content-resource",
+    "content-industry",
+    "content-service",
+    "content-case",
+    "content-faq",
+    "content-career",
+    "content-about",
+    "content-menu",
+    "mall",
+    "quote",
+    "lead",
+    "visit-booking",
+    "download-leads"
+  ],
+  "optionalPlugins": [
+    "ai-translate",
+    "ai-customer-service",
+    "analytics",
+    "form-builder",
+    "email-marketing",
+    "seo"
+  ],
+  "languages": {
+    "default": "en",
+    "enabled": [
+      "zh",
+      "en",
+      "ja",
+      "ko",
+      "fr",
+      "ar"
+    ]
+  },
+  "designTokens": {
+    "primary": "#0B3D91",
+    "primaryLight": "#2E5CBB",
+    "accent": "#CC0000",
+    "fontFamily": "Roboto, PingFang SC, Segoe UI, Arial, sans-serif"
+  },
+  "seedData": [
+    {
+      "model": "language",
+      "file": "seed/language.json"
+    },
+    {
+      "model": "themeConfig",
+      "file": "seed/themeConfig.json"
+    },
+    {
+      "model": "seoConfig",
+      "file": "seed/seoConfig.json"
+    },
+    {
+      "model": "menu",
+      "file": "seed/menu.json"
+    },
+    {
+      "model": "productTab",
+      "file": "seed/productTab.json"
+    },
+    {
+      "model": "productCategory",
+      "file": "seed/productCategory.json"
+    },
+    {
+      "model": "product",
+      "file": "seed/product.json"
+    },
+    {
+      "model": "productSpec",
+      "file": "seed/productSpec.json"
+    },
+    {
+      "model": "shopProduct",
+      "file": "seed/shopProduct.json"
+    },
+    {
+      "model": "newsCategory",
+      "file": "seed/newsCategory.json"
+    },
+    {
+      "model": "news",
+      "file": "seed/news.json"
+    },
+    {
+      "model": "resourceCategory",
+      "file": "seed/resourceCategory.json"
+    },
+    {
+      "model": "resourceItem",
+      "file": "seed/resourceItem.json"
+    },
+    {
+      "model": "industry",
+      "file": "seed/industry.json"
+    },
+    {
+      "model": "aboutSection",
+      "file": "seed/aboutSection.json"
+    },
+    {
+      "model": "job",
+      "file": "seed/job.json"
+    },
+    {
+      "model": "service",
+      "file": "seed/service.json"
+    },
+    {
+      "model": "case",
+      "file": "seed/case.json"
+    },
+    {
+      "model": "faq",
+      "file": "seed/faq.json"
+    },
+    {
+      "model": "homeConfig",
+      "file": "seed/homeConfig.json"
+    }
+  ],
+  "assets": [],
+  "uiPreset": "backend-lang: zh | frontend-preset: industrial-valve"
+}

@@ -1,0 +1,45 @@
+{
+  "passed": [
+    "Contact captcha API returns captchaId+question",
+    "Contact bad email returns validation error",
+    "Contact wrong captcha rejected",
+    "Contact form valid submission succeeds",
+    "Quote cart page loads",
+    "Visit booking page loads",
+    "Register page loads",
+    "Login page loads",
+    "Shop page loads"
+  ],
+  "bugs": [
+    {
+      "id": "I-001",
+      "module": "联系表单",
+      "url": "/api/contact",
+      "phenomenon": "空表单提交返回 500: {'error': 'Unexpected end of JSON input'}",
+      "expected": "应返回400校验错误",
+      "steps": "PUT /api/contact with empty body",
+      "severity": "P1",
+      "screenshot": ""
+    },
+    {
+      "id": "I-002",
+      "module": "询价车",
+      "url": "/api/public/products",
+      "phenomenon": "产品列表API异常: 200 {'success': True, 'data': [{'id': 'growth', 'name': '长晶设备', 'nameEn': 'Growth Equipment', 'nameJa': '長結晶デバイス', 'nameKo': '장정 설비', 'nameFr': 'Équipement à cristaux longs', 'nameAr': 'معدات الكريستال ال",
+      "expected": "应返回产品列表",
+      "steps": "GET /api/public/products",
+      "severity": "P2",
+      "screenshot": ""
+    },
+    {
+      "id": "I-003",
+      "module": "下载留资",
+      "url": "/api/contact/send-code",
+      "phenomenon": "下载验证码发送失败: 404 <!DOCTYPE html><html lang=\"zh-CN\" style=\"--color-primary:#CC0000;--color-primary-light:#FF3333;--color-primary-dark:#990000;--color-accent:#C0C0C0;--color-dark:#111111;--radius:10px;--section-pad:88px;--font-scale:1;--tpl-shadow:0 8px 24px rgba(0,0,0,0.10);--tpl-font-family:&#x27;Roboto&#x27;, &#x27;PingFang SC&#x27;, &#x27;Microsoft YaHei&#x27;, sans-serif\" data-template=\"t2-industrial\" data-header-style=\"solid\" data-card-style=\"elevated\" data-cta-style=\"solid\" data-hero-style=\"overlay\"><head><",
+      "expected": "应返回200",
+      "steps": "POST /api/contact/send-code",
+      "severity": "P2",
+      "screenshot": ""
+    }
+  ]
+}

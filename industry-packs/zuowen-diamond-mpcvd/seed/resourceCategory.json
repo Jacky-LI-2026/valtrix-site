@@ -1,0 +1,59 @@
+{
+  "model": "resourceCategory",
+  "rows": [
+    {
+      "id": "1",
+      "type": "catalogs",
+      "title": "产品样本",
+      "titleEn": "Product Catalogs",
+      "titleJa": "製品サンプル",
+      "titleKo": "제품 샘플",
+      "titleFr": "échantillons de produits",
+      "titleAr": "عينة المنتج",
+      "description": "全系列产品技术样本，包含MPCVD设备、培育钻石、金刚石功能材料等产品的参数、选型指南等详细资料。",
+      "descriptionEn": "Full-range product technical catalogs with MPCVD equipment, lab-grown diamonds, diamond functional materials parameters and selection guides.",
+      "descriptionJa": "MPCVD設備、育成ダイヤモンド、ダイヤモンド機能材料などの製品のパラメータ、選択ガイドなどの詳細な資料を含む全シリーズの製品技術サンプル。",
+      "descriptionKo": "MPCVD 장비, 육성 다이아몬드, 금강석 기능 소재 등 제품의 매개변수, 선형 가이드 등 상세한 자료를 포함한 전 시리즈 제품 기술 샘플.",
+      "descriptionFr": "Une gamme complète d'échantillons techniques de produits contenant des informations détaillées sur l'équipement MPCVD, les paramètres des diamants cultivés, les matériaux fonctionnels diamantés et d'autres produits, le Guide de sélection et d'autres.",
+      "descriptionAr": "مجموعة كاملة من المنتجات التقنية ، بما في ذلك mpcvd المعدات ، زراعة الماس ، الماس المواد الفنية وغيرها من المنتجات من المعلمات ، واختيار المبادئ التوجيهية وغيرها من المعلومات التفصيلية .",
+      "icon": "FileText",
+      "sortOrder": 0
+    },
+    {
+      "id": "2",
+      "type": "certificates",
+      "title": "证书",
+      "titleEn": "Certificates",
+      "titleJa": "証明書",
+      "titleKo": "증명서",
+      "titleFr": "Certificat",
+      "titleAr": "شهادة",
+      "description": "公司资质证书和产品认证证书，包括ISO9001、CE、RoHS等。",
+      "descriptionEn": "Company qualification certificates and product certifications including ISO9001, CE, RoHS.",
+      "descriptionJa": "ISO 9001、CE、RoHSなどを含む会社資格証明書と製品認証証明書。",
+      "descriptionKo": "ISO9001, CE, RoHS 등을 포함한 회사 자격 증명 및 제품 인증 인증서",
+      "descriptionFr": "Certificat de qualification de la société et certificat de certification de produit, y compris ISO9001, ce, ROHS, etc.",
+      "descriptionAr": "الشركة شهادة التأهيل وشهادة المنتج ، بما في ذلك ISO9001 ، م ، بنفايات ، وهلم جرا .",
+      "icon": "Award",
+      "sortOrder": 1
+    },
+    {
+      "id": "3",
+      "type": "drawings",
+      "title": "图纸",
+      "titleEn": "Drawings",
+      "titleJa": "図面",
+      "titleKo": "도면",
+      "titleFr": "Dessins",
+      "titleAr": "رسم",
+      "description": "产品2D/3D图纸下载，支持STEP、IGES、DWG等多种格式。",
+      "descriptionEn": "Product 2D/3D drawing downloads supporting STEP, IGES, DWG and other formats.",
+      "descriptionJa": "製品の2 D/3 D図面のダウンロード、STEP、IGES、DWGなどの多種のフォーマットをサポートする。",
+      "descriptionKo": "STEP, IGES, DWG 등 다양한 형식을 지원하는 제품 2D/3D 시트 다운로드",
+      "descriptionFr": "Produit 2D / 3D dessin télécharger, support step, IGES, dwg et beaucoup d'autres formats.",
+      "descriptionAr": "المنتج 2D / 3D الرسومات تحميل ، دعم الخطوة ، المعهد ، دوغ ، وغيرها من الأشكال .",
+      "icon": "FileImage",
+      "sortOrder": 2
+    }
+  ]
+}

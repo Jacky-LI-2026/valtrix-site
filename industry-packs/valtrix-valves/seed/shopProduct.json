@@ -1,0 +1,515 @@
+{
+  "model": "shopProduct",
+  "rows": [
+    {
+      "id": "6",
+      "slug": "dv12a-mr4-nc-pneumatic",
+      "productId": null,
+      "name": "气动常闭隔膜阀 316L-DV12A-MR4-NC-HP",
+      "nameEn": "Pneumatic NC Diaphragm Valve 316L-DV12A-MR4-NC-HP",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "气动常闭隔膜阀，失气关闭，1/4\" VCR 阳螺纹。",
+      "summaryEn": "Pneumatic NC diaphragm valve, fail-closed, 1/4\" VCR male.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>气动驱动常闭型，适合自动化工艺控制，失气自动关闭保证安全。</p>",
+      "descriptionEn": "<p>Pneumatic NC type for automated process control, fail-closed for safety.</p>",
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "/uploads/oem/dv12a-smr4.jpg",
+      "categoryId": "9",
+      "images": [
+        "/uploads/oem/dv12a-smr4.jpg"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 5,
+          "price": 420
+        },
+        {
+          "qty": 20,
+          "price": 395
+        },
+        {
+          "qty": 100,
+          "price": 370
+        }
+      ],
+      "specs": [
+        {
+          "name": "口径",
+          "nameEn": "Size",
+          "options": [
+            {
+              "label": "1/4\" (MR4)",
+              "price": 0,
+              "stock": 100,
+              "labelEn": "1/4\" (MR4)"
+            },
+            {
+              "label": "1/2\" (MR8)",
+              "price": 130,
+              "stock": 50,
+              "labelEn": "1/2\" (MR8)"
+            }
+          ]
+        },
+        {
+          "name": "表面处理",
+          "nameEn": "Finish",
+          "options": [
+            {
+              "label": "标准",
+              "price": 0,
+              "stock": 150,
+              "labelEn": "Standard"
+            },
+            {
+              "label": "EP（半导体级）",
+              "price": 80,
+              "stock": 80,
+              "labelEn": "EP (semi-grade)"
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": "440",
+      "originalPrice": "480",
+      "unit": "个",
+      "stock": 150,
+      "minOrder": 1,
+      "status": "published",
+      "featured": true,
+      "sortOrder": 1
+    },
+    {
+      "id": "7",
+      "slug": "cv3-fmr4-check",
+      "productId": null,
+      "name": "全焊接单向阀 316L-CV3-FMR4-HP",
+      "nameEn": "All-Welded Check Valve 316L-CV3-FMR4-HP",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "全焊接单向阀，开启 <2psi，20.7MPa，VCR 1/4\"。",
+      "summaryEn": "All-welded check valve, crack <2psi, 20.7MPa, 1/4\" VCR.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>无弹性体全焊接结构，EP 表面，用于超高纯气体防倒流。</p>",
+      "descriptionEn": "<p>Elastomer-free all-welded, EP finish, for UHP gas backflow prevention.</p>",
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "/uploads/oem/cv3-fmr4.jpg",
+      "categoryId": "10",
+      "images": [
+        "/uploads/oem/cv3-fmr4.jpg"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 10,
+          "price": 330
+        },
+        {
+          "qty": 50,
+          "price": 310
+        },
+        {
+          "qty": 200,
+          "price": 290
+        }
+      ],
+      "specs": [
+        {
+          "name": "口径",
+          "nameEn": "Size",
+          "options": [
+            {
+              "label": "1/4\" (FMR4)",
+              "price": 0,
+              "stock": 150,
+              "labelEn": "1/4\" (FMR4)"
+            },
+            {
+              "label": "1/2\" (FMR8)",
+              "price": 110,
+              "stock": 60,
+              "labelEn": "1/2\" (FMR8)"
+            }
+          ]
+        },
+        {
+          "name": "开启压力",
+          "nameEn": "Crack Pressure",
+          "options": [
+            {
+              "label": "<2psi",
+              "price": 0,
+              "stock": 200,
+              "labelEn": "<2psi"
+            },
+            {
+              "label": "<5psi",
+              "price": -20,
+              "stock": 100,
+              "labelEn": "<5psi"
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": "350",
+      "originalPrice": "380",
+      "unit": "个",
+      "stock": 300,
+      "minOrder": 1,
+      "status": "published",
+      "featured": true,
+      "sortOrder": 2
+    },
+    {
+      "id": "5",
+      "slug": "dv12a-fmr4-manual",
+      "productId": null,
+      "name": "手动隔膜阀 316L-DV12A-FMR4-HP",
+      "nameEn": "Manual Diaphragm Valve 316L-DV12A-FMR4-HP",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "1/4\" VCR 手动隔膜阀，250psi，支持口径与表面处理规格选配。",
+      "summaryEn": "1/4\" VCR manual diaphragm valve, 250psi, configurable by size and finish.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>规格选配：口径、连接形式、表面处理组合定价。</p><p>适用于超高纯工艺气体开关控制。</p>",
+      "descriptionEn": "<p>Configuration: size, connection and finish combined pricing.</p><p>For UHP process gas on/off control.</p>",
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "/uploads/oem/dv12a-mr4.jpg",
+      "categoryId": "9",
+      "images": [
+        "/uploads/oem/dv12a-mr4.jpg"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 5,
+          "price": 470
+        },
+        {
+          "qty": 20,
+          "price": 445
+        },
+        {
+          "qty": 100,
+          "price": 420
+        }
+      ],
+      "specs": [
+        {
+          "name": "口径",
+          "nameEn": "Size",
+          "options": [
+            {
+              "label": "1/4\" (FMR4)",
+              "price": 0,
+              "stock": 100,
+              "labelEn": "1/4\" (FMR4)"
+            },
+            {
+              "label": "1/2\" (FMR8)",
+              "price": 120,
+              "stock": 60,
+              "labelEn": "1/2\" (FMR8)"
+            }
+          ]
+        },
+        {
+          "name": "表面处理",
+          "nameEn": "Finish",
+          "options": [
+            {
+              "label": "标准",
+              "price": 0,
+              "stock": 200,
+              "labelEn": "Standard"
+            },
+            {
+              "label": "EP（半导体级）",
+              "price": 80,
+              "stock": 100,
+              "labelEn": "EP (semi-grade)"
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": "495",
+      "originalPrice": "545",
+      "unit": "个",
+      "stock": 200,
+      "minOrder": 1,
+      "status": "published",
+      "featured": true,
+      "sortOrder": 0
+    },
+    {
+      "id": "8",
+      "slug": "ft4-mr4-filter",
+      "productId": null,
+      "name": "直通过滤器 316L-FT4-MR4-S15-HP",
+      "nameEn": "In-Line Filter 316L-FT4-MR4-S15-HP",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "粉末烧结过滤器，滤芯最小 0.5μm，VCR 外螺纹。",
+      "summaryEn": "Sintered powder filter, min 0.5μm, VCR male.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>半导体级气体过滤，滤芯可更换，EP 表面可选。</p>",
+      "descriptionEn": "<p>Semi-grade gas filtration, replaceable element, EP finish option.</p>",
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "/uploads/oem/ft4-mr4.png",
+      "categoryId": "11",
+      "images": [
+        "/uploads/oem/ft4-mr4.png"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 10,
+          "price": 288
+        },
+        {
+          "qty": 50,
+          "price": 270
+        },
+        {
+          "qty": 200,
+          "price": 250
+        }
+      ],
+      "specs": [
+        {
+          "name": "滤芯精度",
+          "nameEn": "Element",
+          "options": [
+            {
+              "label": "0.5μm",
+              "price": 0,
+              "stock": 100,
+              "labelEn": "0.5μm"
+            },
+            {
+              "label": "2μm",
+              "price": 20,
+              "stock": 100,
+              "labelEn": "2μm"
+            }
+          ]
+        },
+        {
+          "name": "表面处理",
+          "nameEn": "Finish",
+          "options": [
+            {
+              "label": "标准",
+              "price": 0,
+              "stock": 150,
+              "labelEn": "Standard"
+            },
+            {
+              "label": "EP（半导体级）",
+              "price": 70,
+              "stock": 60,
+              "labelEn": "EP (semi-grade)"
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": "305",
+      "originalPrice": "335",
+      "unit": "个",
+      "stock": 200,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 3
+    },
+    {
+      "id": "9",
+      "slug": "vcr-gn-fmr4-nut",
+      "productId": null,
+      "name": "VCR 阴螺纹螺母 316L-GN-FMR4",
+      "nameEn": "VCR Female Nut 316L-GN-FMR4",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "1/4\" VCR 内螺纹螺母，金属面密封，多种口径可选。",
+      "summaryEn": "1/4\" VCR female nut, metal face seal, multiple sizes.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>VCR 面密封接头组件，316L 材质，批量价格优惠。</p>",
+      "descriptionEn": "<p>VCR face seal fitting component, 316L, volume pricing.</p>",
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "/uploads/oem/GN_2.png",
+      "categoryId": "12",
+      "images": [
+        "/uploads/oem/GN_2.png"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 50,
+          "price": 13
+        },
+        {
+          "qty": 200,
+          "price": 11
+        },
+        {
+          "qty": 500,
+          "price": 9
+        }
+      ],
+      "specs": [
+        {
+          "name": "口径",
+          "nameEn": "Size",
+          "options": [
+            {
+              "label": "1/4\"",
+              "price": 0,
+              "stock": 500,
+              "labelEn": "1/4\""
+            },
+            {
+              "label": "3/8\"",
+              "price": 5,
+              "stock": 300,
+              "labelEn": "3/8\""
+            },
+            {
+              "label": "1/2\"",
+              "price": 10,
+              "stock": 300,
+              "labelEn": "1/2\""
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": "15",
+      "originalPrice": "18",
+      "unit": "个",
+      "stock": 1000,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 4
+    },
+    {
+      "id": "10",
+      "slug": "vcr-gj-long-tube",
+      "productId": null,
+      "name": "VCR 长焊接接管 316L-GJ-MR4-TB4-12",
+      "nameEn": "VCR Long Weld Tube 316L-GJ-MR4-TB4-12",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "1/4\" VCR 转对焊长接管，L=43.2mm。",
+      "summaryEn": "1/4\" VCR to weld long adapter, L=43.2mm.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>VCR 转对焊连接，316L 材质，高纯管路安装。</p>",
+      "descriptionEn": "<p>VCR to butt-weld adapter, 316L, for UHP piping.</p>",
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "/uploads/oem/GJ_1.jpg",
+      "categoryId": "12",
+      "images": [
+        "/uploads/oem/GJ_1.jpg"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 50,
+          "price": 23
+        },
+        {
+          "qty": 200,
+          "price": 20
+        },
+        {
+          "qty": 500,
+          "price": 17
+        }
+      ],
+      "specs": [
+        {
+          "name": "口径",
+          "nameEn": "Size",
+          "options": [
+            {
+              "label": "1/4\"",
+              "price": 0,
+              "stock": 400,
+              "labelEn": "1/4\""
+            },
+            {
+              "label": "1/2\"",
+              "price": 12,
+              "stock": 300,
+              "labelEn": "1/2\""
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": "26",
+      "originalPrice": "30",
+      "unit": "个",
+      "stock": 800,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 5
+    }
+  ]
+}

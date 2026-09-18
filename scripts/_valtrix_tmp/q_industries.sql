@@ -1,0 +1,2 @@
+\pset pager off
+SELECT id, slug, name, COALESCE("nameEn",'') AS nameEn, COALESCE("nameJa",'') AS nameJa, COALESCE("nameKo",'') AS nameKo, COALESCE("nameFr",'') AS nameFr, COALESCE("nameAr",'') AS nameAr, COALESCE(tagline,'') AS tagline, COALESCE("taglineEn",'') AS taglineEn, COALESCE("taglineJa",'') AS taglineJa, COALESCE("taglineKo",'') AS taglineKo, COALESCE("taglineFr",'') AS taglineFr, COALESCE("taglineAr",'') AS taglineAr, "sortOrder", status FROM industries ORDER BY "sortOrder", id;

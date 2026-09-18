@@ -1,0 +1,1264 @@
+{
+  "model": "shopProduct",
+  "rows": [
+    {
+      "id": "16",
+      "slug": "diamond-lapping-powder",
+      "productId": null,
+      "name": "金刚石研磨抛光粉",
+      "nameEn": "Diamond Lapping & Polishing Powder",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "多晶/单晶金刚石微粉，粒度 0.1-45μm 可选，用于硬质材料研磨抛光。",
+      "summaryEn": "Poly/single crystal diamond powder, 0.1-45μm grades, for lapping and polishing hard materials.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>粒度分布：D50 精确控制，批次一致性高。包装：50g/瓶。</p>",
+      "descriptionEn": null,
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "https://picsum.photos/seed/diamond-lapping-powder/800/800",
+      "categoryId": "5",
+      "images": [
+        {
+          "alt": "Diamond Lapping & Polishing Powder",
+          "url": "https://picsum.photos/seed/diamond-lapping-powder-1/800/800"
+        },
+        {
+          "alt": "Diamond Lapping & Polishing Powder",
+          "url": "https://picsum.photos/seed/diamond-lapping-powder-2/800/800"
+        }
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 5,
+          "price": 620
+        },
+        {
+          "qty": 20,
+          "price": 550
+        }
+      ],
+      "specs": null,
+      "modelFiles": null,
+      "price": "680",
+      "originalPrice": null,
+      "unit": "瓶",
+      "stock": 2000,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "17",
+      "slug": "wafer-carrier",
+      "productId": null,
+      "name": "半导体晶圆载台",
+      "nameEn": "Semiconductor Wafer Carrier",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "高纯石英/碳化硅晶圆载台，适配 4-8 英寸工艺，耐温 1200℃。",
+      "summaryEn": "High-purity quartz/SiC wafer carrier for 4-8\" processes, temperature resistance up to 1200℃.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>材质可选石英、碳化硅涂层石墨；热膨胀系数匹配工艺要求。</p>",
+      "descriptionEn": null,
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "https://picsum.photos/seed/wafer-carrier/800/800",
+      "categoryId": "1",
+      "images": [
+        {
+          "alt": "Semiconductor Wafer Carrier",
+          "url": "https://picsum.photos/seed/wafer-carrier-1/800/800"
+        },
+        {
+          "alt": "Semiconductor Wafer Carrier",
+          "url": "https://picsum.photos/seed/wafer-carrier-2/800/800"
+        }
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 2,
+          "price": 52000
+        },
+        {
+          "qty": 5,
+          "price": 48000
+        }
+      ],
+      "specs": null,
+      "modelFiles": null,
+      "price": "56000",
+      "originalPrice": null,
+      "unit": "套",
+      "stock": 30,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "18",
+      "slug": "profilometer",
+      "productId": null,
+      "name": "高精度轮廓仪",
+      "nameEn": "High-Precision Profilometer",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "接触式表面轮廓仪，垂直分辨率 0.1nm，用于金刚石膜与晶圆表面形貌检测。",
+      "summaryEn": "Contact profilometer, 0.1nm vertical resolution, for diamond film and wafer surface metrology.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>扫描范围 50mm，样品台 200mm 电动移动。含分析软件与标准样块。</p>",
+      "descriptionEn": null,
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "https://picsum.photos/seed/profilometer/800/800",
+      "categoryId": "4",
+      "images": [
+        {
+          "alt": "High-Precision Profilometer",
+          "url": "https://picsum.photos/seed/profilometer-1/800/800"
+        },
+        {
+          "alt": "High-Precision Profilometer",
+          "url": "https://picsum.photos/seed/profilometer-2/800/800"
+        }
+      ],
+      "isParts": false,
+      "priceTiers": [],
+      "specs": null,
+      "modelFiles": null,
+      "price": "320000",
+      "originalPrice": null,
+      "unit": "台",
+      "stock": 8,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "19",
+      "slug": "diamond-cutting-tool",
+      "productId": null,
+      "name": "金刚石刀具",
+      "nameEn": "Diamond Cutting Tools",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "PCD/单晶金刚石车刀、铣刀，用于有色金属与非金属材料精密加工。",
+      "summaryEn": "PCD/SCD turning and milling tools for precision machining of non-ferrous and non-metal materials.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>可定制刀尖圆弧、前角、刀杆规格。提供修磨服务。</p>",
+      "descriptionEn": null,
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "https://picsum.photos/seed/diamond-cutting-tool/800/800",
+      "categoryId": "3",
+      "images": [
+        {
+          "alt": "Diamond Cutting Tools",
+          "url": "https://picsum.photos/seed/diamond-cutting-tool-1/800/800"
+        },
+        {
+          "alt": "Diamond Cutting Tools",
+          "url": "https://picsum.photos/seed/diamond-cutting-tool-2/800/800"
+        }
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 10,
+          "price": 1350
+        },
+        {
+          "qty": 50,
+          "price": 1200
+        }
+      ],
+      "specs": null,
+      "modelFiles": null,
+      "price": "1500",
+      "originalPrice": null,
+      "unit": "支",
+      "stock": 800,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "20",
+      "slug": "pvd-chamber",
+      "productId": null,
+      "name": "真空镀膜腔体",
+      "nameEn": "PVD Coating Chamber",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "不锈钢真空镀膜腔体，极限真空 5×10⁻⁶ Pa，含加热与气氛控制系统。",
+      "summaryEn": "Stainless steel PVD chamber, ultimate vacuum 5×10⁻⁶ Pa, with heating and gas control.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>腔体尺寸可定制（φ300-800mm）。含视窗、送样机构与安全联锁。</p>",
+      "descriptionEn": null,
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "https://picsum.photos/seed/pvd-chamber/800/800",
+      "categoryId": "1",
+      "images": [
+        {
+          "alt": "PVD Coating Chamber",
+          "url": "https://picsum.photos/seed/pvd-chamber-1/800/800"
+        },
+        {
+          "alt": "PVD Coating Chamber",
+          "url": "https://picsum.photos/seed/pvd-chamber-2/800/800"
+        }
+      ],
+      "isParts": false,
+      "priceTiers": [],
+      "specs": null,
+      "modelFiles": null,
+      "price": "450000",
+      "originalPrice": null,
+      "unit": "套",
+      "stock": 4,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "21",
+      "slug": "wafer-defect-inspection",
+      "productId": null,
+      "name": "晶圆缺陷检测仪",
+      "nameEn": "Wafer Defect Inspection System",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "自动光学检测设备，可识别晶圆表面颗粒、划伤与薄膜缺陷，检出率 ≥98%。",
+      "summaryEn": "Automated optical inspection for particles, scratches and film defects, detection rate ≥98%.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>支持 2-12 英寸晶圆，含缺陷分类与报告导出。</p>",
+      "descriptionEn": null,
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "https://picsum.photos/seed/wafer-defect-inspection/800/800",
+      "categoryId": "4",
+      "images": [
+        {
+          "alt": "Wafer Defect Inspection System",
+          "url": "https://picsum.photos/seed/wafer-defect-inspection-1/800/800"
+        },
+        {
+          "alt": "Wafer Defect Inspection System",
+          "url": "https://picsum.photos/seed/wafer-defect-inspection-2/800/800"
+        }
+      ],
+      "isParts": false,
+      "priceTiers": [],
+      "specs": null,
+      "modelFiles": null,
+      "price": "890000",
+      "originalPrice": null,
+      "unit": "台",
+      "stock": 2,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "22",
+      "slug": "cleanroom-glove-kit",
+      "productId": null,
+      "name": "洁净室手套耗材包",
+      "nameEn": "Cleanroom Glove Consumable Kit",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "Class 100 洁净室丁腈/乳胶手套，含抽检报告，100 只/盒、10 盒/箱。",
+      "summaryEn": "Class 100 cleanroom nitrile/latex gloves with inspection report, 100 pcs/box, 10 boxes/case.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>低离子析出，适用于半导体与精密制造环境。</p>",
+      "descriptionEn": null,
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "https://picsum.photos/seed/cleanroom-glove-kit/800/800",
+      "categoryId": "5",
+      "images": [
+        {
+          "alt": "Cleanroom Glove Consumable Kit",
+          "url": "https://picsum.photos/seed/cleanroom-glove-kit-1/800/800"
+        },
+        {
+          "alt": "Cleanroom Glove Consumable Kit",
+          "url": "https://picsum.photos/seed/cleanroom-glove-kit-2/800/800"
+        }
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 10,
+          "price": 340
+        },
+        {
+          "qty": 50,
+          "price": 300
+        }
+      ],
+      "specs": null,
+      "modelFiles": null,
+      "price": "380",
+      "originalPrice": null,
+      "unit": "箱",
+      "stock": 3000,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "13",
+      "slug": "gallery-demo",
+      "productId": null,
+      "name": "画廊演示商品",
+      "nameEn": null,
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "多图画廊演示",
+      "summaryEn": null,
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": null,
+      "descriptionEn": null,
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "https://picsum.photos/seed/cover1/800/800",
+      "categoryId": "1",
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/g1/800/800"
+        },
+        {
+          "url": "https://picsum.photos/seed/g2/800/800"
+        },
+        {
+          "url": "https://picsum.photos/seed/g3/800/800"
+        }
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 2,
+          "price": 899
+        },
+        {
+          "qty": 5,
+          "price": 799
+        }
+      ],
+      "specs": null,
+      "modelFiles": null,
+      "price": "999",
+      "originalPrice": null,
+      "unit": "台",
+      "stock": 10,
+      "minOrder": 1,
+      "status": "draft",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "23",
+      "slug": "graphite-susceptor",
+      "productId": null,
+      "name": "石墨基座",
+      "nameEn": "Graphite Susceptor",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "高纯等静压石墨基座，可选 SiC 涂层，适配 MOCVD 与金刚石生长设备。",
+      "summaryEn": "High-purity isostatic graphite susceptor with optional SiC coating, for MOCVD and diamond growth.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<h3>产品特性</h3><ul><li>高纯等静压石墨基座，可选 <b>SiC 涂层</b></li><li>适配 MOCVD 与 MPCVD 金刚石生长设备</li><li>支持定制尺寸、开槽与定位孔加工</li></ul><p>采用细颗粒等静压石墨成型，耐高温、热稳定性好，是金刚石与化合物半导体外延生长的关键载具。</p>",
+      "descriptionEn": null,
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "https://picsum.photos/seed/graphite-susceptor/800/800",
+      "categoryId": "5",
+      "images": [
+        {
+          "alt": "Graphite Susceptor",
+          "url": "https://picsum.photos/seed/graphite-susceptor-1/800/800"
+        },
+        {
+          "alt": "Graphite Susceptor",
+          "url": "https://picsum.photos/seed/graphite-susceptor-2/800/800"
+        }
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 5,
+          "price": 9000
+        },
+        {
+          "qty": 20,
+          "price": 8200
+        }
+      ],
+      "specs": null,
+      "modelFiles": null,
+      "price": "9800",
+      "originalPrice": null,
+      "unit": "件",
+      "stock": 115,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "25",
+      "slug": "rough-standard",
+      "productId": "9",
+      "name": "标准型培育钻石毛坯",
+      "nameEn": "standard cultured diamond blank",
+      "nameJa": "標準養殖ダイヤモンドロー",
+      "nameKo": "표준형 재배 다이아몬드 벽돌",
+      "nameFr": "Diamant brut de culture standard",
+      "nameAr": "معيار زراعة الماس الخام",
+      "summary": "标准品质培育钻石毛坯，适用于首饰加工，颜色D-J，尺寸3-8mm",
+      "summaryEn": "Standard quality grown diamond rough, suitable for jewelry processing, color D-J, size 3-8mm",
+      "summaryJa": "ジュエリー加工に適した標準品質の培養ダイヤモンドブランク、カラーD - J、サイズ3 -8 mm",
+      "summaryKo": "표준 품질 육성 다이아몬드 벽돌, 액세서리 가공, 색상 D-J, 사이즈 3-8mm",
+      "summaryFr": "Brut de diamant de culture de qualité standard pour le traitement des bijoux, couleurs D - J, taille 3 - 8mm",
+      "summaryAr": "معيار جودة الماس الخام ، مناسبة لتجهيز المجوهرات ، لون d-j ، حجم 3-8mm",
+      "description": "<p>ZW-Rough-S是左文科技推出的标准型培育钻石毛坯，采用CVD法生长，颜色等级D-J，尺寸3-8mm，厚度1-3mm，氮含量低于5ppm。该产品专为首饰加工设计，适用于各类珠宝镶嵌和切割加工，具备高纯净度和低缺陷密度的特点。 产品采用左文科技自主研发的MPCVD设备生长，经过严格的品质检测和分级，确保每颗毛坯的品质稳定性。标准型毛坯可满足常规首饰加工需求，支持定制尺寸和品质等级。产品采用环保的CVD生长工艺，无天然钻石开采的环境和伦理问题，是可持续珠宝的理想选择。 左文科技深圳量产基地具备稳定的批量供应能力，可满足客户的持续采购需求。产品提供完整的品质检测报告，支持第三方复检。左文科技提供从毛坯选型、切割加工建议到成品品质控制的全流程技术支持，帮助客户实现高效稳定的珠宝生产。</p>",
+      "descriptionEn": "<p>ZW-Rough-S is a standard Rough lab-grown diamond launched by Zuowen Technology. It is grown using the CVD method, has a color grade of DJ, a size of 3-8mm, a thickness of 1-3mm, and a nitrogen content of less than 5ppm. This product is specially designed for jewelry processing, suitable for various types of jewelry inlay and cutting processing, and features high purity and low defect density. The product is grown using MPCVD equipment independently developed by Zuowen Technology, and undergoes strict quality testing and grading to ensure the quality stability of each blank. Standard blanks can meet routine jewelry processing needs and support customized sizes and quality levels. The product uses an environmentally friendly CVD growth process, free from the environmental and ethical issues of natural diamond mining, making it an ideal choice for sustainable jewelry. Zuowen Technology's Shenzhen mass production base has stable mass supply capacity, which can meet customers' continuous procurement needs. The product provides a complete quality inspection report and supports third-party re-inspection. Zuowen Technology provides full-process technical support, from blank selection and cutting and processing recommendations to finished product quality control, to help customers achieve efficient and stable jewelry production.</p>",
+      "descriptionJa": "<p>ZW-Rough-Sは左文科学技術が発売した標準型育成ダイヤモンドブランクで、CVD法を用いて成長させ、色等級D-J、サイズ3-8 mm、厚さ1-3 mm、窒素含有量は5 ppm未満である。この製品はアクセサリー加工のために設計されており、各種ジュエリーのモザイク加工と切断加工に適しており、高純度と低欠陥密度の特徴を備えている。製品は左文科学技術が自主開発したMPCVD設備を用いて成長し、厳格な品質検査と等級分けを経て、各ブランクの品質安定性を確保する。標準ブランクは通常のアクセサリー加工の需要を満たし、カスタムサイズと品質レベルをサポートすることができる。製品は環境に優しいCVD成長プロセスを採用し、天然ダイヤモンド採掘の環境と倫理問題がなく、持続可能なジュエリーの理想的な選択である。左文科学技術深セン量産基地は安定した大量供給能力を備えており、顧客の持続的な購入需要を満たすことができる。左文科学技術はブランクの選択、切断加工の提案から完成品の品質制御までの全プロセス技術サポートを提供し、顧客の効率的で安定したジュエリー生産の実現を支援する。</p>",
+      "descriptionKo": "<p>ZW-Rough-S는 좌문테크놀로지가 출시한 표준형 육성 다이아몬드 반제품으로 CVD법으로 생장하며 색상 등급 D-J, 크기 3-8mm, 두께 1-3mm, 질소 함량이 5ppm 이하이다.이 제품은 액세서리 가공을 위해 설계되었으며, 각종 보석 상감 및 절단 가공에 적용되며, 높은 순도와 낮은 결함 밀도의 특징을 갖추고 있다.제품은 좌문과학기술이 자주적으로 연구개발한 MPCVD 설비를 채용하여 생장하고 엄격한 품질검측과 등급을 거쳐 매개 반제품의 품질안정성을 확보한다.표준형 반제품은 일반적인 액세서리 가공 수요를 만족시킬 수 있으며, 맞춤형 사이즈와 품질 등급을 지원한다.제품은 친환경적인 CVD 성장 공정을 채택하고 천연 다이아몬드 채굴의 환경과 윤리적 문제가 없어 지속 가능한 보석에 이상적입니다.좌문과학기술 심천양산기지는 안정적인 대량공급능력을 구비하여 고객의 지속적인 구매수요를 만족시킬수 있다.제품은 완벽한 품질 검사 보고서를 제공하며 타사 재검사를 지원합니다.좌문과학기술은 반제품의 선형, 절단가공건의로부터 완제품의 품질통제에 이르는 전반 과정의 기술지원을 제공하여 고객이 고효률적이고 안정적인 보석생산을 실현하도록 도와주었다.</p>",
+      "descriptionFr": "< p > ZW Rough - S est un diamant brut de culture standard lancé par la technologie zuwen, cultivé par la méthode CVD, classe de couleur d - J, taille 3 - 8 mm, épaisseur 1 - 3 mm, teneur en azote inférieure à 5 ppm. Ce produit est spécialement conçu pour le traitement des bijoux et convient à tous les types d'incrustation de bijoux et de traitement de coupe, avec une pureté élevée et une faible densité de défauts. Les produits sont cultivés à l'aide de l'équipement MPCVD développé par la science et la technologie de zuwen, après un test de qualité strict et un classement, assurant la stabilité de la qualité de chaque ébauche. Les ébauches de type standard peuvent répondre aux besoins de traitement de bijoux réguliers, en prenant en charge les tailles personnalisées et les niveaux de qualité. Les produits utilisent un processus de croissance CVD respectueux de l'environnement, sans les problèmes environnementaux et éthiques de l'extraction de diamants naturels, idéal pour les bijoux durables. La base de production de masse de Shenzhen de zowen Technology dispose d'une capacité d'approvisionnement en vrac stable pour répondre aux besoins d'achat continus des clients. Le produit fournit un rapport de test de qualité complet, prend en charge la ré - inspection par un tiers. Zuwen Technology fournit un support technique complet du processus, de la sélection de l'ébauche, des conseils de traitement de la coupe au contrôle de la qualité du produit fini, pour aider les clients à atteindre une production de bijoux efficace et stable. </p>",
+      "descriptionAr": "<p>zw-rough-s هو معيار الماس الخام المزروعة من قبل zuowen العلم والتكنولوجيا ، التي نمت من الأمراض القلبية الوعائية ، لون الصف d-j ، حجم 3-8mm ، سمك 1-3mm ، محتوى النيتروجين أقل من 5 جزء في المليون . هذا المنتج هو خصيصا لتجهيز المجوهرات تصميم , مناسبة لأنّ أنواع مختلفة من المجوهرات الفسيفساء وقطع تجهيز ، مع نقاء عالية ومنخفضة الكثافة عيب الخصائص . المنتجات تعتمد على التكنولوجيا المتقدمة من قبل zuowen MPCVD معدات النمو ، من خلال اختبار الجودة الصارمة والتصنيف ، لضمان استقرار جودة كل فارغة . معيار فارغة يمكن أن تلبي متطلبات تجهيز المجوهرات التقليدية ، ودعم تخصيص حجم ونوعية الصف . المنتجات التي تعتمد على عملية النمو الأمراض القلبية الوعائية الصديقة للبيئة ، لا توجد مشاكل بيئية وأخلاقية في استخراج الماس الطبيعي ، هو الخيار المثالي للمجوهرات المستدامة . zuowen قاعدة الانتاج فى شنتشن للعلوم والتكنولوجيا لديها القدرة على توريد كمية ثابتة ، يمكن أن تلبي احتياجات العملاء من الشراء المستمر . المنتج يوفر نوعية كاملة تقرير الاختبار ، ودعم طرف ثالث إعادة التفتيش . zuowen التكنولوجيا يوفر كامل عملية الدعم التقني من اختيار فارغة ، قطع تجهيز اقتراح مراقبة جودة المنتج النهائي ، ومساعدة العملاء على تحقيق كفاءة عالية ومستقرة إنتاج المجوهرات .</p>",
+      "coverImage": "/uploads/products/rough-standard.svg",
+      "categoryId": null,
+      "images": [
+        "/uploads/products/rough-standard.svg"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 10,
+          "price": "97"
+        },
+        {
+          "qty": 50,
+          "price": "93"
+        }
+      ],
+      "specs": [
+        {
+          "name": "净度",
+          "nameEn": "Clarity",
+          "options": [
+            {
+              "label": "SI 标准",
+              "price": "1800",
+              "labelEn": "SI Standard"
+            },
+            {
+              "label": "VS 优等",
+              "price": "2400",
+              "labelEn": "VS Fine"
+            }
+          ]
+        },
+        {
+          "name": "重量",
+          "nameEn": "Weight",
+          "options": [
+            {
+              "label": "0.5ct",
+              "price": "0"
+            },
+            {
+              "label": "1ct",
+              "price": "600"
+            },
+            {
+              "label": "2ct",
+              "price": "1600"
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": null,
+      "originalPrice": null,
+      "unit": "件",
+      "stock": -1,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "14",
+      "slug": "mpcvd-growth-system",
+      "productId": null,
+      "name": "MPCVD 金刚石生长设备",
+      "nameEn": "MPCVD Diamond Growth System",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "6kW 微波等离子体化学气相沉积设备，用于单晶/多晶金刚石薄膜生长，支持 2-4 英寸晶圆级生长。",
+      "summaryEn": "6kW microwave plasma CVD system for single/polycrystalline diamond film growth, wafer-scale up to 4 inches.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>核心优势：</p><ul><li>2.45GHz 微波源，功率 0.5-6kW 连续可调</li><li>腔体真空度 ≤1×10⁻⁵ Pa</li><li>均匀性 ±5%，支持 2-4 英寸衬底</li><li>全自动 PLC 控制，配方化管理</li></ul>",
+      "descriptionEn": null,
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "https://picsum.photos/seed/mpcvd-growth-system/800/800",
+      "categoryId": "1",
+      "images": [
+        {
+          "alt": "MPCVD Diamond Growth System",
+          "url": "https://picsum.photos/seed/mpcvd-growth-system-1/800/800"
+        },
+        {
+          "alt": "MPCVD Diamond Growth System",
+          "url": "https://picsum.photos/seed/mpcvd-growth-system-2/800/800"
+        }
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 1,
+          "price": 1280000
+        }
+      ],
+      "specs": null,
+      "modelFiles": null,
+      "price": "1280000",
+      "originalPrice": null,
+      "unit": "台",
+      "stock": 4,
+      "minOrder": 1,
+      "status": "draft",
+      "featured": true,
+      "sortOrder": 0
+    },
+    {
+      "id": "15",
+      "slug": "diamond-heat-spreader",
+      "productId": null,
+      "name": "单晶金刚石热沉片",
+      "nameEn": "Single-Crystal Diamond Heat Spreader",
+      "nameJa": null,
+      "nameKo": null,
+      "nameFr": null,
+      "nameAr": null,
+      "summary": "HPHT 单晶金刚石热沉片，热导率 ≥1800 W/m·K，适用于大功率激光器与 GaN 器件散热。",
+      "summaryEn": "HPHT single-crystal diamond heat spreader, thermal conductivity ≥1800 W/m·K, for high-power lasers and GaN devices.",
+      "summaryJa": null,
+      "summaryKo": null,
+      "summaryFr": null,
+      "summaryAr": null,
+      "description": "<p>规格：2×2×0.3mm / 3×3×0.5mm，可定制尺寸。表面粗糙度 Ra&lt;0.5nm，翘曲度 &lt;5μm。</p>",
+      "descriptionEn": null,
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "coverImage": "https://picsum.photos/seed/diamond-heat-spreader/800/800",
+      "categoryId": "3",
+      "images": [
+        {
+          "alt": "Single-Crystal Diamond Heat Spreader",
+          "url": "https://picsum.photos/seed/diamond-heat-spreader-1/800/800"
+        },
+        {
+          "alt": "Single-Crystal Diamond Heat Spreader",
+          "url": "https://picsum.photos/seed/diamond-heat-spreader-2/800/800"
+        }
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 10,
+          "price": 2500
+        },
+        {
+          "qty": 50,
+          "price": 2200
+        },
+        {
+          "qty": 100,
+          "price": 1900
+        }
+      ],
+      "specs": null,
+      "modelFiles": null,
+      "price": "2800",
+      "originalPrice": null,
+      "unit": "片",
+      "stock": 479,
+      "minOrder": 10,
+      "status": "published",
+      "featured": true,
+      "sortOrder": 0
+    },
+    {
+      "id": "30",
+      "slug": "nv-diamond",
+      "productId": "15",
+      "name": "NV色心金刚石",
+      "nameEn": "NV color center diamond",
+      "nameJa": "NV色芯ダイヤモンド",
+      "nameKo": "NV 색심 금강석",
+      "nameFr": "NV diamant de coeur de couleur",
+      "nameAr": "نيفادا الماس",
+      "summary": "高品质NV色心金刚石，适用于量子传感、量子计算研究及磁场探测",
+      "summaryEn": "High-quality NV color-centered diamonds are suitable for quantum sensing, quantum computing research, and magnetic field detection.",
+      "summaryJa": "高品質NV色心ダイヤモンド、量子センシング、量子計算研究及び磁場探査に適用する",
+      "summaryKo": "양자 센싱, 양자 컴퓨팅 연구 및 자기장 탐지를 위한 고품질 NV 색심 금강석",
+      "summaryFr": "Diamant coloré NV de haute qualité pour la détection quantique, la recherche en Informatique quantique et la détection de champs magnétiques",
+      "summaryAr": "جودة عالية نيفادا لون الماس الأساسية ، تنطبق على أجهزة الاستشعار الكم ، حساب الكم و الكشف عن المجال المغناطيسي",
+      "description": "<p>ZW-NV是左文科技推出的NV色心金刚石量子材料，NV浓度可定制，尺寸3×3~5×5mm，厚度0.1-0.5mm，表面粗糙度&lt;1nm Ra。该产品专为量子传感、量子计算研究及磁场探测设计，适用于量子精密测量、生物医学成像、地磁导航等前沿科研和应用场景。 产品采用左文科技CVD法生长的高纯度金刚石材料，通过精确的氮掺杂和电子辐照退火工艺，可控地引入NV色心，确保NV浓度的均匀性和稳定性。NV色心金刚石具有高NV浓度、低本底噪声和光学级表面的特点，可满足量子传感和量子计算研究的严苛要求。产品支持定制NV浓度和尺寸，可满足不同科研和应用场景的需求。 左文科技具备NV色心金刚石的研发和小批量供应能力，可满足科研机构和高科技企业的采购需求。产品提供完整的NV浓度检测和光学性能报告，支持第三方检测验证。左文科技提供从量子材料选型、NV浓度定制到器件集成测试的科研级技术支持，帮助客户推进量子技术研究和应用。</p>",
+      "descriptionEn": "<p>ZW-NV is an NV color-centered diamond quantum material launched by Zuowen Technology. The NV concentration can be customized, the size is 3×3~5×5mm, the thickness is 0.1-0.5mm, and the surface roughness is <1nm Ra. This product is specifically designed for quantum sensing, quantum computing research, and magnetic field detection, and is suitable for cutting-edge scientific research and application scenarios such as quantum precision measurement, biomedical imaging, and geomagnetic navigation. The product uses high-purity diamond material grown by Zuowen Technology's CVD method. Through precise nitrogen doping and electron irradiation annealing processes, the NV color center is controllably introduced to ensure the uniformity and stability of NV concentration. NV color-centered diamonds are characterized by high NV concentration, low background noise, and optical-grade surfaces, which can meet the stringent requirements of quantum sensing and quantum computing research. The product supports customized NV concentration and size to meet the needs of different scientific research and application scenarios. Zuowen Technology has the research and development and small-batch supply capabilities for NV color-centered diamonds, which can meet the procurement needs of research institutions and high-tech enterprises. The product provides complete NV concentration testing and optical performance reports, and supports third-party testing and verification. Zuowen Technology provides research-grade technical support from quantum material selection and NV concentration customization to device integration testing, helping customers advance quantum technology research and application.</p>",
+      "descriptionJa": "<p>ZW−NVは左文科学技術が発売したNV色心ダイヤモンド量子材料であり、NV濃度はカスタマイズでき、サイズは3×3 ~ 5×5 mm、厚さは0.1-0.5 mm、表面粗さ&lt ; 1 nm Raである。この製品はもっぱら量子センシング、量子計算研究及び磁場探査設計であり、量子精密測定、生物医学イメージング、地磁気ナビゲーションなどの最先端の科学研究と応用シーンに適している。製品は左文科学技術CVD法を用いて成長させた高純度ダイヤモンド材料を用い、正確な窒素ドーピングと電子照射アニーリング技術を通じて、NV色心を制御可能に導入し、NV濃度の均一性と安定性を確保する。NV色心ダイヤモンドは高NV濃度、低バックグラウンドノイズと光学レベル表面の特徴を持ち、量子センシングと量子計算研究の厳しい要求を満たすことができる。製品はカスタムNV濃度とサイズをサポートし、異なる科学研究と応用シーンの需要を満たすことができる。左文科学技術はNV色心ダイヤモンドの研究開発と小ロット供給能力を備え、科学研究機関とハイテク企業の購買需要を満たすことができる。製品は完全なNV濃度検査と光学性能報告を提供し、第三者検査検証をサポートする。</p>",
+      "descriptionKo": "<p>ZW-NV는 좌문테크놀로지가 출시한 NV 색심 금강석 양자 소재로 NV 농도를 맞춤형으로 제작할 수 있으며 크기는 3 × 3~5 × 5mm, 두께는 0.1-0.5mm, 표면 거친도는 < 1nm Ra이다.이 제품은 양자 센싱, 양자 컴퓨팅 연구 및 자기장 탐지를 위해 설계되었으며, 양자 정밀 측정, 생물 의학 영상, 지자기 항법 등 첨단 과학 연구 및 응용 장면에 적용된다.제품은 좌문과학기술 CVD법으로 생장하는 순도 높은 금강석 재료를 채용하여 정확한 질소 혼합과 전자 투사 퇴화 공정을 통해 NV 색심을 통제적으로 도입하여 NV 농도의 균일성과 안정성을 확보한다.NV 색심 금강석은 높은 NV 농도, 낮은 본저 소음 및 광학급 표면의 특징을 가지고 있으며 양자 센싱 및 양자 컴퓨팅 연구의 가혹한 요구를 충족시킬 수 있습니다.제품은 다양한 과학 연구 및 응용 시나리오의 요구를 충족시키기 위해 사용자 정의 NV 농도와 크기를 지원합니다.좌문과학기술은 NV 색심금강석의 연구개발과 소량공급능력을 구비하여 과학연구기구와 첨단과학기술기업의 구매수요를 만족시킬수 있다.제품은 완전한 NV 농도 검사 및 광학 성능 보고서를 제공하며 타사 검사 검증을 지원합니다.좌문과학기술은 량자재료선형, NV농도맞춤형으로부터 부품집성테스트에 이르는 과학연구급기술지원을 제공하여 고객이 량자기술연구와 응용을 추진하도록 도와주었다.</p>",
+      "descriptionFr": "< p > ZW - NV est un matériau quantique diamant coloré NV lancé par la technologie zuwen, la concentration NV peut être personnalisée, taille 3 × 3 ~ 5 × 5 mm, épaisseur 0,1 - 0,5 mm, rugosité de surface & lt; 1 nm ra. Conçu pour la détection quantique, la recherche en Informatique quantique et la détection de champs magnétiques, ce produit convient à la recherche de pointe et aux scénarios d'application tels que la mesure de précision quantique, l'imagerie biomédicale et la navigation géomagnétique. Les produits sont fabriqués à partir de matériaux diamantés de haute pureté cultivés par la méthode CVD de la technologie de zuwen, grâce à un processus de recuit précis de dopage à l'azote et d'irradiation électronique, l'introduction contrôlée du Centre de couleur NV garantit l'uniformité et la stabilité de la concentration NV. Caractérisé par une concentration élevée de nv, un faible bruit de fond et une surface de qualité optique, le diamant coloré NV peut répondre aux exigences strictes de la recherche en détection quantique et en Informatique quantique. Les produits prennent en charge la concentration et la taille NV personnalisées, qui peuvent répondre aux besoins de différents scénarios de recherche scientifique et d'application. Avec la R & D et la capacité d'approvisionnement en petites quantités de diamants colorés NV, zuwen Technology peut répondre aux besoins d'achat des instituts de recherche scientifique et des entreprises de haute technologie. Les produits offrent une détection complète de la concentration de nv et des rapports de performance optique qui prennent en charge la vérification de la détection par des tiers. Zuwen Technology fournit un support technique de qualité scientifique allant de la sélection de matériaux quantiques à la personnalisation de la concentration NV en passant par les tests d'intégration de dispositifs pour aider les clients à faire progresser la recherche et l'application de la technologie quantique. </p>",
+      "descriptionAr": "<p>zw-nv هو نوع جديد من المواد التي تم تطويرها من قبل zuowen التكنولوجيا . تركيز نيفادا يمكن تخصيصها مع حجم 3 × 5 × 5 ملم ، سمك 0.1-0.5mm ، خشونة السطح و اللفتنانت ؛ 1 نانومتر را . هذا المنتج هو خصيصا الكم الاستشعار ، حساب الكم و المجال المغناطيسي للكشف عن تصميم , مناسبة لأنّ الكم دقة القياس ، التصوير الطبي الحيوي ، والملاحة المغناطيسية الأرضية وغيرها من البحوث المتقدمة والتطبيقات . عالية النقاء الماس المواد التي تزرع من قبل الأمراض القلبية الوعائية طريقة zuowen التكنولوجيا يمكن السيطرة عليها من خلال إدخال نيفادا مركز اللون النيتروجين المنشطات الإلكترون تشعيع الصلب ، وبالتالي ضمان الاتساق والاستقرار نيفادا التركيز . نيفادا لون الماس الأساسية لديها خصائص عالية نيفادا التركيز ، وانخفاض الضوضاء الخلفية البصرية الصف السطح ، والتي يمكن أن تلبي متطلبات صارمة من أجهزة الاستشعار الكم والكم الحساب . المنتجات التي تدعم تخصيص نيفادا التركيز والحجم ، يمكن أن تلبي احتياجات مختلف البحوث العلمية وتطبيق السيناريوهات . تسوه ون التكنولوجيا لديها القدرة على البحث والتطوير من نيفادا لون الماس الأساسية ، وانخفاض حجم العرض ، والتي يمكن أن تلبي متطلبات الشراء من مؤسسات البحث العلمي وشركات التكنولوجيا الفائقة . المنتج يوفر كامل NV تركيز اختبار الأداء البصري تقرير دعم طرف ثالث اختبار التحقق . zuowen التكنولوجيا يوفر مستوى البحث العلمي والدعم التقني من اختيار المواد الكم ، نيفادا التركيز التخصيص إلى جهاز اختبار التكامل لمساعدة العملاء على تعزيز البحوث وتطبيق تكنولوجيا الكم .</p>",
+      "coverImage": "/uploads/products/nv-diamond.svg",
+      "categoryId": null,
+      "images": [
+        "/uploads/products/nv-diamond.svg"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 5,
+          "price": "97"
+        }
+      ],
+      "specs": [
+        {
+          "name": "衬底取向",
+          "nameEn": "Orientation",
+          "options": [
+            {
+              "label": "(100)",
+              "price": "0"
+            },
+            {
+              "label": "(111)",
+              "price": "2000"
+            }
+          ]
+        },
+        {
+          "name": "规格",
+          "nameEn": "Size",
+          "options": [
+            {
+              "label": "3×3mm",
+              "price": "0"
+            },
+            {
+              "label": "5×5mm",
+              "price": "3000"
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": null,
+      "originalPrice": null,
+      "unit": "件",
+      "stock": -1,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "28",
+      "slug": "hs-standard",
+      "productId": "13",
+      "name": "标准型金刚石散热片",
+      "nameEn": "standard type diamond heat sink",
+      "nameJa": "ひょうじゅんがたダイヤモンドフィン",
+      "nameKo": "표준형 금강석 방열편",
+      "nameFr": "Radiateur diamant type standard",
+      "nameAr": "معيار الماس بالوعة الحرارة",
+      "summary": "标准导热性能散热片，热导率≥1000 W/(m·K)，适用于一般功率器件散热",
+      "summaryEn": "Standard thermal conductivity fins with a thermal conductivity of ≥1000 W/(m·K) are suitable for heat dissipation in general power devices.",
+      "summaryJa": "標準熱伝導性能放熱フィン、熱伝導率≧1000 W/（m・K）、一般的なパワーデバイスの放熱に適している",
+      "summaryKo": "표준 열전도 성능 히트싱크, 열전도도 ≥ 1000W/(m·K), 일반 전력 부품 히트싱크에 적용",
+      "summaryFr": "Dissipateurs de chaleur de performance de conductivité thermique standard, conductivité thermique ≥ 1000 W / (M · K), adapté à la dissipation de chaleur des dispositifs de puissance générale",
+      "summaryAr": "معيار التوصيل الحراري بالوعة الحرارة ، التوصيل الحراري أكثر من 1000 واط / ( م · ك ) ، تنطبق على تبديد الحرارة من أجهزة السلطة العامة",
+      "description": "<p>ZW-HS-S是左文科技推出的标准型金刚石散热片，热导率≥1000 W/(m·K)，尺寸5×5~10×10mm，厚度0.3-1mm，表面可金属化处理。该产品专为一般功率电子器件散热管理设计，适用于激光二极管、LED、功率模块等器件的散热应用。 产品采用左文科技CVD法生长的高纯度金刚石材料，经过精密加工和严格品质检测，确保散热性能的稳定性和一致性。金刚石散热片具有极高的热导率和极低的热阻，可显著提升功率器件的散热效率，降低器件工作温度，延长使用寿命。产品支持定制尺寸，可满足不同器件的散热需求。 左文科技具备金刚石散热片的稳定批量供应能力，可满足电子器件厂商的持续采购需求。产品提供完整的性能检测报告，支持第三方检测验证。左文科技提供从散热方案设计、散热片选型到器件集成测试的全流程技术支持，帮助客户优化器件散热性能。</p>",
+      "descriptionEn": "<p>ZW-HS-S is a standard diamond heat sink launched by Zuowen Technology. It has a thermal conductivity of ≥1000 W/(m·K), a size of 5×5~10×10mm, a thickness of 0.3-1mm, and can be metallized on the surface. This product is specifically designed for heat dissipation management of general power electronic devices and is suitable for heat dissipation applications in laser diodes, LEDs, power modules and other devices. The product uses high-purity diamond material grown by Zuowen Technology's CVD method, which undergoes precision processing and strict quality testing to ensure the stability and consistency of heat dissipation performance. Diamond heat sinks have extremely high thermal conductivity and extremely low thermal resistance, which can significantly improve the heat dissipation efficiency of power devices, reduce the operating temperature of devices, and extend their service life. The product supports customized sizes to meet the heat dissipation needs of different devices. Zuowen Technology has a stable batch supply capacity of diamond heat sinks, which can meet the continuous procurement needs of electronic component manufacturers. The product provides a complete performance test report and supports third-party testing and verification. Zuowen Technology provides full-process technical support, from heat dissipation solution design and heat sink selection to device integration testing, to help customers optimize device heat dissipation performance.</p>",
+      "descriptionJa": "<p>ZW-HS-Sは左文科学技術が発売した標準型ダイヤモンド放熱フィンであり、熱伝導率≧1000 W/（m・K）、寸法5×5 ~ 10×10 mm、厚さ0.3-1 mm、表面金属化処理が可能である。この製品は一般的な電力電子デバイスの放熱管理のために設計されており、レーザーダイオード、LED、パワーモジュールなどのデバイスの放熱用途。製品は左文科学技術CVD法で成長させた高純度ダイヤモンド材料を採用し、精密加工と厳格な品質検査を経て、放熱性能の安定性と一致性を確保した。ダイヤモンド放熱フィンは極めて高い熱伝導率と極めて低い熱抵抗を有し、電力デバイスの放熱効率を著しく向上させ、デバイスの動作温度を低下させ、使用寿命を延長することができる。製品はカスタムサイズをサポートし、異なるデバイスの放熱需要を満たすことができる。左文科学技術はダイヤモンド放熱フィンの安定した大量供給能力を備えており、電子デバイスメーカーの持続的な購入需要を満たすことができる。製品は完全な性能検査報告を提供し、第三者検査検証をサポートする。</p>",
+      "descriptionKo": "<p>ZW-HS-S는 좌문테크놀로지가 출시한 표준형 금강석 방열판으로 열전도율 ≥ 1000W/(m·K), 크기 5 × 5~10 × 10mm, 두께 0.3-1mm로 표면을 금속화 처리할 수 있다.이 제품은 레이저 다이오드,LED、전력 모듈과 같은 부품의 열 방출 응용.제품은 좌문과학기술 CVD법으로 생장하는 순도 높은 금강석 재료를 사용하여 정밀가공과 엄격한 품질검측을 거쳐 방열성능의 안정성과 일치성을 확보한다.금강석 방열편은 매우 높은 열전도율과 매우 낮은 열저항을 가지고 있어 출력 부품의 방열 효율을 현저하게 향상시키고 부품의 작업 온도를 낮추며 사용 수명을 연장할 수 있다.제품은 다양한 장치의 발열 요구를 충족하는 맞춤형 크기를 지원합니다.좌문과학기술은 금강석방열편의 안정적인 대량공급능력을 구비하여 전자부품제조업체의 지속적인 구매수요를 만족시킬수 있다.제품은 완전한 성능 검사 보고서를 제공하며 타사 검사 검증을 지원합니다.좌문과학기술은 방열방안설계, 방열편선형으로부터 부품집적테스트에 이르는 전반 과정의 기술지원을 제공하여 고객이 부품의 방열성능을 최적화하도록 도와주었다.</p>",
+      "descriptionFr": "< p > ZW - HS - S est un dissipateur de chaleur en diamant de type standard lancé par zhuwen Technology, avec une conductivité thermique ≥ 1000 W / (M · K), une taille de 5 × 5 ~ 10 × 10 mm, une épaisseur de 0,3 à 1 mm et une surface pouvant être métallisée. Ce produit est spécialement conçu pour la gestion de la dissipation thermique de l'électronique de puissance générale, adapté aux diodes laser, LED、 Applications de dissipation thermique de dispositifs tels que les modules de puissance. Les produits sont fabriqués à partir de matériaux diamantés de haute pureté cultivés par la méthode CVD de la technologie de zhuwen, après un traitement de précision et un test de qualité strict pour assurer la stabilité et la cohérence des performances de dissipation thermique. Les ailettes de refroidissement en diamant ont une conductivité thermique extrêmement élevée et une résistance thermique extrêmement faible, ce qui peut augmenter considérablement l'efficacité de dissipation thermique des dispositifs de puissance, réduire la température de fonctionnement des dispositifs et prolonger la durée de vie. Le produit prend en charge la taille personnalisée, qui peut répondre aux besoins de dissipation de chaleur de différents dispositifs. La technologie de zuwen a la capacité d'approvisionnement en vrac stable de Dissipateurs de chaleur de diamant, qui peut répondre aux besoins d'achat continus des fabricants de dispositifs électroniques. Les produits fournissent des rapports complets d'inspection de performance qui prennent en charge la vérification d'inspection par des tiers. Left Tech fournit un support technique complet du processus, de la conception du schéma de dissipation de chaleur à la sélection des ailettes de dissipation de chaleur en passant par les tests d'intégration des dispositifs, afin d'aider les clients à optimiser les performances de dissipation de chaleur des dispositifs. </p>",
+      "descriptionAr": "<p>zw-hs-s هو معيار الماس بالوعة الحرارة التي تنتجها zuowen التكنولوجيا الموصلية الحرارية ≥ 1000 واط / ( م · ك ) ، 5 × 5 ~ 10 × 10 ملم ، سمك 0.3-1 ملم ، سطح معدني . هذه المنتجات هي مصممة خصيصا من أجل تبديد الحرارة إدارة الطاقة العامة الأجهزة الإلكترونية . LED、 وحدة الطاقة وغيرها من الأجهزة . عالية النقاء الماس المواد التي تم الحصول عليها من الأمراض القلبية الوعائية طريقة zuowen التكنولوجيا ، والتي يمكن ضمان الاستقرار والاتساق في تبديد الحرارة الأداء من خلال الآلات الدقيقة و اختبار الجودة الصارمة . الماس بالوعة الحرارة لديها الموصلية الحرارية العالية وانخفاض المقاومة الحرارية ، والتي يمكن أن تحسن بشكل ملحوظ كفاءة تبديد الحرارة من جهاز السلطة ، والحد من درجة حرارة التشغيل من الجهاز ، وإطالة عمر خدمة الجهاز . المنتجات التي تدعم أحجام مخصصة ، يمكن أن تلبي متطلبات مختلف مكونات تبديد الحرارة . zuowen التكنولوجيا لديها القدرة على توريد الماس بالوعة الحرارة في دفعة واحدة ، ويمكن أن تلبي الطلب المستمر على شراء الأجهزة الإلكترونية المصنعة . المنتج يوفر الأداء الكامل تقرير الاختبار ، ودعم طرف ثالث اختبار التحقق . zuowen التكنولوجيا يوفر كامل عملية الدعم التقني من تبديد الحرارة تصميم المشروع ، زعنفة الحرارة اختيار جهاز اختبار التكامل لمساعدة العملاء على تحسين تبديد الحرارة الأداء .</p>",
+      "coverImage": "/uploads/products/hs-standard.svg",
+      "categoryId": null,
+      "images": [
+        "/uploads/products/hs-standard.svg"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 10,
+          "price": "98"
+        },
+        {
+          "qty": 50,
+          "price": "95"
+        }
+      ],
+      "specs": [
+        {
+          "name": "尺寸",
+          "nameEn": "Size",
+          "options": [
+            {
+              "label": "5×5mm",
+              "price": "0"
+            },
+            {
+              "label": "10×10mm",
+              "price": "80"
+            },
+            {
+              "label": "15×15mm",
+              "price": "220"
+            }
+          ]
+        },
+        {
+          "name": "厚度",
+          "nameEn": "Thickness",
+          "options": [
+            {
+              "label": "0.5mm",
+              "price": "0"
+            },
+            {
+              "label": "1.0mm",
+              "price": "30"
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": "280",
+      "originalPrice": null,
+      "unit": "件",
+      "stock": -1,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "24",
+      "slug": "rough-premium",
+      "productId": "10",
+      "name": "高端型培育钻石毛坯",
+      "nameEn": "high-end cultured diamond blank",
+      "nameJa": "ハイエンド型育成ダイヤモンドブランク",
+      "nameKo": "고급형 육성 다이아몬드 벽돌",
+      "nameFr": "Brut de diamant de culture haut de gamme",
+      "nameAr": "ارتفاع نهاية زراعة الماس الخام",
+      "summary": "高品质培育钻石毛坯，颜色和净度优异，适用于高端珠宝，颜色D-F，尺寸5-12mm",
+      "summaryEn": "High-quality rough grown diamonds with excellent color and clarity, suitable for high-end jewelry, colors DF, sizes 5-12mm.",
+      "summaryJa": "高品質育成ダイヤモンドブランク、色と純度に優れ、ハイエンドジュエリー、色D-F、サイズ5-12 mmに適している",
+      "summaryKo": "고품질 재배 다이아몬드 벽돌, 색상 및 순도 우수, 고급 보석에 적용, 색상 D-F, 크기 5-12mm",
+      "summaryFr": "Brut de diamant cultivé de haute qualité, excellente couleur et pureté, pour bijoux haut de gamme, couleurs D - F, taille 5 - 12mm",
+      "summaryAr": "جودة عالية الماس الخام ، ممتازة في اللون والوضوح ، ينطبق على المجوهرات الراقية ، لون D-F ، حجم 5-12mm",
+      "description": "<p>ZW-Rough-P是左文科技推出的高端型培育钻石毛坯，采用CVD法生长，颜色等级D-F，尺寸5-12mm，厚度2-5mm，氮含量低于1ppm。该产品专为高端珠宝设计，具备极高纯净度和极低缺陷密度，适用于高端珠宝镶嵌和大尺寸钻石切割加工。 产品采用左文科技高端MPCVD设备生长，经过多轮严格的品质检测和精选，确保每颗毛坯达到高端品质标准。高端型毛坯支持大尺寸定制，可满足高端珠宝对大颗粒钻石的需求。产品采用环保的CVD生长工艺，是高端可持续珠宝的理想选择。 左文科技深圳量产基地具备高端钻石的稳定供应能力，可满足高端珠宝品牌的持续采购需求。产品提供完整的高端品质检测报告，支持国际权威机构复检。左文科技提供从高端毛坯选型、切割工艺优化到成品品质控制的专属技术支持，帮助客户打造顶级珠宝产品。</p>",
+      "descriptionEn": "<p>ZW-Rough-P is a high-end Rough lab-grown diamond launched by Zuowen Technology. It is grown using the CVD method, has a color grade of DF, a size of 5-12mm, a thickness of 2-5mm, and a nitrogen content of less than 1ppm. This product is designed specifically for high-end jewelry, featuring extremely high purity and low defect density, making it suitable for high-end jewelry setting and large-size diamond cutting. The products are grown using Zuowen Technology's high-end MPCVD equipment, and undergo multiple rounds of rigorous quality testing and selection to ensure that each blank meets high-end quality standards. High-end rough diamonds support large-size customization, which can meet the needs of high-end jewelry for large-grain diamonds. The product uses an environmentally friendly CVD growth process, making it an ideal choice for high-end sustainable jewelry. Zuowen Technology's Shenzhen mass production base has a stable supply capacity of high-end diamonds, which can meet the continuous procurement needs of high-end jewelry brands. The products provide complete high-end quality inspection reports and support re-inspection by international authoritative institutions. Zuowen Technology provides dedicated technical support from high-end blank selection and cutting process optimization to finished product quality control, helping customers create top-notch jewelry products.</p>",
+      "descriptionJa": "<p>ZW-Rough-Pは左文科学技術が発売したハイエンド型育成ダイヤモンドブランクで、CVD法を用いて成長し、色等級D-F、サイズ5-12 mm、厚さ2-5 mm、窒素含有量は1 ppm未満である。この製品はハイエンドジュエリーのために設計され、極めて高い純度と極めて低い欠陥密度を備えており、ハイエンドジュエリーの象眼と大型ダイヤモンドの切断加工に適している。製品は左文科学技術のハイエンドMPCVD設備を用いて成長し、多ラウンドの厳格な品質検査と精選を経て、各ブランクがハイエンド品質基準に達することを確保する。ハイエンドパリソンは大型カスタマイズをサポートし、ハイエンドジュエリーの大粒ダイヤモンドに対する需要を満たすことができる。製品は環境に優しいCVD成長技術を採用し、ハイエンドの持続可能なジュエリーの理想的な選択である。左文科学技術深セン量産基地はハイエンドダイヤモンドの安定供給能力を備えており、ハイエンドジュエリーブランドの持続的な購入需要を満たすことができる。製品は完全なハイエンド品質検査報告書を提供し、国際権威機関の再検査をサポートする。左文科学技術はハイエンドブランクの選択、切断技術の最適化から完成品の品質制御までの専属技術サポートを提供し、顧客がトップジュエリー製品を製造するのを支援する。</p>",
+      "descriptionKo": "<p>ZW-Rough-P는 좌문테크놀로지가 출시한 고급형 육성 다이아몬드 반제품으로 CVD법으로 생장하며 색상 등급 D-F, 크기 5-12mm, 두께 2-5mm, 질소 함량이 1ppm 이하이다.이 제품은 고급 보석을 위해 특별히 설계되었으며, 매우 높은 순도와 매우 낮은 결함 밀도를 갖추고 있으며, 고급 보석 상감과 대형 다이아몬드 절단 가공에 적용된다.제품은 좌문과학기술의 고급MPCVD설비를 채용하여 생장하고 여러차례의 엄격한 품질검측과 정선을 거쳐 매개 반제품이 고급품질표준에 도달하도록 확보하였다.고급형 반제품은 큰 사이즈의 맞춤형을 지원하여 고급 보석의 큰 입자 다이아몬드에 대한 수요를 만족시킬 수 있다.제품은 친환경적인 CVD 성장 공정을 채택하여 고급 지속 가능한 보석에 이상적입니다.좌문과학기술 심천양산기지는 고급다이아몬드의 안정적인 공급능력을 갖추어 고급보석브랜드의 지속적인 구매수요를 만족시킬수 있다.제품은 완전한 고급 품질 검사 보고서를 제공하며 국제 권위 있는 기관의 재검사를 지원합니다.좌문과학기술은 고급반제품의 선형, 절단공예의 최적화로부터 완제품의 품질통제에 이르는 전속기술지원을 제공하여 고객이 최고급 보석제품을 구축하도록 도와주었다.</p>",
+      "descriptionFr": "ZW - Rough - P est un diamant brut de culture haut de gamme lancé par zewen Technology, cultivé selon la méthode CVD, classe de couleur d - F, taille 5 - 12 mm, épaisseur 2 - 5 mm, teneur en azote inférieure à 1 ppm. Conçu pour les bijoux haut de gamme avec une pureté extrême et une densité de défauts extrêmement faible, ce produit convient à la sertissage de bijoux haut de gamme et au traitement de taille de diamant de grande taille. Les produits sont cultivés à l'aide de l'équipement MPCVD haut de gamme de la technologie zuwen, après plusieurs séries d'essais de qualité rigoureux et de sélection, pour s'assurer que chaque ébauche répond aux normes de qualité haut de gamme. Les ébauches de type haut de gamme prennent en charge la personnalisation de grande taille, ce qui peut répondre aux besoins des bijoux haut de gamme en diamants granuleux. Les produits sont fabriqués avec un processus de croissance CVD respectueux de l'environnement, idéal pour les bijoux durables haut de gamme. La base de production de masse de Shenzhen de zowen Technology a une capacité d'approvisionnement stable en diamants Haut de gamme, ce qui peut répondre aux besoins d'achat continus des marques de bijoux haut de gamme. Les produits fournissent des rapports d'inspection de qualité haut de gamme complets qui soutiennent la ré - inspection par les autorités internationales. Zuwen Tech offre un support technique exclusif allant de la sélection de flans haut de gamme à l'optimisation des processus de coupe en passant par le contrôle de la qualité des produits finis pour aider les clients à créer des produits de Haute Joaillerie. </p>",
+      "descriptionAr": "<p>zw-rough-p هو نوع من ارتفاع نهاية الماس الخام التي تنتجها zuowen التكنولوجيا . وقد نمت من الأمراض القلبية الوعائية الأسلوب . هذا المنتج هو تصميم المجوهرات الراقية ، مع نقاء عالية جدا ، وانخفاض كثافة عيب ، ومناسبة الراقية والمجوهرات فسيفساء كبيرة الحجم قطع الماس . المنتجات التي تستخدم التكنولوجيا الراقية MPCVD تسوه ون معدات النمو ، من خلال العديد من جولات من اختبار الجودة الصارمة واختيار لضمان أن كل فارغة تصل إلى معايير الجودة الراقية . ارتفاع نهاية الفراغات دعم حجم كبير من التخصيص ، يمكن أن تلبي الطلب على المجوهرات الراقية الماس الجسيمات الكبيرة . المنتجات التي تعتمد على حماية البيئة الأمراض القلبية الوعائية عملية النمو ، هو الخيار المثالي الراقية والمجوهرات المستدامة . zuowen التكنولوجيا شنتشن قاعدة الانتاج الشامل لديها القدرة على توريد الماس عالية الجودة مستقرة ، يمكن أن تلبي الطلب على المجوهرات الراقية العلامة التجارية المشتريات المستمرة . المنتجات عالية الجودة لتوفير كامل تقرير الاختبار ، ودعم السلطة الدولية إعادة التفتيش . zuowen التكنولوجيا يوفر الدعم التقني الحصري من اختيار الراقية فارغة ، وتحسين عملية القطع إلى مراقبة جودة المنتجات النهائية ، ومساعدة العملاء على بناء أعلى جودة المنتجات والمجوهرات .</p>",
+      "coverImage": "/uploads/products/rough-premium.svg",
+      "categoryId": null,
+      "images": [
+        "/uploads/products/rough-premium.svg"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 5,
+          "price": "97"
+        },
+        {
+          "qty": 20,
+          "price": "93"
+        }
+      ],
+      "specs": [
+        {
+          "name": "净度",
+          "nameEn": "Clarity",
+          "options": [
+            {
+              "label": "SI 标准",
+              "price": "2800",
+              "labelEn": "SI Standard"
+            },
+            {
+              "label": "VS 优等",
+              "price": "3600",
+              "labelEn": "VS Fine"
+            },
+            {
+              "label": "VVS 精选",
+              "price": "5200",
+              "labelEn": "VVS Premium"
+            }
+          ]
+        },
+        {
+          "name": "重量",
+          "nameEn": "Weight",
+          "options": [
+            {
+              "label": "1ct",
+              "price": "0"
+            },
+            {
+              "label": "2ct",
+              "price": "1200"
+            },
+            {
+              "label": "3ct",
+              "price": "3000"
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": null,
+      "originalPrice": null,
+      "unit": "件",
+      "stock": -1,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "26",
+      "slug": "polished-round",
+      "productId": "11",
+      "name": "圆形培育钻石裸石",
+      "nameEn": "round cultured diamond bare stone",
+      "nameJa": "円形育成ダイヤモンド裸石",
+      "nameKo": "원형 재배 다이아몬드 나석",
+      "nameFr": "Diamant de culture ronde Pierre nue",
+      "nameAr": "جولة زراعة الماس حجر العارية",
+      "summary": "标准圆形明亮式切割培育钻石，颜色D-J，净度VS-SI，适用于各类珠宝镶嵌",
+      "summaryEn": "Standard round brilliant cut cultured diamond, color D-J, clarity VS-SI, suitable for all types of jewelry settings.",
+      "summaryJa": "標準円形明るいカット育成ダイヤモンド、色D-J、純度VS-SI、各種ジュエリーモザイクに適用",
+      "summaryKo": "표준 원형 밝기 절단 육성 다이아몬드, 색상 D-J, 순도 VS-SI, 각종 보석 상감에 적용",
+      "summaryFr": "Diamant de culture taille brillant rond standard, couleur d - J, pureté vs - Si, pour tous types de sertissage de bijoux",
+      "summaryAr": "معيار جولة مشرق قطع الماس المزروعة ، اللون d-j ، والوضوح vs-si مناسبة لجميع أنواع المجوهرات الفسيفساء",
+      "description": "<p>ZW-Polished-R是左文科技推出的标准圆形明亮式切割培育钻石裸石，采用标准圆形明亮式切割，颜色等级D-J，净度等级VS-SI，切工等级Excellent-Very Good，重量0.3-5ct。该产品专为各类珠宝镶嵌设计，具备高火彩和标准切工的特点，适用于戒指、项链、耳环等各类珠宝产品。 产品采用左文科技CVD培育钻石毛坯，经过专业切割打磨和严格品质检测，确保每颗裸石的切工比例和光学性能达到标准。标准圆形明亮式切割可最大化钻石的火彩和亮度，呈现璀璨的视觉效果。产品支持定制规格，可满足不同珠宝设计的需求。 左文科技具备稳定的批量供应能力，可满足珠宝品牌的持续采购需求。产品提供完整的品质检测报告，可选配国际权威机构证书。左文科技提供从裸石选型、镶嵌建议到珠宝成品设计的全流程技术支持，帮助客户打造高品质珠宝产品。</p>",
+      "descriptionEn": "<p>ZW-Polished-R is a standard round brilliant cut cultured diamond nude stone launched by Zuowen Technology. It uses a standard round brilliant cut, has a color grade of DJ, a clarity grade of VS-SI, a cut grade of Excellent-Very Good, and a weight of 0.3-5ct. This product is specially designed for various types of jewelry inlay, featuring high flame and standard cutting, and is suitable for various jewelry products such as rings, necklaces, and earrings. The product uses Zuowen Technology's CVD-grown diamond blanks, which undergo professional cutting and polishing and strict quality testing to ensure that the cut ratio and optical properties of each bare stone meet the standards. The standard round brilliant cut maximizes the diamond's sparkle and brilliance, creating a dazzling visual effect. The product supports customized specifications to meet the needs of different jewelry designs. Zuowen Technology has stable bulk supply capabilities, which can meet the continuous procurement needs of jewelry brands. The product provides a complete quality inspection report and can be equipped with certificates from international authoritative institutions. Zuowen Technology provides full-process technical support, from bare stone selection and inlay recommendations to finished jewelry design, to help clients create high-quality jewelry products.</p>",
+      "descriptionJa": "<p>ZW-Polished-Rは左文科学技術が発売した標準円形明るさ式切断育成ダイヤモンド裸石で、標準円形明るさ式切断、色等級D-J、純度等級VS-SI、切断等級Excellent-Very Good、重量0.3-5 ctを採用している。この製品は各種ジュエリーのモザイク設計に特化しており、高火彩と標準切断の特徴を備えており、指輪、ネックレス、イヤリングなど各種ジュエリー製品に適している。製品は左文科学技術CVDを用いてダイヤモンドブランクを育成し、専門的な切断研磨と厳格な品質検査を経て、1粒の裸石の切断比率と光学性能が基準に達することを確保した。製品はカスタム仕様をサポートし、異なるジュエリーデザインのニーズに対応することができます。左文科学技術は安定した大量供給能力を備えており、ジュエリーブランドの持続的な購入需要を満たすことができる。製品は完全な品質検査報告書を提供し、国際権威機関の証明書を選択することができる。左文科学技術は裸石の選択、象眼提案からジュエリー製品の設計までの全プロセス技術サポートを提供し、顧客の高品質ジュエリー製品の製造を支援する。</p>",
+      "descriptionKo": "<p>ZW-Polished-R은 좌문테크놀로지가 출시한 표준 원형 밝기 절단 육성 다이아몬드 누드스톤으로 표준 원형 밝기 절단, 색상 등급 D-J, 순도 등급 VS-SI, 절단 등급 Excellent-Very Good, 무게 0.3-5ct를 사용한다. 이 제품은 각종 보석 상감 디자인을 위해 고화채와 표준 절단의 특징을 갖추고 있으며 반지, 목걸이, 귀걸이 등 각종 보석 제품에 적용된다.제품은 좌문과학기술 CVD를 채용하여 다이아몬드반제품을 육성하고 전문적인 절단연마와 엄격한 품질검측을 거쳐 매개 나석의 절단비례와 광학성능이 표준에 도달하도록 확보한다.표준 원형 밝기 절단은 다이아몬드의 화채와 밝기를 극대화하여 찬란한 시각적 효과를 나타낼 수 있다.제품은 다양한 보석 디자인의 요구를 충족시키는 맞춤형 사양을 지원합니다.좌문과학기술은 안정적인 대량공급능력을 구비하여 보석브랜드의 지속적인 구매수요를 만족시킬수 있다.제품은 완전한 품질 검사 보고서를 제공하며, 국제 권위 있는 기관의 증서를 선택할 수 있다.좌문과학기술은 나석선형, 상감건의로부터 보석완제품설계에 이르는 전반 과정의 기술지원을 제공하여 고객이 고품질의 보석제품을 구축하도록 도와주었다.</p>",
+      "descriptionFr": "< p > ZW - polished - R est la pierre nue de diamant cultivée de taille brillante ronde standard introduite par la technologie zuwen, utilisant la taille brillante ronde standard, la classe de couleur d - J, la classe de pureté vs - Si, la classe de coupe excellente - very good, poids 0,3 - 5ct. Ce produit est conçu pour tous les types de bijoux incrustation, avec des couleurs de feu élevées et les caractéristiques de coupe standard, convient à tous les types de produits de bijoux tels que des bagues, des colliers, des boucles d'oreilles et d'autres. Le produit utilise la technologie de levain CVD pour cultiver le diamant brut, a subi un ponçage de coupe professionnel et un test de qualité strict, assurant que les proportions de coupe et les performances optiques de chaque pierre nue sont conformes aux normes. La coupe lumineuse ronde standard maximise la couleur de feu et la luminosité du diamant pour un effet visuel brillant. Le produit prend en charge les spécifications personnalisées, qui peuvent répondre aux besoins de différents designs de bijoux. La technologie de zuwen a une capacité d'approvisionnement en vrac stable qui peut répondre aux besoins d'achat continus des marques de bijoux. Le produit fournit un rapport de test de qualité complet et peut être accompagné d'un certificat d'autorité international en option. Zuwen Technology fournit un support technique complet du processus, de la sélection de pierres nues, des conseils en marqueterie à la conception de bijoux finis, pour aider les clients à créer des produits de haute qualité. </p>",
+      "descriptionAr": "<p>zw-polished-r هو معيار جولة مشرق قطع الماس العارية التي وضعتها zuowen العلم والتكنولوجيا ، وذلك باستخدام معيار جولة مشرق قطع ، لون الصف d-j ، درجة الوضوح vs-si ، قطع الصف excellent-very جيدة ، والوزن 0.3-5ct . هذا المنتج هو خصيصا لجميع أنواع المجوهرات فسيفساء تصميم ، مع ميزات عالية من الألوان النارية و قطع القياسية ، ومناسبة لمختلف المنتجات والمجوهرات مثل الخواتم والقلائد والأقراط . هذا المنتج يعتمد على تقنية زراعة الماس الخام تسوه ون الأمراض القلبية الوعائية ، ويمر من خلال المهنية قطع وطحن واختبار الجودة الصارمة ، وضمان أن كل حجر العارية قطع نسبة الأداء البصري تصل إلى مستوى . معيار جولة مشرق قطع الماس يمكن تحقيق أقصى قدر من النار اللون والسطوع ، مما يدل على تأثير مرئي مشرق . المنتجات التي تدعم مواصفات مخصصة ، ويمكن تلبية متطلبات تصميم المجوهرات المختلفة . تسوه ون التكنولوجيا لديها القدرة على توريد كميات ثابتة ، يمكن أن تلبي الطلب على المجوهرات العلامة التجارية الشراء المستمر . المنتج يوفر نوعية كاملة تقرير الاختبار ، يمكن أن تتطابق مع شهادة السلطة الدولية . تسوه ون التكنولوجيا من اختيار الحجر العاري ، فسيفساء من التوصيات إلى تصميم المجوهرات الانتهاء من العملية برمتها من الدعم التقني لمساعدة العملاء على بناء منتجات عالية الجودة والمجوهرات .</p>",
+      "coverImage": "/uploads/products/polished-round.svg",
+      "categoryId": null,
+      "images": [
+        "/uploads/products/polished-round.svg"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 5,
+          "price": "96"
+        }
+      ],
+      "specs": [
+        {
+          "name": "净度",
+          "nameEn": "Clarity",
+          "options": [
+            {
+              "label": "VS",
+              "price": "4800"
+            },
+            {
+              "label": "VVS",
+              "price": "6800"
+            }
+          ]
+        },
+        {
+          "name": "颜色",
+          "nameEn": "Color",
+          "options": [
+            {
+              "label": "D",
+              "price": "0"
+            },
+            {
+              "label": "E",
+              "price": "0"
+            },
+            {
+              "label": "F",
+              "price": "-400"
+            }
+          ]
+        },
+        {
+          "name": "重量",
+          "nameEn": "Weight",
+          "options": [
+            {
+              "label": "1ct",
+              "price": "0"
+            },
+            {
+              "label": "2ct",
+              "price": "3000"
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": null,
+      "originalPrice": null,
+      "unit": "件",
+      "stock": -1,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "27",
+      "slug": "polished-fancy",
+      "productId": "12",
+      "name": "异形/彩色培育钻石裸石",
+      "nameEn": "irregular-shaped/colored cultured diamond nude stone",
+      "nameJa": "異形/カラー育成ダイヤモンド裸石",
+      "nameKo": "이형/컬러 재배 다이아몬드 나석",
+      "nameFr": "Pierre nue de diamant de culture Alien / coloré",
+      "nameAr": "الغريبة / لون الماس المزروعة الحجر العاري",
+      "summary": "异形切割及彩色培育钻石，包括公主方、祖母绿、梨形等，以及粉色、黄色、蓝色等彩色钻石",
+      "summaryEn": "Irregular-cut and color-cut diamonds, including princess, emerald, pear-shaped diamonds, and colored diamonds such as pink, yellow, and blue.",
+      "summaryJa": "異形カットやカラー育成ダイヤモンド、姫方、エメラルド、梨形など、ピンク、黄色、青などのカラーダイヤモンド",
+      "summaryKo": "공주방, 에메랄드, 배 모양 등을 포함한 이형 절단 및 컬러 육성 다이아몬드 및 분홍색, 노란색, 파란색 등 컬러 다이아몬드",
+      "summaryFr": "Diamants de coupe et de culture de couleur, y compris les carrés de princesse, émeraudes, poires, etc., ainsi que les diamants de couleur rose, jaune, bleu, etc.",
+      "summaryAr": "شكل قطع الماس الملونة ، بما في ذلك الأميرة مربع ، الزمرد ، على شكل الكمثرى ، فضلا عن الوردي ، الأصفر ، والأزرق وغيرها من الماس الملونة",
+      "description": "<p>ZW-Polished-F是左文科技推出的异形/彩色培育钻石裸石，支持多种异形切割（公主方、祖母绿、梨形、心形等）和丰富色彩（无色、粉色、黄色、蓝色等），净度等级VS-SI，重量0.5-3ct。该产品专为独特珠宝设计和高端定制珠宝打造，具备多种形状和丰富色彩的特点，可满足个性化珠宝设计需求。 产品采用左文科技CVD培育钻石毛坯，经过专业异形切割打磨和严格品质检测，确保每颗裸石的切工比例和光学性能达到标准。异形切割可展现钻石独特的几何美感，彩色钻石可呈现丰富的色彩效果，为珠宝设计提供更多创意空间。产品支持定制形状和颜色，可满足高端定制珠宝的需求。 左文科技具备异形和彩色钻石的稳定供应能力，可满足珠宝设计师和高端定制品牌的采购需求。产品提供完整的品质检测报告，可选配国际权威机构证书。左文科技提供从异形/彩色钻石选型、设计建议到珠宝成品打造的专属技术支持，帮助客户创造独特的珠宝作品。</p>",
+      "descriptionEn": "<p>ZW-Polished-F is an irregular-shaped/color-grown diamond bare stone launched by Zuowen Technology. It supports a variety of irregular-shaped cuts (princess square, emerald, pear-shaped, heart-shaped, etc.) and rich colors (colorless, pink, yellow, blue, etc.), with a clarity grade of VS-SI and a weight of 0.5-3ct. This product is specifically designed for unique jewelry designs and high-end custom jewelry, featuring a variety of shapes and rich colors to meet personalized jewelry design needs. The product uses Zuowen Technology's CVD-grown diamond blanks, which undergo professional irregular-shaped cutting and polishing and strict quality testing to ensure that the cut ratio and optical properties of each bare stone meet the standards. Irregular cuts can showcase the unique geometric beauty of diamonds, while colored diamonds can present rich color effects, providing more creative space for jewelry design. The product supports customized shapes and colors to meet the needs of high-end custom jewelry. Zuowen Technology has a stable supply of irregular-shaped and colored diamonds, which can meet the procurement needs of jewelry designers and high-end custom brands. The product provides a complete quality inspection report and can be equipped with certificates from international authoritative institutions. Zuowen Technology provides exclusive technical support, from the selection of irregular-shaped/colored diamonds and design advice to the creation of finished jewelry pieces, to help clients create unique jewelry pieces.</p>",
+      "descriptionJa": "<p>ZW-Polished-Fは左文科学技術が発売した異形/彩色育成ダイヤモンド裸石であり、多種の異形切断（王女方、エメラルド、梨形、ハート形など）と豊富な色彩（無色、ピンク、黄色、青など）、純度等級VS-SI、重量0.5-3 ctをサポートする。この製品は独特なジュエリーデザインとハイエンドのカスタムジュエリーのために作られ、多種の形状と豊富な色彩の特徴を備え、個性的なジュエリーデザインの需要を満たすことができる。製品は左文科学技術CVDを用いてダイヤモンドブランクを育成し、専門的な異形切断研磨と厳格な品質検査を経て、1粒当たりの裸石の切断比率と光学性能が基準に達することを確保した。異形カットはダイヤモンド独特の幾何学的な美しさを表現することができ、カラーダイヤモンドは豊富な色彩効果を表現することができ、ジュエリーデザインにより多くのクリエイティブな空間を提供することができる。製品はカスタム形状と色をサポートし、ハイエンドのカスタムジュエリーの需要を満たすことができます。製品は完全な品質検査報告書を提供し、国際権威機関の証明書を選択することができる。左文科学技術は異形/カラーダイヤモンドの選択、設計提案からジュエリー製品の製造までの専属技術サポートを提供し、お客様が独自のジュエリー作品を創造するのを支援します。</p>",
+      "descriptionKo": "<p>ZW-Polished-F는 좌문테크놀로지가 출시한 이형/컬러 육성 다이아몬드 누드스톤으로 다양한 이형 절단(공주방, 에메랄드, 배모양, 하트 등)과 풍부한 색채(무색, 핑크, 노랑, 파랑 등), 순도 등급 VS-SI, 무게 0.5-3ct를 지원한다. 이 제품은 독특한 보석 디자인과 프리미엄 커스터마이징 보석으로 제작되었으며 다양한 모양과 풍부한 색채의 특징을 갖추고 있어 개성화된 디자인을 만족시킬 수 있다.제품은 좌문과학기술 CVD를 채용하여 다이아몬드반제품을 육성하고 전문적인 이형절단연마와 엄격한 품질검측을 거쳐 매 나석의 절공비례와 광학성능이 표준에 도달하도록 확보한다.이형 절단은 다이아몬드의 독특한 기하학적 미감을 나타낼 수 있고, 컬러 다이아몬드는 풍부한 색채 효과를 나타낼 수 있으며, 보석 디자인에 더 많은 창의적인 공간을 제공할 수 있다.제품은 맞춤형 모양과 색상을 지원하여 고급 맞춤형 보석의 수요를 만족시킬 수 있다.좌문과학기술은 이형과 채색다이아몬드의 안정적인 공급능력을 구비하여 보석설계사와 고급맞춤브랜드의 구매수요를 만족시킬수 있다.제품은 완전한 품질 검사 보고서를 제공하며, 국제 권위 있는 기관의 증서를 선택할 수 있다.좌문과학기술은 이형/채색다이아몬드의 선형, 설계건의로부터 보석완제품제조에 이르는 전속기술지원을 제공하여 고객이 독특한 보석작품을 창조하도록 도와주었다.</p>",
+      "descriptionFr": "< p > ZW - polished - F est une pierre nue de diamant cultivée en forme / couleur introduite par zewen Technology, qui prend en charge une variété de coupes profilées (carré princesse, émeraude, poire, cœur, etc.) et de couleurs riches (incolore, rose, jaune, bleu, etc.), classe de pureté vs - Si, poids 0,5 - 3ct. Ce produit est spécialement conçu pour la conception de bijoux uniques et les bijoux personnalisés haut de gamme, avec des caractéristiques de nombreuses formes et de couleurs riches pour répondre aux besoins de conception de bijoux personnalisés. Le produit utilise la technologie de levain CVD pour cultiver le diamant brut, après le polissage de coupe spéciale professionnelle et les tests de qualité rigoureux pour assurer les proportions de coupe et les performances optiques de chaque pierre nue à la norme. La coupe profilée peut révéler la beauté géométrique unique du diamant, les diamants de couleur peuvent présenter des effets de couleur riches, offrant plus d'espace créatif pour la conception de bijoux. Les produits prennent en charge les formes et les couleurs personnalisées qui peuvent répondre aux besoins des bijoux personnalisés haut de gamme. Avec une capacité d'approvisionnement stable en diamants profilés et colorés, la technologie de zuwen peut répondre aux besoins d'approvisionnement des concepteurs de bijoux et des marques personnalisées haut de gamme. Le produit fournit un rapport de test de qualité complet et peut être accompagné d'un certificat d'autorité international en option. Gauwen Tech offre un soutien technique exclusif allant de la sélection de diamants profilés / colorés, des conseils de conception à la création de bijoux finis pour aider les clients à créer des pièces de bijoux uniques. </p>",
+      "descriptionAr": "<p>zw-polished-f هو غير طبيعي / لون الماس العارية التي تنتجها zuowen التكنولوجيا ، والتي تدعم مختلف قطع غير طبيعي ( الأميرة مربع ، الزمرد ، شكل الكمثرى ، على شكل قلب ، وما إلى ذلك ) ، والألوان الغنية ( عديم اللون ، الوردي ، الأصفر ، الأزرق ، وما إلى ذلك ) ، درجة الوضوح vs-si والوزن 0.5-3ct . هذا المنتج هو تصميم فريد من نوعه من المجوهرات الراقية والمجوهرات حسب الطلب ، مع مجموعة متنوعة من الأشكال والألوان الغنية الميزات ، يمكن أن تلبي احتياجات تصميم المجوهرات الشخصية . هذا المنتج يعتمد على تقنية زراعة الماس الخام تسوه ون الأمراض القلبية الوعائية ، من خلال المهنية على شكل قطع وطحن واختبار الجودة الصارمة ، وضمان أن كل حجر العارية قطع نسبة الأداء البصري إلى مستوى . خاصة على شكل قطع الماس يمكن أن تظهر جمالية هندسية فريدة من نوعها ، لون الماس يمكن أن تظهر تأثير الألوان الغنية ، وتصميم المجوهرات لتوفير المزيد من الإبداع في الفضاء . المنتجات التي تدعم الأشكال والألوان حسب الطلب ، ويمكن تلبية الطلب على المجوهرات الراقية حسب الطلب . تسوه ون التكنولوجيا لديها القدرة على توريد الماس الملونة وغير النظامية ، ويمكن تلبية الطلب على المجوهرات مصمم الراقية مخصصة العلامة التجارية . المنتج يوفر نوعية كاملة تقرير الاختبار ، يمكن أن تتطابق مع شهادة السلطة الدولية . zuowen التكنولوجيا يوفر الدعم التقني الحصري من اختيار نوع من الماس الملونة / الغريبة ، وتقديم المشورة بشأن تصميم المجوهرات الانتهاء من المنتجات ، ومساعدة العملاء على خلق فريدة من نوعها قطعة من المجوهرات .</p>",
+      "coverImage": "/uploads/products/polished-fancy.svg",
+      "categoryId": null,
+      "images": [
+        "/uploads/products/polished-fancy.svg"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 5,
+          "price": "96"
+        }
+      ],
+      "specs": [
+        {
+          "name": "净度",
+          "nameEn": "Clarity",
+          "options": [
+            {
+              "label": "VS",
+              "price": "5200"
+            },
+            {
+              "label": "VVS",
+              "price": "7200"
+            }
+          ]
+        },
+        {
+          "name": "重量",
+          "nameEn": "Weight",
+          "options": [
+            {
+              "label": "1ct",
+              "price": "0"
+            },
+            {
+              "label": "2ct",
+              "price": "3200"
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": null,
+      "originalPrice": null,
+      "unit": "件",
+      "stock": -1,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "29",
+      "slug": "hs-high",
+      "productId": "14",
+      "name": "高导热型金刚石散热片",
+      "nameEn": "high thermal conductivity type diamond heat sink",
+      "nameJa": "高伝熱型ダイヤモンドフィン",
+      "nameKo": "고도열형 금강석 방열편",
+      "nameFr": "Dissipateurs de chaleur diamant de type haute conductivité thermique",
+      "nameAr": "عالية التوصيل الحراري نوع الماس يشع زعنفة",
+      "summary": "超高导热性能散热片，热导率≥1800 W/(m·K)，适用于超高功率器件散热",
+      "summaryEn": "Ultra-high thermal conductivity heat sink with thermal conductivity ≥1800 W/(m·K), suitable for heat dissipation of ultra-high power devices.",
+      "summaryJa": "超高伝導性放熱フィン、熱伝導率≧1800 W/（m・K）、超高出力デバイスの放熱に適用することができる。（1）：超高伝導性放熱フィン、（2）：超高伝導率放熱フィン、（2）：（2）：（2）：（2）（2）",
+      "summaryKo": "초고전도성 열 방출 슬라이스, 열 전도도 ≥ 1800 W/(m·K), 초고출력 부품 열 방출에 적용",
+      "summaryFr": "Dissipateurs de chaleur ultra - haute conductivité thermique, conductivité thermique ≥ 1800 W / (m·k), adaptés à la dissipation de chaleur par des dispositifs ultra - haute puissance",
+      "summaryAr": "فائقة التوصيل الحراري بالوعة الحرارة ، التوصيل الحراري ≥ 1800 ث / م · ك ) ، تنطبق على تبديد الحرارة عالية الطاقة الأجهزة",
+      "description": "<p>ZW-HS-H是左文科技推出的高导热型金刚石散热片，热导率≥1800 W/(m·K)，尺寸5×5~20×20mm，厚度0.3-2mm，表面可金属化处理。该产品专为超高功率电子器件散热管理设计，适用于高功率激光二极管、射频器件、功率半导体模块等超高功率器件的散热应用。 产品采用左文科技高端CVD法生长的超高纯度金刚石材料，经过精密加工和多轮严格品质检测，确保散热性能达到超高导热标准。金刚石散热片具有接近天然IIa型钻石的极高热导率和极低热阻，可显著提升超高功率器件的散热效率，解决高功率器件的热管理难题。产品支持大面积定制，可满足不同超高功率器件的散热需求。 左文科技具备高导热金刚石散热片的稳定供应能力，可满足高端电子器件厂商的采购需求。产品提供完整的高端性能检测报告，支持第三方权威机构检测验证。左文科技提供从超高功率散热方案设计、散热片选型到器件集成热测试的专属技术支持，帮助客户解决高功率器件的热管理挑战。</p>",
+      "descriptionEn": "<p>ZW-HS-H is a high thermal conductivity diamond heat sink launched by Zuowen Technology. It has a thermal conductivity of ≥1800 W/(m·K), a size of 5×5~20×20mm, a thickness of 0.3-2mm, and can be metallized on the surface. This product is specifically designed for heat dissipation management of ultra-high power electronic devices, and is suitable for heat dissipation applications of ultra-high power devices such as high-power laser diodes, radio frequency devices, and power semiconductor modules. The product uses ultra-high purity diamond material grown by Zuowen Technology's high-end CVD method. After precision processing and multiple rounds of strict quality testing, it ensures that the heat dissipation performance meets the ultra-high thermal conductivity standard. Diamond heat sinks have extremely high thermal conductivity and extremely low thermal resistance, which are close to those of natural IIa diamonds. They can significantly improve the heat dissipation efficiency of ultra-high power devices and solve the thermal management problems of high power devices. The product supports large-area customization and can meet the heat dissipation needs of different ultra-high power devices. Zuowen Technology has a stable supply capacity of highly thermally conductive diamond heat sinks, which can meet the procurement needs of high-end electronic component manufacturers. The product provides complete high-end performance testing reports and supports testing and verification by authoritative third-party organizations. Zuowen Technology provides dedicated technical support, from ultra-high power heat dissipation solution design and heat sink selection to device integration thermal testing, to help customers solve the thermal management challenges of high-power devices.</p>",
+      "descriptionJa": "<p>ZW-HS-Hは左文科学技術が発売した高熱伝導型ダイヤモンド放熱シートで、熱伝導率≧1800 W/（m・K）、サイズ5×5 ~ 20×20 mm、厚さ0.3-2 mm、表面金属化処理が可能である。この製品は超高出力電子デバイスの放熱管理のために設計されており、高出力レーザダイオード、無線周波デバイス、パワー半導体モジュールなどの超高出力デバイスの放熱応用に適している。製品は左文科学技術ハイエンドCVD法で成長させた超高純度ダイヤモンド材料を採用し、精密加工と多輪厳格な品質検査を経て、放熱性能が超高伝熱基準に達することを確保した。ダイヤモンド放熱フィンは天然IIa型ダイヤモンドに近い極めて高い熱伝導率と極低熱抵抗を有し、超高出力デバイスの放熱効率を著しく向上させ、高出力デバイスの熱管理難題を解決することができる。製品は大面積カスタマイズをサポートし、異なる超高出力デバイスの放熱需要を満たすことができる。製品は完全なハイエンド性能検査報告書を提供し、第三者権威機関の検査検証をサポートする。左文科学技術は超高出力放熱方案の設計、放熱フィンの選択型からデバイス統合熱テストまでの専属技術サポートを提供し、顧客が高出力デバイスの熱管理の課題を解決するのを支援する。</p>",
+      "descriptionKo": "<p>ZW-HS-H는 좌문테크놀로지가 출시한 고도열형 금강석 방열판으로 열전도율 ≥ 1800W/(m·K), 크기 5 × 5~20 × 20mm, 두께 0.3-2mm로 표면을 금속화 처리할 수 있다.초고출력 전자부품 방열관리를 위해 설계된 이 제품은 고출력 레이저 다이오드, 무선주파수 부품, 파워반도체 모듈 등 초고출력 부품의 방열 응용에 적용된다.제품은 좌문과학기술 고급CVD법으로 생장하는 초고순도 금강석재료를 채용하여 정밀가공과 다륜의 엄격한 품질검측을 거쳐 열방출성능이 초고열전도기준에 도달하도록 확보한다.금강석 방열편은 천연 IIa형 다이아몬드에 가까운 매우 높은 열전도율과 매우 낮은 열저항을 가지고 있어 초고출력 부품의 방열효율을 현저하게 향상시키고 고출력 부품의 열관리 난제를 해결할 수 있다.제품은 서로 다른 초고출력 부품의 발열 수요를 충족시킬 수 있는 대면적 맞춤형 제작을 지원한다.좌문과학기술은 열전도가 높은 금강석 방열편의 안정적인 공급능력을 구비하여 고급전자부품제조업체의 구매수요를 만족시킬수 있다.제품은 완벽한 하이엔드 성능 검사 보고서를 제공하며 타사 공인 기관의 검사 검증을 지원합니다.좌문과학기술은 초고공률방열방안설계, 방열편선형으로부터 부품집성열테스트에 이르는 전속기술지원을 제공하여 고객이 고공률부품의 열관리도전을 해결할수 있도록 도와주었다.</p>",
+      "descriptionFr": "< p > ZW - HS - H est un dissipateur de chaleur en diamant de type haute conductivité thermique lancé par la technologie zuwen, conductivité thermique ≥ 1800 W / (M · K), taille 5 × 5 ~ 20 × 20 mm, épaisseur 0,3 - 2 mm, la surface peut être métallisée. Ce produit est spécialement conçu pour la gestion de la dissipation de chaleur des dispositifs électroniques à très haute puissance et convient aux applications de dissipation de chaleur des dispositifs à très haute puissance tels que les diodes laser à haute puissance, les dispositifs RF, les modules semi - conducteurs de puissance et autres. Les produits sont fabriqués à partir de matériaux diamantés de très haute pureté cultivés par la méthode CVD haut de gamme de zhuwen Technology, après un traitement de précision et plusieurs tours de tests de qualité rigoureux, garantissant des performances de dissipation thermique atteignant des normes de conductivité thermique ultra - élevées. Avec une conductivité thermique extrêmement élevée et une résistance thermique extrêmement faible proches des diamants naturels de type IIA, les ailettes de refroidissement en diamant peuvent améliorer considérablement l'efficacité de la dissipation thermique des dispositifs à très haute puissance et résoudre les problèmes de gestion thermique des dispositifs à haute puissance. Le produit prend en charge la personnalisation de grande surface, qui peut répondre aux besoins de dissipation thermique de différents dispositifs à très haute puissance. La technologie de zuwen a une capacité d'approvisionnement stable de Dissipateurs de chaleur en diamant à haute conductivité thermique, qui peut répondre aux besoins d'achat des fabricants de dispositifs électroniques haut de gamme. Les produits fournissent des rapports d'inspection de performance complets et haut de gamme qui prennent en charge la vérification d'inspection par une autorité tierce. Left Tech fournit un support technique exclusif allant de la conception de solutions de dissipation thermique ultra - haute puissance à la sélection de Dissipateurs de chaleur en passant par les tests thermiques intégrés des dispositifs, aidant les clients à résoudre les défis de gestion thermique des dispositifs haute puissance. </p>",
+      "descriptionAr": "<p>zw-hs-h هو الماس بالوعة الحرارة مع الموصلية الحرارية العالية ≥ 1800 واط / ( م · ك ) ، 5 × 5 ~ 20 × 20 ملم ، سمك 0.3-2mm ، سطح معدني . هذا المنتج هو خصيصا من أجل تبديد الحرارة عالية الطاقة الأجهزة الإلكترونية تصميم الإدارة ، ينطبق على الطاقة العالية ليزر ديود ، جهاز الترددات اللاسلكية ، وحدة أشباه الموصلات السلطة وغيرها من تطبيقات تبديد الحرارة عالية الطاقة الأجهزة . المنتجات التي تستخدم التكنولوجيا الراقية تسوه ون الأمراض القلبية الوعائية نمو عالية النقاء مواد الماس ، من خلال معالجة دقيقة و عدة جولات من اختبار الجودة الصارمة ، لضمان أن أداء الإشعاع الحراري تصل إلى معايير فائقة التوصيل الحراري . الماس بالوعة الحرارة لديها الموصلية الحرارية العالية وانخفاض المقاومة الحرارية التي هي قريبة من نوع الماس الطبيعي IIA ، والتي يمكن أن تحسن بشكل كبير من كفاءة تبديد الحرارة من أجهزة السلطة العليا وحل مشكلة إدارة الحرارية من أجهزة السلطة العليا . المنتجات التي تدعم مساحة كبيرة مخصصة ، يمكن أن تلبي مختلف أجهزة الطاقة الفائقة تبديد الحرارة الاحتياجات . تسوه ون التكنولوجيا لديها القدرة على توريد الماس بالوعة الحرارة مع التوصيل الحراري عالية ، والتي يمكن أن تلبي متطلبات الشراء من الشركات المصنعة للأجهزة الإلكترونية الراقية . المنتج يوفر نهاية عالية الأداء الكامل تقرير الاختبار ، ودعم سلطة الطرف الثالث اختبار التحقق . zuowen التكنولوجيا يوفر الدعم التقني من أجل حل تحديات الإدارة الحرارية عالية الطاقة الأجهزة ، بما في ذلك تصميم عالية الطاقة تبديد الحرارة ، زعنفة نوع الاختبار الحراري .</p>",
+      "coverImage": "/uploads/products/hs-high.svg",
+      "categoryId": null,
+      "images": [
+        "/uploads/products/hs-high.svg"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 10,
+          "price": "98"
+        },
+        {
+          "qty": 50,
+          "price": "95"
+        }
+      ],
+      "specs": [
+        {
+          "name": "尺寸",
+          "nameEn": "Size",
+          "options": [
+            {
+              "label": "5×5mm",
+              "price": "0"
+            },
+            {
+              "label": "10×10mm",
+              "price": "120"
+            },
+            {
+              "label": "15×15mm",
+              "price": "300"
+            }
+          ]
+        },
+        {
+          "name": "厚度",
+          "nameEn": "Thickness",
+          "options": [
+            {
+              "label": "0.5mm",
+              "price": "0"
+            },
+            {
+              "label": "1.0mm",
+              "price": "45"
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": "360",
+      "originalPrice": null,
+      "unit": "件",
+      "stock": -1,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    },
+    {
+      "id": "31",
+      "slug": "scd-tool",
+      "productId": "16",
+      "name": "单晶金刚石刀具",
+      "nameEn": "single crystal diamond cutter",
+      "nameJa": "単結晶ダイヤモンド工具",
+      "nameKo": "단결정 금강석 공구",
+      "nameFr": "outil diamant monocristallin",
+      "nameAr": "الكريستال واحد قطع الماس",
+      "summary": "高品质单晶金刚石刀具，适用于有色金属、非金属材料的超精密加工",
+      "summaryEn": "High-quality single-crystal diamond cutters, suitable for ultra-precision machining of non-ferrous metals and non-metallic materials. [Synchronous testing]",
+      "summaryJa": "高品質単結晶ダイヤモンド工具、非鉄金属、非金属材料の超精密加工に適用【同期試験】",
+      "summaryKo": "고품질 단결정 금강석 칼, 비금속, 비금속 재료의 초정밀 가공에 적용【동기 테스트】",
+      "summaryFr": "Outils diamant monocristallins de haute qualité pour l'usinage ultra-précis de matériaux non ferreux et non métalliques [Essais simultanés]",
+      "summaryAr": "عالية الجودة قطع الماس الكريستال واحد ، تنطبق على المعادن غير الحديدية ، والمواد غير المعدنية فائقة الدقة بالقطع ( متزامن اختبار )",
+      "description": "<p>ZW-SCD是左文科技推出的单晶金刚石刀具，采用高品质单晶金刚石材料，刃口半径&lt;50nm，加工精度达到纳米级，适用于铝、铜、亚克力、复合材料等有色金属和非金属材料的超精密加工。该产品专为精密加工和超精密加工领域设计，适用于光学元件、精密模具、医疗器械等高端制造场景。 产品采用左文科技CVD法生长的高纯度单晶金刚石材料，经过精密刃磨和严格品质检测，确保刃口半径和加工精度达到超精密标准。单晶金刚石刀具具有超高硬度、纳米级刃口和超长寿命的特点，可实现镜面加工效果，显著提升加工表面质量和加工效率。产品支持定制刀具形状和规格，可满足不同加工场景的需求。 左文科技具备单晶金刚石刀具的研发和定制供应能力，可满足精密制造企业的采购需求。产品提供完整的刃口检测和加工性能报告，支持第三方检测验证。左文科技提供从刀具选型、加工参数优化到刀具寿命管理的全流程技术支持，帮助客户实现超精密加工的稳定量产。</p>",
+      "descriptionEn": "<p>The ZW-SCD is a single-crystal diamond cutting tool launched by Zuowen Technology. It uses high-quality single-crystal diamond material, has a cutting edge radius of <50nm, and a machining accuracy of nano-level. It is suitable for ultra-precision machining of non-ferrous metals and non-metallic materials such as aluminum, copper, acrylic, and composite materials. This product is specifically designed for precision and ultra-precision machining, and is suitable for high-end manufacturing scenarios such as optical components, precision molds, and medical devices. The product uses high-purity single-crystal diamond material grown by Zuowen Technology's CVD method. After precision grinding and strict quality testing, it ensures that the cutting edge radius and machining accuracy reach ultra-precision standards. Single-crystal diamond cutting tools feature ultra-high hardness, nano-level cutting edge, and ultra-long lifespan, enabling mirror-finish processing and significantly improving surface quality and processing efficiency. The product supports customized tool shapes and specifications to meet the needs of different machining scenarios. Zuowen Technology has the capability to develop and customize single-crystal diamond cutting tools, which can meet the procurement needs of precision manufacturing enterprises. The product provides complete cutting edge testing and machining performance reports, and supports third-party testing and verification. Zuowen Technology provides full-process technical support from tool selection and machining parameter optimization to tool life management, helping customers achieve stable mass production of ultra-precision machining.</p>",
+      "descriptionJa": "<p>ZW-SCDは左文科学技術が発売した単結晶ダイヤモンド工具で、高品質の単結晶ダイヤモンド材料を採用し、刃口半径&lt ; 50 nm、加工精度はナノメートル級に達し、アルミニウム、銅、アクリル、複合材料などの非鉄金属と非金属材料の超精密加工に適している。この製品は精密加工と超精密加工分野に特化して設計されており、光学素子、精密金型、医療機器などのハイエンド製造シーンに適している。製品は左文科学技術CVD法で成長させた高純度単結晶ダイヤモンド材料を採用し、精密刃磨と厳格な品質検査を経て、刃口半径と加工精度が超精密基準に達することを確保した。単結晶ダイヤモンド工具は超高硬度、ナノメートル級刃口と超長寿命の特徴を有し、鏡面加工効果を実現でき、加工表面の品質と加工効率を著しく向上させることができる。製品はカスタム工具形状と仕様をサポートし、異なる加工シーンのニーズを満たすことができます。左文科学技術は単結晶ダイヤモンド工具の研究開発とカスタム供給能力を備えており、精密製造企業の購買需要を満たすことができる。製品は完全な刃口検査と加工性能報告を提供し、第三者検査検証をサポートする。</p>",
+      "descriptionKo": "<p>ZW-SCD는 좌문과학기술이 출시한 단결정금강석칼로서 고품질의 단결정금강석재료, 칼날반경 < 50nm를 채용하여 가공정밀도가 나노급에 달하고 알루미늄, 구리, 아크릴, 복합재료 등 유색금속과 비금속재료의 초정밀가공에 적용된다.정밀가공과 초정밀가공 분야를 위해 설계된 이 제품은 광학소자, 정밀금형, 의료기기 등 첨단 제조장면에 적용된다.제품은 좌문과학기술 CVD법으로 생장하는 고순도 단결정 금강석 재료를 채용하여 정밀 날갈이와 엄격한 품질 검측을 거쳐 날의 반경과 가공 정밀도가 초정밀 표준에 도달하도록 확보한다.단결정 금강석 칼은 초고경도, 나노급 칼날과 초장수명의 특징을 가지고 있어 거울면 가공 효과를 실현할 수 있으며 가공 표면의 품질과 가공 효율을 현저하게 향상시킬 수 있다.제품은 다양한 가공 장면의 요구를 충족하는 사용자정의 공구 형태와 사양을 지원합니다.좌문과학기술은 단결정금강석칼의 연구개발과 맞춤공급능력을 구비하여 정밀제조기업의 구매수요를 만족시킬수 있다.제품은 완전한 블레이드 감지 및 가공 성능 보고서를 제공하며 타사 감지 검증을 지원합니다.좌문과학기술은 칼의 선형, 가공매개변수의 최적화로부터 칼의 수명관리에 이르는 전반 과정의 기술지원을 제공하여 고객이 초정밀가공의 안정적인 량산을 실현하도록 도와주었다.</p>",
+      "descriptionFr": "<p>ZW-SCD est un outil diamant monocristallin introduit par Zuowen Technology. Il utilise des matériaux diamant monocristallins de haute qualité avec un rayon de coupe < 50 nm et une précision d'usinage nanométrique. Il convient à l'usinage ultra-précis de métaux non ferreux et de matériaux non métalliques tels que l'aluminium, le cuivre, l'acrylique et les matériaux composites. Ce produit est conçu pour l'usinage de précision et l'usinage ultra-précis, et convient aux scénarios de fabrication haut de gamme tels que les composants optiques, les moules de précision et les dispositifs médicaux. Le produit utilise un matériau de diamant monocristallin de haute pureté cultivé par la méthode CVD de Zuowen, qui a subi un meulage de précision et des tests de qualité stricts pour s'assurer que le rayon de l'arête de coupe et la précision d'usinage atteignent des normes d'ultra-précision. L'outil en diamant monocristallin présente les caractéristiques d'une dureté ultra-élevée, d'un tranchant à l'échelle nanométrique et d'une durée de vie ultra-longue, ce qui permet d'obtenir l'effet d'un traitement miroir et d'améliorer considérablement la qualité de la surface de traitement et l'efficacité du traitement. Le produit prend en charge les formes et les spécifications d'outils personnalisés pour répondre aux besoins de différents scénarios d'usinage. Zuowen Technology dispose des capacités de R&D et d'approvisionnement personnalisées des outils en diamant monocristallin pour répondre aux besoins d'approvisionnement des entreprises de fabrication de précision. Le produit fournit un rapport complet sur les performances d'inspection et d'usinage de la lame, prenant en charge l'inspection et la vérification par une tierce partie. Zuowen fournit un support technique pour l'ensemble du processus, de la sélection des outils et de l'optimisation des paramètres de traitement à la gestion de la durée de vie des outils, pour aider les clients à obtenir une production de masse stable d'usinage ultra-précis.</p>",
+      "descriptionAr": "<p>zw-scd هي واحدة من الكريستال قطع الماس التي وضعتها zuowen التكنولوجيا . zw-scd يستخدم عالية الجودة واحدة من الكريستال الماس المواد مع حافة قطرها 50 نانومتر واللفتنانت ، وتجهيز الدقة تصل إلى مستوى النانومتر . هذا المنتج هو خصيصا في مجال تصنيع الآلات الدقيقة ، فائقة الدقة بالقطع ، ينطبق على العناصر البصرية ، قوالب دقيقة ، والأجهزة الطبية وغيرها من الراقية تصنيع المشهد . عالية النقاء الكريستال واحد الماس المواد التي تزرع من قبل الأمراض القلبية الوعائية طريقة zuowen التكنولوجيا يمكن أن تصل إلى معيار الدقة فائقة الدقة من خلال طحن الدقيق واختبار الجودة . الكريستال واحد قطع الماس لديها خصائص صلابة عالية جدا ، نانو حافة القطع ، والخدمة الطويلة في الحياة ، ويمكن تحقيق تأثير المرآة ، ومن الواضح أن تحسين نوعية السطح وكفاءة الآلات . المنتجات التي تدعم أداة مخصصة الأشكال والمواصفات ، يمكن أن تلبي احتياجات مختلف تجهيز المشهد . zuowen التكنولوجيا لديها القدرة على البحث والتطوير والعرف من الكريستال واحد قطع الماس ، والتي يمكن أن تلبي متطلبات الشراء من الدقة تصنيع الشركات . المنتج يوفر كامل حافة التفتيش وتجهيز تقرير الأداء ، ودعم طرف ثالث التفتيش والتحقق . zuowen التكنولوجيا يوفر كامل عملية الدعم التقني من أداة اختيار المعلمة الأمثل أداة إدارة الحياة .</p>",
+      "coverImage": "/uploads/products/scd-tool.svg",
+      "categoryId": null,
+      "images": [
+        "/uploads/products/scd-tool.svg"
+      ],
+      "isParts": false,
+      "priceTiers": [
+        {
+          "qty": 10,
+          "price": "98"
+        },
+        {
+          "qty": 50,
+          "price": "95"
+        }
+      ],
+      "specs": [
+        {
+          "name": "刀尖圆弧",
+          "nameEn": "Nose Radius",
+          "options": [
+            {
+              "label": "0.2mm R",
+              "price": "0",
+              "stock": -1,
+              "labelEn": "0.2mm R"
+            },
+            {
+              "label": "0.5mm R",
+              "price": "300",
+              "stock": -1,
+              "labelEn": "0.5mm R"
+            },
+            {
+              "label": "1.0mm R",
+              "price": "800",
+              "stock": -1,
+              "labelEn": "1.0mm R"
+            }
+          ]
+        },
+        {
+          "name": "刃口类型",
+          "nameEn": "Edge Type",
+          "options": [
+            {
+              "label": "标准刃",
+              "price": "0",
+              "stock": -1,
+              "labelEn": "Standard"
+            },
+            {
+              "label": "加强刃",
+              "price": "400",
+              "stock": -1,
+              "labelEn": "Reinforced"
+            }
+          ]
+        }
+      ],
+      "modelFiles": null,
+      "price": "1200",
+      "originalPrice": null,
+      "unit": "件",
+      "stock": -1,
+      "minOrder": 1,
+      "status": "published",
+      "featured": false,
+      "sortOrder": 0
+    }
+  ]
+}

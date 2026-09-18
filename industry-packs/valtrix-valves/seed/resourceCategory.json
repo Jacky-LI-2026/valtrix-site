@@ -1,0 +1,59 @@
+{
+  "model": "resourceCategory",
+  "rows": [
+    {
+      "id": "1",
+      "type": "manual",
+      "title": "产品手册",
+      "titleEn": "Manuals",
+      "titleJa": null,
+      "titleKo": null,
+      "titleFr": null,
+      "titleAr": null,
+      "description": "产品目录、安装与使用手册",
+      "descriptionEn": "Catalogs and installation manuals",
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "icon": "book",
+      "sortOrder": 0
+    },
+    {
+      "id": "2",
+      "type": "certificate",
+      "title": "资质认证",
+      "titleEn": "Certificates",
+      "titleJa": null,
+      "titleKo": null,
+      "titleFr": null,
+      "titleAr": null,
+      "description": "产品认证与资质证书",
+      "descriptionEn": "Product certifications",
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "icon": "cert",
+      "sortOrder": 1
+    },
+    {
+      "id": "3",
+      "type": "drawing",
+      "title": "图纸资料",
+      "titleEn": "Drawings",
+      "titleJa": null,
+      "titleKo": null,
+      "titleFr": null,
+      "titleAr": null,
+      "description": "产品图纸与技术资料",
+      "descriptionEn": "Product drawings and technical data",
+      "descriptionJa": null,
+      "descriptionKo": null,
+      "descriptionFr": null,
+      "descriptionAr": null,
+      "icon": "draw",
+      "sortOrder": 2
+    }
+  ]
+}
