@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Puzzle, Power, Settings2, ExternalLink, ShieldCheck, CheckCircle2, XCircle,
-  KeyRound, Search, ListChecks, AlertTriangle, Lock, Store, RefreshCw, Copy, Check, Download, Tag, X,
+  KeyRound, Plus, Trash2, Search, ListChecks, AlertTriangle, Lock, Store, RefreshCw, Copy, Check, Download, Tag, X,
 } from "lucide-react";
 import PluginEventsPanel from "@/components/admin/PluginEventsPanel";
 import { PLUGIN_CATEGORY_LABELS } from "@/lib/plugins/registry";
@@ -40,6 +40,8 @@ interface PluginItem {
   config: Record<string, any>;
   showInSidebar?: boolean;
   installedAt?: string;
+  /** P1-2：上次状态变更时记录的目录版本（与 version 比对提示"版本不一致"） */
+  installedVersion?: string;
   marketSource?: "remote" | "builtin";
   price?: number;
   paid?: boolean;
@@ -56,6 +58,8 @@ interface MarketPlugin {
   defaultEnabled: boolean;
   configurable: boolean;
   planned?: boolean;
+  /** 通用内容模型派生出的栏目（由 registry 标记）；市场视图不单独展示 */
+  isContentSection?: boolean;
   features: string[];
   impact?: string;
   adminUrl?: string;
@@ -72,6 +76,13 @@ interface Catalog {
   cached: boolean;
   installedKeys: string[];
   activatedKeys: string[];
+}
+
+interface GatewayKey {
+  key: string;
+  name: string;
+  createdAt: string;
+  lastUsed?: string;
 }
 
 /** 插件 category → 展示分组名（按业务口径归组） */
@@ -119,6 +130,12 @@ export default function PluginsPage() {
   const [metaName, setMetaName] = useState("");
   const [metaShowSidebar, setMetaShowSidebar] = useState(true);
 
+  // 对外 API 网关（基地自有能力，保留内嵌管理面板）
+  const [gatewayKeys, setGatewayKeys] = useState<GatewayKey[]>([]);
+  const [gatewayCaps, setGatewayCaps] = useState<string[]>([]);
+  const [gwName, setGwName] = useState("");
+  const [gwBusy, setGwBusy] = useState(false);
+
   // 付费开通弹窗
   const [activateTarget, setActivateTarget] = useState<MarketPlugin | null>(null);
   const [activateCode, setActivateCode] = useState("");
@@ -142,9 +159,17 @@ export default function PluginsPage() {
 
   const loadInstalled = async () => {
     try {
-      const r = await fetch("/api/admin/plugins");
-      const d = await r.json();
+      const [pr, kr] = await Promise.all([
+        fetch("/api/admin/plugins"),
+        fetch("/api/admin/plugins/gateway"),
+      ]);
+      const d = await pr.json();
       if (d.ok) setPlugins(d.list);
+      const kd = await kr.json();
+      if (kd.ok) {
+        setGatewayKeys(kd.keys || []);
+        setGatewayCaps(kd.capabilities || []);
+      }
     } catch {
       setError("加载已安装插件列表失败");
     } finally {
@@ -182,24 +207,87 @@ export default function PluginsPage() {
     loadCatalog(true);
   };
 
+  // ===== 对外 API 网关 =====
+  const createKey = async () => {
+    setGwBusy(true); setError("");
+    try {
+      const r = await fetch("/api/admin/plugins/gateway", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: gwName }),
+      });
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.error || "创建失败");
+      setGwName("");
+      await loadInstalled();
+    } catch (e: any) { setError(e.message || "创建失败"); }
+    finally { setGwBusy(false); }
+  };
+
+  const revokeKey = async (key: string) => {
+    if (!window.confirm("确认删除该 API Key？删除后使用此 Key 的调用将立即失效。")) return;
+    setGwBusy(true);
+    try {
+      const r = await fetch("/api/admin/plugins/gateway", {
+        method: "DELETE", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key }),
+      });
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.error || "删除失败");
+      await loadInstalled();
+    } catch (e: any) { setError(e.message || "删除失败"); }
+    finally { setGwBusy(false); }
+  };
+
+  const copyGwKey = (key: string) => {
+    navigator.clipboard?.writeText(key).catch(() => { /* 剪贴板不可用时忽略 */ });
+  };
+
   // ===== 市场视图：过滤 =====
   const marketPlugins = catalog?.plugins || [];
+  // 🔴 2026-09-18 修复（P1-4）：市场视图**不再单独展示"内容栏目"**（`isContentSection`）。
+  //
+  //   这些条目是由通用内容模型（`content-types`）派生出的 10 个栏目
+  //   （content-product / news / resource / industry / service / case / faq / career / about / menu）。
+  //   registry 里 `isContentSection` 字段的注释早已写明"能力市场不独立展示为卡片"，
+  //   但市场视图的过滤**从未实现这一条** ⇒ 市场里「内容类型」和它的 10 个栏目并列出现，
+  //   用户会以为要逐个"安装"，且与"已安装管理"视图（那里本来就有 `if (p.isContentSection) return false`）
+  //   对不上。现改为：市场视图折叠这些栏目，只保留「内容类型」这一张卡。
+  const marketVisible = useMemo(() => marketPlugins.filter((p) => !p.isContentSection), [marketPlugins]);
   const marketFiltered = useMemo(() => {
     const kw = search.trim().toLowerCase();
-    return marketPlugins.filter((p) => {
+    return marketVisible.filter((p) => {
       if (catFilter !== "all" && p.category !== catFilter) return false;
       if (!kw) return true;
       const haystack = [p.name, p.description, p.key, (p.features || []).join(" "), p.impact || ""].join(" ").toLowerCase();
       return haystack.includes(kw);
     });
-  }, [marketPlugins, search, catFilter]);
+  }, [marketVisible, search, catFilter]);
 
   const marketStats = useMemo(() => {
-    const installed = marketPlugins.filter((p) => (catalog?.installedKeys || []).includes(p.key)).length;
-    const activated = marketPlugins.filter((p) => (catalog?.activatedKeys || []).includes(p.key)).length;
-    const paid = marketPlugins.filter((p) => p.paid).length;
-    return { total: marketPlugins.length, installed, activated, paid };
-  }, [marketPlugins, catalog]);
+    // 🔴 2026-09-18：统一「已安装」口径。
+    //   此前市场 tab 的 `installed` 只数 `plugin_state` 里有记录的 key，而"已安装管理" tab 的定义是
+    //   `p.builtin || installedKeys.includes(p.key)`（内置全部 + 已装远程）⇒ 同一个词两个口径，
+    //   阀门站会出现「共 49 条：已安装 4」这种与实际不符的显示（46 个内置其实一直在跑）。
+    //   现改为与"已安装管理"同口径，并拆成三段更准确：内置 / 已装远程 / 已开通付费。
+    const builtin = marketVisible.filter((p) => p.builtin && !p.planned).length;
+    const remoteInstalled = marketVisible.filter(
+      (p) => !p.builtin && (catalog?.installedKeys || []).includes(p.key)
+    ).length;
+    const activated = marketVisible.filter((p) => (catalog?.activatedKeys || []).includes(p.key)).length;
+    const paid = marketVisible.filter((p) => p.paid).length;
+    const planned = marketVisible.filter((p) => !!p.planned).length;
+    const contentSections = marketPlugins.length - marketVisible.length;
+    return {
+      total: marketVisible.length,
+      builtin,
+      remoteInstalled,
+      installed: builtin + remoteInstalled,
+      activated,
+      paid,
+      planned,
+      contentSections,
+    };
+  }, [marketVisible, marketPlugins, catalog]);
 
   // ===== 已安装视图：仅 builtin 全部 + 已安装远程 =====
   const installedKeys = catalog?.installedKeys || [];
@@ -274,6 +362,11 @@ export default function PluginsPage() {
 
   const installPlugin = async (p: MarketPlugin): Promise<boolean> => {
     setError("");
+    // UI 层兜底：规划中条目不该走到这里（服务端 installMarketPlugin 亦返回 400）
+    if (p.planned) {
+      setError("该条目为规划中能力（功能尚未实现），暂不可安装");
+      return false;
+    }
     try {
       const r = await fetch("/api/admin/plugin-market/install", {
         method: "POST",
@@ -489,9 +582,16 @@ export default function PluginsPage() {
   };
 
   const marketStatusBadge = (p: MarketPlugin) => {
+    // 🔴 2026-09-18（P1-5）：规划中条目**先于一切状态**判定 —— 未实现的条目不该显示
+    //   「内置 / 未安装 / 已开通」，否则用户会以为"装一下就能用"。
+    if (p.planned) return <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium"><AlertTriangle size={11} /> 规划中</span>;
     const st = marketStatus(p);
     if (st === "activated") return <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-medium"><CheckCircle2 size={11} /> 已开通</span>;
     if (st === "installed") return <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium"><Download size={11} /> 已安装</span>;
+    // 🔴 2026-09-18：内置插件**不参与"安装"语义** —— 它随系统分发，只有启用/停用。
+    //   此前一律显示「未安装」并给出「安装」按钮，而点下去实际是把它**停用**
+    //   （服务端已同步收紧：installMarketPlugin 对内置插件返回 400）。
+    if (p.builtin) return <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium border border-emerald-100"><CheckCircle2 size={11} /> 内置 · 随系统提供</span>;
     return <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">未安装</span>;
   };
 
@@ -504,6 +604,10 @@ export default function PluginsPage() {
   );
 
   const priceTag = (p: MarketPlugin) => (
+    // 规划中条目"标了价却买不到"最容易误导 ⇒ 不显示价格，改显示「未上架」
+    p.planned ? (
+      <span className="text-xs font-medium text-amber-600">未上架</span>
+    ) :
     p.paid ? (
       <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600"><Lock size={11} /> ¥{p.price || 0} · 付费</span>
     ) : (
@@ -569,9 +673,9 @@ export default function PluginsPage() {
           {!pluginsLoading && <span className="ml-1.5 text-xs text-gray-400">({stats.total})</span>}
         </button>
         <span className="ml-auto text-xs text-gray-400">
-          {tab === "market"
-            ? `共 ${marketStats.total} 条：已安装 ${marketStats.installed} · 已开通付费 ${marketStats.activated} · 付费条目 ${marketStats.paid}`
-            : `共 ${stats.total} 个已安装能力：启用 ${stats.enabled} / 停用 ${stats.disabled}`}
+      {tab === "market"
+        ? `共 ${marketStats.total} 个能力：内置 ${marketStats.builtin} · 已装远程 ${marketStats.remoteInstalled} · 已开通付费 ${marketStats.activated} · 规划中 ${marketStats.planned}${marketStats.contentSections > 0 ? ` · 内容栏目已折叠 ${marketStats.contentSections}` : ""}`
+        : `共 ${stats.total} 个已安装能力：启用 ${stats.enabled} / 停用 ${stats.disabled}`}
         </span>
       </div>
 
@@ -617,7 +721,7 @@ export default function PluginsPage() {
               {marketFiltered.map((p) => {
                 const st = marketStatus(p);
                 return (
-                  <div key={p.key} className={`bg-white rounded-xl border shadow-sm p-4 flex flex-col transition-shadow hover:shadow-md ${st === "activated" ? "border-green-200" : st === "installed" ? "border-blue-200" : "border-gray-200"}`}>
+                  <div key={p.key} className={`bg-white rounded-xl border shadow-sm p-4 flex flex-col transition-shadow hover:shadow-md ${p.planned ? "border-dashed border-amber-300 bg-amber-50/30" : st === "activated" ? "border-green-200" : st === "installed" ? "border-blue-200" : "border-gray-200"}`}>
                     {/* 头部：名称 + 来源 + 状态 */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
@@ -653,8 +757,13 @@ export default function PluginsPage() {
                       </div>
                     )}
 
-                    {/* 远程条目待部署提示 */}
-                    {p.marketSource === "remote" && (
+                    {/* 规划中条目提示（优先）：功能未实现，不提供安装 */}
+                    {p.planned ? (
+                      <div className="mt-3 text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded px-2.5 py-1.5 flex items-start gap-1.5">
+                        <AlertTriangle size={12} className="text-amber-500 mt-0.5 shrink-0" />
+                        <span>规划中能力：功能尚未实现，本条目不提供安装（实现后去掉 <code>planned</code> 标记即可上架）。</span>
+                      </div>
+                    ) : p.marketSource === "remote" && (
                       <div className="mt-3 text-[11px] text-gray-500 bg-gray-50 border border-gray-100 rounded px-2.5 py-1.5 flex items-start gap-1.5">
                         <AlertTriangle size={12} className="text-amber-500 mt-0.5 shrink-0" />
                         <span>功能代码待部署：当前为市场目录条目（能力开关 + 入口 + 说明），实际功能需随部署提供。</span>
@@ -663,8 +772,23 @@ export default function PluginsPage() {
 
                     {/* 操作区 */}
                     <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
-                      {st === "fresh" && (
-                        <button onClick={async () => {
+            {/* 规划中条目：不给任何安装/开通入口（服务端同样拒绝，见 installMarketPlugin） */}
+            {p.planned && (
+              <button disabled
+                title="该能力尚未实现，暂不可安装"
+                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-xs bg-gray-100 text-gray-400 rounded-md cursor-not-allowed">
+                <AlertTriangle size={12} /> 规划中 · 暂不可安装
+              </button>
+            )}
+            {/* 内置插件：不显示「安装」，改为跳到已安装管理里启停（与服务端口径一致） */}
+            {!p.planned && st === "fresh" && p.builtin && (
+              <button onClick={() => setTab("installed")}
+                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md hover:bg-emerald-100 transition-colors">
+                <CheckCircle2 size={12} /> 内置 · 前往启停
+              </button>
+            )}
+            {!p.planned && st === "fresh" && !p.builtin && (
+              <button onClick={async () => {
                           const ok = await installPlugin(p);
                           // 付费插件：安装成功后直接弹出「付费开通」，一步到位
                           if (ok && p.paid) {
@@ -677,19 +801,19 @@ export default function PluginsPage() {
                           <Download size={12} /> {p.paid ? "安装并开通" : "安装"}
                         </button>
                       )}
-                      {st === "installed" && !p.paid && (
+                      {!p.planned && st === "installed" && !p.paid && (
                         <button onClick={() => setTab("installed")}
                           className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-xs bg-green-50 text-green-700 border border-green-200 rounded-md hover:bg-green-100 transition-colors">
                           <CheckCircle2 size={12} /> 已安装 ✓
                         </button>
                       )}
-                      {st === "installed" && p.paid && (
+                      {!p.planned && st === "installed" && p.paid && (
                         <button onClick={() => { setActivateTarget(p); setActivateCode(""); setActivateError(""); }}
                           className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
                           <KeyRound size={12} /> 付费开通
                         </button>
                       )}
-                      {st === "activated" && (
+                      {!p.planned && st === "activated" && (
                         <button onClick={() => setTab("installed")}
                           className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-xs bg-green-100 text-green-700 border border-green-200 rounded-md hover:bg-green-200 transition-colors">
                           <CheckCircle2 size={12} /> 已开通 ✓
@@ -773,6 +897,13 @@ export default function PluginsPage() {
                                 )}
                               </div>
                               <div className="text-xs text-gray-400 mt-1">v{p.version} · {p.categoryLabel}{!p.builtin ? " · 扩展" : ""}{p.configurable ? " · 可配置" : ""}</div>
+                              {/* P1-2：状态记录里的目录版本与当前目录不一致时提示（不改任何行为，只如实告知） */}
+                              {p.installedVersion && p.installedVersion !== p.version && (
+                                <div className="text-[11px] text-amber-600 mt-1 flex items-center gap-1">
+                                  <AlertTriangle size={11} />
+                                  启停记录停在 v{p.installedVersion}（当前目录 v{p.version}）：下次启停/保存配置时自动对齐
+                                </div>
+                              )}
                             </div>
                             <button
                               onClick={() => locked ? setError("该功能需付费开通：请在插件市场输入兑换码后启用") : toggle(p)}
@@ -893,6 +1024,40 @@ export default function PluginsPage() {
               );
             })
           )}
+
+          {/* 对外 API 网关（沿用基地内嵌面板） */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
+            <div className="flex items-center gap-2 mb-1">
+              <KeyRound size={18} className="text-red-600" />
+              <h2 className="font-semibold text-gray-900">对外 API 网关</h2>
+              <span className="text-xs text-gray-400 font-normal">第三方系统通过 REST 调用对外公开的插件能力</span>
+            </div>
+            <p className="text-xs text-gray-500 mb-3">
+              调用方式：<code className="bg-gray-100 px-1 rounded">POST /api/integration/[capability]</code>，请求头
+              <code className="bg-gray-100 px-1 rounded">X-API-Key: &lt;key&gt;</code>，body <code className="bg-gray-100 px-1 rounded">{"{ \"args\": {...} }"}</code>。
+              当前对外开放能力：{gatewayCaps.length ? gatewayCaps.map((c) => <b key={c} className="text-gray-700">{c}</b>).reduce((a, b) => <>{a}、{b}</>) : <span className="text-gray-400">（暂无，注册能力时加 {`{ public: true }`} 即对外开放）</span>}
+            </p>
+            <div className="flex items-center gap-2 mb-3">
+              <input value={gwName} onChange={(e) => setGwName(e.target.value)} placeholder="用途说明（如：采集系统推送）"
+                className="flex-1 max-w-xs px-3 py-1.5 border border-gray-300 rounded-md text-sm outline-none focus:ring-2 focus:ring-red-500" />
+              <button onClick={createKey} disabled={gwBusy || !gwName.trim()}
+                className="flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 disabled:opacity-50">
+                <Plus size={14} /> 生成 Key
+              </button>
+            </div>
+            {gatewayKeys.length > 0 && (
+              <div className="space-y-2">
+                {gatewayKeys.map((k) => (
+                  <div key={k.key} className="flex items-center gap-2 bg-gray-50 rounded-md px-3 py-2">
+                    <code className="flex-1 text-sm text-gray-700 font-mono">{k.key.slice(0, 16)}…</code>
+                    <span className="text-xs text-gray-400">{k.name}</span>
+                    <button onClick={() => copyGwKey(k.key)} title="复制完整 Key" className="text-gray-400 hover:text-gray-600"><Copy size={14} /></button>
+                    <button onClick={() => revokeKey(k.key)} title="删除" className="text-red-400 hover:text-red-600"><Trash2 size={14} /></button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </>
       )}
 
@@ -1021,7 +1186,7 @@ export default function PluginsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setMetaTarget(null)}>
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-gray-900 mb-1">编辑插件 · {metaTarget.key}</h3>
-            <p className="text-xs text-gray-500 mb-4">自定义名称会同步显示在左侧菜单栏；不填写名称则使用默认名。</p>
+            <p className="text-xs text-gray-500 mb-4">自定义名称会同步显示在左侧菜单栏与能力市场；不填写名称则使用默认名。</p>
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">插件名称（留空恢复默认「{metaTarget.name}」）</label>
