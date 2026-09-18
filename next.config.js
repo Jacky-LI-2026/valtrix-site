@@ -88,6 +88,25 @@ const nextConfig = {
     }
     return config;
   },
+  /**
+   * 历史/常见短链重定向（2026-09-19 手术式合并）
+   * =====================================================
+   * 与 Base 同名文件的差异：**只有这一段**（Base 那份没有本文件顶部的 eslint 设置，
+   * 那份 eslint 设置是本服务器有意保留的站点侧差异，不能被覆盖 —— 见
+   * `scripts/_valve_sync_rest_20260918.js` 的 KEEP_SERVER_SIDE）。
+   *
+   * 目的：把"路径不对但意图明确"的 404 接住
+   *   · `/register`               → `/member/register`（会员注册真路径）
+   *   · `/admin/business/orders`  → `/admin/shop/orders`（后台订单真路径）
+   * 前台公开路径用 308（SEO 合并权重），后台路径用 307（内部别名，不长期缓存）。
+   * 产品短链 `/products/<slug>` 需要查库定位分类，放在 `app/products/[tab]/page.tsx` 里做 308。
+   */
+  async redirects() {
+    return [
+      { source: '/register', destination: '/member/register', permanent: true },
+      { source: '/admin/business/orders', destination: '/admin/shop/orders', permanent: false },
+    ];
+  },
 };
 
 module.exports = nextConfig;

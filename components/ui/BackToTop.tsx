@@ -17,10 +17,11 @@ export default function BackToTop() {
   if (!visible) return null;
 
   return (
+    // print-hidden：打印时不出现这个返回顶部圆钮（与全站打印样式 globals.css 的 @media print 配套）
     <button
       aria-label="返回顶部"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed bottom-4 left-4 z-[80] flex h-11 w-11 items-center justify-center"
+      className="print-hidden fixed bottom-4 left-4 z-[80] flex h-11 w-11 items-center justify-center"
     >
       <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 border border-gray-200 text-gray-600 shadow-md hover:bg-gray-50 hover:text-gray-900 transition-colors">
         <ArrowUp size={18} />

@@ -223,7 +223,7 @@ export default function AiChatWidget() {
         type="button"
         onClick={() => setOpen(!open)}
         aria-label="AI Assistant"
-        className="fixed bottom-4 right-4 z-[90] flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105"
+        className="print-hidden fixed bottom-4 right-4 z-[90] flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105"
         style={{ background: "var(--color-primary, #CC0000)" }}
       >
         {open ? (
@@ -238,7 +238,7 @@ export default function AiChatWidget() {
 
       {/* 聊天窗 */}
       {open && (
-        <div className="fixed bottom-20 right-4 z-[95] flex w-[calc(100vw-32px)] max-w-[360px] flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl"
+        <div className="print-hidden fixed bottom-20 right-4 z-[95] flex w-[calc(100vw-32px)] max-w-[360px] flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl"
              style={{ height: "min(520px, calc(100vh - 100px))" }}>
           {/* 头部 */}
           <div className="flex items-center justify-between px-4 py-3 text-white" style={{ background: "var(--color-primary, #CC0000)" }}>
