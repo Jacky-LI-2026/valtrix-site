@@ -181,14 +181,23 @@ export default function ProductDetailClient() {
     if (typeof x === "object") return typeof x.url === "string" ? x.url : "";
     return "";
   };
-  // 缩略图 URL：/uploads/xxx.webp -> /uploads/xxx_thumb.webp（兼容 xxx.jpg -> xxx_thumb.jpg）
+  // 缩略图 URL：一律指向 **`_thumb.webp`**
+  //
+  // 🔴 2026-09-18 修复（线上实测：每张图先 404 再回退）：
+  //   此前按**原扩展名**推导（`x.jpg → x_thumb.jpg`、`x.png → x_thumb.png`），
+  //   而上传管线 `app/api/admin/upload/route.ts` 产出的缩略图**永远是 `.webp`**
+  //   （`thumbName = ${baseName}_thumb.webp`）⇒ 两边约定不一致，前端请求的
+  //   `x_thumb.jpg` 在服务器上根本不存在，只能靠 onError 回退到原图（多一次 404 + 加载大图）。
+  //   现统一为 `.webp`，并顺手只对 `/uploads/` 路径推导 —— 静态图（/images/**、占位图）
+  //   本身已是优化过的资源，不该再拼 `_thumb`。
   const toThumbUrl = (src: string) => {
     if (!src || src.startsWith("placeholder-") || src.startsWith("http")) return src;
+    if (!src.startsWith("/uploads/")) return src; // 静态资源不做缩略图推导
     const dot = src.lastIndexOf(".");
     if (dot === -1) return src;
     const ext = src.slice(dot).toLowerCase();
     if (ext === ".svg" || ext === ".gif") return src; // 矢量/动画不生成缩略图
-    return src.slice(0, dot) + "_thumb" + src.slice(dot);
+    return src.slice(0, dot) + "_thumb.webp";
   };
   const currentImage = images[currentImageIndex] || images[0] || "";
   const manualUrl = model?.manualUrl || DEFAULT_MANUAL_URL;
