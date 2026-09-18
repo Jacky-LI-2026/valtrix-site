@@ -16,5 +16,5 @@
     "paths": { "@/*": ["./*"] }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "_backups", "项目备份", "backups", "_pgsql", "_archive", "_local_backup", "updates", "data", "docs"]
+  "exclude": ["node_modules", "_backups", "项目备份", "backups", "_pgsql", "_archive", "_local_backup", "updates", "data", "docs", "tmp"]
 }

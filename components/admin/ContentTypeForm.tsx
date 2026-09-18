@@ -404,14 +404,24 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
         if (active && data && !data.error) {
           if (cfgProp) {
             // 动态类型：字段已由 serializeItem 展开到顶层（多语言为 {zh,en,...} 对象），展开为表单后缀键
+            //
+            // 🔴 2026-09-18 修复：**必须用「合并」而不是「整体替换」**。
+            //   `useAdminForm` 初始化时已把「所有多语言字段 × 所有语种」的键展开进 form
+            //   （例如 descriptionJa、titleEn）；而这里若替换为 `expanded`，一旦 `expanded`
+            //   未覆盖某个语种键（例如内置类型的扁平列形态），该键就会**从表单里消失** ⇒
+            //     · 各语种 Tab 显示为空；
+            //     · 字段级「重新翻译为X」按钮写回时被 useAdminForm.handleValuesChange 的
+            //       `if (fieldName in next)` 守卫**静默丢弃**（顶部「一键翻译全部」不受影响）。
+            //   合并可保证「预展开的语种键」始终存在，是对上面那类数据形态问题的第二道防线。
             const expanded = expandFieldsToForm(cfgProp, data)
-            setForm({
+            setForm((prev: any) => ({
+              ...prev,
               ...expanded,
               status: data.status || 'published',
               sortOrder: data.sortOrder ?? 0,
               title: data.title || '',
               slug: data.slug || '',
-            })
+            }))
           } else {
             setForm(deserializeJsonFields(data, (cfg?.fields || []) as MultiLangFieldConfig[]))
           }
