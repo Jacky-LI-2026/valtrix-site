@@ -1,7 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Globe, MapPin, Phone, Mail, Send, RefreshCw, FileText, CheckCircle2, AlertCircle } from "lucide-react";
+import { Save, Globe, MapPin, Phone, Mail, Send, RefreshCw, FileText, CheckCircle2, AlertCircle, Sparkles, Loader2 } from "lucide-react";
+
+/**
+ * 页面级 SEO 的语种（owner 2026-09-21：「页面级SEO标题应该增加多语言功能」）
+ * 与数据库列对应：中文=defaultTitle/defaultDesc/keywords，其余=基础名 + En/Ja/Ko/Fr/Ar。
+ */
+const SEO_LANGS: { code: string; label: string; suffix: string }[] = [
+  { code: "zh", label: "中文", suffix: "" },
+  { code: "en", label: "English", suffix: "En" },
+  { code: "ja", label: "日本語", suffix: "Ja" },
+  { code: "ko", label: "한국어", suffix: "Ko" },
+  { code: "fr", label: "Français", suffix: "Fr" },
+  { code: "ar", label: "العربية", suffix: "Ar" },
+];
 
 interface SEOConfig {
   id: string;
@@ -10,6 +23,10 @@ interface SEOConfig {
   defaultTitle: string;
   defaultDesc: string;
   keywords: string;
+  /** 页面级 SEO 多语言（可空；空则回退中文，见 lib/seo.ts 的 seoTitleForLocale 等） */
+  defaultTitleEn?: string; defaultTitleJa?: string; defaultTitleKo?: string; defaultTitleFr?: string; defaultTitleAr?: string;
+  defaultDescEn?: string; defaultDescJa?: string; defaultDescKo?: string; defaultDescFr?: string; defaultDescAr?: string;
+  keywordsEn?: string; keywordsJa?: string; keywordsKo?: string; keywordsFr?: string; keywordsAr?: string;
   companyName: string;
   companyAddress: string;
   phone: string;
@@ -47,6 +64,57 @@ export default function SEOConfigPage() {
   const [pushing, setPushing] = useState(false);
   // 站点级 sitemap 状态检测
   const [sitemap, setSitemap] = useState<{ checking: boolean; ok?: boolean; count?: number; error?: string }>({ checking: true });
+  // 页面级 SEO 多语言：当前编辑语种 + 一键翻译状态
+  const [seoLang, setSeoLang] = useState("zh");
+  const [seoI18nBusy, setSeoI18nBusy] = useState(false);
+  const [seoI18nMsg, setSeoI18nMsg] = useState("");
+
+  /**
+   * 一键翻译：中文的 标题/描述/关键词 → 英/日/韩/法/阿
+   * 走后台统一翻译接口 `/api/admin/translate`（与其它后台表单同一个入口），逐条回填。
+   */
+  const translateSeoAll = async () => {
+    const src = {
+      defaultTitle: String(config.defaultTitle || "").trim(),
+      defaultDesc: String(config.defaultDesc || "").trim(),
+      keywords: String(config.keywords || "").trim(),
+    };
+    if (!src.defaultTitle && !src.defaultDesc && !src.keywords) {
+      setSeoI18nMsg("请先填写中文的标题/描述/关键词");
+      return;
+    }
+    setSeoI18nBusy(true);
+    setSeoI18nMsg("");
+    const targets = SEO_LANGS.filter((l) => l.code !== "zh");
+    const bases: { base: keyof typeof src; label: string; capitalize: boolean }[] = [
+      { base: "defaultTitle", label: "标题", capitalize: true },
+      { base: "defaultDesc", label: "描述", capitalize: false },
+      { base: "keywords", label: "关键词", capitalize: false },
+    ];
+    const next: any = { ...config };
+    try {
+      for (const l of targets) {
+        for (const b of bases) {
+          const text = src[b.base];
+          if (!text) continue;
+          const res = await fetch("/api/admin/translate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text, targetLang: l.code, capitalize: b.capitalize }),
+          });
+          const d = await res.json().catch(() => ({}));
+          if (!res.ok || !d.translatedText) throw new Error(`${l.label}${b.label}翻译失败：${d.error || res.status}`);
+          next[`${b.base}${l.suffix}`] = d.translatedText;
+          setConfig({ ...next }); // 逐条回填，能看进度
+        }
+      }
+      setSeoI18nMsg(`已翻译 ${targets.length} 个语种`);
+    } catch (e: any) {
+      setSeoI18nMsg(e?.message || "翻译失败");
+    } finally {
+      setSeoI18nBusy(false);
+    }
+  };
 
   const checkSitemap = async () => {
     setSitemap((st) => ({ ...st, checking: true }));
@@ -211,35 +279,88 @@ export default function SEOConfigPage() {
               className="w-full px-3 py-2 border border-dark-200 rounded focus:outline-none focus:border-primary"
             />
           </div>
+          {/* 页面级 SEO（标题/描述/关键词）——**多语言**：按语种 Tab 编辑，中文为基准，可一键翻译 */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-dark mb-2">默认页面标题</label>
-            <input
-              type="text"
-              value={config.defaultTitle}
-              onChange={(e) => setConfig({ ...config, defaultTitle: e.target.value })}
-              placeholder="VALTRIX - 工业阀门与精密流体控制专家"
-              className="w-full px-3 py-2 border border-dark-200 rounded focus:outline-none focus:border-primary"
-            />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-dark mb-2">默认页面描述</label>
-            <textarea
-              value={config.defaultDesc}
-              onChange={(e) => setConfig({ ...config, defaultDesc: e.target.value })}
-              rows={3}
-              placeholder="VALTRIX Co., Ltd.专注于工业阀门与精密流体控制元件研发、制造与服务..."
-              className="w-full px-3 py-2 border border-dark-200 rounded focus:outline-none focus:border-primary"
-            />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-dark mb-2">关键词（逗号分隔）</label>
-            <textarea
-              value={config.keywords}
-              onChange={(e) => setConfig({ ...config, keywords: e.target.value })}
-              rows={2}
-              placeholder="VALTRIX, 工业阀门, 闸阀, 球阀, 蝶阀, 流体控制..."
-              className="w-full px-3 py-2 border border-dark-200 rounded focus:outline-none focus:border-primary"
-            />
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <label className="block text-sm font-medium text-dark">页面级 SEO（标题 / 描述 / 关键词）</label>
+              <span className="flex items-center gap-2">
+                {seoI18nMsg && (
+                  <span className={`text-xs ${seoI18nMsg.startsWith("已翻译") ? "text-green-600" : "text-red-500"}`}>{seoI18nMsg}</span>
+                )}
+                <button
+                  type="button"
+                  onClick={translateSeoAll}
+                  disabled={seoI18nBusy}
+                  title="把中文的标题/描述/关键词翻译到其余 5 个语种（可再手动修改）"
+                  className="inline-flex items-center gap-1 text-xs border border-red-200 text-red-600 px-2.5 py-1 rounded hover:bg-red-50 disabled:opacity-50"
+                >
+                  {seoI18nBusy ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                  {seoI18nBusy ? "翻译中…" : "一键翻译"}
+                </button>
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-1 mb-3">
+              {SEO_LANGS.map((l) => (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => setSeoLang(l.code)}
+                  className={`px-3 py-1.5 text-xs rounded-md border ${
+                    seoLang === l.code ? "bg-primary text-white border-primary" : "border-dark-200 text-dark-500 hover:bg-dark-50"
+                  }`}
+                >
+                  {l.label}
+                  {l.code !== "zh" && !String((config as any)[`defaultTitle${l.suffix}`] || "").trim() ? " ⚠" : ""}
+                </button>
+              ))}
+            </div>
+            {(() => {
+              const l = SEO_LANGS.find((x) => x.code === seoLang) || SEO_LANGS[0];
+              const kTitle = `defaultTitle${l.suffix}`;
+              const kDesc = `defaultDesc${l.suffix}`;
+              const kKeys = `keywords${l.suffix}`;
+              const ph = l.code === "zh"
+                ? { title: "VALTRIX - 工业阀门与精密流体控制专家", desc: "VALTRIX Co., Ltd.专注于工业阀门与精密流体控制元件研发、制造与服务…", keys: "VALTRIX, 工业阀门, 闸阀, 球阀, 蝶阀, 流体控制…" }
+                : { title: `${l.label} title`, desc: `${l.label} description`, keys: `${l.label} keywords` };
+              return (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-dark-500 mb-1">默认页面标题（{l.label}，上限 200 字符）</label>
+                    <input
+                      type="text"
+                      maxLength={200}
+                      value={String((config as any)[kTitle] || "")}
+                      onChange={(e) => setConfig({ ...config, [kTitle]: e.target.value } as any)}
+                      placeholder={l.code === "zh" ? ph.title : `留空则回退中文标题`}
+                      className="w-full px-3 py-2 border border-dark-200 rounded focus:outline-none focus:border-primary"
+                    />
+                    <div className="mt-1 flex justify-end text-[11px] tabular-nums text-dark-400">
+                      已用 {String((config as any)[kTitle] || "").length} / 上限 200
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-dark-500 mb-1">默认页面描述（{l.label}）</label>
+                    <textarea
+                      rows={3}
+                      value={String((config as any)[kDesc] || "")}
+                      onChange={(e) => setConfig({ ...config, [kDesc]: e.target.value } as any)}
+                      placeholder={l.code === "zh" ? ph.desc : "留空则回退中文描述"}
+                      className="w-full px-3 py-2 border border-dark-200 rounded focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-dark-500 mb-1">关键词（{l.label}，逗号分隔）</label>
+                    <textarea
+                      rows={2}
+                      value={String((config as any)[kKeys] || "")}
+                      onChange={(e) => setConfig({ ...config, [kKeys]: e.target.value } as any)}
+                      placeholder={l.code === "zh" ? ph.keys : "留空则回退中文关键词"}
+                      className="w-full px-3 py-2 border border-dark-200 rounded focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>

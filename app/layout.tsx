@@ -10,8 +10,8 @@ import { I18nProvider } from "@/lib/i18n";
 import { defaultLocale, locales, type Locale } from "@/config/i18n";
 import { prisma } from "@/lib/prisma";
 import { initScheduler } from "@/lib/scheduler";
-import { getSEOConfig } from "@/lib/seo";
-import { buildCurrentPageAlternates } from "@/lib/seo-metadata";
+import { getSEOConfig, seoTitleForLocale, seoDescForLocale, seoKeywordsForLocale } from "@/lib/seo";
+import { buildCurrentPageAlternates, getLocaleFromCookies } from "@/lib/seo-metadata";
 import { organizationSchema, websiteSchema, renderJsonLd } from "@/lib/seo/schema";
 import { getTemplatePreset, DEFAULT_TEMPLATE_SLUG } from "@/lib/templates/presets";
 
@@ -27,26 +27,32 @@ if (typeof window === "undefined") {
 // 动态生成metadata，从数据库获取SEO配置（多租户：按 Host 站点差异化 siteName）
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSEOConfig(headers())
+  // 页面级 SEO 多语言（owner 2026-09-21，与左文站同步）：默认标题/描述/关键词按**当前语种**取，
+  // 优先级 库内该语种 → 部署级 env（仅标题）→ 库内中文 → env 中文，见 lib/seo.ts。
+  const locale = getLocaleFromCookies()
+  const seoTitle = seoTitleForLocale(seo, locale)
+  const seoDesc = seoDescForLocale(seo, locale)
+  const seoKeywords = seoKeywordsForLocale(seo, locale)
   // canonical + hreflang 由**服务端**输出（此前靠客户端 JS 注入 ⇒ 不执行 JS 的爬虫
   // 在 HTML 里看不到；2026-09-18 线上实测确认 canonical/hreflang 均为 0 个）。
   // 根布局兜底 ⇒ 每个前台页面都有正确 canonical，含未接 metadata 的路由（如 /shop）。
   // 路径来自 middleware 注入的 `x-pathname`；拿不到则不输出（后台/接口不会产生指向后台的 canonical）。
   const alternates = buildCurrentPageAlternates()
   return {
-    title: seo.defaultTitle,
-    description: seo.defaultDesc,
-    keywords: seo.keywords,
+    title: seoTitle,
+    description: seoDesc,
+    keywords: seoKeywords,
     ...(alternates ? { alternates } : {}),
     openGraph: {
-      title: seo.defaultTitle,
-      description: seo.defaultDesc,
+      title: seoTitle,
+      description: seoDesc,
       type: "website",
       siteName: seo.siteName,
     },
     twitter: {
       card: "summary_large_image",
-      title: seo.defaultTitle,
-      description: seo.defaultDesc,
+      title: seoTitle,
+      description: seoDesc,
     },
   }
 }

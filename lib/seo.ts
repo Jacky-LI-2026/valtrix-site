@@ -22,6 +22,67 @@ const DEFAULT_SEO = {
   geoRegion: '',
 }
 
+/**
+ * 部署级「分语种默认标题」（均来自 env，未配置则为空串）。
+ *
+ * 为什么需要：站点默认标题原为**单语言**（DB seo_config.defaultTitle 或
+ * `NEXT_PUBLIC_DEFAULT_TITLE`），首页 `<title>` 因此无论切到哪个语种都显示中文
+ * （用户报障：「多语言切换后浏览器 <title> 仍为中文」）。
+ * 列表页/详情页的标题本就走 i18n / 记录级 seoTitle<语种>，不受影响；
+ * 缺的正是**首页这一条**的多语言来源。
+ *
+ * ⚠️ 必须**静态引用** `process.env.NEXT_PUBLIC_*`：Next 在构建期做字面量内联，
+ *    动态键名（process.env[`...${x}`]）取不到值。
+ * 未配置时回退中文，**不改变既有行为**。
+ */
+const LOCALIZED_DEFAULT_TITLES: Record<string, string> = {
+  zh: String(process.env.NEXT_PUBLIC_DEFAULT_TITLE || '').trim(),
+  en: String(process.env.NEXT_PUBLIC_DEFAULT_TITLE_EN || '').trim(),
+  ja: String(process.env.NEXT_PUBLIC_DEFAULT_TITLE_JA || '').trim(),
+  ko: String(process.env.NEXT_PUBLIC_DEFAULT_TITLE_KO || '').trim(),
+  fr: String(process.env.NEXT_PUBLIC_DEFAULT_TITLE_FR || '').trim(),
+  ar: String(process.env.NEXT_PUBLIC_DEFAULT_TITLE_AR || '').trim(),
+}
+
+/** 取某语种的部署级默认标题；未配置返回空串（由调用方回退） */
+export function localizedDefaultTitle(locale: string): string {
+  return LOCALIZED_DEFAULT_TITLES[locale] || ''
+}
+
+/**
+ * 语种 → 数据库列名后缀（与 lib/admin-form.ts 的 langFieldName 约定一致）
+ * 例：defaultTitle + 'Fr' → `defaultTitleFr`
+ */
+const LANG_COL_SUFFIX: Record<string, string> = { zh: '', en: 'En', ja: 'Ja', ko: 'Ko', fr: 'Fr', ar: 'Ar' }
+
+/**
+ * 站点默认标题（按当前语种）——**页面级 SEO 多语言**（owner 2026-09-21）
+ * ==========================================================================
+ * 取值优先级：**库内该语种** → 部署级 env 该语种 → **库内中文** → env 中文。
+ * 为什么这样排：后台「设置 → SEO」是客户自己能改的地方，应优先于 env；
+ *   env 只在"后台还没填"时兜底（老部署的行为不变），最后才回退中文保证不空。
+ */
+export function seoTitleForLocale(seo: any, locale: string): string {
+  const suffix = LANG_COL_SUFFIX[locale] ?? ''
+  return (
+    String(seo?.[`defaultTitle${suffix}`] || '').trim() ||
+    localizedDefaultTitle(locale) ||
+    String(seo?.defaultTitle || '').trim()
+  )
+}
+
+/** 站点默认描述（按当前语种）：库内该语种 → 库内中文（env 只有标题，无分语种描述） */
+export function seoDescForLocale(seo: any, locale: string): string {
+  const suffix = LANG_COL_SUFFIX[locale] ?? ''
+  return String(seo?.[`defaultDesc${suffix}`] || '').trim() || String(seo?.defaultDesc || '').trim()
+}
+
+/** 站点默认关键词（按当前语种）：库内该语种 → 库内中文 */
+export function seoKeywordsForLocale(seo: any, locale: string): string {
+  const suffix = LANG_COL_SUFFIX[locale] ?? ''
+  return String(seo?.[`keywords${suffix}`] || '').trim() || String(seo?.keywords || '').trim()
+}
+
 // 获取SEO配置（多租户：可传入请求 headers 按 Host 解析站点，站点级 siteName 覆盖全局；全局 sEOConfig 表为空时用默认值）
 export async function getSEOConfig(headers?: Headers | Record<string, string | string[] | null | undefined>) {
   const result: any = { ...DEFAULT_SEO }
@@ -35,6 +96,12 @@ export async function getSEOConfig(headers?: Headers | Record<string, string | s
       result.defaultTitle = config.defaultTitle || DEFAULT_SEO.defaultTitle
       result.defaultDesc = config.defaultDesc || DEFAULT_SEO.defaultDesc
       result.keywords = config.keywords || DEFAULT_SEO.keywords
+      // 页面级 SEO 多语言（2026-09-21）：把各语种列一并带出，交由 seoTitleForLocale 等取值
+      for (const s of ['En', 'Ja', 'Ko', 'Fr', 'Ar']) {
+        result[`defaultTitle${s}`] = (config as any)[`defaultTitle${s}`] || ''
+        result[`defaultDesc${s}`] = (config as any)[`defaultDesc${s}`] || ''
+        result[`keywords${s}`] = (config as any)[`keywords${s}`] || ''
+      }
       result.companyName = config.companyName || ''
       result.companyAddress = config.companyAddress || ''
       result.phone = config.phone || ''
