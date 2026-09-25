@@ -135,7 +135,8 @@ export default function ShopPage() {
                 href={`/shop/${item.slug}`}
                 className="group overflow-hidden rounded-2xl border border-dark-100 bg-white transition-shadow hover:shadow-lg"
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-dark-50">
+                {/* 商城商品卡：1:1 + 铺满（与产品页统一） */}
+                <div className="relative aspect-square overflow-hidden bg-dark-50">
                   {item.coverImage ? (
                     <Image
                       src={item.coverImage}

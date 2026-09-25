@@ -159,9 +159,13 @@ export default function ThreeSixtyViewer({
       className={`relative bg-dark-50 rounded-lg overflow-hidden select-none ${className}`}
       style={{ touchAction: "none" }}
     >
-      {/* 主图片 */}
+      {/*
+        主图片舞台：**正方形 1:1**（owner 2026-09-21：「把产品图片和360旋转设置为正方形比例」）。
+        原来是 5:4 —— 与主图区（现也已改成 1:1）不一致，切换"静态图 / 360"时高度会跳。
+        帧图按 object-contain 居中，不裁切。
+      */}
       <div
-        className={`w-full aspect-[5/4] flex items-center justify-center cursor-grab ${
+        className={`w-full aspect-square flex items-center justify-center cursor-grab ${
           isDragging ? "cursor-grabbing" : ""
         } ${isZoomed ? "overflow-auto" : "overflow-hidden"}`}
         onMouseDown={handleMouseDown}

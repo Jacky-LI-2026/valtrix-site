@@ -181,13 +181,15 @@ function ProductsContent() {
                         className="group bg-white border border-dark-100 rounded-lg overflow-hidden hover:border-primary hover:shadow-xl transition-all duration-300"
                       >
                         {/* Model Image */}
-                        <div className="aspect-[4/3] bg-dark-50 relative overflow-hidden">
+                        {/* 正方形 1:1 + 图片铺满（owner 2026-09-25：两者同时生效） */}
+                        <div className="aspect-square bg-dark-50 relative overflow-hidden">
                           {model.image ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={model.image}
                               alt={model.name}
-                              className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+                              /* 铺满图片区（owner 2026-09-25：「产品图片充满背景」）：object-contain + p-4 → object-cover */
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">

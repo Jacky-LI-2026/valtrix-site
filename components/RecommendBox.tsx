@@ -90,10 +90,11 @@ export default function RecommendBox({
               href={it.href}
               className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all"
             >
-              <div className="aspect-[4/3] bg-gray-100 relative">
+              {/* 推荐位卡片：正方形 1:1 + 图片铺满（与列表页/详情页统一） */}
+              <div className="aspect-square bg-gray-100 relative overflow-hidden">
                 {it.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={it.image} alt={it.name} loading="lazy" className="w-full h-full object-contain p-4" />
+                  <img src={it.image} alt={it.name} loading="lazy" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <span className="text-primary font-bold text-2xl">{(it.name || "?").charAt(0)}</span>

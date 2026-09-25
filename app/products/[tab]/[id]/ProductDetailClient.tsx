@@ -385,10 +385,14 @@ export default function ProductDetailClient() {
                 />
               ) : (
               <>
-              {/* Main Image - Draggable 360 View */}
+              {/*
+                Main Image - Draggable 360 View
+                正方形 1:1（owner 2026-09-21：「把产品图片和360旋转设置为正方形比例」，左文站同步到阀门站）。
+                原来是 4:3：与 360 查看器（现 1:1）高度不一致，切换视图会跳；缩略图本来就是 1:1，改成正方形后整列对齐。
+              */}
               <div
                 ref={imageContainerRef}
-                className={`relative bg-dark-50 rounded-lg overflow-hidden aspect-[4/3] border border-dark-100 select-none ${
+                className={`relative bg-dark-50 rounded-lg overflow-hidden aspect-square border border-dark-100 select-none ${
                   isDragging ? "cursor-grabbing" : isHovering ? "cursor-zoom-in" : "cursor-default"
                 }`}
                 onMouseDown={handleMouseDown}
@@ -405,7 +409,8 @@ export default function ProductDetailClient() {
                   <img
                     src={currentImage}
                     alt={`${model.name} - ${model.model} - ${t("view")} ${currentImageIndex + 1}`}
-                    className="w-full h-full object-contain transition-transform"
+                    /* 铺满正方形主图区（产品图为 1000×1000 方图 ⇒ 不裁切） */
+                    className="w-full h-full object-cover transition-transform"
                     style={{ transform: imageTransform, transitionDuration: isDragging || isHovering ? "0ms" : "200ms" }}
                     draggable={false}
                   />
@@ -520,7 +525,7 @@ export default function ProductDetailClient() {
                         <img
                           src={toThumbUrl(img)}
                           alt={`${model.model} ${t("view")} ${index + 1}`}
-                          className="w-full h-full object-contain bg-dark-50"
+                          className="w-full h-full object-cover bg-dark-50"
                           loading="lazy"
                           onError={(e) => { if (e.currentTarget.src !== img) e.currentTarget.src = img; }}
                         />
@@ -812,10 +817,11 @@ export default function ProductDetailClient() {
                   href={`/products/${tab.id}/${related.id}`}
                   className="group bg-white border border-dark-100 rounded-lg overflow-hidden hover:border-primary hover:shadow-lg transition-all"
                 >
-                  <div className="aspect-[4/3] bg-dark-50 relative">
+                  {/* 相关产品卡片：同样 1:1 + 铺满（与列表页、主图一致） */}
+                  <div className="aspect-square bg-dark-50 relative overflow-hidden">
                     {related.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={toThumbUrl(getImgStr(related.image))} loading="lazy" onError={(e) => { const raw = getImgStr(related.image); if (e.currentTarget.src !== raw) e.currentTarget.src = raw; }} alt={related.name} className="w-full h-full object-contain p-4" />
+                      <img src={toThumbUrl(getImgStr(related.image))} loading="lazy" onError={(e) => { const raw = getImgStr(related.image); if (e.currentTarget.src !== raw) e.currentTarget.src = raw; }} alt={related.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <span className="text-primary font-bold text-2xl">{related.model.charAt(0)}</span>
