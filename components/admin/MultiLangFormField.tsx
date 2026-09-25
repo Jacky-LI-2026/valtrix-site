@@ -117,6 +117,8 @@ export default function MultiLangFormField({
         height={config.height}
         required={config.required}
         capitalize={config.capitalize}
+        /* 字数上限（各语种）：由编辑页从 /meta 的列宽下发，用于 maxLength + 「已用 x / 上限 y」 */
+        maxLengthByLang={(config as any).maxLengthByLang}
         richTextEditor={kind === 'richtext' ? RichTextEditorLoader : undefined}
       />
     </div>

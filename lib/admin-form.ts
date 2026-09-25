@@ -39,6 +39,24 @@ export function expandLangFieldNames(base: string): Record<Lang, string> {
   }, {} as Record<Lang, string>)
 }
 
+/**
+ * 由「列宽上限表」推出某个多语言字段各语种的上限：`{ zh: 500, fr: 500, en: 300, … }`
+ * ---------------------------------------------------------------------------
+ * 上游：`/api/admin/content/[type]/meta` 的 `limits`（服务端读 `prisma/schema.prisma` 的 VarChar 宽度）。
+ * 用途：编辑页把结果塞进字段 config 的 `maxLengthByLang`，输入框据此加 `maxLength` 并显示
+ * 「已用 x / 上限 y」（owner 2026-09-20 要求：「不要保存后才知道超了」）。
+ * 返回 undefined 表示该字段没有任何列宽上限（例如 Text 列）—— 此时不显示提示、不加限制。
+ */
+export function maxLengthByLangOf(limits: Record<string, number> | undefined, baseName: string): Record<string, number> | undefined {
+  if (!limits) return undefined
+  const out: Record<string, number> = {}
+  for (const lang of LANGS) {
+    const max = limits[langFieldName(baseName, lang)]
+    if (typeof max === 'number' && max > 0) out[lang] = max
+  }
+  return Object.keys(out).length ? out : undefined
+}
+
 /** 从 form 提取某基础字段的多语言值对象 { zh, en, ja, ... } */
 export function buildLangValues<T extends Record<string, any>>(
   form: T,
@@ -107,6 +125,12 @@ export interface MultiLangFieldConfig {
   /** stringArray 专用 */
   itemLabel?: string
   addButtonText?: string
+  /**
+   * 各语种的字数上限（2026-09-20）：来自数据库列宽（`prisma/schema.prisma` 的 `@db.VarChar(n)`），
+   * 经 `/api/admin/content/[type]/meta` 下发。编辑页据此给输入框加 `maxLength` 并显示
+   * 「已用 x / 上限 y」——避免"保存后才知道超了"。未声明的语种/字段不加限制（Text 列无上限）。
+   */
+  maxLengthByLang?: Record<string, number>
 }
 
 /** 生成 AutoTranslateBar 的 fieldMap：{ zh字段: zh字段En }（仅 autoTranslate 字段） */

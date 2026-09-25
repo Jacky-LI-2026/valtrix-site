@@ -13,7 +13,8 @@ import { useRouter } from 'next/navigation'
 import { getContentType, ContentField, ContentTypeConfig } from '@/lib/content-types/registry'
 import { expandFieldsToForm } from '@/lib/content-types/dynamic'
 import { useAdminForm } from '@/lib/use-admin-form'
-import { serializeJsonFields, deserializeJsonFields, MultiLangFieldConfig } from '@/lib/admin-form'
+import { serializeJsonFields, deserializeJsonFields, MultiLangFieldConfig, maxLengthByLangOf } from '@/lib/admin-form'
+import CharCounter from './CharCounter'
 import MultiLangFormField from './MultiLangFormField'
 import AutoTranslateBar from './AutoTranslateBar'
 import SeoGeoConfig from './SeoGeoConfig'
@@ -367,6 +368,12 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [relationOptions, setRelationOptions] = useState<Record<string, { value: string; label: string }[]>>({})
+  /**
+   * 各列的字数上限（`{ name:200, subtitleFr:500, seoTitle:200, … }`）
+   * 来源：`/api/admin/content/[type]/meta` —— 服务端读 `prisma/schema.prisma` 的 VarChar 宽度。
+   * 用途：输入框旁显示「已用 x / 上限 y」+ 输入框 `maxLength` 硬限制（owner 2026-09-20 要求，左文/阀门同步）。
+   */
+  const [limits, setLimits] = useState<Record<string, number>>({})
 
   const multiLangFields = (cfg?.fields || []).filter((f) => f.multiLang) as MultiLangFieldConfig[]
   const singleFields = (cfg?.fields || []).filter((f) => !f.multiLang)
@@ -384,15 +391,19 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
     useAdminForm<any>({} as any, multiLangFields)
 
   // 加载关联下拉选项
+  // 加载关联下拉选项 + 字段字数上限
   useEffect(() => {
-    if (!hasRelation) return
     let active = true
     fetch(`/api/admin/content/${typeName}/meta`)
       .then((r) => r.json())
-      .then((data) => { if (active && data && data.relations) setRelationOptions(data.relations) })
+      .then((data) => {
+        if (!active || !data) return
+        if (data.relations) setRelationOptions(data.relations)
+        if (data.limits) setLimits(data.limits)
+      })
       .catch(() => {})
     return () => { active = false }
-  }, [typeName, hasRelation])
+  }, [typeName])
 
   // 编辑模式：加载详情
   useEffect(() => {
@@ -509,7 +520,8 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
           {mainFields.map((f) => (
             <MultiLangFormField
               key={f.name}
-              config={f}
+              /* 带上该字段各语种的字数上限（数据库列宽）→ 输入框 maxLength + 「已用 x / 上限 y」 */
+              config={{ ...f, maxLengthByLang: maxLengthByLangOf(limits, f.name) }}
               form={form}
               onValuesChange={handleValuesChange}
               getLangValues={getLangValues}
@@ -525,9 +537,14 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
                   value={form[f.name] || ''}
                   onChange={(e) => handleChange(f.name, e.target.value)}
                   placeholder={f.placeholder}
+                  maxLength={limits[f.name]}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                 />
                 <AiFieldButton label={f.label} value={form[f.name] || ''} onResult={(v) => handleChange(f.name, v)} />
+              </div>
+              {/* 有数据库上限时显示「已用 x / 上限 y」（Slug / 型号 / 作者 这类短文本列） */}
+              <div className="mt-1 flex justify-end">
+                <CharCounter value={form[f.name] || ''} max={limits[f.name]} />
               </div>
             </div>
           ))}
@@ -660,7 +677,12 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
                 geoRegion={form.geoRegion || ''}
                 geoCity={form.geoCity || ''}
                 onChange={(field, value) => handleChange(field, value)}
-                sourceText={form.content || ''}
+                /* SEO 标题这类 VarChar 列的字数上限（keyword/描述/城市是 Text 列，无上限） */
+                maxLengthByField={{ seoTitle: limits.seoTitle, seoTitleEn: limits.seoTitleEn }}
+                /* 整个表单：多语种 SEO 区（seoTitleEn/Ja/Ko/Fr/Ar 等）直接从 form 读写 */
+                form={form}
+                /* 关键词"内容提取"的来源文本：不同内容类型的正文字段名不同（产品=description、新闻/案例=content、FAQ=answer） */
+                sourceText={form.description || form.content || form.answer || ''}
                 sourceTitle={form[cfg.titleField] || ''}
                 sourceSummary={form.summary || ''}
               />

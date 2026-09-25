@@ -21,6 +21,235 @@ interface Highlight {
 }
 interface Block { blockId: string; heading: string; paragraphs: string[] }
 
+
+/**
+ * 内容块编辑：纯函数 + 编辑器（模块级）
+ * ==========================================================================
+ * 🔴 必须定义在模块级（owner 2026-09-21 报错「只能输入一个字符」的同一类程序缺陷）：
+ *   组件内定义组件 ⇒ 每次渲染产生新的组件类型 ⇒ React 卸载重建子树 ⇒
+ *   内容块的标题/段落输入框每敲一个字就丢一次焦点。
+ */
+// ===== 内容块编辑辅助函数 =====
+const addContentBlock = (blocks: any[]) => {
+  const blockId = `block-${Date.now()}`;
+  return [...blocks, { blockId, heading: '', paragraphs: [''] }];
+};
+
+const deleteContentBlock = (blocks: any[], blockId: string) => {
+  return blocks.filter((block: any) => block.blockId !== blockId);
+};
+
+const updateBlockHeading = (blocks: any[], blockId: string, heading: string) => {
+  return blocks.map((block: any) =>
+    block.blockId === blockId ? { ...block, heading } : block
+  );
+};
+
+const addParagraph = (blocks: any[], blockId: string) => {
+  return blocks.map((block: any) =>
+    block.blockId === blockId ? { ...block, paragraphs: [...block.paragraphs, ''] } : block
+  );
+};
+
+const deleteParagraph = (blocks: any[], blockId: string, paraIndex: number) => {
+  return blocks.map((block: any) =>
+    block.blockId === blockId
+      ? { ...block, paragraphs: block.paragraphs.filter((_: string, i: number) => i !== paraIndex) }
+      : block
+  );
+};
+
+const updateParagraph = (blocks: any[], blockId: string, paraIndex: number, text: string) => {
+  return blocks.map((block: any) =>
+    block.blockId === blockId
+      ? { ...block, paragraphs: block.paragraphs.map((p: string, i: number) => i === paraIndex ? text : p) }
+      : block
+  );
+};
+
+// 内容块编辑器组件（内联）
+const ContentBlockEditor = ({ value, onChange, lang, readOnly }: any) => {
+  const [aiOpen, setAiOpen] = useState(false)
+  const [aiHint, setAiHint] = useState('')
+  const [aiBusy, setAiBusy] = useState(false)
+  const [aiMsg, setAiMsg] = useState('')
+
+  // AI 生成内容块：主题 → 结构化 blocks JSON 数组
+  const handleAiGenerate = async () => {
+    setAiBusy(true)
+    setAiMsg('')
+    try {
+      const r = await fetch('/api/ai/feature', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          feature: 'content_block_generate',
+          action: 'generate_json',
+          label: '内容块',
+          prompt: `请为「${aiHint || '企业介绍'}」生成企业官网内容块 JSON 数组，数组元素结构为 {"heading":"小节标题","paragraphs":["段落1","段落2"]}，3-5 个内容块，每个块 1-3 段，专业 B2B 风格，只输出数组本身。`,
+        }),
+      })
+      const d = await r.json()
+      if (!d.ok) { setAiMsg(d.error || 'AI 调用失败'); return }
+      let raw = (d.result || '').trim()
+      raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '')
+      const arr = JSON.parse(raw)
+      if (!Array.isArray(arr)) throw new Error('返回格式不是数组')
+      const newBlocks = arr
+        .filter((x: any) => x && typeof x.heading === 'string' && x.heading.trim())
+        .map((x: any) => ({
+          blockId: `block-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          heading: x.heading.trim(),
+          paragraphs: Array.isArray(x.paragraphs) && x.paragraphs.length
+            ? x.paragraphs.map((p: any) => String(p))
+            : [''],
+        }))
+      if (!newBlocks.length) throw new Error('没有有效内容块')
+      onChange([...blocks, ...newBlocks])
+      setAiMsg(`已生成 ${newBlocks.length} 个内容块`)
+    } catch (e: any) {
+      setAiMsg('AI 生成失败：' + (e?.message || '返回内容无法解析'))
+    } finally {
+      setAiBusy(false)
+    }
+  }
+
+  let blocks: any[] = [];
+  if (Array.isArray(value)) {
+    blocks = value;
+  } else if (typeof value === 'string' && value.trim()) {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        blocks = parsed;
+      }
+    } catch (e) {
+      console.error('解析内容块JSON失败:', e);
+    }
+  }
+  const isZh = lang === 'zh';
+  return (
+    <div className="space-y-4">
+      {!readOnly && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => onChange(addContentBlock(blocks))}
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
+          >
+            <Plus size={14} /> {isZh ? '添加内容块' : 'Add Block'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setAiOpen(!aiOpen)}
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-purple-50 text-purple-700 rounded-md hover:bg-purple-100 transition-colors"
+            title="AI 根据主题自动生成内容块"
+          >
+            <Sparkles size={14} /> AI 生成内容块
+          </button>
+        </div>
+      )}
+      {!readOnly && aiOpen && (
+        <div className="rounded-lg border border-purple-100 bg-purple-50/40 p-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-purple-700 flex items-center gap-1">
+              <Sparkles size={12} /> AI 生成内容块
+            </span>
+            <button type="button" onClick={() => setAiOpen(false)} className="text-gray-400 hover:text-gray-600" title="关闭">
+              <X size={14} />
+            </button>
+          </div>
+          <input
+            type="text"
+            value={aiHint}
+            onChange={(e) => setAiHint(e.target.value)}
+            placeholder={isZh ? '输入主题，如：公司核心技术能力与研发体系' : 'Enter topic, e.g. Core technology and R&D system'}
+            className="w-full px-3 py-1.5 border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none mb-2"
+          />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleAiGenerate}
+              disabled={aiBusy}
+              className="px-3 py-1.5 bg-purple-600 text-white rounded-md text-xs hover:bg-purple-700 disabled:opacity-50"
+            >
+              {aiBusy ? '生成中…' : '生成并追加'}
+            </button>
+            {aiMsg && <span className="text-xs text-gray-500">{aiMsg}</span>}
+          </div>
+        </div>
+      )}
+      {blocks.length === 0 && (
+        <p className="text-sm text-gray-400 italic text-center py-8">
+          {isZh ? '暂无内容块' : 'No blocks'}
+        </p>
+      )}
+      {blocks.map((block: any, blockIndex: number) => (
+        <div key={block.blockId} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs text-gray-500">
+              {isZh ? `内容块 ${blockIndex + 1}` : `Block ${blockIndex + 1}`} (ID: {block.blockId})
+            </span>
+            {!readOnly && (
+              <button
+                type="button"
+                onClick={() => onChange(deleteContentBlock(blocks, block.blockId))}
+                className="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
+              >
+                <Trash2 size={12} /> {isZh ? '删除块' : 'Delete'}
+              </button>
+            )}
+          </div>
+          <div className="mb-3">
+            <label className="block text-xs text-gray-500 mb-1">{isZh ? '标题' : 'Heading'}</label>
+            <input
+              type="text"
+              value={block.heading}
+              onChange={(e) => onChange(updateBlockHeading(blocks, block.blockId, e.target.value))}
+              placeholder={isZh ? '输入内容块标题...' : 'Enter heading...'}
+              disabled={readOnly}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none disabled:bg-gray-100 disabled:text-gray-500"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-xs text-gray-500">{isZh ? '段落内容' : 'Paragraphs'}</label>
+            {block.paragraphs.map((para: string, paraIndex: number) => (
+              <div key={paraIndex} className="flex gap-2">
+                <textarea
+                  rows={2}
+                  value={para}
+                  onChange={(e) => onChange(updateParagraph(blocks, block.blockId, paraIndex, e.target.value))}
+                  placeholder={isZh ? '输入段落内容...' : 'Enter paragraph...'}
+                  disabled={readOnly}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none disabled:bg-gray-100 disabled:text-gray-500"
+                />
+                {!readOnly && (
+                  <button
+                    type="button"
+                    onClick={() => onChange(deleteParagraph(blocks, block.blockId, paraIndex))}
+                    className="px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors self-start"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                )}
+              </div>
+            ))}
+            {!readOnly && (
+              <button
+                type="button"
+                onClick={() => onChange(addParagraph(blocks, block.blockId))}
+                className="text-xs text-blue-600 hover:text-blue-700"
+              >
+                + {isZh ? '添加段落' : 'Add Paragraph'}
+              </button>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function AboutEditPage() {
   const router = useRouter();
   const params = useParams();
@@ -160,226 +389,7 @@ export default function AboutEditPage() {
     }
   };
 
-  // ===== 内容块编辑辅助函数 =====
-  const addContentBlock = (blocks: any[]) => {
-    const blockId = `block-${Date.now()}`;
-    return [...blocks, { blockId, heading: '', paragraphs: [''] }];
-  };
 
-  const deleteContentBlock = (blocks: any[], blockId: string) => {
-    return blocks.filter((block: any) => block.blockId !== blockId);
-  };
-
-  const updateBlockHeading = (blocks: any[], blockId: string, heading: string) => {
-    return blocks.map((block: any) =>
-      block.blockId === blockId ? { ...block, heading } : block
-    );
-  };
-
-  const addParagraph = (blocks: any[], blockId: string) => {
-    return blocks.map((block: any) =>
-      block.blockId === blockId ? { ...block, paragraphs: [...block.paragraphs, ''] } : block
-    );
-  };
-
-  const deleteParagraph = (blocks: any[], blockId: string, paraIndex: number) => {
-    return blocks.map((block: any) =>
-      block.blockId === blockId
-        ? { ...block, paragraphs: block.paragraphs.filter((_: string, i: number) => i !== paraIndex) }
-        : block
-    );
-  };
-
-  const updateParagraph = (blocks: any[], blockId: string, paraIndex: number, text: string) => {
-    return blocks.map((block: any) =>
-      block.blockId === blockId
-        ? { ...block, paragraphs: block.paragraphs.map((p: string, i: number) => i === paraIndex ? text : p) }
-        : block
-    );
-  };
-
-  // 内容块编辑器组件（内联）
-  const ContentBlockEditor = ({ value, onChange, lang, readOnly }: any) => {
-    const [aiOpen, setAiOpen] = useState(false)
-    const [aiHint, setAiHint] = useState('')
-    const [aiBusy, setAiBusy] = useState(false)
-    const [aiMsg, setAiMsg] = useState('')
-
-    // AI 生成内容块：主题 → 结构化 blocks JSON 数组
-    const handleAiGenerate = async () => {
-      setAiBusy(true)
-      setAiMsg('')
-      try {
-        const r = await fetch('/api/ai/feature', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            feature: 'content_block_generate',
-            action: 'generate_json',
-            label: '内容块',
-            prompt: `请为「${aiHint || '企业介绍'}」生成企业官网内容块 JSON 数组，数组元素结构为 {"heading":"小节标题","paragraphs":["段落1","段落2"]}，3-5 个内容块，每个块 1-3 段，专业 B2B 风格，只输出数组本身。`,
-          }),
-        })
-        const d = await r.json()
-        if (!d.ok) { setAiMsg(d.error || 'AI 调用失败'); return }
-        let raw = (d.result || '').trim()
-        raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '')
-        const arr = JSON.parse(raw)
-        if (!Array.isArray(arr)) throw new Error('返回格式不是数组')
-        const newBlocks = arr
-          .filter((x: any) => x && typeof x.heading === 'string' && x.heading.trim())
-          .map((x: any) => ({
-            blockId: `block-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-            heading: x.heading.trim(),
-            paragraphs: Array.isArray(x.paragraphs) && x.paragraphs.length
-              ? x.paragraphs.map((p: any) => String(p))
-              : [''],
-          }))
-        if (!newBlocks.length) throw new Error('没有有效内容块')
-        onChange([...blocks, ...newBlocks])
-        setAiMsg(`已生成 ${newBlocks.length} 个内容块`)
-      } catch (e: any) {
-        setAiMsg('AI 生成失败：' + (e?.message || '返回内容无法解析'))
-      } finally {
-        setAiBusy(false)
-      }
-    }
-
-    let blocks: any[] = [];
-    if (Array.isArray(value)) {
-      blocks = value;
-    } else if (typeof value === 'string' && value.trim()) {
-      try {
-        const parsed = JSON.parse(value);
-        if (Array.isArray(parsed)) {
-          blocks = parsed;
-        }
-      } catch (e) {
-        console.error('解析内容块JSON失败:', e);
-      }
-    }
-    const isZh = lang === 'zh';
-    return (
-      <div className="space-y-4">
-        {!readOnly && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              type="button"
-              onClick={() => onChange(addContentBlock(blocks))}
-              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
-            >
-              <Plus size={14} /> {isZh ? '添加内容块' : 'Add Block'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setAiOpen(!aiOpen)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-purple-50 text-purple-700 rounded-md hover:bg-purple-100 transition-colors"
-              title="AI 根据主题自动生成内容块"
-            >
-              <Sparkles size={14} /> AI 生成内容块
-            </button>
-          </div>
-        )}
-        {!readOnly && aiOpen && (
-          <div className="rounded-lg border border-purple-100 bg-purple-50/40 p-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-purple-700 flex items-center gap-1">
-                <Sparkles size={12} /> AI 生成内容块
-              </span>
-              <button type="button" onClick={() => setAiOpen(false)} className="text-gray-400 hover:text-gray-600" title="关闭">
-                <X size={14} />
-              </button>
-            </div>
-            <input
-              type="text"
-              value={aiHint}
-              onChange={(e) => setAiHint(e.target.value)}
-              placeholder={isZh ? '输入主题，如：公司核心技术能力与研发体系' : 'Enter topic, e.g. Core technology and R&D system'}
-              className="w-full px-3 py-1.5 border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none mb-2"
-            />
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handleAiGenerate}
-                disabled={aiBusy}
-                className="px-3 py-1.5 bg-purple-600 text-white rounded-md text-xs hover:bg-purple-700 disabled:opacity-50"
-              >
-                {aiBusy ? '生成中…' : '生成并追加'}
-              </button>
-              {aiMsg && <span className="text-xs text-gray-500">{aiMsg}</span>}
-            </div>
-          </div>
-        )}
-        {blocks.length === 0 && (
-          <p className="text-sm text-gray-400 italic text-center py-8">
-            {isZh ? '暂无内容块' : 'No blocks'}
-          </p>
-        )}
-        {blocks.map((block: any, blockIndex: number) => (
-          <div key={block.blockId} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs text-gray-500">
-                {isZh ? `内容块 ${blockIndex + 1}` : `Block ${blockIndex + 1}`} (ID: {block.blockId})
-              </span>
-              {!readOnly && (
-                <button
-                  type="button"
-                  onClick={() => onChange(deleteContentBlock(blocks, block.blockId))}
-                  className="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
-                >
-                  <Trash2 size={12} /> {isZh ? '删除块' : 'Delete'}
-                </button>
-              )}
-            </div>
-            <div className="mb-3">
-              <label className="block text-xs text-gray-500 mb-1">{isZh ? '标题' : 'Heading'}</label>
-              <input
-                type="text"
-                value={block.heading}
-                onChange={(e) => onChange(updateBlockHeading(blocks, block.blockId, e.target.value))}
-                placeholder={isZh ? '输入内容块标题...' : 'Enter heading...'}
-                disabled={readOnly}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none disabled:bg-gray-100 disabled:text-gray-500"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="block text-xs text-gray-500">{isZh ? '段落内容' : 'Paragraphs'}</label>
-              {block.paragraphs.map((para: string, paraIndex: number) => (
-                <div key={paraIndex} className="flex gap-2">
-                  <textarea
-                    rows={2}
-                    value={para}
-                    onChange={(e) => onChange(updateParagraph(blocks, block.blockId, paraIndex, e.target.value))}
-                    placeholder={isZh ? '输入段落内容...' : 'Enter paragraph...'}
-                    disabled={readOnly}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none disabled:bg-gray-100 disabled:text-gray-500"
-                  />
-                  {!readOnly && (
-                    <button
-                      type="button"
-                      onClick={() => onChange(deleteParagraph(blocks, block.blockId, paraIndex))}
-                      className="px-2 py-1 text-xs text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors self-start"
-                    >
-                      <Trash2 size={12} />
-                    </button>
-                  )}
-                </div>
-              ))}
-              {!readOnly && (
-                <button
-                  type="button"
-                  onClick={() => onChange(addParagraph(blocks, block.blockId))}
-                  className="text-xs text-blue-600 hover:text-blue-700"
-                >
-                  + {isZh ? '添加段落' : 'Add Paragraph'}
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
 
   const updateHighlight = (i: number, patch: Partial<Highlight>) => {
     const n = [...(form.highlights as Highlight[])];

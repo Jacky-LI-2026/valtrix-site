@@ -261,12 +261,14 @@ model Product {
   nameKo       String?  @db.VarChar(200)
   nameFr       String?  @db.VarChar(200)
   nameAr       String?  @db.VarChar(200)
-  subtitle     String?  @db.VarChar(300)
-  subtitleEn   String?  @db.VarChar(300)
-  subtitleJa   String?  @db.VarChar(300)
-  subtitleKo   String?  @db.VarChar(300)
-  subtitleFr   String?  @db.VarChar(300)
-  subtitleAr   String?  @db.VarChar(300)
+  // 2026-09-21：300 → 500（与左文站同步）。同一句中文副标题翻成法文/阿拉伯文会膨胀 2~4 倍
+  //   （实测 99 字中文 → 384 字法文），300 上限会把整条保存打回；超过 500 时服务端给可读中文提示。
+  subtitle     String?  @db.VarChar(500)
+  subtitleEn   String?  @db.VarChar(500)
+  subtitleJa   String?  @db.VarChar(500)
+  subtitleKo   String?  @db.VarChar(500)
+  subtitleFr   String?  @db.VarChar(500)
+  subtitleAr   String?  @db.VarChar(500)
   summary      String?  @db.Text
   summaryEn    String?  @db.Text
   summaryJa    String?  @db.Text
@@ -1365,6 +1367,24 @@ model SEOConfig {
   defaultTitle  String?  @db.VarChar(200)
   defaultDesc   String?  @db.Text
   keywords      String?  @db.Text
+  // ===== 页面级 SEO 多语言（owner 2026-09-21，与左文站同步）=====
+  // 站点默认标题/描述/关键词此前只有中文，切语种后 <title>/description 仍是中文；
+  // 现改为库字段，取值优先级见 lib/seo.ts：库内该语种 → env 该语种 → 库内中文 → env 中文。
+  defaultTitleEn String?  @db.VarChar(200)
+  defaultTitleJa String?  @db.VarChar(200)
+  defaultTitleKo String?  @db.VarChar(200)
+  defaultTitleFr String?  @db.VarChar(200)
+  defaultTitleAr String?  @db.VarChar(200)
+  defaultDescEn  String?  @db.Text
+  defaultDescJa  String?  @db.Text
+  defaultDescKo  String?  @db.Text
+  defaultDescFr  String?  @db.Text
+  defaultDescAr  String?  @db.Text
+  keywordsEn     String?  @db.Text
+  keywordsJa     String?  @db.Text
+  keywordsKo     String?  @db.Text
+  keywordsFr     String?  @db.Text
+  keywordsAr     String?  @db.Text
   companyName   String?  @db.VarChar(200)
   companyAddress String? @db.VarChar(500)
   phone         String?  @db.VarChar(50)
@@ -2006,4 +2026,3 @@ model ShopCouponClaim {
   @@index([memberId])
   @@map("shop_coupon_claims")
 }
-

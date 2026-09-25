@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import MultiLangFieldV2 from './MultiLangFieldV2';
 import AiFieldButton from './AiFieldButton';
+import CharCounter from './CharCounter';
 import { throttleTranslate } from '@/lib/translate-utils';
 
 interface MultiLangTextFieldProps {
@@ -24,6 +25,8 @@ interface MultiLangTextFieldProps {
   onValuesChange?: (values: Record<string, string>) => void;
   // 新增：是否将英文翻译结果的首字母大写（用于标题类内容）
   capitalize?: boolean;
+  /** 各语种的字数上限（来自数据库列宽，经 /meta 下发）；用于输入框 maxLength + 「已用 x / 上限 y」 */
+  maxLengthByLang?: Record<string, number>;
 }
 
 /**
@@ -48,6 +51,7 @@ export default function MultiLangTextField({
   values: externalValues,
   onValuesChange,
   capitalize = false,
+  maxLengthByLang,
 }: MultiLangTextFieldProps) {
   const LANG_SHOW: Record<string, string> = {
     zh: '中文', en: 'English', ja: '日本語', ko: '한국어', fr: 'Français', ar: 'العربية',
@@ -144,6 +148,8 @@ export default function MultiLangTextField({
   const renderEditor = (value: string, onChange: (value: string) => void, lang: string, readOnly: boolean) => {
     const isZh = lang === 'zh';
     const ph = isZh ? placeholder : (placeholderEn || placeholder);
+    // 数据库列宽上限（该语种）；没有上限（Text 列）时为 undefined ⇒ 不显示提示、不加 maxLength
+    const max = maxLengthByLang?.[lang];
 
     if (type === 'richtext' && RichTextEditor) {
       return (
@@ -167,10 +173,12 @@ export default function MultiLangTextField({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             disabled={readOnly}
+            maxLength={max}
             className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none resize-y disabled:bg-gray-50 disabled:text-gray-500"
             placeholder={ph}
           />
-          <div className="mt-1.5 flex justify-end">
+          <div className="mt-1.5 flex items-center justify-between gap-3">
+            <CharCounter value={value} max={max} />
             <AiFieldButton label={label} langLabel={LANG_SHOW[lang] || lang.toUpperCase()} value={value} onResult={onChange} />
           </div>
         </div>
@@ -178,19 +186,24 @@ export default function MultiLangTextField({
     }
 
     return (
-      <div className="flex gap-2 items-stretch">
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={readOnly}
-          required={required && isZh}
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none disabled:bg-gray-50 disabled:text-gray-500"
-          placeholder={ph}
-        />
-        {!readOnly && (
-          <AiFieldButton label={label} langLabel={LANG_SHOW[lang] || lang.toUpperCase()} value={value} onResult={onChange} />
-        )}
+      <div>
+        <div className="flex gap-2 items-stretch">
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            disabled={readOnly}
+            maxLength={max}
+            required={required && isZh}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none disabled:bg-gray-50 disabled:text-gray-500"
+            placeholder={ph}
+          />
+          {!readOnly && (
+            <AiFieldButton label={label} langLabel={LANG_SHOW[lang] || lang.toUpperCase()} value={value} onResult={onChange} />
+          )}
+        </div>
+        {/* 字数提示：有数据库上限时才显示（Title/Subtitle/SEO 标题这类 VarChar 列） */}
+        {max ? <div className="mt-1 flex justify-end"><CharCounter value={value} max={max} /></div> : null}
       </div>
     );
   };

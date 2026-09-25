@@ -76,6 +76,79 @@ const providerNames: Record<string, string> = {
   mymemory: "MyMemory",
 };
 
+
+/**
+ * 提供方折叠区 / 开关（模块级）
+ * ==========================================================================
+ * 🔴 必须定义在模块级（owner 2026-09-21 报错「只能输入一个字符」的同一类程序缺陷）：
+ *   组件内定义组件 ⇒ 每次渲染都是新类型 ⇒ React 卸载重建子树 ⇒ 子树上任何
+ *   input 每敲一个字就丢一次焦点。展开状态与切换回调改为 props 传入。
+ */
+  const ToggleSwitch = ({ enabled, onChange }: { enabled: boolean; onChange: () => void }) => (
+    <button
+      onClick={onChange}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+        enabled ? "bg-red-600" : "bg-gray-300"
+      }`}
+    >
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+          enabled ? "translate-x-6" : "translate-x-1"
+        }`}
+      />
+    </button>
+  );
+
+  const ProviderSection = ({
+    id,
+    title,
+    color,
+    description,
+    applyUrl,
+    expanded,
+    onToggle,
+    children,
+  }: {
+    id: string;
+    title: string;
+    color: string;
+    description: string;
+    applyUrl?: string;
+    expanded: boolean;
+    onToggle: (id: string) => void;
+    children: React.ReactNode;
+  }) => (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+      <button
+        onClick={() => onToggle(id)}
+        className="w-full flex items-center justify-between p-6 text-left"
+      >
+        <div className="flex items-center gap-2">
+          <Globe className={color} size={20} />
+          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+        </div>
+        {expanded ? (
+          <ChevronUp className="text-gray-400" size={20} />
+        ) : (
+          <ChevronDown className="text-gray-400" size={20} />
+        )}
+      </button>
+      {expanded && (
+        <div className="px-6 pb-6">
+          <p className="text-sm text-gray-500 mb-4">
+            {description}
+            {applyUrl && (
+              <a href={applyUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1">
+                立即申请
+              </a>
+            )}
+          </p>
+          <div className="space-y-4">{children}</div>
+        </div>
+      )}
+    </div>
+  );
+
 export default function TranslateConfigPage() {
   const [config, setConfig] = useState<TranslateConfig>(defaultConfig);
   const [loading, setLoading] = useState(true);
@@ -185,67 +258,6 @@ export default function TranslateConfigPage() {
     });
   };
 
-  const ToggleSwitch = ({ enabled, onChange }: { enabled: boolean; onChange: () => void }) => (
-    <button
-      onClick={onChange}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-        enabled ? "bg-red-600" : "bg-gray-300"
-      }`}
-    >
-      <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-          enabled ? "translate-x-6" : "translate-x-1"
-        }`}
-      />
-    </button>
-  );
-
-  const ProviderSection = ({
-    id,
-    title,
-    color,
-    description,
-    applyUrl,
-    children,
-  }: {
-    id: string;
-    title: string;
-    color: string;
-    description: string;
-    applyUrl?: string;
-    children: React.ReactNode;
-  }) => (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-      <button
-        onClick={() => toggleSection(id)}
-        className="w-full flex items-center justify-between p-6 text-left"
-      >
-        <div className="flex items-center gap-2">
-          <Globe className={color} size={20} />
-          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-        </div>
-        {expandedSections.has(id) ? (
-          <ChevronUp className="text-gray-400" size={20} />
-        ) : (
-          <ChevronDown className="text-gray-400" size={20} />
-        )}
-      </button>
-      {expandedSections.has(id) && (
-        <div className="px-6 pb-6">
-          <p className="text-sm text-gray-500 mb-4">
-            {description}
-            {applyUrl && (
-              <a href={applyUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-1">
-                立即申请
-              </a>
-            )}
-          </p>
-          <div className="space-y-4">{children}</div>
-        </div>
-      )}
-    </div>
-  );
-
   if (loading) {
     return <div className="p-8 text-gray-500">加载中...</div>;
   }
@@ -263,6 +275,8 @@ export default function TranslateConfigPage() {
       {/* AI 大模型翻译 */}
       <ProviderSection
         id="ai"
+        expanded={expandedSections.has("ai")}
+        onToggle={toggleSection}
         title="AI 大模型翻译"
         color="text-purple-600"
         description="调用大语言模型进行高质量翻译（支持豆包 Ark、DeepSeek、OpenAI 等 OpenAI 兼容接口）。翻译质量最佳，适合产品介绍、新闻等正式内容。未配置 Key 时自动跳过，不影响其他翻译通道。"
@@ -306,6 +320,8 @@ export default function TranslateConfigPage() {
       {/* 百度翻译 */}
       <ProviderSection
         id="baidu"
+        expanded={expandedSections.has("baidu")}
+        onToggle={toggleSection}
         title="百度翻译API"
         color="text-blue-600"
         description="百度翻译API提供高质量的机器翻译服务，标准版每月免费5万字符，企业认证后尊享版每月免费200万字符。"
@@ -339,6 +355,8 @@ export default function TranslateConfigPage() {
       {/* 阿里翻译 */}
       <ProviderSection
         id="aliyun"
+        expanded={expandedSections.has("aliyun")}
+        onToggle={toggleSection}
         title="阿里翻译"
         color="text-yellow-600"
         description="阿里翻译是阿里云旗下的翻译服务，每月免费100万字符，支持多种语言互译。"
@@ -373,6 +391,8 @@ export default function TranslateConfigPage() {
       {/* 小牛翻译 */}
       <ProviderSection
         id="niu"
+        expanded={expandedSections.has("niu")}
+        onToggle={toggleSection}
         title="小牛翻译"
         color="text-green-600"
         description="小牛翻译每日免费20万字符（约每月600万字符），支持454种语言互译，免费额度最大。"
@@ -397,6 +417,8 @@ export default function TranslateConfigPage() {
       {/* 腾讯翻译 */}
       <ProviderSection
         id="tencent"
+        expanded={expandedSections.has("tencent")}
+        onToggle={toggleSection}
         title="腾讯翻译"
         color="text-cyan-600"
         description="腾讯翻译是腾讯云旗下的翻译服务，每月免费500万字符，支持多种语言互译。"
@@ -431,6 +453,8 @@ export default function TranslateConfigPage() {
       {/* 有道翻译 */}
       <ProviderSection
         id="youdao"
+        expanded={expandedSections.has("youdao")}
+        onToggle={toggleSection}
         title="有道翻译"
         color="text-purple-600"
         description="有道翻译是网易有道旗下的翻译服务，新用户有一定的免费额度，翻译质量较好。"
@@ -465,6 +489,8 @@ export default function TranslateConfigPage() {
       {/* MyMemory翻译 */}
       <ProviderSection
         id="mymemory"
+        expanded={expandedSections.has("mymemory")}
+        onToggle={toggleSection}
         title="MyMemory免费翻译"
         color="text-gray-600"
         description="MyMemory是免费的翻译服务，无需申请即可使用，作为其他翻译服务的备用方案。"

@@ -3,6 +3,7 @@
 import { Search, MapPin, Lightbulb, Sparkles, Loader2, RefreshCw, CheckSquare, Square } from 'lucide-react'
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { GEO_REGIONS, getCitiesByRegion } from '@/lib/geo-data'
+import CharCounter from './CharCounter'
 
 interface SeoGeoConfigProps {
   seoTitle: string
@@ -14,6 +15,17 @@ interface SeoGeoConfigProps {
   geoRegion: string
   geoCity: string
   onChange: (field: string, value: string) => void
+  /**
+   * 字段字数上限（可选）：`{ seoTitle: 200, seoTitleEn: 200 }` —— 由编辑页从
+   * `/api/admin/content/[type]/meta` 的列宽下发，用于输入框 `maxLength` + 「已用 x / 上限 y」。
+   * 未提供的字段（Text 列，如 关键词/描述/城市清单）不加限制。
+   */
+  maxLengthByField?: Record<string, number>
+  /**
+   * 整个表单（可选）：用于读写**多语种 SEO**（seoTitleEn/Ja/Ko/Fr/Ar 等）。
+   * 传入后本组件的多语言区直接从 form 取名，父表单只需 `handleChange` 写回。
+   */
+  form?: Record<string, any>
   // 用于关键词提取的源文本
   sourceText?: string
   sourceTitle?: string
@@ -33,6 +45,18 @@ const INDUSTRY_KEYWORDS = [
   '天然气管道', '电力能源', '船用阀门', '低温阀门', '高压阀门',
   'VALTRIX', '阀门厂家', '工业阀门制造商', '流体系统解决方案', '阀门供应商',
 ]
+/**
+ * 多语种 SEO（owner 2026-09-21：「产品级页面端的 SEO 可以多语言吗？」）
+ * 库里 `seoTitle/seoDescription/seoKeywords` 本来就各有 6 个语种列，前台
+ * `buildSeoMetadata` 也是按 `seoTitle<语种>` 取值的 —— 缺的只是**后台编辑界面**。
+ */
+const SEO_I18N_LANGS: { code: string; label: string; suffix: string }[] = [
+  { code: 'en', label: 'English', suffix: 'En' },
+  { code: 'ja', label: '日本語', suffix: 'Ja' },
+  { code: 'ko', label: '한국어', suffix: 'Ko' },
+  { code: 'fr', label: 'Français', suffix: 'Fr' },
+  { code: 'ar', label: 'العربية', suffix: 'Ar' },
+]
 
 export default function SeoGeoConfig({
   seoTitle,
@@ -44,6 +68,8 @@ export default function SeoGeoConfig({
   geoRegion,
   geoCity,
   onChange,
+  maxLengthByField,
+  form,
   sourceText = '',
   sourceTitle = '',
   sourceSummary = '',
@@ -58,6 +84,57 @@ export default function SeoGeoConfig({
   // 英文SEO关键词自动翻译相关状态
   const [translatingKeywords, setTranslatingKeywords] = useState(false)
   const [englishKeywordsEdited, setEnglishKeywordsEdited] = useState(false)
+  // 多语种 SEO：当前编辑语种 + 一键翻译状态
+  const [seoI18nLang, setSeoI18nLang] = useState('en')
+  const [seoI18nBusy, setSeoI18nBusy] = useState(false)
+  const [seoI18nMsg, setSeoI18nMsg] = useState('')
+
+  /** 取某键的值：优先整表单 `form`，回退到组件自身的 props（兼容其它调用方） */
+  const valOf = (key: string): string => {
+    if (form && key in form) return String((form as any)[key] ?? '')
+    if (key === 'seoTitle') return seoTitle || ''
+    if (key === 'seoDescription') return seoDescription || ''
+    if (key === 'seoKeywords') return seoKeywords || ''
+    return ''
+  }
+
+  /**
+   * 一键翻译：中文的 SEO 标题/描述/关键词 → 英/日/韩/法/阿
+   * 与后台其它表单同一接口（POST /api/admin/translate），逐条回填。
+   */
+  const translateSeoI18n = async () => {
+    const bases = [
+      { base: 'seoTitle', zh: valOf('seoTitle'), capitalize: true },
+      { base: 'seoDescription', zh: valOf('seoDescription'), capitalize: false },
+      { base: 'seoKeywords', zh: valOf('seoKeywords'), capitalize: false },
+    ]
+    if (!bases.some((b) => b.zh.trim())) {
+      setSeoI18nMsg('请先填写中文的 SEO 标题/描述/关键词')
+      return
+    }
+    setSeoI18nBusy(true)
+    setSeoI18nMsg('')
+    try {
+      for (const l of SEO_I18N_LANGS) {
+        for (const b of bases) {
+          if (!b.zh.trim()) continue
+          const res = await fetch('/api/admin/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: b.zh, targetLang: l.code, capitalize: b.capitalize }),
+          })
+          const d = await res.json().catch(() => ({}))
+          if (!res.ok || !d.translatedText) throw new Error(`${l.label} ${b.base} 翻译失败：${d.error || res.status}`)
+          onChange(`${b.base}${l.suffix}`, d.translatedText)
+        }
+      }
+      setSeoI18nMsg(`已翻译 ${SEO_I18N_LANGS.length} 个语种`)
+    } catch (e: any) {
+      setSeoI18nMsg(e?.message || '翻译失败')
+    } finally {
+      setSeoI18nBusy(false)
+    }
+  }
   // 使用useRef存储源文本和回调，避免引用变化导致无限循环
   const sourceTitleRef = useRef(sourceTitle)
   const sourceTextRef = useRef(sourceText)
@@ -470,9 +547,13 @@ export default function SeoGeoConfig({
             type="text"
             value={seoTitle}
             onChange={(e) => onChange('seoTitle', e.target.value)}
+            maxLength={maxLengthByField?.seoTitle}
             className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
             placeholder="搜索引擎显示的标题，建议60字符以内"
           />
+          <div className="mt-1 flex justify-end">
+            <CharCounter value={seoTitle} max={maxLengthByField?.seoTitle} />
+          </div>
         </div>
         <div className="md:col-span-2">
           <label className="block text-xs font-medium text-gray-500 mb-1">SEO描述（留空自动从摘要/正文生成）</label>
@@ -596,6 +677,96 @@ export default function SeoGeoConfig({
               </div>
             </div>
           )}
+        </div>
+        {/* ===== 多语种 SEO（英/日/韩/法/阿）=====
+            库里 seoTitle/seoDescription/seoKeywords 各有 6 个语种列，前台 buildSeoMetadata
+            按当前语种取值 —— 这里把非中文语种也开放出来，并提供一键翻译。 */}
+        <div className="md:col-span-2 border border-gray-200 rounded-md p-3 bg-gray-50/60">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <label className="block text-xs font-medium text-gray-500">SEO 多语言（标题 / 描述 / 关键词）</label>
+            <span className="flex items-center gap-2">
+              {seoI18nMsg && (
+                <span className={`text-xs ${seoI18nMsg.startsWith('已翻译') ? 'text-green-600' : 'text-red-500'}`}>{seoI18nMsg}</span>
+              )}
+              <button
+                type="button"
+                onClick={translateSeoI18n}
+                disabled={seoI18nBusy}
+                title="把中文的 SEO 标题/描述/关键词翻译到英/日/韩/法/阿（可再手动修改）"
+                className="inline-flex items-center gap-1 text-xs border border-red-200 text-red-600 px-2.5 py-1 rounded hover:bg-red-50 disabled:opacity-50"
+              >
+                {seoI18nBusy ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                {seoI18nBusy ? '翻译中…' : '一键翻译'}
+              </button>
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1 mb-3">
+            {SEO_I18N_LANGS.map((l) => {
+              const filled = valOf(`seoTitle${l.suffix}`).trim()
+              return (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => setSeoI18nLang(l.code)}
+                  className={`px-3 py-1.5 text-xs rounded-md border ${
+                    seoI18nLang === l.code ? 'bg-red-600 text-white border-red-600' : 'border-gray-300 text-gray-600 hover:bg-white'
+                  }`}
+                >
+                  {l.label}{filled ? '' : ' ⚠'}
+                </button>
+              )
+            })}
+          </div>
+          {(() => {
+            const l = SEO_I18N_LANGS.find((x) => x.code === seoI18nLang) || SEO_I18N_LANGS[0]
+            const kT = `seoTitle${l.suffix}`
+            const kD = `seoDescription${l.suffix}`
+            const kK = `seoKeywords${l.suffix}`
+            const vT = valOf(kT)
+            return (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">SEO 标题（{l.label}，留空回退中文）</label>
+                  <input
+                    type="text"
+                    value={vT}
+                    onChange={(e) => onChange(kT, e.target.value)}
+                    maxLength={maxLengthByField?.[kT]}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                    placeholder={`${l.label} title`}
+                  />
+                  {maxLengthByField?.[kT] ? (
+                    <div className="mt-1 flex justify-end">
+                      <CharCounter value={vT} max={maxLengthByField[kT]} />
+                    </div>
+                  ) : null}
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">SEO 描述（{l.label}，留空回退中文）</label>
+                  <textarea
+                    rows={2}
+                    value={valOf(kD)}
+                    onChange={(e) => onChange(kD, e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                    placeholder={`${l.label} description`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                    SEO 关键词（{l.label}，逗号分隔，留空回退中文）
+                    {l.code === 'en' && <span className="ml-1 text-gray-400">（与上方「英文」同一字段，改哪个都行）</span>}
+                  </label>
+                  <input
+                    type="text"
+                    value={valOf(kK)}
+                    onChange={(e) => onChange(kK, e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                    placeholder={`${l.label} keywords`}
+                  />
+                </div>
+              </div>
+            )
+          })()}
         </div>
         <div>
           <div className="flex items-center justify-between mb-2">

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, Edit2, Trash2, Save, X, ChevronDown, ChevronRight, Package, FolderOpen } from "lucide-react"
+import { Plus, Edit2, Trash2, Save, X, ChevronDown, ChevronRight, Package, FolderOpen, Sparkles, Loader2 } from "lucide-react"
 
 interface ProductTab {
   id: string
@@ -47,6 +47,105 @@ const emptyForm = () => ({
   slug: "",
   sortOrder: 0,
 })
+
+/**
+ * 六语种输入行
+ * ==========================================================================
+ * 🔴 **必须定义在组件之外**（owner 2026-09-21 报障「只能输入一个字符」）：
+ *   原实现把 `LangInputs` 定义在页面组件**内部**，每次渲染都会生成一个**全新的函数**；
+ *   JSX 里用 `<LangInputs />` 时 React 认为"组件类型变了" ⇒ 卸载重建整棵子树 ⇒
+ *   **每敲一个字，输入框就重新挂载一次、焦点丢失**，于是"只能输入一个字符"。
+ *   （值本身是对的——它来自 props；丢的是 DOM 焦点。）
+ */
+function LangInputs({ form, setForm }: { form: any; setForm: (f: any) => void }) {
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      {LANGS.map((l) => (
+        <div key={l.key}>
+          <label className="block text-xs font-medium text-gray-500 mb-1">
+            {l.label} {l.required && <span className="text-red-500">*</span>}
+          </label>
+          <input
+            type="text"
+            value={form[l.key] || ""}
+            onChange={(e) => setForm({ ...form, [l.key]: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
+            placeholder={l.label}
+          />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/**
+ * 一键翻译：中文 → 其余 5 个语种
+ * 走后台统一接口 `POST /api/admin/translate`（与「通用内容」表单的翻译按钮同一个入口，
+ * 配置/降级策略一致，不在这里另造一套）。翻译结果逐条回填，过程中能看到进度。
+ */
+function TranslateAllButton({ form, setForm }: { form: any; setForm: (f: any) => void }) {
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState("")
+  const targets = [
+    { key: "nameEn", lang: "en", label: "英文" },
+    { key: "nameJa", lang: "ja", label: "日文" },
+    { key: "nameKo", lang: "ko", label: "韩文" },
+    { key: "nameFr", lang: "fr", label: "法文" },
+    { key: "nameAr", lang: "ar", label: "阿拉伯文" },
+  ]
+  const run = async () => {
+    const src = String(form.name || "").trim()
+    if (!src) { setMsg("请先填写中文名称"); return }
+    setBusy(true); setMsg("")
+    const next: any = { ...form }
+    try {
+      for (const t of targets) {
+        const res = await fetch("/api/admin/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: src, targetLang: t.lang, capitalize: true }),
+        })
+        const d = await res.json().catch(() => ({}))
+        if (!res.ok || !d.translatedText) throw new Error(d.error || `${t.label}翻译失败`)
+        next[t.key] = d.translatedText
+        setForm({ ...next }) // 逐条回填，用户能看到进度
+      }
+      setMsg(`已翻译 ${targets.length} 个语种`)
+    } catch (e: any) {
+      setMsg(e?.message || "翻译失败")
+    } finally {
+      setBusy(false)
+    }
+  }
+  return (
+    <span className="flex items-center gap-2">
+      {msg && <span className={`text-xs ${msg.startsWith("已翻译") ? "text-green-600" : "text-red-500"}`}>{msg}</span>}
+      <button
+        type="button"
+        onClick={run}
+        disabled={busy}
+        title="把中文名称翻译成其余 5 个语种（可再手动修改）"
+        className="text-xs border border-red-200 text-red-600 px-2.5 py-1 rounded-md hover:bg-red-50 disabled:opacity-50 inline-flex items-center gap-1"
+      >
+        {busy ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+        {busy ? "翻译中…" : "一键翻译"}
+      </button>
+    </span>
+  )
+}
+
+/** 多语言名称区（标题行 + 一键翻译 + 六语种输入） */
+function LangSection({ form, setForm }: { form: any; setForm: (f: any) => void }) {
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs text-gray-400">多语言名称（中文为基准，其它语种可手动改）</span>
+        <TranslateAllButton form={form} setForm={setForm} />
+      </div>
+      <LangInputs form={form} setForm={setForm} />
+    </div>
+  )
+}
 
 export default function ProductCategoriesAdminPage() {
   const [tabs, setTabs] = useState<ProductTab[]>([])
@@ -222,26 +321,6 @@ export default function ProductCategoriesAdminPage() {
     setShowNewCat(false)
   }
 
-  // 通用：六语种输入行
-  const LangInputs = ({ form, setForm }: { form: any; setForm: (f: any) => void }) => (
-    <div className="grid grid-cols-2 gap-3">
-      {LANGS.map((l) => (
-        <div key={l.key}>
-          <label className="block text-xs font-medium text-gray-500 mb-1">
-            {l.label} {l.required && <span className="text-red-500">*</span>}
-          </label>
-          <input
-            type="text"
-            value={form[l.key] || ""}
-            onChange={(e) => setForm({ ...form, [l.key]: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
-            placeholder={l.label}
-          />
-        </div>
-      ))}
-    </div>
-  )
-
   if (loading) return <div className="p-8 text-gray-500">加载中...</div>
 
   return (
@@ -278,7 +357,7 @@ export default function ProductCategoriesAdminPage() {
             {/* 新建 Tab 表单 */}
             {showNewTab && (
               <div className="p-4 border-b border-gray-200 bg-gray-50">
-                <LangInputs form={tabForm} setForm={setTabForm} />
+                <LangSection form={tabForm} setForm={setTabForm} />
                 <div className="grid grid-cols-2 gap-3 mt-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-500 mb-1">Slug *</label>
@@ -335,7 +414,7 @@ export default function ProductCategoriesAdminPage() {
                   {/* 编辑 Tab 展开 */}
                   {expandedTab === tab.id && (
                     <div className="px-4 py-3 bg-gray-50 border-t border-gray-100">
-                      <LangInputs form={tabForm} setForm={setTabForm} />
+                      <LangSection form={tabForm} setForm={setTabForm} />
                       <div className="grid grid-cols-2 gap-3 mt-3">
                         <div>
                           <label className="block text-xs font-medium text-gray-500 mb-1">Slug *</label>
@@ -388,7 +467,7 @@ export default function ProductCategoriesAdminPage() {
                 {/* 新建 Category 表单 */}
                 {showNewCat && (
                   <div className="p-4 border-b border-gray-200 bg-gray-50">
-                    <LangInputs form={catForm} setForm={setCatForm} />
+                    <LangSection form={catForm} setForm={setCatForm} />
                     <div className="grid grid-cols-2 gap-3 mt-3">
                       <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Slug *</label>
@@ -433,7 +512,7 @@ export default function ProductCategoriesAdminPage() {
 
                       {expandedCat === cat.id && (
                         <div className="px-4 py-3 bg-gray-50 border-t border-gray-100">
-                          <LangInputs form={catForm} setForm={setCatForm} />
+                          <LangSection form={catForm} setForm={setCatForm} />
                           <div className="grid grid-cols-2 gap-3 mt-3">
                             <div>
                               <label className="block text-xs font-medium text-gray-500 mb-1">Slug *</label>
