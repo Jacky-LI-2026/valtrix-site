@@ -53,8 +53,19 @@ export default function ProductDetailClient() {
   const tab = dp?.tab;
   const productInfo: { model: any; category: any; tab: any } | null =
     dp && dp.tab && dp.category ? { model: dp, category: dp.category, tab: dp.tab } : null;
-  const rawImages = model?.images && model.images.length > 0 ? model.images : (model?.image ? [model.image] : []);
-  const images = (Array.isArray(rawImages) ? rawImages : [])
+  /**
+   * 图集来源：只有详情接口返回的图集才算数（owner 2026-09-26：首帧会渲染静态兜底里的
+   * 别的机型照片当"占位缩略图"）。加载中只给中性占位图，不出缩略图。
+   */
+  const imagesRaw =
+    !detailLoading && Array.isArray(model?.images) && model.images.length > 0
+      ? model.images
+      : detailLoading
+        ? ["/placeholders/generic-tech.webp"]
+        : model?.image
+          ? [model.image]
+          : [];
+  const images = (Array.isArray(imagesRaw) ? imagesRaw : [])
     .map((x: any) => (typeof x === "string" ? x : x?.url || ""))
     .filter(Boolean);
 
