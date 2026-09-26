@@ -286,6 +286,8 @@ const menuItems: MenuItem[] = [
     icon: <Settings size={18} />,
     children: [
       { label: '站点配置', href: '/admin/settings/site', permission: 'config:site', plugin: 'site-config' },
+      // 维护模式（2026-09-26，与左文站同步）：前台 503 开关
+      { label: '维护模式', href: '/admin/maintenance', permission: 'config:site' },
       { label: '首页配置', href: '/admin/settings/home', permission: 'config:home', plugin: 'home-config' },
       { label: '页面头部', href: '/admin/page-hero', permission: 'page-hero:view', plugin: 'page-hero' },
       { label: '主题配色', href: '/admin/settings/theme', permission: 'config:theme', plugin: 'theme' },

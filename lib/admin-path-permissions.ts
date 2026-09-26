@@ -61,6 +61,8 @@ export const PATH_PERMISSION: [string, string][] = [
   ['/admin/settings/oem', 'config:site'],
   ['/admin/visit-bookings', 'lead:view'],
   ['/admin/email-marketing', 'lead:view'],
+  // 维护模式（2026-09-26，与左文站同步）：与 /api/admin/maintenance 同一权限码成对
+  ['/admin/maintenance', 'config:site'],
   ['/admin/members', 'member:view'],
   ['/admin/member-levels', 'member-level:view'],
   ['/admin/shop/orders', 'order:view'],

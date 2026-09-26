@@ -28,6 +28,8 @@ const FORBIDDEN_HTML = `<!doctype html><html lang="zh-CN"><head><meta charset="u
 const API_PERMISSION: [string, string][] = [
   // ===== 系统与安全 =====
   ['/api/admin/users', 'system:user'],
+  // 维护模式（2026-09-26，与左文站同步）：前台 503 开关 → 站点配置权限
+  ['/api/admin/maintenance', 'config:site'],
   ['/api/admin/roles', 'system:role'],
   ['/api/admin/logs', 'system:log'],
   ['/api/admin/backup', 'system:backup'],
