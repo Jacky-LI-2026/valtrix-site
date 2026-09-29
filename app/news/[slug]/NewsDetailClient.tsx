@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Calendar, Tag, ChevronLeft, Share2, FolderOpen } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
+import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { HeroBackground, usePageHeroConfig } from "@/lib/page-hero-config";
 import ShareModal from "@/components/ui/ShareModal";
 import RecommendBox from "@/components/RecommendBox";
@@ -314,7 +315,10 @@ function NewsDetailDefaultInner({ params }: PageProps) {
                 </video>
               </div>
             )}
-            <article className="prose prose-lg max-w-none text-dark-600 leading-relaxed" dangerouslySetInnerHTML={{ __html: loc.get(article, "content") || loc.get(article, "summary") }} />
+            <article
+              className="prose prose-lg max-w-none text-dark-600 leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: preserveLeadingSpaces(loc.get(article, "content") || loc.get(article, "summary")) }}
+            />
             <div className="flex items-center justify-between mt-12 pt-8 border-t border-dark-100">
               <div className="flex items-center gap-2 text-dark-400 text-sm">
                 <Tag size={14} />

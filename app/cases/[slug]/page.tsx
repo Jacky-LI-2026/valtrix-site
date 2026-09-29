@@ -7,6 +7,7 @@ import Link from "next/link";
 import { ArrowRight, Calendar, Building2, Share2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
+import { preserveLeadingSpaces } from "@/lib/rich-text";
 import ShareModal from "@/components/ui/ShareModal";
 
 interface CaseDetail {
@@ -155,7 +156,7 @@ export default function CaseDetailPage() {
           {/* 正文 */}
           <article
             className="prose prose-dark max-w-none prose-headings:scroll-mt-24"
-            dangerouslySetInnerHTML={{ __html: loc.get(item, "content") || loc.get(item, "summary") }}
+            dangerouslySetInnerHTML={{ __html: preserveLeadingSpaces(loc.get(item, "content") || loc.get(item, "summary")) }}
           />
 
           {/* 分享 */}

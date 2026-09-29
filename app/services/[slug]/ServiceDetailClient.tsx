@@ -7,6 +7,7 @@ import PageHero from "@/components/ui/PageHero";
 import { ArrowLeft, ArrowRight, CheckCircle, Settings, Microwave, Wrench, Headphones, FlaskConical, ShieldCheck, Phone, Mail, Download } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
+import { preserveLeadingSpaces } from "@/lib/rich-text";
 import DownloadGateButton from "@/components/ui/DownloadGateButton";
 import { getContactEmail, getContactPhone } from "@/lib/brand";
 
@@ -202,7 +203,7 @@ export default function ServiceDetailClient() {
               </div>
               <div
                 className="prose prose-lg max-w-none text-gray-600 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: description }}
+                dangerouslySetInnerHTML={{ __html: preserveLeadingSpaces(description) }}
               />
               {service.video && (
                 <div className="mt-8">

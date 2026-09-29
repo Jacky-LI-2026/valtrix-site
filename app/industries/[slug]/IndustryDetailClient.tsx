@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight, AlertTriangle, Lightbulb, ChevronLeft, Download, CheckCircle2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
+import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { HeroBackground } from "@/lib/page-hero-config";
 import DownloadGateButton from "@/components/ui/DownloadGateButton";
 
@@ -220,7 +221,10 @@ export default function IndustryDetailClient({ params }: PageProps) {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-dark mb-4">{t("industryOverviewDetail")}</h2>
-              <div className="text-dark-600 leading-relaxed mb-8 prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: loc.get(industry, "description") }} />
+              <div
+                className="text-dark-600 leading-relaxed mb-8 prose prose-lg max-w-none"
+                dangerouslySetInnerHTML={{ __html: preserveLeadingSpaces(loc.get(industry, "description")) }}
+              />
               {industry.video && (
                 <div className="mb-8">
                   <video

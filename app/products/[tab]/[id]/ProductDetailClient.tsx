@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle, ChevronLeft, ChevronRight, Phone, Mail, Download, FileText, RotateCw, Hand, ShoppingCart, Heart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
+import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { groupSpecs } from "@/lib/spec-grouping";
 import { useProductBySlug } from "@/lib/api/useProducts";
 import ThreeSixtyViewer from "@/components/ui/ThreeSixtyViewer";
@@ -807,7 +808,10 @@ export default function ProductDetailClient() {
               {t("productDetails")}
             </h2>
             <div className="bg-white rounded-lg p-8 lg:p-10 border border-dark-100 shadow-sm">
-              <div className="prose prose-lg max-w-none text-dark-600 leading-relaxed" dangerouslySetInnerHTML={{ __html: detailContent }} />
+              <div
+                className="prose prose-lg max-w-none text-dark-600 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: preserveLeadingSpaces(detailContent) }}
+              />
             </div>
           </div>
         </section>
