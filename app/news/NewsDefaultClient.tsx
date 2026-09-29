@@ -22,12 +22,17 @@ interface NewsItem {
   coverImage: string;
 }
 
-export default function NewsDefaultClient() {
+export default function NewsDefaultClient({ initialCategorySlug }: { initialCategorySlug?: string } = {}) {
   const { locale , t} = useI18n();
     const loc = createLocalizedGetter(locale);
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState<string>("");
+  /**
+   * 当前筛选的**分类 slug**（空串=全部）。
+   * `initialCategorySlug`：由 `/news/<分类slug>` 这类链接传入（owner 2026-09-29：
+   * 菜单里的 `/news/Company-News` 这类链接之前 404，现在由 [slug] 路由识别为分类并预置筛选）。
+   */
+  const [activeCategory, setActiveCategory] = useState<string>(initialCategorySlug || "");
   const { pageConfig } = usePageConfig("news");
 
   useEffect(() => {

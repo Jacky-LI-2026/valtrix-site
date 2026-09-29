@@ -167,7 +167,18 @@ export default function IndustryDetailClient({ params }: PageProps) {
   }
 
   const hasSolutionFile = !!industry.solutionFile && industry.solutionFile !== "#";
-  const solutionFileName = loc.get(industry, "solutionFileName") || `${loc.get(industry, "name")} Solution`;
+  /**
+   * 「解决方案」下载按钮的显示名（owner 2026-09-29 报障：多语种站点仍显示中文「解决方案」）
+   * 两个原因：① 兜底文案把「解决方案」**写死中文**；
+   *          ② `loc.get` 在该语种译文缺失时会**回退中文**，于是英文站显示中文文件名。
+   * 口径：优先取**当前语种自己的**文件名（**不回退中文**）；没有就用
+   *      「本地化行业名 + 本地化『解决方案』」（i18n 的 industrySolution）。
+   */
+  const fileNameSuffix = locale === "zh" ? "" : locale.charAt(0).toUpperCase() + locale.slice(1);
+  const ownLangSolutionName = String(
+    (locale === "zh" ? industry.solutionFileName : (industry as any)[`solutionFileName${fileNameSuffix}`]) || ""
+  ).trim();
+  const solutionFileName = ownLangSolutionName || `${loc.get(industry, "name")} ${t("industrySolution") || "解决方案"}`;
 
   return (
     <>

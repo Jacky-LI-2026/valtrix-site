@@ -3,6 +3,7 @@ import { buildSeoMetadata } from "@/lib/seo-metadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import NewsDetailClient from "./NewsDetailClient";
+import NewsDefaultClient from "../NewsDefaultClient";
 import UnilokNewsDetailPage from "@/components/theme-unilok/NewsDetailPage";
 import KitzNewsDetailPage from "@/components/theme-kitzsct/NewsDetailPage";
 import { articleSchema, breadcrumbSchema, renderJsonLd } from "@/lib/seo/schema";
@@ -44,6 +45,56 @@ interface Props {
   params: Record<string, string>;
 }
 
+/**
+ * `/news/<段>` 的**分类兜底**（owner 2026-09-29：「解决这类链接报 404 的问题」，例：`/news/Company-News`）
+ * ==========================================================================
+ * 背景：站点菜单/行业包里存在 `/news/<分类 slug>` 这类链接，但 `/news/[slug]` 此前只按
+ *   **文章 slug** 查库 ⇒ 命中不到就直接 404。
+ * 口径：先当文章查（既有行为不变）；查不到再当**分类**查（大小写不敏感），
+ *   命中则以「新闻列表 + 该分类预筛选」渲染，仍查不到才 404。
+ * 返回：{ slug, id, name } 或 null。
+ */
+async function findNewsCategory(rawSlug: string): Promise<{ slug: string; id: bigint; name: string } | null> {
+  const slug = decodeURIComponent(rawSlug || "");
+  if (!slug) return null;
+  /**
+   * 兼容别名：行业包/菜单里写的是英文段，而库里分类 slug/名称可能是中文
+   * ⇒ 直接匹配命中不到。这里做一次「英文段 → 中文分类关键词」的兜底匹配。
+   */
+  const ALIAS: Record<string, string> = {
+    "company-news": "公司",
+    "industry-news": "行业",
+    "product-news": "产品",
+    "tech-news": "技术",
+  };
+  const aliasKey = slug.toLowerCase().replace(/[\s_]+/g, "-");
+  try {
+    const row: any = await (prisma as any)["newsCategory"].findFirst({
+      where: { slug: { equals: slug, mode: "insensitive" } },
+      select: { id: true, slug: true, name: true },
+    });
+    if (row) return { slug: String(row.slug), id: row.id, name: String(row.name || row.slug) };
+    // 再兜一层：分类名与段一致时也认（后台把 slug 写成中文/异形时仍可用）
+    const byName: any = await (prisma as any)["newsCategory"].findFirst({
+      where: { name: { equals: slug, mode: "insensitive" } },
+      select: { id: true, slug: true, name: true },
+    });
+    if (byName) return { slug: String(byName.slug), id: byName.id, name: String(byName.name || byName.slug) };
+    const kw = ALIAS[aliasKey];
+    if (kw) {
+      const byAlias: any = await (prisma as any)["newsCategory"].findFirst({
+        where: { OR: [{ name: { contains: kw } }, { slug: { contains: kw } }] },
+        orderBy: { id: "asc" },
+        select: { id: true, slug: true, name: true },
+      });
+      if (byAlias) return { slug: String(byAlias.slug), id: byAlias.id, name: String(byAlias.name || byAlias.slug) };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export async function generateMetadata(props: Props): Promise<Metadata> {
   let record: any = null;
   try {
@@ -55,7 +106,12 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   }
   // 🔴 记录不存在 ⇒ notFound()（HTTP 404）。此前是 `return { title: slug }` ⇒ HTTP 200 = soft-404。
   //    ⚠️ 必须在 try 之外：notFound() 靠抛特殊异常工作，放在 try 里会被上面的 catch 吞掉。
-  if (!record) notFound();
+  if (!record) {
+    // 不是文章 ⇒ 可能是"分类列表页"（/news/Company-News）
+    const cat = await findNewsCategory(props.params.slug);
+    if (!cat) notFound();
+    return { title: cat.name } as Metadata;
+  }
   return buildSeoMetadata({
     record,
     fallbackTitle: record["titleEn"] || record["title"] || "",
@@ -79,7 +135,13 @@ export default async function Page(props: Props) {
   } catch (e) {
     exists = { id: -1, status: "published" };
   }
-  if (!exists || exists.status !== "published") notFound();
+  if (!exists || exists.status !== "published") {
+    // 同上：分类兜底 → 渲染新闻列表并预置该分类筛选
+    const cat = await findNewsCategory(props.params.slug);
+    if (!cat) notFound();
+    // 分类列表统一走默认列表组件（带分类预筛选）——非默认模板也只影响样式，不影响"链接可用"
+    return <NewsDefaultClient initialCategorySlug={cat.slug} />;
+  }
 
   let jsonLd = "";
   try {

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Calendar, Tag, ChevronLeft, Share2, FolderOpen } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
-import { HeroBackground } from "@/lib/page-hero-config";
+import { HeroBackground, usePageHeroConfig } from "@/lib/page-hero-config";
 import ShareModal from "@/components/ui/ShareModal";
 import RecommendBox from "@/components/RecommendBox";
 
@@ -46,6 +46,15 @@ function NewsDetailDefaultInner({ params }: PageProps) {
   const [article, setArticle] = useState<NewsItem | null>(null);
   const [categoryData, setCategoryData] = useState<{ category: NewsCategory; items: NewsItem[] } | null>(null);
   const [relatedNews, setRelatedNews] = useState<NewsItem[]>([]);
+  /**
+   * 页头背景优先级（owner 2026-09-29 口径：「新闻二级页应该**优先用页头设置的图片**」）
+   *   ① 后台「页面头部」里为该路径配置的图（`/news/<slug>` 未单独配时，按前缀命中 `/news` 的配置）
+   *   ② 都没有 → 退回**文章封面图**
+   *   ③ 再没有 → 维持原来的深色底（视觉不回归）
+   * ⚠️ 必须放在 `article` 状态声明**之后**（否则 TS2448 块级变量先用后声明）。
+   */
+  const heroCfg = usePageHeroConfig();
+  const heroImage = heroCfg.backgroundImage || article?.coverImage || "";
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -235,6 +244,18 @@ function NewsDetailDefaultInner({ params }: PageProps) {
   return (
     <>
       <section className="relative pt-16 lg:pt-20 pb-12 lg:pb-16 bg-dark-900 overflow-hidden">
+        {/*
+          文章封面图/页头图作为页头背景（owner 2026-09-29 报障：「此处页头图片是黑色的，后台已设置了图片」）
+          原来这里只画了深色底 + 网格，**忽略**了后台设置的图片 ⇒ 页头永远是黑的。
+          现改为：有图就铺满做背景 + 加一层深色渐变压暗（保证白色标题可读）；没有图时
+          与原来完全一致（不改变既有视觉，符合"无图不回归"）。
+        */}
+        {heroImage && (
+          <>
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${heroImage})` }} />
+            <div className="absolute inset-0 bg-gradient-to-b from-dark-900/85 via-dark-900/75 to-dark-900/90" />
+          </>
+        )}
         <div className="absolute inset-0 opacity-5">
           <div
             className="absolute inset-0"
