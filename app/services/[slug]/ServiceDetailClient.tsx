@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import { useParams, notFound } from "next/navigation";
 import Link from "next/link";
 import PageHero from "@/components/ui/PageHero";
-import { ArrowLeft, ArrowRight, CheckCircle, Settings, Microwave, Wrench, Headphones, FlaskConical, ShieldCheck, Phone, Mail, Download } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle, Settings, Microwave, Wrench, Headphones, FlaskConical, ShieldCheck, Phone, Mail, Download, Send } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
 import { preserveLeadingSpaces } from "@/lib/rich-text";
+import { useCanSocialPublish } from "@/lib/api/useSocialPublish";
 import DownloadGateButton from "@/components/ui/DownloadGateButton";
 import { getContactEmail, getContactPhone } from "@/lib/brand";
 
@@ -55,6 +56,8 @@ export default function ServiceDetailClient() {
   const { t, locale } = useI18n();
   const loc = createLocalizedGetter(locale);
   const [service, setService] = useState<any>(null);
+  /** 是否显示「发布到社媒」（仅登录且有发布权限的后台用户） */
+  const canSocialPublish = useCanSocialPublish();
   const [loading, setLoading] = useState(true);
   const [contactData, setContactData] = useState<any>(null);
   const [relatedServices, setRelatedServices] = useState<RelatedService[]>([]);
@@ -461,6 +464,17 @@ export default function ServiceDetailClient() {
             >
               {t("allServices")}
             </Link>
+            {/* 后台用户专用（owner 2026-10-01，与左文站同步） */}
+            {canSocialPublish && (
+              <Link
+                href={`/admin/social-publish?type=service&id=${encodeURIComponent(String((service as any)?.id || slug))}`}
+                className="inline-flex items-center gap-2 px-8 py-3 border-2 border-white/70 text-white rounded-lg hover:bg-white/10 transition-colors font-medium"
+                title="发布到社媒（后台功能）"
+              >
+                <Send size={16} />
+                发布到社媒
+              </Link>
+            )}
           </div>
         </div>
       </section>

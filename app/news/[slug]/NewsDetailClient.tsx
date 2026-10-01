@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, Calendar, Tag, ChevronLeft, Share2, FolderOpen } from "lucide-react";
+import { ArrowRight, Calendar, Tag, ChevronLeft, Share2, FolderOpen, Send } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
 import { preserveLeadingSpaces } from "@/lib/rich-text";
+import { useCanSocialPublish } from "@/lib/api/useSocialPublish";
 import { HeroBackground, usePageHeroConfig } from "@/lib/page-hero-config";
 import ShareModal from "@/components/ui/ShareModal";
 import RecommendBox from "@/components/RecommendBox";
@@ -44,6 +45,8 @@ function NewsDetailDefaultInner({ params }: PageProps) {
   const slug = typeof params?.slug === "string" ? decodeURIComponent(params.slug) : "";
   const [mode, setMode] = useState<"detail" | "category" | "notfound" | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
+  /** 是否显示「发布到社媒」（仅登录且有发布权限的后台用户） */
+  const canSocialPublish = useCanSocialPublish();
   const [article, setArticle] = useState<NewsItem | null>(null);
   const [categoryData, setCategoryData] = useState<{ category: NewsCategory; items: NewsItem[] } | null>(null);
   const [relatedNews, setRelatedNews] = useState<NewsItem[]>([]);
@@ -324,13 +327,26 @@ function NewsDetailDefaultInner({ params }: PageProps) {
                 <Tag size={14} />
                 <span>{loc.get(article!.category, "name")}</span>
               </div>
-              <button
-                onClick={() => setShareOpen(true)}
-                className="inline-flex items-center gap-2 text-dark-500 hover:text-primary transition-colors text-sm"
-              >
-                <Share2 size={16} />
-                {t("share")}
-              </button>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setShareOpen(true)}
+                  className="inline-flex items-center gap-2 text-dark-500 hover:text-primary transition-colors text-sm"
+                >
+                  <Share2 size={16} />
+                  {t("share")}
+                </button>
+                {/* 后台用户专用（owner 2026-10-01，与左文站同步）：点开带参预选进「社媒一键发布」 */}
+                {canSocialPublish && (
+                  <Link
+                    href={`/admin/social-publish?type=news&id=${encodeURIComponent(article?.id || slug)}`}
+                    className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-800 transition-colors text-sm"
+                    title="发布到社媒（后台功能）"
+                  >
+                    <Send size={16} />
+                    发布到社媒
+                  </Link>
+                )}
+              </div>
               <ShareModal
                 open={shareOpen}
                 onClose={() => setShareOpen(false)}

@@ -3,10 +3,11 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, CheckCircle, ChevronLeft, ChevronRight, Phone, Mail, Download, FileText, RotateCw, Hand, ShoppingCart, Heart } from "lucide-react";
+import { ArrowRight, CheckCircle, ChevronLeft, ChevronRight, Phone, Mail, Download, FileText, RotateCw, Hand, ShoppingCart, Heart, Send } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
 import { preserveLeadingSpaces } from "@/lib/rich-text";
+import { useCanSocialPublish } from "@/lib/api/useSocialPublish";
 import { groupSpecs } from "@/lib/spec-grouping";
 import { useProductBySlug } from "@/lib/api/useProducts";
 import ThreeSixtyViewer from "@/components/ui/ThreeSixtyViewer";
@@ -89,6 +90,8 @@ export default function ProductDetailClient() {
 
   // ---- 会员收藏 ----
   const [favState, setFavState] = useState<"unknown" | "no" | "yes">("unknown");
+  /** 是否显示「发布到社媒」（仅登录且有发布权限的后台用户） */
+  const canSocialPublish = useCanSocialPublish();
 
   useEffect(() => {
     let cancelled = false;
@@ -609,6 +612,17 @@ export default function ProductDetailClient() {
                       <Heart size={16} className={favState === "yes" ? "fill-current" : ""} />
                       {favState === "yes" ? t("favorited") : t("favorite")}
                     </button>
+                    {/* 后台用户专用（owner 2026-10-01，与左文站同步） */}
+                    {canSocialPublish && (
+                      <Link
+                        href={`/admin/social-publish?type=product&id=${encodeURIComponent(String(model.id))}`}
+                        className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded font-medium transition-all mb-2 border border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                        title="发布到社媒（后台功能）"
+                      >
+                        <Send size={16} />
+                        发布到社媒
+                      </Link>
+                    )}
                   </>
                 ) : (
                 <>
