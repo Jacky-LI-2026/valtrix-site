@@ -228,8 +228,7 @@ function ProductsContent() {
       {/* Tab Navigation：全部设备 + 各二级目录 */}
       <section className="sticky top-16 z-40 bg-white border-b border-dark-100 shadow-sm">
         <div className="container">
-          <div className="flex items-center gap-3 py-3">
-            <div className="flex gap-1 overflow-x-auto flex-1 min-w-0">
+          <div className="flex gap-1 overflow-x-auto py-3">
               <button
                 key={ALL}
                 onClick={() => selectTab(ALL)}
@@ -252,11 +251,18 @@ function ProductsContent() {
                   </span>
                 </button>
               ))}
-            </div>
+          </div>
+        </div>
+      </section>
 
-            {/* 展示方式切换（右上角，owner 2026-10-01）：排列显示（默认）/ 分类显示 */}
+      {/* Product Content */}
+      <section className="py-12 lg:py-16 bg-white">
+        <div className="container">
+          {/* 展示方式切换（owner 2026-10-01 二次口径：放在**产品列表区域**右上角，
+              不要挤进上面的分类条 —— 那里横向溢出会把按钮裁掉） */}
+          <div className="flex justify-end mb-6">
             <div
-              className="flex items-center gap-1 shrink-0 rounded-lg bg-dark-50 p-1"
+              className="flex items-center gap-1 rounded-lg bg-dark-50 p-1"
               role="group"
               aria-label={viewLabels.grid + " / " + viewLabels.category}
             >
@@ -286,12 +292,7 @@ function ProductsContent() {
               </button>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Product Content */}
-      <section className="py-12 lg:py-16 bg-white">
-        <div className="container">
           {/* 排列显示（默认）：当前范围全部型号平铺成"豆腐块"，不显示分类分组 */}
           {viewMode === "grid" ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
