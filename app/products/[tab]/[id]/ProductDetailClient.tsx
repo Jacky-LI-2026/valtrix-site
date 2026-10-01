@@ -58,14 +58,19 @@ export default function ProductDetailClient() {
    * 图集来源：只有详情接口返回的图集才算数（owner 2026-09-26：首帧会渲染静态兜底里的
    * 别的机型照片当"占位缩略图"）。加载中只给中性占位图，不出缩略图。
    */
+  /**
+   * owner 2026-10-01（阀门站报障）：刷新详情页时**会先闪一张占位图**。
+   * 根因：加载窗口里这里被硬塞了 `["/placeholders/generic-tech.webp"]`，
+   *   而占位图与真实产品图差别极大 ⇒ 视觉上是"先读到了错图"。
+   * 现口径：**加载期间一张图都不出**（主图区给骨架块），真实图集到达后才渲染；
+   *   只有在"确实加载完了、这个型号也真的没有图"时，才退回型号首字母占位块。
+   */
   const imagesRaw =
     !detailLoading && Array.isArray(model?.images) && model.images.length > 0
       ? model.images
-      : detailLoading
-        ? ["/placeholders/generic-tech.webp"]
-        : model?.image
-          ? [model.image]
-          : [];
+      : !detailLoading && model?.image
+        ? [model.image]
+        : [];
   const images = (Array.isArray(imagesRaw) ? imagesRaw : [])
     .map((x: any) => (typeof x === "string" ? x : x?.url || ""))
     .filter(Boolean);
@@ -416,7 +421,10 @@ export default function ProductDetailClient() {
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
               >
-                {currentImage ? (
+                {detailLoading ? (
+                  /* 加载中：中性骨架（不再放占位图，避免"先读到一张错图"） */
+                  <div className="w-full h-full bg-gradient-to-br from-dark-50 to-dark-100 animate-pulse" />
+                ) : currentImage ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={currentImage}
