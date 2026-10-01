@@ -63,6 +63,8 @@ export const PATH_PERMISSION: [string, string][] = [
   ['/admin/email-marketing', 'lead:view'],
   // 维护模式（2026-09-26，与左文站同步）：与 /api/admin/maintenance 同一权限码成对
   ['/admin/maintenance', 'config:site'],
+  // 社媒一键发布（2026-10-01，与左文站同步）：与 /api/admin/social-publish、manifest 入口成对同码
+  ['/admin/social-publish', 'social-publish:config'],
   ['/admin/members', 'member:view'],
   ['/admin/member-levels', 'member-level:view'],
   ['/admin/shop/orders', 'order:view'],

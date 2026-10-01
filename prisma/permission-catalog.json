@@ -397,6 +397,18 @@
       "action": "view"
     },
     {
+      "code": "social-publish:config",
+      "name": "社媒渠道配置",
+      "module": "social-publish",
+      "action": "config"
+    },
+    {
+      "code": "social-publish:publish",
+      "name": "社媒发布",
+      "module": "social-publish",
+      "action": "publish"
+    },
+    {
       "code": "setup:view",
       "name": "查看初始化",
       "module": "setup",

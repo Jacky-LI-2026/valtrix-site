@@ -42,6 +42,8 @@ const API_PERMISSION: [string, string][] = [
   ['/api/admin/plugins', 'config:site'],
   ['/api/admin/plugin-market', 'config:site'],
   ['/api/admin/gateway', 'config:site'],
+  // 社媒一键发布（2026-10-01，与左文站同步）：与页面 /admin/social-publish 同码成对
+  ['/api/admin/social-publish', 'social-publish:config'],
   ['/api/admin/tenants', 'config:site'],
   ['/api/admin/sites', 'config:site'],
   ['/api/admin/industry-packs', 'config:site'],

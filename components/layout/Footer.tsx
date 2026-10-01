@@ -191,7 +191,9 @@ export default function Footer() {
             <Link href="/" className="inline-block">
               <Image src={contactData?.logo || "/images/logo.png"} alt={oemData?.frontendBrandEn || "VALTRIX"} width={280} height={56} className="h-11 w-auto" />
             </Link>
-            <p className="mt-4 max-w-xs text-sm text-gray-600 leading-relaxed">{t("footerDesc")}</p>
+            {/* 品牌简介宽度与下方「邮件订阅」表单对齐（owner 2026-10-01：「增加宽度和下面的按钮对齐」）：
+                订阅表单是 max-w-md（448px），这里原来写死 max-w-xs（320px）⇒ 简介被挤成窄条 */}
+            <p className="mt-4 max-w-md text-sm text-gray-600 leading-relaxed">{t("footerDesc")}</p>
             <div className="mt-6 space-y-3">
               {phone && (
                 <a href={`tel:${phone.replace(/[^\d+]/g, "")}`} className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors">

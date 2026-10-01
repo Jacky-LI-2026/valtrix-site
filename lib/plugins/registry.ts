@@ -14,8 +14,6 @@
  *  - key 唯一，小写连字符；启用状态/配置存 site_config.plugin_state（Json）
  *  - configFields 用于后台插件配置弹窗自动渲染
  *  - permissions 为权限声明（human-readable，供展示与校验）
- *  - features 为功能点列表（后台插件卡片展示，用户可感知）
- *  - impact 为启用影响说明（后台插件卡片展示，说明对前台/后台的影响）
  */
 
 export type PluginCategory =
@@ -50,12 +48,6 @@ export interface PluginManifest {
   defaultEnabled: boolean;
   /** 是否需要配置 */
   configurable: boolean;
-  /** 功能点列表（后台插件卡片展示） */
-  features: string[];
-  /** 启用影响说明（后台插件卡片展示，说明对前台/后台的影响） */
-  impact: string;
-  /** 依赖的其他插件 key 列表（依赖声明，供插件卡片展示与联动校验；D12 新增） */
-  dependencies?: string[];
   /** 配置项 schema（后台弹窗渲染） */
   configFields?: PluginConfigField[];
   /** 权限/能力声明 */
@@ -70,6 +62,15 @@ export interface PluginManifest {
   isContentSection?: boolean;
   /** 通用内容模型插件的衍生栏目列表 */
   sections?: { label: string; href: string }[];
+  // ===== 插件市场（自阀门站回流至通用基地，双 fork 合并 D2）=====
+  // features / impact 为阀门站接口的**必填**字段，已在全部内置 manifest 中逐条补齐
+  // （双 fork 合并 D2：由可选收紧为必填，与阀门站接口完全对齐）。
+  /** 功能点列表（后台插件卡片展示） */
+  features: string[];
+  /** 启用影响说明（后台插件卡片展示，说明对前台/后台的影响） */
+  impact: string;
+  /** 依赖的其他插件 key 列表（依赖声明，供插件卡片展示与联动校验） */
+  dependencies?: string[];
   /** 市场价（元/一次性授权）；0 或未定义 = 免费 */
   price?: number;
   /** 是否付费插件（付费插件需兑换码开通后才能启停） */
@@ -78,6 +79,52 @@ export interface PluginManifest {
   market?: boolean;
   /** 市场来源标记：builtin=内置（随系统分发）；remote=远程市场条目 */
   marketSource?: "remote" | "builtin";
+  /**
+   * 侧边栏归属分组（**可选覆盖**；不写则按 `category` 推导，见 `resolvePluginMenuGroup`）。
+   *
+   * 为什么需要它：`category` 是"能力领域"（marketing/ai/…），而侧边栏要的是"用户去哪找"。
+   *   多数情况下两者一致（ai→AI 能力、data→数据与统计），但有些插件按 category 归组会反直觉
+   *   —— 例如「在线商城 / 会员中心 / 询价报价」的 category 都是 `marketing`，但它们属于业务功能，
+   *   放进"营销与线索"会让用户找不到。这类少数情况用本字段显式覆盖。
+   */
+  menuGroup?: PluginMenuGroup;
+  /** 同组内排序（小在前；不写则排在末尾） */
+  menuOrder?: number;
+}
+
+/**
+ * 侧边栏分组键（与 `AdminSidebar.tsx` 的顶层分组一一对应）。
+ * 2026-09-18 新增：插件菜单不再"全部塞进能力市场"，而是按分组归位。
+ */
+export type PluginMenuGroup =
+  | "content"    // 内容管理
+  | "business"   // 业务运营（商城/会员/报价/预约…）
+  | "marketing"  // 营销与线索
+  | "data"       // 数据与统计
+  | "ai"         // AI 能力
+  | "site"       // 站点设置
+  | "ops";       // 系统运维
+
+/** category → 默认分组（个别插件用 manifest.menuGroup 覆盖） */
+const CATEGORY_TO_MENU_GROUP: Record<PluginCategory, PluginMenuGroup> = {
+  ai: "ai",
+  data: "data",
+  marketing: "marketing",
+  seo: "marketing",
+  content: "content",
+  integration: "site",
+  system: "site",
+};
+
+/**
+ * 解析插件应出现在侧边栏的哪个分组。
+ * 优先级：`manifest.menuGroup` 显式覆盖 → `category` 推导 → 兜底 `site`。
+ */
+export function resolvePluginMenuGroup(p: { category?: PluginCategory; menuGroup?: PluginMenuGroup }): PluginMenuGroup {
+  if (p.menuGroup) return p.menuGroup;
+  const c = p.category as PluginCategory | undefined;
+  if (c && CATEGORY_TO_MENU_GROUP[c]) return CATEGORY_TO_MENU_GROUP[c];
+  return "site";
 }
 
 export const PLUGIN_CATEGORY_LABELS: Record<PluginCategory, string> = {
@@ -121,8 +168,7 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
   {
     key: "ai-customer-service",
     name: "AI 智能客服",
-    // D3: AI 模型与密钥全站共享（与 AI 文本同一套配置，配置在「AI 设置」）
-    description: "前台在线客服（多语言欢迎语/知识库问答/转人工留资/人机验证）。关闭后前台悬浮客服按钮隐藏。AI 模型与密钥全站共享（与 AI 文本同一套配置，配置在「AI 设置」）。",
+    description: "前台在线客服（多语言欢迎语/知识库问答/转人工留资/人机验证）。关闭后前台悬浮客服按钮隐藏。",
     category: "ai",
     version: "1.0.0",
     builtin: true,
@@ -156,8 +202,8 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
   {
     key: "seo",
     name: "SEO / GEO 优化",
-    // D9: 去掉「外链回链」相关表述（外链功能归 backlink 插件），避免功能描述重叠
-    description: "全站 SEO 配置、结构化数据、百度站长主动推送、多语言 hreflang。",
+    menuGroup: "site",
+    description: "全站 SEO 配置、结构化数据、百度站长主动推送、多语言 hreflang、外链回链管理。",
     category: "seo",
     version: "1.0.0",
     builtin: true,
@@ -165,18 +211,14 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     configurable: true,
     features: ["SEO meta 标题/描述/关键词编辑", "GEO 地区定位配置", "结构化数据自动生成", "百度站长主动推送", "多语言 hreflang 与 sitemap"],
     impact: "启用后站点设置出现「SEO 优化」入口；停用后前台停止输出 SEO 标签与 sitemap",
-    permissions: ["SEO/GEO 配置", "百度收录推送", "sitemap/hreflang"],
-    // D6: seo 插件管理入口扩展为两个：SEO 优化设置 + SEO 批量补全（/admin/seo-audit）
-    adminUrls: [
-      { label: "SEO 优化设置", href: "/admin/settings/seo" },
-      { label: "SEO 批量补全", href: "/admin/seo-audit" },
-    ],
+    permissions: ["SEO/GEO 配置", "百度收录推送", "外链回链", "sitemap/hreflang"],
+    adminUrl: "/admin/settings/seo",
   },
   {
     key: "content-collector",
     name: "内容采集",
     description: "从指定网站自动采集新闻/内容（配置 + 定时任务 + 去重入库）。",
-    category: "ai",
+    category: "content",
     version: "1.0.0",
     builtin: true,
     defaultEnabled: true,
@@ -344,8 +386,7 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
   {
     key: "ai-text",
     name: "AI 文本",
-    // D3: 去掉独立 adminUrl，配置并入「AI 设置」（/admin/settings/ai）；AI 模型与密钥全站共享（与 AI 客服同一套）
-    description: "文本 AI：全站任意编辑器可嵌入「AI 生成/改写/润色」，内容自动创作、SEO 文案生成、批量改写。统一走 AI 能力网关（lib/ai/gateway.ts）。AI 模型与密钥全站共享（与 AI 客服同一套配置，配置并入「AI 设置」）。",
+    description: "文本 AI：全站任意编辑器可嵌入「AI 生成/改写/润色」，内容自动创作、SEO 文案生成、批量改写。统一走 AI 能力网关（lib/ai/gateway.ts）。",
     category: "ai",
     version: "1.0.0",
     builtin: true,
@@ -353,6 +394,7 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     configurable: true,
     features: ["编辑器内 AI 生成/改写/润色", "SEO 文案自动生成", "批量改写"],
     impact: "启用后后台各内容表单出现 AI 文本按钮；仅后台使用，不影响前台。配置并入「AI 设置」（/admin/settings/ai），本插件无独立管理页",
+    adminUrl: "/admin/settings/ai",
     configFields: [
       { key: "provider", label: "文本模型服务商", type: "select", options: [{ label: "DeepSeek", value: "deepseek" }, { label: "OpenAI 兼容", value: "openai" }] },
       { key: "model", label: "模型名称", type: "text", placeholder: "deepseek-chat" },
@@ -380,6 +422,7 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
   },
   {
     key: "ai-autopilot",
+    dependencies: ["content-collector"],
     name: "AI 自动运营",
     description: "自动运营：流水线「草稿 → AI 补全 → AI 翻译 → 发布 → 搜索引擎推送」，内容类型草稿自动更新运营；可在后台一键运行一轮。",
     category: "ai",
@@ -388,9 +431,7 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     defaultEnabled: true,
     configurable: true,
     features: ["草稿自动补全", "自动翻译与发布", "自动推送搜索引擎"],
-    // D12: 依赖声明
     impact: "启用后后台出现「AI 自动运营」入口，可按流水线批量发布内容；仅后台使用。依赖：内容采集(content-collector)插件",
-    dependencies: ["content-collector"],
     adminUrl: "/admin/ai-autopilot",
     configFields: [
       { key: "schedule", label: "运行频率", type: "select", options: [{ label: "手动运行", value: "manual" }, { label: "每天一次", value: "daily" }, { label: "每周一次", value: "weekly" }] },
@@ -401,7 +442,8 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
   {
     key: "ai-site-wizard",
     name: "AI 建站向导",
-    // D11: 独立插件，不受 AI 自动运营(ai-autopilot)启停控制；自带独立管理页
+    // 独立插件：不受 AI 自动运营(ai-autopilot)启停控制，自带独立管理页
+    // （阶段 2 能力回流：自阀门站回流；/admin/ai-site-wizard 两仓均已存在，此前只缺 manifest 登记）
     description: "AI 建站向导：输入行业/关键词一键生成站点框架与内容初稿，辅助快速建站。独立插件，不受 AI 自动运营启停影响。",
     category: "ai",
     version: "1.0.0",
@@ -415,9 +457,9 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
   },
   {
     key: "email-marketing",
+    dependencies: ["smtp"],
     name: "EDM 邮件营销",
-    // D12: 依赖声明
-    description: "邮件订阅管理、营销邮件群发（基于 SMTP，依赖 smtp 插件）。依赖：SMTP 邮件配置（站点设置→SMTP）。",
+    description: "邮件订阅管理、营销邮件群发（基于 SMTP）。",
     category: "marketing",
     version: "1.0.0",
     builtin: true,
@@ -425,7 +467,6 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     configurable: false,
     features: ["邮件订阅者管理", "营销邮件群发", "发送记录追踪"],
     impact: "启用后后台出现「EDM 邮件营销」入口；群发依赖 SMTP 配置，不影响前台",
-    dependencies: ["smtp"],
     permissions: ["邮件群发", "订阅管理"],
     adminUrl: "/admin/email-marketing",
   },
@@ -458,11 +499,11 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     features: ["访客统计", "销售漏斗", "访客热力图", "运营驾驶舱", "操作日志"],
     impact: "启用后后台出现数据统计系列入口；仅后台使用，不影响前台",
     permissions: ["访客统计", "销售漏斗", "操作日志"],
-    // D4: 移除「运营驾驶舱」入口（工作台静态菜单已挂 plugin:analytics 控制显隐）
     adminUrls: [
       { label: "访客统计", href: "/admin/analytics" },
       { label: "销售漏斗", href: "/admin/funnel" },
       { label: "访客热力图", href: "/admin/heatmap" },
+      { label: "运营驾驶舱", href: "/admin/operations" },
     ],
   },
   {
@@ -502,7 +543,6 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     defaultEnabled: true,
     configurable: false,
     features: ["前台留言/询盘统一收集", "IP/国家/城市识别", "线索导出 CSV", "线索统一归口管理"],
-    // D8: 线索归口标注
     impact: "启用后后台出现「询盘线索」入口；前台提交表单照常工作，线索在此统一查看。线索归口：/admin/leads 统一查看",
     permissions: ["询盘线索管理"],
     adminUrl: "/admin/leads",
@@ -512,12 +552,12 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     name: "询价报价",
     description: "询价车、附加项、报价单生成（中英双语 PDF / 含 LOGO）、后台审核后发邮箱。",
     category: "marketing",
+    menuGroup: "business",
     version: "1.0.0",
     builtin: true,
     defaultEnabled: true,
     configurable: false,
     features: ["前台询价车", "附加项选择", "中英双语报价单 PDF", "后台审核后发送", "线索统一归口管理"],
-    // D8: 线索归口标注
     impact: "启用后前台产品页出现「加入询价车」入口，后台可生成报价单；停用后询价车入口隐藏。线索归口：/admin/leads 统一查看",
     permissions: ["询价车", "报价单 PDF", "后台审核发送"],
     adminUrls: [
@@ -530,12 +570,12 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     name: "考察预约",
     description: "前台参观考察预约（多语言日历）+ 后台预约管理。",
     category: "marketing",
+    menuGroup: "business",
     version: "1.0.0",
     builtin: true,
     defaultEnabled: true,
     configurable: false,
     features: ["前台参观预约表单", "多语言预约日历", "后台预约管理", "线索统一归口管理"],
-    // D8: 线索归口标注
     impact: "启用后前台联系页/导航出现考察预约入口；停用后预约入口隐藏。线索归口：/admin/leads 统一查看",
     permissions: ["前台预约", "预约管理"],
     adminUrl: "/admin/visit-bookings",
@@ -543,14 +583,13 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
   {
     key: "download-leads",
     name: "下载留资",
-    description: "方案/手册下载需留资（邮箱验证码，依赖 smtp），下载链接发邮箱，后台留资管理与导出。",
+    description: "方案/手册下载需留资（邮箱验证码），下载链接发邮箱，后台留资管理与导出。",
     category: "marketing",
     version: "1.0.0",
     builtin: true,
     defaultEnabled: true,
     configurable: false,
     features: ["下载需邮箱验证", "验证码发送与校验", "留资记录管理与导出", "线索统一归口管理"],
-    // D8: 线索归口标注
     impact: "启用后前台资源/手册下载需填写邮箱验证码；留资在后台统一管理，依赖 SMTP 配置。线索归口：/admin/leads 统一查看",
     permissions: ["下载留资", "留资导出"],
     adminUrl: "/admin/download-leads",
@@ -558,15 +597,15 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
   {
     key: "template",
     name: "模板管理",
-    description: "站点模板登记与管理（默认模板 / 多模板切换预留）+ 前台模板市场：多套前台模板（首页/列表/详情/配色）一键切换，内置十套预设模板 + 行业数据包，支持自定义模板登记。",
-    category: "content",
+    description: "站点模板登记与管理（默认模板 / 多模板切换预留）。",
+    category: "system",
     version: "1.0.0",
     builtin: true,
     defaultEnabled: true,
     configurable: false,
     features: ["默认模板与多模板登记", "预设模板一键切换", "行业数据包导入", "模板版本管理"],
     impact: "启用后站点设置出现「模板管理」入口；切换模板将改变前台整体版式",
-    permissions: ["模板管理", "模板下载", "模板切换"],
+    permissions: ["模板管理"],
     adminUrl: "/admin/templates",
   },
   // ===== 站点配置功能插件族（站点设置内的功能统一插件化：停用 → 侧边栏隐藏对应入口）=====
@@ -587,7 +626,7 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
   {
     key: "home-config",
     name: "首页配置",
-    description: "首页轮播/Banner、核心优势、数据统计、CTA、SEO 等首页区块内容管理；首页各区块（Hero/产品/优势/数据/关于/领域/案例/服务/CTA）显示启停与排序。停用后侧边栏隐藏「首页配置」入口。",
+    description: "首页轮播/Banner、核心优势、数据统计、CTA、SEO 等首页区块内容管理。停用后侧边栏隐藏「首页配置」入口。",
     category: "system",
     version: "1.0.0",
     builtin: true,
@@ -595,7 +634,7 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     configurable: false,
     features: ["首页轮播/Banner 内容", "核心优势与数据统计", "首页区块显示启停", "区块展示顺序调整", "首页 SEO 配置"],
     impact: "启用后站点设置出现「首页配置」入口；配置与区块启停直接影响前台首页渲染",
-    permissions: ["首页配置", "首页区块启停", "区块排序"],
+    permissions: ["首页配置"],
     adminUrl: "/admin/settings/home",
   },
   {
@@ -646,6 +685,7 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     name: "会员中心",
     description: "前台会员注册/登录、个人中心、产品收藏、会员管理（独立 HMAC token，与后台管理员隔离）。",
     category: "marketing",
+    menuGroup: "business",
     version: "1.0.0",
     builtin: true,
     defaultEnabled: true,
@@ -664,19 +704,19 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     permissions: ["注册/登录", "个人中心", "会员分级"],
   },
   {
-    key: "mall",
-    name: "在线商城",
-    description: "商品/购物车/订单/支付（线下转账/对公/微信/支付宝），可与询价报价并存。",
-    category: "marketing",
-    version: "1.0.0",
+  key: "mall",
+  dependencies: ["member"],
+  name: "在线商城",
+  description: "商品/购物车/订单/支付（线下转账/对公/微信/支付宝），可与询价报价并存。",
+  category: "marketing",
+  menuGroup: "business",
+  version: "1.0.0",
     builtin: true,
     defaultEnabled: true,
     planned: false,
     configurable: true,
     features: ["商品管理", "购物车与订单", "在线支付（线下/微信/支付宝）", "优惠券与销售统计"],
-    // D12: 依赖声明
     impact: "启用后前台导航显示在线商城入口；停用后商城入口与购物车隐藏。依赖：会员中心(member)插件",
-    dependencies: ["member"],
     configFields: [
       { key: "currency", label: "结算币种", type: "select", options: [{ label: "人民币 CNY", value: "CNY" }, { label: "美元 USD", value: "USD" }, { label: "欧元 EUR", value: "EUR" }] },
       { key: "enableWechat", label: "微信支付", type: "boolean" },
@@ -693,6 +733,21 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     ],
   },
   {
+    key: "frontend-theme",
+    name: "前台模板市场",
+    description: "多套前台模板（首页/列表/详情/配色）管理与一键切换，内置十套预设模板 + 行业数据包，支持自定义模板登记。",
+    category: "integration",
+    version: "1.0.0",
+    builtin: true,
+    defaultEnabled: true,
+    planned: false,
+    configurable: true,
+    features: ["多套前台模板一键切换", "预设模板与行业数据包", "模板登记与版本管理"],
+    impact: "启用后站点设置出现「前台模板市场」入口（/admin/templates）；切换模板将改变前台首页/列表/详情整体版式与配色",
+    adminUrl: "/admin/templates",
+    permissions: ["模板下载", "模板切换"],
+  },
+  {
     key: "form-builder",
     name: "通用表单",
     description: "可视化创建自定义表单（字段/多语言/必填/选项），前台 /forms/标识 访问，提交自动入库并记录 IP/国家/城市，支持导出 CSV。",
@@ -702,7 +757,6 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     defaultEnabled: true,
     configurable: false,
     features: ["可视化表单设计", "字段多语言/必填/选项", "提交记录入库与导出", "线索统一归口管理"],
-    // D8: 线索归口标注
     impact: "启用后前台可通过 /forms/标识 访问自定义表单；提交记录在后台统一管理。线索归口：/admin/leads 统一查看",
     permissions: ["表单定义增删改", "提交记录管理", "前台表单渲染"],
     adminUrl: "/admin/forms",
@@ -800,21 +854,58 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
   },
   {
     key: "customer-portal",
+    dependencies: ["member"],
     name: "客户门户",
-    description: "签约客户专属登录门户：查看授权状态、下载手册资料、提交工单、跟踪历史询价报价（会员登录，依赖 member 会员体系）。",
+    description: "签约客户专属登录门户：查看授权状态、下载手册资料、提交工单、跟踪历史询价报价（会员登录）。",
     category: "marketing",
+    menuGroup: "business",
     version: "1.0.0",
     builtin: true,
     defaultEnabled: false,
     planned: false,
     configurable: true,
     features: ["客户专属登录门户", "授权状态查看", "手册下载与工单提交", "询价报价历史"],
-    // D12: 依赖声明
     impact: "启用后后台出现「客户门户」入口；依赖会员体系，前台登录后进入专属门户，默认停用。依赖：会员中心(member)插件",
-    dependencies: ["member"],
     adminUrl: "/admin/tickets",
     permissions: ["客户登录", "工单系统"],
   },
+
+  {
+    key: "home-sections",
+    name: "前台组件市场",
+    description: "可视化配置首页区块（Hero/产品/优势/数据/关于/领域/案例/服务/CTA）的显示与排序，关闭即前台隐藏。",
+    category: "system",
+    version: "1.0.0",
+    builtin: true,
+    defaultEnabled: true,
+    configurable: false,
+    features: ["首页区块显示启停", "首页区块展示排序", "区块内容可视化配置"],
+    impact: "启用后后台出现「前台组件市场」入口（/admin/home-sections）；区块启停与排序直接影响前台首页渲染",
+    permissions: ["首页区块启停", "区块排序"],
+    adminUrl: "/admin/home-sections",
+  },
+
+  // ===== 2026-10-01 owner 新增：社媒一键发布 =====
+  {
+    key: "social-publish",
+    name: "社媒一键发布",
+    description:
+      "把产品 / 解决方案 / 新闻一键发布到国内与海外社媒渠道；无开放发文接口的平台（小红书/抖音/视频号/B站/知乎/公众号）" +
+      "自动生成文案供一键复制 + 打开发布页。",
+    category: "marketing",
+    // ⚠️ 阀门站这份 registry 的 PluginMenuGroup 还没有 "capability"（那是基地后加的），
+    //    按 category 推导即可（marketing → 营销与线索）
+    version: "1.0.0",
+    builtin: true,
+    defaultEnabled: true,
+    configurable: true,
+    features: ["多渠道一键发布", "国内 + 海外渠道", "群机器人/Webhook 开箱可用", "发布记录与原文报错", "无 API 平台生成文案"],
+    impact:
+      "启用后后台「能力市场」出现「社媒一键发布」（发布 / 渠道配置 / 发布记录 三个页签）；前台版式与内容**零变化**（不注入任何前台元素）。",
+    permissions: ["社媒渠道配置", "社媒发布"],
+    adminUrl: "/admin/social-publish",
+  },
+
 ];
 
 export function getPluginManifest(key: string): PluginManifest | undefined {
@@ -829,6 +920,8 @@ export function getPluginManifest(key: string): PluginManifest | undefined {
  * 生产接入真实远程市场时，应由 /api/admin/plugin-market 从 site_config.plugin_market_url 拉取目录。
  * 注意：示例条目不进入 BUILTIN_PLUGINS，不会出现在侧边栏/启停的默认列表；
  * 只有「安装」后（写入 plugin_state）才出现在已安装管理视图。
+ *
+ * 来源：自阀门站（VALTRIX）回流至通用基地（2026-09-12，双 fork 合并 D2）。
  */
 export const MARKET_EXAMPLE_PLUGINS: PluginManifest[] = [
   {
@@ -847,6 +940,10 @@ export const MARKET_EXAMPLE_PLUGINS: PluginManifest[] = [
     market: true,
     marketSource: "remote",
     adminUrl: "/admin/ai-video",
+    // 2026-09-18（P1-5）：本条目 impact 里已写明"功能代码待部署，当前仅市场目录条目" ⇒
+    //   用 `planned` 如实标记为规划中占位（后台会显示"规划中"、不提供启停），
+    //   而不是让用户以为买/装了就真能用。将来做成真插件时，去掉 planned 即可。
+    planned: true,
   },
   {
     key: "advanced-seo",
@@ -864,6 +961,7 @@ export const MARKET_EXAMPLE_PLUGINS: PluginManifest[] = [
     market: true,
     marketSource: "remote",
     adminUrl: "/admin/seo-audit",
+    planned: true, // 同上：示例占位（impact 已声明功能代码待部署）
   },
   {
     key: "crm-integration",
@@ -880,7 +978,9 @@ export const MARKET_EXAMPLE_PLUGINS: PluginManifest[] = [
     paid: true,
     market: true,
     marketSource: "remote",
-    adminUrl: "/admin/crm",
+    // 2026-09-18（P1-5）：原来指向 `/admin/crm`，但**该页面根本不存在** ⇒ 点击必 404。
+    //   已移除该死链；本条目同时标为 planned（未实现）。
+    planned: true,
   },
 ];
 
