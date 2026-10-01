@@ -28,21 +28,28 @@ const VIEW_LABELS: Record<string, { grid: string; category: string }> = {
   ar: { grid: "عرض شبكي", category: "حسب الفئة" },
 };
 
-/** 产品列表加载骨架（替代原 Suspense fallback=null 白屏） */
+/** 产品网格骨架（"接口未回"与 Suspense 兜底共用同一份） */
+function ProductsGridSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="animate-pulse border border-gray-200">
+          <div className="aspect-square bg-gray-100" />
+          <div className="space-y-3 p-5">
+            <div className="h-4 w-2/3 bg-gray-100" />
+            <div className="h-3 w-full bg-gray-100" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** 整块加载骨架（Suspense fallback 用：自带容器与上下留白） */
 function ProductsSkeleton() {
   return (
     <div className="container py-20">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="animate-pulse border border-gray-200">
-            <div className="aspect-square bg-gray-100" />
-            <div className="space-y-3 p-5">
-              <div className="h-4 w-2/3 bg-gray-100" />
-              <div className="h-3 w-full bg-gray-100" />
-            </div>
-          </div>
-        ))}
-      </div>
+      <ProductsGridSkeleton />
     </div>
   );
 }
@@ -51,7 +58,14 @@ function ProductsContent() {
   const { t, locale } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { productTabs } = useProductTabs();
+  /**
+   * ⚠️ owner 2026-10-01「处理全站类似的 404 问题」：
+   *   `useProductTabs` 的首帧初值是**静态兜底树**（`lib/products.ts`），而它可能已经过期 ——
+   *   实测左文站 `/products` 的 SSR HTML 里因此挂着 **14 条指向不存在型号的死链**
+   *   （`/products/growth/zw-10d` 之类）。现改为：**接口没回来之前只出骨架**，
+   *   不渲染任何拿不准的链接（真实数据到达后再渲染产品树）。
+   */
+  const { productTabs, loading: tabsLoading } = useProductTabs();
   const tabParam = searchParams.get("tab");
   const loc = createLocalizedGetter(locale);
   const [pageConfig, setPageConfig] = useState<any>(null);
@@ -225,7 +239,8 @@ function ProductsContent() {
         breadcrumbEn={pageConfig?.breadcrumbEn || "Products"}
       />
 
-      {/* Tab Navigation：全部设备 + 各二级目录 */}
+      {/* Tab Navigation：全部设备 + 各二级目录（**接口回来后才渲染**，避免显示过期目录/计数） */}
+      {!tabsLoading && (
       <section className="sticky top-16 z-40 bg-white border-b border-dark-100 shadow-sm">
         <div className="container">
           <div className="flex gap-1 overflow-x-auto py-3">
@@ -254,10 +269,18 @@ function ProductsContent() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Product Content */}
-      <section className="py-12 lg:py-16 bg-white">
+      {/* 上间距压到原来的约 30%（owner 2026-10-01：「距离上面容器距离…缩小到现在的30%」）：
+          原 py-12/py-16 = 48/64px ⇒ 现固定 pt-5 = 20px。下间距保持不变。 */}
+      <section className="pt-5 pb-12 lg:pb-16 bg-white">
         <div className="container">
+          {/* 接口未回：只出骨架（不渲染静态兜底树里的链接，owner 2026-10-01 死链收口） */}
+          {tabsLoading ? (
+            <ProductsGridSkeleton />
+          ) : (
+          <>
           {/* 展示方式切换（owner 2026-10-01 二次口径：放在**产品列表区域**右上角，
               不要挤进上面的分类条 —— 那里横向溢出会把按钮裁掉） */}
           <div className="flex justify-end mb-6">
@@ -347,6 +370,8 @@ function ProductsContent() {
               ))}
             </div>
             ))
+          )}
+          </>
           )}
         </div>
       </section>

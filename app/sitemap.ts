@@ -23,13 +23,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getSiteBaseUrl();
 
   // 静态页面
+  // ⚠️ 服务详情页**不写死**（owner 2026-10-01：「处理全站类似的 404 问题」）——
+  //    写死会让"本站不存在的服务"也进 sitemap（本机实测 `/services/odm`、
+  //    `/services/after-sales` 就是这种死链）。改为下面**按库里真实存在的服务**生成。
   const staticPages = [
     "",
     "/products",
     "/services",
-    "/services/odm",
-    "/services/technical-support",
-    "/services/after-sales",
     "/industries",
     "/resources",
     "/news",
@@ -84,6 +84,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: { slug: true, updatedAt: true },
     });
 
+    // 从数据库获取服务（**替代原先写死的 /services/xxx**，杜绝"库里没有却在 sitemap 里"）
+    const services = await prisma.service.findMany({
+      where: { status: "published" },
+      select: { slug: true, updatedAt: true },
+    });
+
     const entries: SitemapEntry[] = [
       // 静态页：不输出 lastModified（见顶部 SitemapEntry 注释）
       ...staticPages.map((path) => ({
@@ -125,6 +131,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: j.updatedAt,
         priority: 0.5,
         changeFrequency: "weekly" as const,
+      })),
+      ...services.map((s) => ({
+        path: `/services/${s.slug}`,
+        lastModified: s.updatedAt,
+        priority: 0.7,
+        changeFrequency: "monthly" as const,
       })),
     ];
 
