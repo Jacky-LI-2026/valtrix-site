@@ -1,4 +1,4 @@
-// Prisma Schema — VALTRIX 后台管理系统
+// Prisma Schema — 左文科技后台管理系统
 // 数据库：PostgreSQL 17
 // 本文件为核心表（M1 基础建设），内容表在 M2/M3 阶段扩展
 
@@ -211,7 +211,7 @@ model RolePermission {
 model ProductTab {
   id        BigInt   @id @default(autoincrement())
   siteId    BigInt?  // 所属站点（null=全局共享）
-  slug      String   @unique @db.VarChar(50) // vcr-fittings/welded-fittings/diaphragm-valves/... 
+  slug      String   @unique @db.VarChar(50) // growth/auxiliary/diamonds/materials
   name      String   @db.VarChar(100)
   nameEn    String?  @db.VarChar(100)
   nameJa    String?  @db.VarChar(100)
@@ -261,8 +261,6 @@ model Product {
   nameKo       String?  @db.VarChar(200)
   nameFr       String?  @db.VarChar(200)
   nameAr       String?  @db.VarChar(200)
-  // 2026-09-21：300 → 500（与左文站同步）。同一句中文副标题翻成法文/阿拉伯文会膨胀 2~4 倍
-  //   （实测 99 字中文 → 384 字法文），300 上限会把整条保存打回；超过 500 时服务端给可读中文提示。
   subtitle     String?  @db.VarChar(500)
   subtitleEn   String?  @db.VarChar(500)
   subtitleJa   String?  @db.VarChar(500)
@@ -1367,9 +1365,6 @@ model SEOConfig {
   defaultTitle  String?  @db.VarChar(200)
   defaultDesc   String?  @db.Text
   keywords      String?  @db.Text
-  // ===== 页面级 SEO 多语言（owner 2026-09-21，与左文站同步）=====
-  // 站点默认标题/描述/关键词此前只有中文，切语种后 <title>/description 仍是中文；
-  // 现改为库字段，取值优先级见 lib/seo.ts：库内该语种 → env 该语种 → 库内中文 → env 中文。
   defaultTitleEn String?  @db.VarChar(200)
   defaultTitleJa String?  @db.VarChar(200)
   defaultTitleKo String?  @db.VarChar(200)
@@ -2026,3 +2021,4 @@ model ShopCouponClaim {
   @@index([memberId])
   @@map("shop_coupon_claims")
 }
+
