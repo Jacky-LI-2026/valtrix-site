@@ -11,7 +11,7 @@ import { defaultLocale, locales, type Locale } from "@/config/i18n";
 import { prisma } from "@/lib/prisma";
 import { initScheduler } from "@/lib/scheduler";
 import { getSEOConfig, seoTitleForLocale, seoDescForLocale, seoKeywordsForLocale } from "@/lib/seo";
-import { buildCurrentPageAlternates, getLocaleFromCookies } from "@/lib/seo-metadata";
+import { getLocaleFromCookies, buildCurrentPageAlternates } from "@/lib/seo-metadata";
 import { organizationSchema, websiteSchema, renderJsonLd } from "@/lib/seo/schema";
 import { getTemplatePreset, DEFAULT_TEMPLATE_SLUG } from "@/lib/templates/presets";
 
@@ -27,32 +27,42 @@ if (typeof window === "undefined") {
 // 动态生成metadata，从数据库获取SEO配置（多租户：按 Host 站点差异化 siteName）
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSEOConfig(headers())
-  // 页面级 SEO 多语言（owner 2026-09-21，与左文站同步）：默认标题/描述/关键词按**当前语种**取，
-  // 优先级 库内该语种 → 部署级 env（仅标题）→ 库内中文 → env 中文，见 lib/seo.ts。
+  // 站点默认标题/描述/关键词按**当前语种**取（页面级 SEO 多语言，owner 2026-09-21）：
+  //   库内该语种 → 部署级 env 该语种（标题）→ 库内中文 → env 中文，见 lib/seo.ts 的
+  //   seoTitleForLocale / seoDescForLocale / seoKeywordsForLocale。
   const locale = getLocaleFromCookies()
-  const seoTitle = seoTitleForLocale(seo, locale)
-  const seoDesc = seoDescForLocale(seo, locale)
-  const seoKeywords = seoKeywordsForLocale(seo, locale)
-  // canonical + hreflang 由**服务端**输出（此前靠客户端 JS 注入 ⇒ 不执行 JS 的爬虫
-  // 在 HTML 里看不到；2026-09-18 线上实测确认 canonical/hreflang 均为 0 个）。
-  // 根布局兜底 ⇒ 每个前台页面都有正确 canonical，含未接 metadata 的路由（如 /shop）。
-  // 路径来自 middleware 注入的 `x-pathname`；拿不到则不输出（后台/接口不会产生指向后台的 canonical）。
+  const title = seoTitleForLocale(seo, locale)
+  const description = seoDescForLocale(seo, locale)
+  const keywords = seoKeywordsForLocale(seo, locale)
+  // canonical + hreflang 由**服务端**输出（此前靠客户端 JS 注入 ⇒ 不执行 JS 的爬虫看不到，
+  // 2026-09-18 线上实测确认 HTML 中为 0 个）。根布局兜底，使每个前台页面都有正确的
+  // canonical；页面/子布局若自带 alternates 会覆盖这里的值（Next metadata 逐字段合并）。
+  // 路径来自 middleware 注入的 `x-pathname`：拿不到就不输出（后台/接口不会产生指向后台的 canonical）。
   const alternates = buildCurrentPageAlternates()
   return {
-    title: seoTitle,
-    description: seoDesc,
-    keywords: seoKeywords,
+    title,
+    description,
+    keywords,
+    /**
+     * 搜索引擎站长平台「站点归属验证」标签（Baidu 站长平台 · HTML 标签验证，owner 2026-09-29）
+     * 值走**服务端环境变量** `BAIDU_SITE_VERIFICATION`（不是 NEXT_PUBLIC_*，因此**不需要重新构建**也能改）：
+     *   · 只在左文站的 `.env` 里配置 ⇒ 阀门站首页不会带上左文站的验证码（双站隔离）；
+     *   · 未配置时不输出该 meta，行为与之前完全一致。
+     */
+    ...(process.env.BAIDU_SITE_VERIFICATION
+      ? { other: { "baidu-site-verification": process.env.BAIDU_SITE_VERIFICATION } }
+      : {}),
     ...(alternates ? { alternates } : {}),
     openGraph: {
-      title: seoTitle,
-      description: seoDesc,
+      title,
+      description,
       type: "website",
       siteName: seo.siteName,
     },
     twitter: {
       card: "summary_large_image",
-      title: seoTitle,
-      description: seoDesc,
+      title,
+      description,
     },
   }
 }
@@ -115,7 +125,10 @@ export default async function RootLayout({
   const theme = await getTheme();
   let tune: Record<string, string> = {};
 
-  // 默认语种 = 后台 language 表 isDefault（后台可配置）；cookie（用户手动选择）优先覆盖
+  // 语种优先级（后者覆盖前者）：
+  //   代码默认 → 后台 language 表 isDefault → cookie（用户手动选择）
+  //   → **URL 显式指定 ?lang=（middleware 转成 x-locale）**
+  // ⚠️ ?lang= 必须最高：它是站点地图 hreflang 采用的入口，点开 ?lang=ja 链接就应当看到日文。
   let htmlLang: string = defaultLocale;
   try {
     const langRow = await prisma.language.findFirst({
@@ -135,6 +148,14 @@ export default async function RootLayout({
     }
   } catch (e) {
     /* 读 cookie 失败用默认 */
+  }
+  try {
+    const xLocale = headers().get("x-locale") as Locale | undefined;
+    if (xLocale && (locales as readonly string[]).includes(xLocale)) {
+      htmlLang = xLocale;
+    }
+  } catch (e) {
+    /* 读请求头失败则沿用 cookie/默认 */
   }
 
   // 前台模板预览：middleware 将 ?__template=xxx 转发为 x-preview-template header，
@@ -165,22 +186,6 @@ export default async function RootLayout({
   try {
     seo = await getSEOConfig();
   } catch (e) {}
-
-  // 联系信息回退真源：site_config.contact_info（前台页脚/联系页消费的站点设置）。
-  // 用于 seo_config 的 phone/companyAddress 被清空后，JSON-LD 仍能输出真实联系方式。
-  let contact: Record<string, any> | null = null;
-  try {
-    const row = await prisma.siteConfig.findUnique({
-      where: { configKey: "contact_info" },
-      select: { configValue: true },
-    });
-    const v = row?.configValue;
-    if (v && typeof v === "object" && !Array.isArray(v)) {
-      contact = v as Record<string, any>;
-    }
-  } catch (e) {
-    /* contact_info 不可用时结构化数据不输出联系字段 */
-  }
 
   // 前台模板风格引擎（R4 深化）：读取当前模板的 style 偏好，注入 CSS 变量驱动差异化渲染
   const preset = getTemplatePreset(theme.templateSlug || DEFAULT_TEMPLATE_SLUG);
@@ -218,7 +223,7 @@ export default async function RootLayout({
   } as React.CSSProperties;
 
   const jsonLd = seo
-    ? renderJsonLd([organizationSchema(seo, contact), websiteSchema(seo)])
+    ? renderJsonLd([organizationSchema(seo), websiteSchema(seo)])
     : "";
 
   return (

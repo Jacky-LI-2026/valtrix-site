@@ -9,13 +9,11 @@ import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
 import { HeroBackground } from "@/lib/page-hero-config";
 
-// 模板判断已移至 page.tsx 服务端：本文件仅渲染默认主题关于子栏目
-
 interface PageProps {
   params: { section: string };
 }
 
-function AboutSectionDefaultInner({ params }: PageProps) {
+export default function AboutSectionClient({ params }: PageProps) {
   const { locale , t} = useI18n();
     const loc = createLocalizedGetter(locale);
   const [section, setSection] = useState<any>(null);
@@ -135,8 +133,14 @@ function AboutSectionDefaultInner({ params }: PageProps) {
               <div className="mt-16 grid grid-cols-1 gap-4 sm:gap-5 max-w-3xl mx-auto">
                 {section.highlights.map((h: any, i: number) => (
                   <div key={i} className="text-center p-5 sm:p-6 bg-dark-50 rounded-lg">
-                    <div className="text-lg sm:text-xl font-bold text-primary mb-1 leading-snug">{loc.get(h, "value")}</div>
-                    <div className="text-sm text-dark-500">{loc.get(h, "label")}</div>
+                    {/*
+                      层级修正（owner 2026-09-29：「此类型目前反了，小标题突出显示，副标题缩小显示，黑色」）
+                      · 小标题（label，如「创新驱动」）→ **突出**：大号 + 粗体 + 品牌红
+                      · 副标题（value，如「以技术创新为核心…」）→ **缩小 + 黑色**
+                      原来是反的：长句用大号红粗体、短标签用小号灰。
+                    */}
+                    <div className="text-lg sm:text-xl font-bold text-primary mb-1 leading-snug">{loc.get(h, "label")}</div>
+                    <div className="text-sm text-dark">{loc.get(h, "value")}</div>
                   </div>
                 ))}
               </div>
@@ -231,8 +235,4 @@ function AboutSectionDefaultInner({ params }: PageProps) {
       </section>
     </>
   );
-}
-
-export default function AboutSectionDefault({ params }: PageProps) {
-  return <AboutSectionDefaultInner params={params} />;
 }

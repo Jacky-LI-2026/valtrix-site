@@ -181,7 +181,16 @@ export default function HomeConfigPage() {
         body: JSON.stringify(payload),
       });
       if (res.ok) {
-        setMessage("保存成功，前台首页已更新");
+        const saved = await res.json().catch(() => null);
+        const cut: { field: string; from: number; to: number }[] = saved?.__truncated || [];
+        if (cut.length > 0) {
+          setMessage(
+            "保存成功，但以下字段超出长度上限已被自动截断：" +
+              cut.map((c) => `${c.field}（${c.from}→${c.to} 字符）`).join("、")
+          );
+        } else {
+          setMessage("保存成功，前台首页已更新");
+        }
       } else {
         const err = await res.json();
         setMessage("保存失败: " + (err.error || "未知错误"));
@@ -714,10 +723,10 @@ export default function HomeConfigPage() {
             <div className="space-y-4">
               <h3 className="text-sm font-medium text-gray-900">CTA行动召唤区域</h3>
               <div className="grid grid-cols-1 gap-4">
-                {renderExtraLang("ctaTitle", "CTA标题")}
-                {renderExtraLang("ctaSubtitle", "CTA副标题")}
+                {renderExtraLang("ctaTitle", "CTA标题（上限 200 字符）")}
+                {renderExtraLang("ctaSubtitle", "CTA副标题（上限 500 字符）")}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {renderExtraLang("ctaButtonText", "按钮文字")}
+                  {renderExtraLang("ctaButtonText", "按钮文字（上限 50 字符）")}
                   <div>
                     <label className="block text-xs font-medium text-gray-500 mb-1">按钮链接</label>
                     <input type="text" value={ctaButtonLink} onChange={(e) => setCtaButtonLink(e.target.value)}
@@ -733,7 +742,7 @@ export default function HomeConfigPage() {
             <div className="space-y-4">
               <h3 className="text-sm font-medium text-gray-900">首页SEO配置</h3>
               <div className="space-y-4">
-                {renderExtraLang("seoTitle", "SEO标题")}
+                {renderExtraLang("seoTitle", "SEO标题（上限 200 字符）")}
                 {renderExtraLang("seoDesc", "SEO描述", "textarea", 3)}
                 {renderExtraLang("seoKeywords", "SEO关键词（逗号分隔）")}
               </div>

@@ -68,7 +68,7 @@ export default function AdminUpdatePage() {
       setAppliedFiles(apd.applied?.length || 0);
       addLog(`✅ 更新成功：版本 ${apd.version}，更新 ${apd.applied?.length || 0} 个文件`);
       if (apd.migration) addLog("⚠️ 本次更新包含数据库变更，请手动执行 npx prisma db push 后重启服务");
-      else addLog("提示：建议重启服务使更新完全生效（pm2 restart <你的 pm2 进程名> 或重启 Node 进程）");
+      else addLog("提示：建议重启服务使更新完全生效（pm2 restart zuowen-web 或重启 Node 进程）");
       setMessage(`版本 ${apd.version} 已应用`);
     } catch (e: any) {
       setError("操作失败：" + (e?.message || ""));

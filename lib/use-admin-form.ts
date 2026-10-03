@@ -63,6 +63,13 @@ export function useAdminForm<T extends Record<string, any>>(
         const fieldName = langFieldName(baseField, lang as any)
         if (fieldName in next) {
           ;(next as any)[fieldName] = values[lang] ?? ''
+        } else {
+          // 🔴 2026-09-18：这个守卫会**静默丢弃**写入 —— 实测就是「字段级翻译按钮点了没反应」的直接原因：
+          //   加载记录时若某个语种键没被带进 form（见 ContentTypeForm 的加载分支 / expandFieldsToForm），
+          //   这里既不写、也不报错。
+          //   守卫本身**要保留**（避免把模型没有的列写进提交体，例如 buildTranslateFieldMap 会把 slug 也映射成 slugEn），
+          //   但至少留下痕迹，便于下次 5 分钟内定位而不是查半天。
+          console.warn(`[useAdminForm] 跳过写入：表单里没有 ${fieldName}（base=${baseField}, lang=${lang}）`)
         }
       })
       return next

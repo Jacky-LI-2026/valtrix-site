@@ -26,8 +26,9 @@ export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session?.user) return NextResponse.json({ error: '未授权' }, { status: 401 })
 
-  // 🔒 2026-09-17 语义修正（自基地同步）：`req.formData()` 抛错 = **客户端发的不是合法 multipart**
-  //    （或根本没带 body）⇒ 属「客户端输入非法」，必须 400，而不是被下面的 catch 统一报成 500。
+  // 🔒 2026-09-16 语义修正：`req.formData()` 抛错 = **客户端发的不是合法 multipart**（或根本没带 body），
+  //    属「客户端输入非法」⇒ 必须 400，而不是被下面的 catch 统一报成 500。
+  //    与 `/api/admin/upload` 的坏图处理同一口径（500 表示服务端故障，会误导排障与前端处理）。
   let formData: FormData
   try {
     formData = await req.formData()

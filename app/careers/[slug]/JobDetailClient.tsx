@@ -50,6 +50,13 @@ export default function JobDetailClient({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [contactData, setContactData] = useState<any>(null);
 
+  // 简历投递邮箱：DB（recruitEmails / email）优先，兜底取部署级 env；
+  // 三者皆空时不渲染投递按钮（不留 mailto: 空链接）
+  const recruitMail = String(contactData?.recruitEmails || contactData?.email || getRecruitEmail())
+    .split(/[,，\s]+/)
+    .filter(Boolean)
+    .join(",");
+
   useEffect(() => {
     fetch(`/api/public/careers?slug=${params.slug}`)
       .then((r) => {
@@ -95,12 +102,6 @@ export default function JobDetailClient({ params }: PageProps) {
 
   // 职位描述兼容：数组（要点）→ 连接为一段文字；字符串 → 原样
   const formatDesc = (d: any) => (Array.isArray(d) ? d.join(" ") : d || "");
-
-  // 投递邮箱：DB 优先，兜底取部署级 env；为空时不渲染投递入口（不留 mailto: 空链接）
-  const recruitEmail = (contactData?.recruitEmails || contactData?.email || getRecruitEmail())
-    .split(/[,，\s]+/)
-    .filter(Boolean)
-    .join(",");
 
   return (
     <>
@@ -183,18 +184,18 @@ export default function JobDetailClient({ params }: PageProps) {
                   })}
                 </div>
 
-                {recruitEmail && (
-                  <div className="mt-6 pt-6 border-t border-dark-100">
+                <div className="mt-6 pt-6 border-t border-dark-100">
+                  {recruitMail && (
                     <a
-                      href={`mailto:${recruitEmail}`}
+                      href={`mailto:${recruitMail}`}
                       className="w-full inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-600 text-white px-6 py-3 rounded font-medium transition-all"
                     >
                       <Mail size={18} />
                       {t("applyPositionNow")}
                       <ArrowRight size={16} className="rtl-flip" />
                     </a>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </div>

@@ -458,3 +458,59 @@ button {
 [class*="popover"] {
   animation: front-fade-in 0.18s ease-out;
 }
+
+/* ============================================================
+   打印样式（2026-09-18）
+   ============================================================
+   owner 报障：「打印内容不要出现询价车」—— 右下角的悬浮交互件
+   （询价车 / 商城购物车 / 预约参观 / AI 客服）是屏幕上的入口，
+   出现在纸面上纯属噪音。给它们统一打 `.print-hidden`，打印时隐藏。
+
+   ⚠️ 只作用于 @media print，屏幕上的版式与位置**零变化**（ADR-005）。
+   ============================================================ */
+@media print {
+  .print-hidden {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   富文本正文排版（2026-09-29 owner 报障：「富文本编辑器部分功能没有生效——空格、段落行距、边距」）
+   --------------------------------------------------------------------------
+   根因：正文容器用 `className="prose"`，但项目**没有安装 @tailwindcss/typography**
+   ⇒ `prose` 是空类名；叠加 Tailwind Preflight 把 <p> 默认 margin 清零，段落间距/行距/缩进全部失效。
+   这里给 `.prose` 补一套**最小可用**排版（不引入新依赖），并兼容 Quill 输出的
+   `ql-align-*`（对齐，编辑器里选的居中/右对齐/两端对齐）与 `ql-indent-*`（缩进）。
+   ========================================================================== */
+.prose { color: inherit; }
+.prose > p,
+.prose > div > p { margin: 0 0 1.15em; line-height: 1.95; }
+.prose > p:last-child,
+.prose > div:last-child > p:last-child { margin-bottom: 0; }
+.prose h1, .prose h2, .prose h3, .prose h4 { font-weight: 700; line-height: 1.4; margin: 1.6em 0 .7em; color: #111111; }
+.prose h1 { font-size: 1.55em; }
+.prose h2 { font-size: 1.35em; }
+.prose h3 { font-size: 1.18em; }
+.prose h4 { font-size: 1.05em; }
+.prose ul, .prose ol { margin: 0 0 1.15em; padding-left: 1.6em; }
+.prose ul { list-style: disc; }
+.prose ol { list-style: decimal; }
+.prose li { margin: .35em 0; line-height: 1.9; }
+.prose blockquote { margin: 1.2em 0; padding: .6em 1em; border-left: 3px solid var(--color-primary, #CC0000); background: #fafafa; color: #555; }
+.prose img { max-width: 100%; height: auto; border-radius: 8px; margin: 1.1em 0; }
+.prose a { color: var(--color-primary, #CC0000); text-decoration: underline; }
+.prose hr { margin: 2em 0; border: 0; border-top: 1px solid #eee; }
+.prose table { width: 100%; margin: 1.2em 0; border-collapse: collapse; font-size: .95em; }
+.prose th, .prose td { border: 1px solid #eee; padding: .5em .7em; text-align: left; }
+.prose th { background: #fafafa; font-weight: 600; }
+/* Quill：对齐（编辑器里选的居中/右对齐/两端对齐） */
+.prose .ql-align-center { text-align: center; }
+.prose .ql-align-right { text-align: right; }
+.prose .ql-align-justify { text-align: justify; }
+/* Quill：缩进 1~8 级 */
+.prose .ql-indent-1 { padding-left: 2em; } .prose .ql-indent-2 { padding-left: 4em; }
+.prose .ql-indent-3 { padding-left: 6em; } .prose .ql-indent-4 { padding-left: 8em; }
+.prose .ql-indent-5 { padding-left: 10em; } .prose .ql-indent-6 { padding-left: 12em; }
+.prose .ql-indent-7 { padding-left: 14em; } .prose .ql-indent-8 { padding-left: 16em; }
+/* Quill：字号/字体（编辑器可选） */
+.prose .ql-size-small { font-size: .85em; } .prose .ql-size-large { font-size: 1.25em; } .prose .ql-size-huge { font-size: 1.6em; }

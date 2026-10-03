@@ -34,6 +34,61 @@ export function getBrandNameEn(): string {
 }
 
 /**
+ * 品牌名的**大小写变体**（去重、滤空）。
+ *
+ * 为什么需要 —— **已实测，不是推测**（对 `D:\阀门网站` 只读核实）：
+ * 两个 fork 的历史键/密钥大小写约定不一致，**且同一站点内部也不一致**：
+ *
+ *   | 阀门站位置                  | 实际字面量                         | 大小写 |
+ *   |-----------------------------|------------------------------------|--------|
+ *   | `lib/i18n.tsx`              | `VALTRIX-locale`                   | 大写   |
+ *   | `lib/download-gate.ts`      | `VALTRIX-download-verified`        | 大写   |
+ *   | `lib/notifications-read.ts` | `valtrix_admin_notifications_read` | 小写   |
+ *   | `lib/member-token.ts`       | `valtrix-member-token`             | 小写   |
+ *
+ * 即：**只派生原样品牌名的话，上表后两条会迁移失败** —— 阀门站老用户会
+ * 丢通知已读状态，并被强制登出。两种变体都是「该部署的品牌名」的派生，
+ * **不是硬编码**，故一并产出。
+ */
+export function brandNameVariants(): string[] {
+  const name = getBrandName();
+  if (!name) return [];
+  const out = new Set<string>([name]);
+  const lower = name.toLowerCase();
+  if (lower) out.add(lower);
+  return Array.from(out);
+}
+
+/**
+ * 构造「品牌前缀 + 固定后缀」的**历史键/密钥候选集**（AGENTS.md G2 的配套工具）。
+ *
+ * 用途：把 localStorage 键、cookie 兜底密钥等**品牌中立化**之后，仍需**读取**老用户
+ * 存在旧键下的数据（否则改键名会让老用户丢一次设置/被登出）。
+ *
+ * 关键设计：旧键**从品牌名派生**，而不是写死品牌 —— 同一份 Base 代码部署到不同站点时，
+ * 各部署自动得到**自己**的旧键（阀门站 → `VALTRIX-*`，基地 → `左文科技-*`），
+ * 代码里一个品牌名都不出现。
+ *
+ * @param suffix 固定后缀，如 `-locale`
+ * @param extra  额外的**显式历史字面量**（仅限非品牌名形式的旧键，如拉丁 slug `zuowen-xxx`；
+ *               调用处必须写明 TODO 与删除前提）。空串会被忽略。
+ * @returns 去重后的候选列表；品牌名为空时不会生成 `-locale` 这类残缺键
+ */
+export function legacyBrandPrefixedKeys(suffix: string, extra: string[] = []): string[] {
+  const out = new Set<string>();
+  for (const v of brandNameVariants()) {
+    const k = `${v}${suffix}`;
+    // 品牌名为空（或恰等于后缀）时跳过，避免生成 "-locale" 这种残缺键
+    if (k !== suffix && k.replace(suffix, "") !== "") out.add(k);
+  }
+  for (const e of extra) {
+    const v = String(e || "").trim();
+    if (v) out.add(v);
+  }
+  return Array.from(out);
+}
+
+/**
  * 行业关键词（供 AI 报价/新闻提示词使用），逗号分隔（中英文逗号均可）
  * 例：NEXT_PUBLIC_INDUSTRY_TERMS="工业阀门,流体控制元件,闸阀,球阀,蝶阀"
  */

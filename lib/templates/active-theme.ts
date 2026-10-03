@@ -11,6 +11,11 @@ import { useState, useEffect } from "react";
  *   const { template, isUnilok } = useActiveTemplate();
  *   if (isUnilok) return <UnilokHeader />;
  *   return <Header />;
+ *
+ * KITZ 洁净科技风（kitz-clean）为 2026-09 新增主题，判定字段 isKitz；
+ * isUnilok / isDefault 语义保持不变（后向兼容）。
+ *
+ * 来源：自阀门站（VALTRIX）回流至通用基地（2026-09-12，双 fork 合并 D3/D4）。
  */
 
 export const UNILOK_SLUG = "unilok-industrial";

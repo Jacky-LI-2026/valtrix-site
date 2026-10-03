@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Check } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
+import { getBrandNameEn } from "@/lib/brand";
 import CornerAccent from "./CornerAccent";
 
 /**
@@ -50,7 +51,7 @@ export default function WhoWeAre() {
               </span>
             </div>
             <h2 className="mt-6 text-3xl font-bold leading-[1.15] tracking-tight text-primary md:text-4xl lg:text-5xl">
-              {t("unilokWhoTitle1")}
+              {t("unilokWhoTitle1") || getBrandNameEn()}
               <br />
               {t("unilokWhoTitle2")}
               <br />

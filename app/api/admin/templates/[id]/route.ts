@@ -31,27 +31,38 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       if (dup) return NextResponse.json({ error: `模板标识 ${slug} 已存在` }, { status: 400 });
     }
 
-    // 设为默认时，先取消其他模板的默认标记（事务）
+    // ---- 组装字段更新 ----
+    // ⚠️ 2026-09-14 修复（既有 BUG）：原实现在 `if (isDefault) { … } else { … 保存其他字段 … }`
+    //    里，导致「设为默认」时 **name/slug/version/description/screenshot/config/sortOrder 全部被跳过**。
+    //    现改为：字段更新**始终执行**，互斥操作作为额外的事务步骤。
+    const data: Record<string, any> = {
+      name: name ?? existing.name,
+      slug: slug ?? existing.slug,
+      version: version ?? existing.version,
+      description: description ?? existing.description,
+      screenshot: screenshot ?? existing.screenshot,
+      config: config ?? existing.config,
+      isActive: isActive !== undefined ? isActive : existing.isActive,
+      sortOrder: sortOrder ?? existing.sortOrder,
+    };
+    if (isDefault !== undefined) data.isDefault = !!isDefault;
+
+    const ops: any[] = [];
+
+    // ① 设为默认时，取消其他模板的默认标记
     if (isDefault) {
-      await prisma.$transaction([
-        prisma.template.updateMany({ where: { id: { not: id } }, data: { isDefault: false } }),
-        prisma.template.update({ where: { id }, data: { isDefault: true } }),
-      ]);
-    } else {
-      await prisma.template.update({
-        where: { id },
-        data: {
-          name: name ?? existing.name,
-          slug: slug ?? existing.slug,
-          version: version ?? existing.version,
-          description: description ?? existing.description,
-          screenshot: screenshot ?? existing.screenshot,
-          config: config ?? existing.config,
-          isActive: isActive !== undefined ? isActive : existing.isActive,
-          sortOrder: sortOrder ?? existing.sortOrder,
-        },
-      });
+      ops.push(prisma.template.updateMany({ where: { id: { not: id } }, data: { isDefault: false } }));
     }
+
+    // ② 🔒 启用某模板时，**自动停用其他所有模板**（同一时刻只允许一个启用）
+    //    2026-09-14 新增机制（用户需求）。放在服务端而非前端：
+    //    无论从后台按钮、API 直调还是脚本触发，都保证「同一时刻只有一个启用」这一不变式。
+    if (data.isActive === true) {
+      ops.push(prisma.template.updateMany({ where: { id: { not: id } }, data: { isActive: false } }));
+    }
+
+    ops.push(prisma.template.update({ where: { id }, data }));
+    await prisma.$transaction(ops);
 
     const updated = await prisma.template.findUnique({ where: { id } });
     return NextResponse.json(serializeBigInt({ success: true, template: updated }));

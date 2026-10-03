@@ -8,6 +8,7 @@ import PageHero from "@/components/ui/PageHero";
 import { ShoppingBag, ImageOff, Minus, Plus, Download } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
+import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { displayUnitPrice } from "@/lib/shop-price";
 import PriceDisplay, { usePricingContext } from "@/components/PriceDisplay";
 
@@ -293,7 +294,7 @@ export default function ShopDetailPage() {
             {/* 详情 */}
             {product.description && (
               <div className="prose mt-8 max-w-none border-t border-dark-100 pt-6 text-dark-600"
-                dangerouslySetInnerHTML={{ __html: loc.get(product, "description") }} />
+                dangerouslySetInnerHTML={{ __html: preserveLeadingSpaces(loc.get(product, "description")) }} />
             )}
             {/* 模型及图纸下载 */}
             {Array.isArray(product.modelFiles) && product.modelFiles.length > 0 && (

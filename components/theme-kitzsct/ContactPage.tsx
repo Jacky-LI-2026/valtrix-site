@@ -159,17 +159,16 @@ export default function KitzContactPage() {
     return a === undefined || a === null ? "" : String(a);
   };
 
-  // 地址列表：多地址优先，其次单地址；均未配置则**不渲染地址条目**
-  // G2：绝不回退到词条默认值（曾有别家公司地址；且 footerAddressDefault 为空串时 t() 会返回 key 本身）
+  // 地址列表：多地址优先，其次单地址，最后部署级兜底文案
   const addressList = contactData
     ? (() => {
         const arr = loc.getArray(contactData, "addresses");
         if (arr.length > 0) return arr.map(unwrapText);
         const single = loc.get(contactData, "address");
         if (single) return [String(single)];
-        return [];
+        return [t("footerAddressDefault")];
       })()
-    : [];
+    : [t("footerAddressDefault")];
 
   // 联系方式条目：DB 优先，兜底取部署级 env（两者都空则不显示该值）
   const contactItems: { icon: any; label: string; value: string; sub?: string }[] =

@@ -10,6 +10,9 @@ export const dynamic = "force-dynamic";
  * 付费插件开通：输入兑换码（HMAC-SHA256 签名，base64url(payload).base64url(signature)），
  * 校验通过后将插件 key 加入 site_config.plugin_activated（已开通付费插件列表）。
  * 校验失败返回 400 + 错误信息。
+ *
+ * 来源：自阀门站（VALTRIX）回流至通用基地（2026-09-12，双 fork 合并 D2）。
+ * 权限：middleware 的 API_PERMISSION 已将其收口到 config:site。
  */
 export async function POST(req: NextRequest) {
   const session = await auth();

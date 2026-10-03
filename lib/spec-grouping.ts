@@ -7,6 +7,10 @@
  *
  * 纯渲染层分组，不改数据。分组键用中文基础字段 label（canonical 标识），
  * labelEn/Ja/Ko/Fr/Ar 是其译文，同一 label 的多语种行必然同组。
+ *
+ * 来源：自阀门站（VALTRIX）回流至通用基地（2026-09-12，双 fork 合并 D2）。
+ * 兼容性说明：当某产品内 label 互不重复时（如 MPCVD 设备规格），
+ * 每组恰好 1 个 value，渲染结果与「逐行渲染」完全一致，无版式差异。
  */
 
 export interface SpecGroup {

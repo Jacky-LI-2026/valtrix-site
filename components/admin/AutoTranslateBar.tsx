@@ -22,13 +22,35 @@ function langFieldName(lang: string, targetField: string): string {
 }
 
 // 调用翻译API
+//
+// 🔴 2026-09-18：此前**不检查 `res.ok`**，于是 401/403/500 被当成"翻译没有结果"静默吞掉 ——
+//   界面上什么都看不到，反而照常显示「上次翻译: <时间>」，看起来像成功。
+//   真实案例：阀门站编辑者的会话是 2026-09-09 签发的，而 `translate:use` 权限码
+//   2026-09-17 才创建 ⇒ JWT 里没有该权限 ⇒ 接口 403 ⇒ 用户以为"翻译功能坏了"。
+//   现改为：非 2xx 一律**抛错**，并把服务端返回的原因带出来。
 async function callTranslate(text: string, lang: string, capitalize = false): Promise<any> {
   const res = await fetch('/api/admin/translate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text, targetLang: lang, capitalize }),
   })
-  return res.json()
+  let data: any = null
+  try {
+    data = await res.json()
+  } catch {
+    /* 非 JSON（如网关错误页）—— 下面按状态码兜底 */
+  }
+  if (!res.ok) {
+    const base = data?.error || `翻译接口返回 ${res.status}`
+    // 权限类失败给出可操作指引（AGENTS 坑30：权限在登录时写进 JWT）
+    const hint = data?.hint || (res.status === 401 || res.status === 403
+      ? '权限在登录时写入会话；若角色/权限刚调整过，请注销后重新登录'
+      : '')
+    const err: any = new Error(hint ? `${base} —— ${hint}` : base)
+    err.status = res.status
+    throw err
+  }
+  return data
 }
 
 interface AutoTranslateBarProps {
@@ -63,6 +85,8 @@ export default function AutoTranslateBar({
   const [targetLangs, setTargetLangs] = useState<string[]>(['en'])
   const [translating, setTranslating] = useState(false)
   const [lastTranslated, setLastTranslated] = useState('')
+  // 翻译失败原因（2026-09-18 新增：此前失败被静默吞掉，用户只看到"没反应"）
+  const [error, setError] = useState('')
   const [langList, setLangList] = useState(languages || DEFAULT_LANGUAGES)
   const [showLangDropdown, setShowLangDropdown] = useState(false)
   const translateTimer = useRef<NodeJS.Timeout | null>(null)
@@ -109,15 +133,24 @@ export default function AutoTranslateBar({
       .catch(() => {})
   }, [languages])
 
-  // 翻译单个字段到多个目标语言
-  const translateField = useCallback(async (sourceField: string, targetField: string, value: any, langs: string[], cap = false) => {
+  // 翻译单个字段到多个目标语言。
+  // 返回 { ok, fail, firstError }：调用方（translateAll）据此决定**是否显示成功时间**、
+  // 以及**是否把失败原因显示给用户**（2026-09-18 前是静默吞掉）。
+  const translateField = useCallback(async (sourceField: string, targetField: string, value: any, langs: string[], cap = false): Promise<{ ok: number; fail: number; firstError: string }> => {
+    let ok = 0
+    let fail = 0
+    let firstError = ''
+    const noteFail = (e: unknown) => {
+      fail++
+      if (!firstError) firstError = (e as Error)?.message || String(e)
+    }
     // 处理空值
     if (value === null || value === undefined || value === '') {
       for (const lang of langs) {
         const fieldName = langFieldName(lang, targetField)
         updateFormValueRef.current(fieldName, Array.isArray(value) ? [] : '')
       }
-      return
+      return { ok, fail, firstError }
     }
 
     // 数组/对象字段：form 中为 JSON 字符串（如 "[\"...\"]"），需按 JSON 数组整体翻译。
@@ -144,17 +177,19 @@ export default function AutoTranslateBar({
           const fieldName = langFieldName(lang, targetField)
           // 保存为JSON字符串，符合MultiLangFieldV2组件的类型定义
           updateFormValueRef.current(fieldName, translated)
+          ok++
         } catch (error) {
           console.error(`翻译JSON字段 ${sourceField} 到 ${lang} 失败:`, error)
+          noteFail(error)
         }
       }
-      return
+      return { ok, fail, firstError }
     }
 
     // 处理字符串类型的字段（简单文本字段）
     const text = typeof value === 'string' ? value : String(value || '')
     if (!text || text.trim() === '') {
-      return
+      return { ok, fail, firstError }
     }
 
     for (const lang of langs) {
@@ -173,35 +208,58 @@ export default function AutoTranslateBar({
         if (data.success && data.provider !== 'fallback') {
           const fieldName = langFieldName(lang, targetField)
           updateFormValueRef.current(fieldName, data.translatedText)
+          ok++
+        } else if (data?.success === false || !data?.provider) {
+          // 接口 200 但没有可用结果（如 provider=fallback 返回原文）：不计入成功
+          fail++
+          if (!firstError) firstError = '翻译服务未返回可用结果（可能被限流）'
         }
       } catch (error) {
         console.error(`翻译字段 ${sourceField} 到 ${lang} 失败:`, error)
+        noteFail(error)
       }
     }
+    return { ok, fail, firstError }
   }, [])
 
   // 翻译所有字段（手动"一键翻译全部"随时可执行，不依赖自动翻译开关）
   const translateAll = useCallback(async () => {
     setTranslating(true)
+    setError('')
     const values = getFormValuesRef.current()
     const fMap = fieldMapRef.current
     const langs = targetLangsRef.current
 
     if (langs.length === 0) {
       setTranslating(false)
+      setError('请先选择目标语言')
       return
     }
 
+    let ok = 0
+    let fail = 0
+    let firstError = ''
     for (const [sourceField, targetField] of Object.entries(fMap)) {
       const sourceValue = values[sourceField]
       // capitalize: true=全部简单文本字段；数组=仅指定中文字段名
       const cap = Array.isArray(capitalizeRef.current) ? capitalizeRef.current.includes(sourceField) : !!capitalizeRef.current
       // 传递原始值给translateField函数，让它根据值的类型选择相应的翻译函数
-      await translateField(sourceField, targetField, sourceValue, langs, cap)
+      const r = await translateField(sourceField, targetField, sourceValue, langs, cap)
+      ok += r.ok
+      fail += r.fail
+      if (!firstError && r.firstError) firstError = r.firstError
     }
 
     setTranslating(false)
-    setLastTranslated(new Date().toLocaleTimeString())
+    // ⚠️ 只有**真的至少成功一条**才显示"上次翻译"——否则会给出"看起来成功"的假信号
+    if (ok > 0) {
+      setLastTranslated(new Date().toLocaleTimeString())
+      if (fail > 0) setError(`${fail} 个字段翻译失败（${firstError}）`)
+    } else if (fail > 0) {
+      setError(`翻译失败：${firstError}`)
+    } else {
+      setError('没有可翻译的内容（请先填写中文原文）')
+    }
   }, [translateField])
 
   // 监听中文输入变化，自动翻译（防抖）——仅"自动翻译"开启时生效
@@ -349,6 +407,10 @@ export default function AutoTranslateBar({
           <span className="flex items-center gap-1 text-[#CC0000]">
             <Loader2 size={12} className="animate-spin" />
             正在自动翻译...
+          </span>
+        ) : error ? (
+          <span className="flex items-center gap-1 text-red-600">
+            ⚠️ {error}
           </span>
         ) : lastTranslated ? (
           <span className="text-green-600 flex items-center gap-1">

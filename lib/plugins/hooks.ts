@@ -14,8 +14,8 @@
  *     onConfigChange: async (ctx) => { ... },
  *   });
  */
-import { PluginManifest } from "./registry";
-
+/* 说明（2026-09-05）：原 `import { PluginManifest }` 与 assertHookPlugin() 已一并删除——
+   该函数仓库内零调用点；manifest 校验由 app/api/admin/plugins/route.ts 在 toggle/config 前完成。 */
 export interface PluginHookContext {
   /** 插件 key */
   key: string;
@@ -95,10 +95,5 @@ export async function runPluginHook(
   }
 }
 
-/**
- * 供 manifest 校验：确认插件 key 存在时才注册 hooks（避免幽灵 hooks）。
- */
-export function assertHookPlugin(manifest: PluginManifest, hooks: PluginHooks): void {
-  if (!manifest) throw new Error(`[plugin-hooks] 插件不存在，无法注册 hooks`);
-  registerPluginHooks(manifest.key, hooks);
-}
+/* 说明（2026-09-05）：原 assertHookPlugin() 已删除——仓库内零调用点，
+   manifest 校验由 app/api/admin/plugins/route.ts 在 toggle/config 前自行完成。 */

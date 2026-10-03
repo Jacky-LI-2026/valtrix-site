@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
+import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { groupSpecs } from "@/lib/spec-grouping";
 import { getBrandNameEn } from "@/lib/brand";
 import { useProductBySlug } from "@/lib/api/useProducts";
@@ -304,7 +305,7 @@ export default function UnilokProductDetailPage() {
             <div className="border border-gray-200 bg-white p-8 shadow-sm lg:p-10">
               <div
                 className="prose max-w-none leading-relaxed text-dark-600"
-                dangerouslySetInnerHTML={{ __html: detailContent }}
+                dangerouslySetInnerHTML={{ __html: preserveLeadingSpaces(detailContent) }}
               />
             </div>
           </div>

@@ -8,7 +8,7 @@
  * SEO/GEO（SeoGeoConfig，enableSeo 类型）。新建/编辑共用。
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getContentType, ContentField, ContentTypeConfig } from '@/lib/content-types/registry'
 import { expandFieldsToForm } from '@/lib/content-types/dynamic'
@@ -21,7 +21,8 @@ import SeoGeoConfig from './SeoGeoConfig'
 import UrlUploadInput from './UrlUploadInput'
 import AiImagePicker from './AiImagePicker'
 import ProductSpecEditor, { SpecRow } from './ProductSpecEditor'
-import { Sparkles } from 'lucide-react'
+import ThreeSixtyUpload from './ThreeSixtyUpload'
+import { Sparkles, Upload, Loader2 } from 'lucide-react'
 
 interface Props {
   typeName: string
@@ -36,18 +37,64 @@ function defaultSingleValue(f: ContentField): any {
     case 'number': return 0
     case 'select': return f.options?.[0]?.value ?? ''
     case 'datetime': return ''
+    case 'frames360': return null
     default: return ''
   }
 }
 
-/** 图集编辑器（gallery 单语数组）：URL 输入 + 上传 + 预览 + 删除 */
-function GalleryEditor({ value, onChange }: { value: string[]; onChange: (arr: string[]) => void }) {  const [draft, setDraft] = useState('')
+/** gallery 元素归一化成 URL（库里可能是字符串，也可能是 {url} 对象） */
+function galleryToUrl(x: any): string {
+  if (!x) return ''
+  if (typeof x === 'string') return x
+  if (Array.isArray(x)) return galleryToUrl(x[0])
+  if (typeof x === 'object') return typeof x.url === 'string' ? x.url : ''
+  return ''
+}
+
+/**
+ * 图集编辑器（gallery 单语数组）：URL 输入 + **本地上传** + 预览 + 删除。
+ * owner 2026-10-03：「为何没有上传按钮」—— 本仓此前是 fork 早期版本，只有"填 URL"这一条路，
+ *   现与基地（左文）对齐：支持多选图片直传 `/api/admin/upload`，上传后自动追加到图集。
+ */
+function GalleryEditor({ value, onChange }: { value: any[]; onChange: (arr: string[]) => void }) {
+  const [draft, setDraft] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [err, setErr] = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const urls = (Array.isArray(value) ? value : []).map(galleryToUrl).filter(Boolean)
+
   const add = () => {
     const u = draft.trim()
     if (!u) return
-    onChange([...value, u])
+    onChange([...urls, u])
     setDraft('')
   }
+
+  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (!files.length) return
+    setUploading(true)
+    setErr('')
+    const added: string[] = []
+    try {
+      for (const file of files) {
+        const fd = new FormData()
+        fd.append('file', file)
+        const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+        const data = await res.json().catch(() => ({}))
+        if (res.ok && data?.success && data?.url) added.push(data.url)
+        else setErr(data?.error || `「${file.name}」上传失败`)
+      }
+      if (added.length) onChange([...urls, ...added])
+    } catch {
+      setErr('上传失败，请重试')
+    } finally {
+      setUploading(false)
+      if (fileRef.current) fileRef.current.value = '' // 允许重复选择同一文件
+    }
+  }
+
   return (
     <div>
       <div className="flex gap-2">
@@ -63,15 +110,22 @@ function GalleryEditor({ value, onChange }: { value: string[]; onChange: (arr: s
           className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-200 whitespace-nowrap">
           添加
         </button>
+        <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
+          className="inline-flex items-center gap-1.5 px-3 py-2 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 disabled:opacity-60 whitespace-nowrap">
+          {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+          {uploading ? '上传中' : '上传图片'}
+        </button>
+        <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFiles} />
       </div>
-      {value.length > 0 && (
+      {err && <p className="mt-1 text-xs text-red-600">{err}</p>}
+      {urls.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-2">
-          {value.map((u, i) => (
+          {urls.map((u, i) => (
             <div key={i} className="relative group">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={u} alt={`图${i + 1}`} className="h-20 w-24 object-cover rounded border border-gray-200"
                 onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0.25' }} />
-              <button type="button" onClick={() => onChange(value.filter((_, j) => j !== i))}
+              <button type="button" onClick={() => onChange(urls.filter((_, j) => j !== i))}
                 className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100">
                 ×
               </button>
@@ -585,6 +639,33 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
               />
             </div>
           ))}
+          {/* 360° 环拍（frames360：单语 JSON 对象 {template,totalFrames,startIndex}）
+              —— owner 2026-10-03：「为何没有 360」：本仓 fork 早于该功能，字段在注册表里声明了
+                 但表单从不渲染 ⇒ 后台根本改不了。此处与基地（左文）对齐。
+              上传帧图 → /api/admin/upload（带 path，自动命名 Frame000001.webp）→ 回写路径模板。
+              前台 ProductDetailClient 兼容 path / template 两种键名。 */}
+          {sideFields.filter((f) => f.kind === 'frames360').map((f) => {
+            const raw = form[f.name]
+            const v = raw && typeof raw === 'object' ? (raw as any) : {}
+            return (
+              <div key={f.name} className="bg-white rounded-lg border border-gray-200 p-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{f.label}</label>
+                <ThreeSixtyUpload
+                  value={typeof v.template === 'string' ? v.template : typeof v.path === 'string' ? v.path : ''}
+                  totalFrames={Number(v.totalFrames ?? v.count ?? 60) || 60}
+                  startIndex={Number(v.startIndex ?? 1) || 1}
+                  // 每产品独立存储目录 /uploads/360/<型号>/（旧版未传 ⇒ 所有产品共用 product/ 目录）
+                  productModel={String(form.model || form.slug || '')}
+                  onChange={(template, totalFrames, startIndex) =>
+                    setForm((prev: any) => ({
+                      ...prev,
+                      [f.name]: template ? { template, totalFrames, startIndex } : null,
+                    }))
+                  }
+                />
+              </div>
+            )
+          })}
           {sideFields.filter((f) => f.kind === 'video').map((f) => (
             <div key={f.name} className="bg-white rounded-lg border border-gray-200 p-4">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{f.label}</label>

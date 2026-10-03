@@ -18,21 +18,24 @@ export async function GET(req: NextRequest) {
     //   而 `useProductTabs()` 被 Header/Footer/Hero/产品页/搜索/展示区**全站**调用
     //   ⇒ 此前**每个页面都在下载 3.47MB**。传 `?specs=3` 后降到约 0.3MB（约 11×）。
     //
-    //   ⚠️ 本次替代了原先那句 `specs: []`（硬砍光）—— 硬砍会让产品卡的「关键参数（前 3 条）」消失。
-    //   兼容性：**不带该参数时返回全部 specs**，不改变既有契约；`specs=0` ⇒ 不返回 specs 字段。
+    //   兼容性：**不带该参数时行为与以前完全一致（返回全部 specs）**，不改变既有契约。
+    //   `specs=0` ⇒ 不返回 specs 字段（最小）。
+    //   ⚠️ `cachedJson` 只设 HTTP 缓存头，CDN/浏览器按**完整 URL（含查询串）**分键，
+    //      因此不同 `specs` 取值不会互相串号。
     const specsParam = req.nextUrl.searchParams.get("specs");
     const specsLimit =
       specsParam === null ? null : Math.max(0, Math.min(500, Math.trunc(Number(specsParam)) || 0));
 
     // 🔴 2026-09-18 新增 `?lite=1`（**列表/首页专用**瘦身）：省掉六语种富文本正文与卖点。
     //
-    //   背景（实测剖析）：本接口响应里 `detailContent*`（六语种富文本）占大头、
-    //   `features*` 次之。而这两组字段**只有产品详情页**用得到 —— 且详情页读的是
+    //   背景（实测剖析）：本接口响应里 **`detailContent*`（六语种富文本）占 64.2%**、
+    //   `features*` 约 7%。而这两组字段**只有产品详情页**用得到 —— 且详情页读的是
     //   单产品接口 `/api/public/products/<型号>`（自带正文），列表页/首页/相关产品
     //   一律不读它们（2026-09-18 逐消费方 grep 核对：唯一读到的地方是三个详情页组件的
-    //   loc.get(model,"detailContent") / loc.getArray(model,"features") 兜底路径）。
+    //   `loc.get(model,"detailContent")` / `loc.getArray(model,"features")` 兜底路径）。
     //
-    //   ⇒ `?lite=1` 去掉这两组；**详情页必须继续用全量**（`useProductTabs({ full: true })`）。
+    //   ⇒ `?lite=1` 去掉这两组；**详情页必须继续用全量**（`useProductTabs({ full: true })`），
+    //     因为它在单产品接口回来之前会把列表项当兜底渲染源（见 ProductDetailPage 注释）。
     //
     //   兼容性：不带该参数时行为与以前**完全一致**（返回全部字段），不改变既有契约。
     const lite = req.nextUrl.searchParams.get("lite") === "1";
@@ -129,9 +132,8 @@ export async function GET(req: NextRequest) {
           priceUnit: p.priceUnit || '',
           moq: p.moq ?? 1,
           priceNote: p.priceNote || '',
-          // specs 是**体积大头**（占全量 96.3%）⇒ 由 `?specs=` 控制条数；
-          // `specs=0` 时整段省略（连字段都不出现）。
-          // ⚠️ 这里取代了原先的硬砍 `specs: []` —— 那样会让产品卡的「关键参数（前 3 条）」全部消失。
+          // specs 是**体积大头**（占全量 96.3%）⇒ 仅在 `?specs=` 未指定时返回全部；
+          // 指定 0 时整段省略（连字段都不出现，省掉 `"specs":[]` 的开销）
           specs:
             specsLimit === 0
               ? undefined

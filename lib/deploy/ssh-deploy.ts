@@ -36,7 +36,9 @@ export type StepCallback = (stepIndex: number, totalSteps: number) => void;
 
 // 部署步骤定义
 export function getDeploySteps(server: ServerConfig): DeployStep[] {
-  const processName = server.processName || "valtrix";
+  // PM2 进程名：服务器记录 → 部署级环境变量 → 中性默认值（不得写死某站的进程名）
+  // 注：各站服务器的 servers 表里通常已配置 processName，这里只是最后的兜底
+  const processName = server.processName || process.env.PM2_APP_NAME || "web";
   const pmCmd = server.processManager === "pm2"
     ? `bash -c 'command -v pm2 >/dev/null 2>&1 || npm install -g pm2 >/dev/null 2>&1; if pm2 describe ${processName} >/dev/null 2>&1; then if pm2 describe ${processName} 2>/dev/null | grep -q "next start"; then pm2 delete ${processName} && NODE_ENV=production pm2 start "node server.js" --name ${processName} && pm2 save; else pm2 restart ${processName}; fi; else NODE_ENV=production pm2 start "node server.js" --name ${processName} && pm2 save; fi'`
     : server.processManager === "systemd"

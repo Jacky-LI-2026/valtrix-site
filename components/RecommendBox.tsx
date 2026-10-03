@@ -8,14 +8,40 @@
  */
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Calendar, ArrowRight } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface RecItem {
   id: string;
   name: string;
   image?: string;
   href: string;
+  /** 以下三项仅新闻推荐返回（用于与「相关新闻」卡片版式对齐） */
+  categoryName?: string;
+  summary?: string;
+  date?: string;
 }
+
+/**
+ * 「猜你喜欢」区块的文案（i18n 字典里没有对应键，先就地兜底 6 语种）。
+ * 「阅读更多」用统一的 `t("readMore")`。
+ */
+const TITLE: Record<string, string> = {
+  zh: "猜你喜欢",
+  en: "You May Also Like",
+  ja: "おすすめ",
+  ko: "추천 콘텐츠",
+  fr: "Vous aimerez aussi",
+  ar: "قد يعجبك أيضاً",
+};
+const HINT: Record<string, string> = {
+  zh: "根据浏览行为智能推荐",
+  en: "Recommended based on browsing behaviour",
+  ja: "閲覧履歴に基づくおすすめ",
+  ko: "열람 기록 기반 추천",
+  fr: "Recommandé selon votre navigation",
+  ar: "توصيات مستندة إلى سلوك التصفح",
+};
 
 export default function RecommendBox({
   targetType,
@@ -26,8 +52,17 @@ export default function RecommendBox({
   targetId: string;
   locale?: string;
 }) {
+  const { t } = useI18n();
   const [items, setItems] = useState<RecItem[]>([]);
   const [active, setActive] = useState(false);
+
+  const fmtDate = (v?: string) => {
+    if (!v) return "";
+    const d = new Date(v);
+    if (Number.isNaN(d.getTime())) return "";
+    const p = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
 
   useEffect(() => {
     if (!targetId) return;
@@ -75,37 +110,86 @@ export default function RecommendBox({
 
   if (!active || items.length === 0) return null;
 
+  const isNews = targetType === "news";
+
   return (
     <section className="py-16 bg-gray-50">
       <div className="container">
         <div className="flex items-center gap-2 mb-8">
           <Sparkles size={20} className="text-primary" />
-          <h2 className="text-2xl font-bold text-dark">猜你喜欢</h2>
-          <span className="text-xs text-gray-400 ml-2">根据浏览行为智能推荐</span>
+          <h2 className="text-2xl font-bold text-dark">{TITLE[locale] || TITLE.zh}</h2>
+          <span className="text-xs text-gray-400 ml-2">{HINT[locale] || HINT.zh}</span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ${isNews ? "max-w-5xl mx-auto" : ""}`}>
           {items.map((it) => (
             <Link
               key={it.id}
               href={it.href}
-              className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all"
+              className={
+                isNews
+                  ? // 与新闻详情页「相关新闻」卡片完全同一套版式（owner 2026-09-29：
+                    // 「图片显得太突兀，采用和相关新闻一样的版式」）
+                    "group bg-white border border-dark-100 rounded-lg overflow-hidden hover:border-primary hover:shadow-lg transition-all"
+                  : "group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all"
+              }
             >
-              {/* 推荐位卡片：正方形 1:1 + 图片铺满（与列表页/详情页统一） */}
-              <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                {it.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={it.image} alt={it.name} loading="lazy" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-primary font-bold text-2xl">{(it.name || "?").charAt(0)}</span>
+              {isNews ? (
+                <>
+                  {/* 16:9 与「相关新闻」一致；无图用同款占位图（不再是纯色/首字母块） */}
+                  <div className="aspect-[16/9] bg-gradient-to-br from-dark-100 to-dark-200 flex items-center justify-center overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={it.image || "/placeholders/generic-tech.webp"}
+                      alt={it.name}
+                      loading="lazy"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                )}
-              </div>
-              <div className="p-4">
-                <h3 className="font-bold text-dark group-hover:text-primary transition-colors text-sm line-clamp-2">
-                  {it.name}
-                </h3>
-              </div>
+                  <div className="p-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      {it.categoryName ? (
+                        <span className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded">{it.categoryName}</span>
+                      ) : null}
+                      {it.date ? (
+                        <span className="text-dark-400 text-xs flex items-center gap-1">
+                          <Calendar size={12} />
+                          {fmtDate(it.date)}
+                        </span>
+                      ) : null}
+                    </div>
+                    <h3 className="text-lg font-bold text-dark mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                      {it.name}
+                    </h3>
+                    {it.summary ? (
+                      <p className="text-dark-500 text-sm line-clamp-2 mb-4">{it.summary}</p>
+                    ) : null}
+                    <span className="inline-flex items-center gap-1 text-primary text-sm font-medium group-hover:gap-2 transition-all">
+                      {t("readMore")}
+                      <ArrowRight size={14} className="rtl-flip" />
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* 产品推荐位：与列表页/详情页统一 —— 正方形 1:1 + 图片铺满
+                      （owner 2026-09-25：比例与铺满要**同时**生效；产品图是 1000×1000 方图，不裁切） */}
+                  <div className="aspect-square bg-gray-100 relative overflow-hidden">
+                    {it.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={it.image} alt={it.name} loading="lazy" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-primary font-bold text-2xl">{(it.name || "?").charAt(0)}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-bold text-dark group-hover:text-primary transition-colors text-sm line-clamp-2">
+                      {it.name}
+                    </h3>
+                  </div>
+                </>
+              )}
             </Link>
           ))}
         </div>

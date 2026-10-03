@@ -8,6 +8,9 @@ export const dynamic = "force-dynamic";
  * POST /api/admin/plugin-market/uninstall
  * 卸载市场插件：从 site_config.plugin_state 移除（仅远程安装的可卸载）。
  * builtin 插件不可卸载返回 400；未安装返回 404。
+ *
+ * 来源：自阀门站（VALTRIX）回流至通用基地（2026-09-12，双 fork 合并 D2）。
+ * 权限：middleware 的 API_PERMISSION 已将其收口到 config:site。
  */
 export async function POST(req: NextRequest) {
   const session = await auth();

@@ -9,6 +9,9 @@ const MARKET_URL_KEY = "plugin_market_url";
 /**
  * 远程市场 URL 配置（site_config.plugin_market_url，可选）。
  * GET：读取当前配置；POST：保存远程市场目录 JSON URL（空串 = 清除，回退内置目录）。
+ *
+ * 来源：自阀门站（VALTRIX）回流至通用基地（2026-09-12，双 fork 合并 D2）。
+ * 权限：middleware 的 API_PERMISSION 已将其收口到 config:site。
  */
 export async function GET() {
   const session = await auth();

@@ -5,7 +5,7 @@ import { serializeBigInt } from '@/lib/serialize'
 import { recordOperation } from '@/lib/operation-log'
 import { getAdminSiteId } from '@/lib/tenant/admin-scope'
 import { setSiteConfigValue } from '@/lib/tenant/site-config'
-import { getContactEmail, getBrandName, getBrandNameEn } from '@/lib/brand';
+import { getContactEmail, getContactPhone, getBrandName, getBrandNameEn } from '@/lib/brand';
 
 // 默认站点配置项
 const DEFAULT_CONFIG: Record<string, any> = {
@@ -14,7 +14,7 @@ const DEFAULT_CONFIG: Record<string, any> = {
   siteDescription: String(process.env.NEXT_PUBLIC_SITE_DESCRIPTION || ''),
   siteKeywords: String(process.env.NEXT_PUBLIC_SITE_KEYWORDS || ''),
   logo: '',
-  phone: '010-8888-8888',
+  phone: getContactPhone(),
   email: getContactEmail(),
   address: '北京市朝阳区xxx路xxx号',
   addresses: [] as string[],

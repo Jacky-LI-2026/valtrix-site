@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
 import { getClientIp, getLocationFields } from "@/lib/geo";
+import { checkRateLimit, getClientIp as getRateLimitIp } from "@/lib/rate-limit";
 import { sendOrderConfirmationMail, sendNewOrderNoticeMail } from "@/lib/server/shop-mail";
 import { calcUnitPrice } from "@/lib/shop-price";
 import { calcCouponDiscount, couponInEffect } from "@/lib/shop-coupon";
@@ -243,41 +245,67 @@ export async function POST(req: NextRequest) {
 }
 
 // GET /api/public/shop/orders?orderNo=xxx — 按订单号查询
+// 🔒 2026-09-16 安全修复（客户端全量 PII 只凭订单号可取）：
+//   ① 匿名调用按 IP 限流，拖慢订单号枚举；
+//   ② 未认证请求裁剪响应字段（去掉税号/付款凭证/操作历史），只保留查单页渲染必需字段；
+//   ③ 后台登录会话，或"下单会员本人"（member token 与订单 memberId 一致）返回完整字段。
+//   注意：为了不改动前台契约（app/shop/order/[orderNo]/page.tsx 正在被实测），
+//   本接口未引入"订单 token / 二次验证"，该方案见安全修复报告（未实现）。
 export async function GET(req: NextRequest) {
   const orderNo = new URL(req.url).searchParams.get("orderNo")?.trim();
   if (!orderNo) return NextResponse.json({ ok: false, error: "缺少订单号" }, { status: 400 });
+
+  const isAdmin = Boolean((await auth())?.user);
+  const memberTok = verifyMemberToken(memberTokenFromRequest(req));
+
+  // 匿名调用限流 20 次/10 分钟（同一 NAT 出口的正常用户重载查单页不受影响）
+  if (!isAdmin && !memberTok) {
+    const gate = checkRateLimit("shop-order-query", getRateLimitIp(req), 20, 10 * 60 * 1000);
+    if (!gate.ok) {
+      return NextResponse.json(
+        { ok: false, error: `查询过于频繁，请 ${gate.retryAfter} 秒后再试`, retryAfter: gate.retryAfter },
+        { status: 429, headers: { "Retry-After": String(gate.retryAfter) } }
+      );
+    }
+  }
+
   const o = await prisma.shopOrder.findUnique({ where: { orderNo } });
   if (!o) return NextResponse.json({ ok: false, error: "订单不存在" }, { status: 404 });
-  return NextResponse.json({
-    ok: true,
-    order: {
-      orderNo: o.orderNo,
-      name: o.name,
-      phone: o.phone,
-      email: o.email,
-      company: o.company,
-      address: o.address,
-      items: o.items,
-      amount: Number(o.amount),
-      discountAmount: Number(o.discountAmount),
-      couponCode: o.couponCode,
-      currency: o.currency,
-      status: o.status,
-      payMethod: o.payMethod,
-      poNo: o.poNo,
-      invoiceTitle: o.invoiceTitle,
-      taxNo: o.taxNo,
-      payStatus: o.payStatus,
-      payVoucher: o.payVoucher,
-      paidAt: o.paidAt,
-      remark: o.remark,
-      shippingCompany: o.shippingCompany,
-      trackingNo: o.trackingNo,
-      shippedAt: o.shippedAt,
-      shippingStatus: o.shippingStatus,
-      deliveredAt: o.deliveredAt,
-      history: o.history,
-      createdAt: o.createdAt,
-    },
-  });
+
+  // 归属校验：仅后台会话或下单本人可取完整字段（含税号/付款凭证）
+  const isOwner = Boolean(memberTok?.mid) && !!o.memberId && String(memberTok!.mid) === String(o.memberId);
+  const trusted = isAdmin || isOwner;
+
+  const order: Record<string, unknown> = {
+    orderNo: o.orderNo,
+    name: o.name,
+    phone: o.phone,
+    email: o.email,
+    company: o.company,
+    address: o.address,
+    items: o.items,
+    amount: Number(o.amount),
+    discountAmount: Number(o.discountAmount),
+    couponCode: o.couponCode,
+    currency: o.currency,
+    status: o.status,
+    payMethod: o.payMethod,
+    poNo: o.poNo,
+    invoiceTitle: o.invoiceTitle,
+    payStatus: o.payStatus,
+    paidAt: o.paidAt,
+    remark: o.remark,
+    shippingCompany: o.shippingCompany,
+    trackingNo: o.trackingNo,
+    shippedAt: o.shippedAt,
+    shippingStatus: o.shippingStatus,
+    deliveredAt: o.deliveredAt,
+    createdAt: o.createdAt,
+  };
+  if (trusted) {
+    order.taxNo = o.taxNo;
+    order.payVoucher = o.payVoucher;
+    order.history = o.history;
+  }
+  return NextResponse.json({ ok: true, order });
 }

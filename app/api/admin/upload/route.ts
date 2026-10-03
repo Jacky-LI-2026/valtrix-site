@@ -11,7 +11,13 @@ export const runtime = 'nodejs'
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const ANIMATED_TYPES = ['image/gif']
 
-// 压缩图片为 webp：返回 { buffer, width, height }
+// 损坏/伪造的图片数据：sharp 解码失败属「客户端给了非法内容」⇒ 应当 400，而不是 500。
+// 实测：把一个文本文件改名成 .png 上传，libpng 报 `vipspng: libpng read error`，
+// 经最外层 catch 一律回 500 —— 语义错误（500 表示服务端故障，会误导排障、并让前端
+// 把「用户选了坏文件」当成系统异常）。
+// ⚠️ 故意**不用** `class InvalidImageError extends Error` + instanceof：本仓 tsconfig 若编译到
+//    ES5，继承 Error 的子类原型链会断，`instanceof` 恒为 false（TS 已知坑，测试会假阴性）。
+//    改用标记码判定，与编译目标无关。
 type InvalidImageError = Error & { code: 'INVALID_IMAGE' }
 
 function invalidImage(message: string): InvalidImageError {
@@ -20,8 +26,7 @@ function invalidImage(message: string): InvalidImageError {
   return e
 }
 
-// 损坏/伪造的图片数据：sharp 解码失败属「客户端给了非法内容」⇒ 应当 400 而不是 500（2026-09-17 自基地同步）。
-// ⚠️ 故意不用 class extends Error + instanceof：若编译到 ES5，原型链会断，instanceof 恒为 false（假阴性）。
+// 压缩图片为 webp：返回 { buffer, width, height }
 async function compressToWebp(buffer: Buffer, maxEdge: number, quality: number) {
   try {
     return await sharp(buffer)
@@ -75,6 +80,25 @@ export async function POST(req: NextRequest) {
 
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json({ error: '不支持的文件类型' }, { status: 400 })
+    }
+
+    // 🔒 2026-09-16 安全加固：SVG 可内嵌 script 元素 / on* 事件 / foreignObject，
+    //    而本接口把它**原样**写入 public/uploads/（公开静态目录），被直接访问时
+    //    会在**同源**执行脚本 ⇒ 存储型 XSS。此处做入库前特征校验：命中即拒绝，
+    //    而不是尝试消毒（消毒易漏，且可能破坏正常矢量图）。
+    if (file.type === 'image/svg+xml') {
+      const svgText = Buffer.from(await file.arrayBuffer()).toString('utf8')
+      const dangerous = /<script[\s>]/i.test(svgText)
+        || /\son[a-z]+\s*=/i.test(svgText)
+        || /javascript:/i.test(svgText)
+        || /<foreignObject[\s>]/i.test(svgText)
+        || /<(iframe|embed|object)\b[^>]*(href|src)\s*=\s*["']?\s*(https?:|\/\/)/i.test(svgText)
+      if (dangerous) {
+        return NextResponse.json(
+          { error: 'SVG 中含可执行脚本或外部嵌入，出于安全已拒绝上传' },
+          { status: 400 }
+        )
+      }
     }
 
     // 确定上传目录

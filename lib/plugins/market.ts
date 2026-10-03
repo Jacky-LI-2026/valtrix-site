@@ -9,6 +9,10 @@
  * 兑换码签名密钥：优先读 process.env.PLUGIN_MARKET_SECRET；
  * 未配置时使用下方默认 key（仅演示用途）。
  * TODO: 生产环境必须配置 PLUGIN_MARKET_SECRET 环境变量，否则兑换码可被持有默认 key 者伪造。
+ *
+ * 来源：自阀门站（VALTRIX）回流至通用基地（2026-09-12，双 fork 合并 D2）。
+ * 基座化改动：默认密钥去除品牌前缀（基地不感知行业），并保留历史默认值
+ * 作为**验签兼容**——阀门站 fork 期签发的兑换码仍可校验通过。
  */
 import { createHmac, timingSafeEqual } from "crypto";
 import { prisma } from "@/lib/prisma";
@@ -24,11 +28,38 @@ import { getPluginState, savePluginState, PluginEntry } from "./store";
 const ACTIVATED_KEY = "plugin_activated";
 const MARKET_URL_KEY = "plugin_market_url";
 
-// TODO: 生产环境必须配置 PLUGIN_MARKET_SECRET；默认 key 仅供本地演示
-const DEFAULT_SECRET = "valtrix-plugin-market-secret-2026";
+// 演示默认密钥：**仅非生产环境**可用。
+// 生产环境若未配置 PLUGIN_MARKET_SECRET，getMarketSecret() 会直接抛错（见其函数体注释）。
+const DEFAULT_SECRET = "cms-plugin-market-secret-2026";
+
+/**
+ * 历史默认密钥：阀门站 fork 期使用。**仅用于验签兼容**，不再用于签发。
+ * 若某部署曾以旧默认值签发过兑换码，去掉此项会导致这些码全部失效。
+ */
+const LEGACY_SECRETS = ["valtrix-plugin-market-secret-2026"];
 
 export function getMarketSecret(): string {
-  return process.env.PLUGIN_MARKET_SECRET || DEFAULT_SECRET;
+  const fromEnv = process.env.PLUGIN_MARKET_SECRET;
+  if (fromEnv) return fromEnv;
+  // ⚠️ 2026-09-16 安全加固（G8）：生产环境**拒绝**回退到演示默认密钥。
+  //    此前该函数静默回退 `DEFAULT_SECRET`（"cms-plugin-market-secret-2026"），
+  //    而该串是**源码内公开可猜的固定值** ⇒ 任何知道它的人都能伪造兑换码。
+  //    实测依据：本机 `.env` / `.env.local` 均未配置 `PLUGIN_MARKET_SECRET`
+  //    （键名清单核对），`docs/双fork合并方案-20260912.md:600` 亦已记录
+  //    「生产仍必须配置 PLUGIN_MARKET_SECRET（Base 的 .env/.env.local 目前均未配置）」。
+  //    改为 fail-fast：未配置即抛错 —— 宁可拒绝签发/验签，也不签发可被伪造的码
+  //    （对齐插件铁律「内核不可用须拒绝服务」）。
+  //    非生产环境保留演示默认值，便于本地开发。
+  if (process.env.NODE_ENV !== "production") return DEFAULT_SECRET;
+  throw new Error(
+    "PLUGIN_MARKET_SECRET 未配置：生产环境拒绝使用演示默认密钥签发/校验插件兑换码。请在 .env 中配置该变量后重启。"
+  );
+}
+
+/** 验签时依次尝试的密钥列表（当前密钥优先，其后为历史密钥） */
+function candidateSecrets(): string[] {
+  const primary = getMarketSecret();
+  return [primary, ...LEGACY_SECRETS.filter((s) => s !== primary)];
 }
 
 // ===== 已开通付费插件列表（site_config.plugin_activated）=====
@@ -114,6 +145,9 @@ function sanitizeRemotePlugin(raw: any): PluginManifest | null {
     paid: !!raw.paid,
     market: raw.market !== false,
     marketSource: "remote",
+    // 2026-09-18（P1-5）：远程目录同样可以声明"规划中"，与内置示例条目一致
+    //（前端会显示「规划中」且不提供安装；`installMarketPlugin` 亦会拒绝）。
+    planned: !!raw.planned,
   };
   return out;
 }
@@ -190,17 +224,27 @@ export function signPluginCode(payload: PluginCodePayload): string {
   return `${body}.${toBase64Url(sig)}`;
 }
 
-/** 验签 + 校验插件匹配 / 有效期 */
+/** 验签 + 校验插件匹配 / 有效期（依次尝试当前密钥与历史密钥） */
 export function verifyPluginCode(code: string, key: string): { ok: boolean; error?: string } {
   try {
     const parts = code.split(".");
     if (parts.length !== 2) return { ok: false, error: "兑换码格式不正确" };
     const [body, sigB64] = parts;
-    const expected = createHmac("sha256", getMarketSecret()).update(body).digest();
     const provided = fromBase64Url(sigB64);
-    if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
+
+    // 依次用候选密钥验签：任一通过即可（兼容历史默认密钥签发的码）
+    let signatureOk = false;
+    for (const secret of candidateSecrets()) {
+      const expected = createHmac("sha256", secret).update(body).digest();
+      if (provided.length === expected.length && timingSafeEqual(provided, expected)) {
+        signatureOk = true;
+        break;
+      }
+    }
+    if (!signatureOk) {
       return { ok: false, error: "兑换码签名校验失败" };
     }
+
     const payload = JSON.parse(Buffer.from(fromBase64Url(body)).toString("utf8")) as PluginCodePayload;
     if (!payload || payload.pluginKey !== key) return { ok: false, error: "兑换码与插件不匹配" };
     if (payload.exp) {
@@ -233,6 +277,38 @@ export function parseExpiry(exp?: string): { iso?: string } {
 export async function installMarketPlugin(key: string): Promise<{ ok: boolean; error?: string; status?: number }> {
   const manifest = getMarketManifest(key);
   if (!manifest) return { ok: false, error: "市场目录中不存在该插件", status: 404 };
+  // 🔴 2026-09-18 修复（P0）：**内置插件一律拒绝"安装"**。
+  //
+  //   背景：市场目录 = `[...BUILTIN_PLUGINS, ...MARKET_EXAMPLE_PLUGINS].filter(market !== false)`，
+  //   而当前**没有任何条目标 `market:false`** ⇒ 46 个内置插件全都出现在市场里；
+  //   而本函数对任何条目都写 `enabled: false` ⇒ 用户对「产品管理」这类**正在运行**的内置插件
+  //   点一下「安装」，实际效果是**把它停用**（后台入口随之消失）。
+  //   （实测：阀门站 `plugin_state` 只有 4 个键 ⇒ 其余 42 个内置插件在市场上都显示「安装」。）
+  //
+  //   为什么这样修而不是"改显示"：内置插件本来就没有"安装"这一步 —— 它随系统分发，
+  //   只有「启用/停用」。把约束放在服务端，才能同时防住前端误调与后续新增的调用方。
+  if (manifest.builtin || manifest.marketSource === "builtin") {
+    return {
+      ok: false,
+      error: "内置插件无需安装（随系统分发，可直接在「已安装管理」里启用/停用）",
+      status: 400,
+    };
+  }
+  // 🔴 2026-09-18 新增（P1-5）：**规划中（planned）条目一律拒绝安装**。
+  //
+  //   背景：市场默认目录里的 3 条示例远程条目（`ai-video-pro` / `advanced-seo` / `crm-integration`）
+  //   的 `impact` 里已写明"功能代码待部署，当前仅市场目录条目"，但接口此前**照收不误**
+  //   ⇒ 用户花兑换码"买到"的只是一个开关，后台点进去仍是空页面（crm-integration 甚至指向
+  //   根本不存在的 `/admin/crm`）。这与「内核不可用须拒绝服务」一致：**没实现的能力不上架可安装态**。
+  //
+  //   何时移除：该能力真正实现（页面 + 路由 + 权限都在）后，把 registry 里的 `planned: true` 去掉即可。
+  if (manifest.planned) {
+    return {
+      ok: false,
+      error: "该条目为规划中能力（功能尚未实现），暂不可安装",
+      status: 400,
+    };
+  }
   const state = await getPluginState();
   if (state[key]) return { ok: false, error: "插件已安装，请勿重复安装", status: 409 };
   const entry: PluginEntry = {
@@ -241,6 +317,8 @@ export async function installMarketPlugin(key: string): Promise<{ ok: boolean; e
     installedAt: new Date().toISOString(),
     marketSource: manifest.marketSource || "builtin",
     price: manifest.price,
+    // 2026-09-18：记录安装时的目录版本，供后台提示"已装版本与市场不一致"
+    version: manifest.version,
   };
   state[key] = entry;
   await savePluginState(state);

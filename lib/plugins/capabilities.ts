@@ -33,12 +33,7 @@ export async function callCapability(name: string, args?: any, ctx?: any): Promi
   return handler(args, ctx);
 }
 
-/** 同步版调用（能力为同步函数时） */
-export function callCapabilitySync(name: string, args?: any, ctx?: any): any {
-  const handler = capabilities.get(name);
-  if (!handler) return null;
-  return handler(args, ctx);
-}
+/* 说明（2026-09-05）：原 callCapabilitySync() 已删除——仓库内零调用点，同步能力无使用场景。 */
 
 /** 判断能力是否已注册且对外开放（API 网关可调用） */
 export function isPublicCapability(name: string): boolean {

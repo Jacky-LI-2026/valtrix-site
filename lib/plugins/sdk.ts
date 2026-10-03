@@ -33,13 +33,11 @@ export {
   hasPluginHooks,
   runPluginHook,
   listHookedPlugins,
-  assertHookPlugin,
 } from "./hooks";
 export type { PluginHooks, PluginHookContext } from "./hooks";
 export {
   registerCapability,
   callCapability,
-  callCapabilitySync,
   isPublicCapability,
   listCapabilities,
 } from "./capabilities";

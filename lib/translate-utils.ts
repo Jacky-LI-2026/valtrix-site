@@ -142,6 +142,13 @@ export async function translateSingleText(text: string, targetLang: string): Pro
         if (data.provider !== 'fallback' && data.translatedText && data.translatedText.trim()) {
           return data.translatedText;
         }
+      } else {
+        // 🔴 2026-09-18：非 2xx 此前被静默忽略（本函数契约是"失败返回原文"，
+        //    但**至少要留下原因**，否则后台表现为"翻译没反应"却查不到线索）。
+        //    典型：401/403（权限在登录时写进 JWT，权限刚变更的存量会话会 403）。
+        let msg = '';
+        try { msg = (await res.json())?.error || ''; } catch { /* 非 JSON */ }
+        console.error(`翻译接口非 2xx：${res.status} ${msg}`);
       }
     } catch (e) {
       console.error('调用翻译API失败:', e);

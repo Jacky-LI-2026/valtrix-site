@@ -74,7 +74,7 @@ export default function ServicesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
             {services.map((service, index) => {
               const Icon = iconMap[service.icon] || Settings;
-              const isHighlight = index === 1; // 技术支持服务高亮
+              const isHighlight = index === 1; // MPCVD工艺服务高亮
               return (
                 <Link
                   key={service.id}

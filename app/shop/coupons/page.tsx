@@ -74,7 +74,7 @@ export default function ShopCouponsPage() {
 
   return (
     <>
-      <PageHero title="领券中心" titleEn="Coupon Center" subtitle="Claim special coupons and save on your order" subtitleEn="Claim coupons and save on your order" breadcrumb="领券中心" breadcrumbEn="Coupon Center" />
+      <PageHero title="领券中心" titleEn="Coupon Center" subtitle="领取专属优惠，下单更划算" subtitleEn="Claim coupons and save on your order" breadcrumb="领券中心" breadcrumbEn="Coupon Center" />
       <div className="mx-auto max-w-5xl px-4 py-12">
         {!loggedIn && (
           <div className="mb-6 rounded-xl border border-dark-100 bg-white p-4 text-sm text-dark-500">

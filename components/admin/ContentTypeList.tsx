@@ -9,7 +9,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Plus, Edit, Trash2, Search, Columns3, Settings2, Sparkles, ShoppingCart, ExternalLink } from 'lucide-react'
+import { Plus, Edit, Trash2, Search, Columns3, Settings2, Sparkles, ShoppingCart, ExternalLink, Send } from 'lucide-react'
+import { useCanSocialPublish, socialPublishHref, SOCIAL_TYPE_MAP } from '@/lib/api/useSocialPublish'
 
 export interface ListColumn {
   key: string
@@ -29,6 +30,9 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
   const [items, setItems] = useState<any[]>(initialItems || [])
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
+  /** 「发布到社媒」：仅 products / services / news 三类 + 有发布权限的登录用户才显示 */
+  const canPublish = useCanSocialPublish()
+  const supportsSocial = !!SOCIAL_TYPE_MAP[typeName]
   // 列显示勾选：localStorage 按类型记忆（key: content-columns-{typeName}）
   const [visibleCols, setVisibleCols] = useState<string[] | null>(null)
   const [colOpen, setColOpen] = useState(false)
@@ -364,6 +368,17 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
                   >
                     <Edit size={14} /> 编辑
                   </Link>
+                  {/* 「发布到社媒」（owner 2026-10-01）：产品/服务/新闻三类内容行可直接带参跳插件页并预选该条。
+                      仅对**有发布权限**的登录用户显示（探针 /api/admin/social-publish/session）。 */}
+                  {canPublish && supportsSocial && (
+                    <Link
+                      href={socialPublishHref(typeName, item.id) as string}
+                      className="mr-3 inline-flex items-center gap-1 text-sm text-emerald-600 transition-colors hover:text-emerald-800"
+                      title="打开「社媒一键发布」并预选该条"
+                    >
+                      <Send size={14} /> 发布到社媒
+                    </Link>
+                  )}
                   <button
                     onClick={() => handleDelete(item.id)}
                     className="inline-flex items-center gap-1 text-sm text-red-600 transition-colors hover:text-red-800"

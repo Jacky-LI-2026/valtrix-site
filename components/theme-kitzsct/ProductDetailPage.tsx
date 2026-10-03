@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { ArrowRight, Check, ChevronLeft, Download, FileText } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
+import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { groupSpecs } from "@/lib/spec-grouping";
 import { getBrandNameEn } from "@/lib/brand";
 import { useProductBySlug } from "@/lib/api/useProducts";
@@ -309,7 +310,7 @@ export default function KitzProductDetailPage() {
             <div className="mx-auto max-w-3xl">
               <div
                 className="prose max-w-none leading-relaxed text-dark-600"
-                dangerouslySetInnerHTML={{ __html: detailContent }}
+                dangerouslySetInnerHTML={{ __html: preserveLeadingSpaces(detailContent) }}
               />
             </div>
           </div>

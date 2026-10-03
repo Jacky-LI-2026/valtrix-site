@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { canSeePrice, applyDiscount, formatPrice, tierPrice, type PricingMode } from "@/lib/pricing";
+import { addToQuoteCart } from "@/lib/quote-cart";
 
 /**
  * 前台价格显示组件（受后台「定价与价格显示」策略控制）
@@ -40,6 +42,25 @@ export default function PriceDisplay(props: {
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [doneMsg, setDoneMsg] = useState("");
+  const router = useRouter();
+
+  /**
+   * 加入询价车并跳转到询价车页。
+   *
+   * ⚠️ 2026-09-14 修复（用户报障：「点 Add to quote cart 跳转后购物车仍为空，无 API 请求发出」）：
+   *   此处原为 `<a href="/quote/cart">` —— **只跳转、不加购**，所以点完购物车必然为空。
+   *   现复用产品详情页 `addToCart()` 的**同一套本地协议**：
+   *     存储键 `quote_cart`，元素形如 `{ id: <产品 slug>, qty: number }`，
+   *     并派发 `quote-cart-updated` 事件，让浮动购物车按钮/角标实时同步。
+   *   询价车本来就是**纯前端 localStorage**（提交时才调 /api/public/quote 等接口），
+   *   因此"没有 API 请求"属预期行为，不是缺陷；缺陷是**没有写入**。
+   */
+  const addToQuoteCartAndGo = useCallback(() => {
+    const id = productId != null ? String(productId) : "";
+    // 复用 lib/quote-cart.ts 的**单一真源**协议（与产品详情页加购行为完全一致）
+    if (id) addToQuoteCart(id, 1);
+    router.push("/quote/cart");
+  }, [productId, router]);
 
   // 会话级已验证标记（emailVerify 模式）
   useEffect(() => {
@@ -164,9 +185,13 @@ export default function PriceDisplay(props: {
         )}
       </div>
       {showInquiry && (view.reason === "hidden" || view.reason === "parts") && (
-        <a href="/quote/cart" className="text-xs text-gray-500 hover:text-red-600 underline">
+        <button
+          type="button"
+          onClick={addToQuoteCartAndGo}
+          className="text-xs text-gray-500 hover:text-red-600 underline"
+        >
           {t("加入询价车获取报价 →", "Add to quote cart →")}
-        </a>
+        </button>
       )}
       {doneMsg && <div className="text-sm text-green-600">{doneMsg}</div>}
 

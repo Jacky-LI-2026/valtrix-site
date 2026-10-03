@@ -86,6 +86,35 @@ export async function getProductBySlug(slug: string): Promise<ProductModel | nul
 }
 
 /**
+ * 取产品的**规范路径** `/products/<tab>/<slug>`
+ * ==========================================================================
+ * 用途：短链 `/products/<slug>`（历史链接、外部引用、手输型号）要 308 到规范路径。
+ * 规范路径真源 = 产品所属 tab 的 slug（`Product.tabId → product_tab.slug`），
+ * 与产品列表页生成链接的口径一致（ProductsDefaultClient 用 `tab.id / model.id`）。
+ * 找不到或未发布 ⇒ null（调用方给 404，绝不软跳到一个不存在的页面）。
+ */
+export async function getProductCanonicalPath(slug: string): Promise<string | null> {
+  const s = String(slug || "").trim()
+  if (!s) return null
+  try {
+    const p = await prisma.product.findUnique({
+      where: { slug: s },
+      select: { slug: true, status: true, tab: { select: { slug: true } } },
+    })
+    if (!p || p.status !== 'published' || !p.tab?.slug) return null
+    return `/products/${p.tab.slug}/${p.slug}`
+  } catch (error) {
+    console.warn('[getProductCanonicalPath] 数据库查询失败，回退静态数据:', error)
+  }
+  for (const tab of staticProductTabs) {
+    for (const cat of tab.categories) {
+      if (cat.models.some((m) => m.id === s)) return `/products/${tab.id}/${s}`
+    }
+  }
+  return null
+}
+
+/**
  * 获取所有产品 slug 列表（用于 generateStaticParams / sitemap）
  */
 export async function getAllProductSlugs(): Promise<{ tab: string; id: string }[]> {

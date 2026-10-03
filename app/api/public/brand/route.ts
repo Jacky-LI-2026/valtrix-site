@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   try {
     let oem: any = {}
+    // 兼容两种历史配置键：oem_config（现行）/ oem（早期）—— 双 fork 合并时阀门站用的是后者
     const row = await prisma.siteConfig.findFirst({ where: { configKey: { in: ['oem_config', 'oem'] } } })
     if (row?.configValue && typeof row.configValue === 'object') {
       oem = row.configValue as any

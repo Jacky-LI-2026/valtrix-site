@@ -5,6 +5,7 @@ import Link from "next/link";
 import sanitize from "sanitize-html";
 import { useI18n } from "@/lib/i18n";
 import { pickLang } from "@/lib/content-types/dynamic";
+import { preserveLeadingSpaces } from "@/lib/rich-text";
 
 interface Props {
   cfg: any;
@@ -66,7 +67,7 @@ export default function ContentDetailView({ cfg, item }: Props) {
         return (
           <div
             className="prose prose-sm max-w-none dark:prose-invert leading-relaxed text-dark-700 [&_img]:max-w-full [&_img]:rounded-lg"
-            dangerouslySetInnerHTML={{ __html: sanitize(v) }}
+            dangerouslySetInnerHTML={{ __html: preserveLeadingSpaces(sanitize(v)) }}
           />
         );
       case "boolean":

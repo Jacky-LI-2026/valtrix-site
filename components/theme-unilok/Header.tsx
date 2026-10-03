@@ -8,6 +8,7 @@ import { Menu, X, ChevronDown, ChevronRight, Search } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
 import { useNavTabs } from "@/lib/api/useProducts";
+import { getBrandNameEn } from "@/lib/brand";
 import { type Locale } from "@/config/i18n";
 
 // 国旗图片URL映射（使用flagcdn，解决Windows不显示国旗emoji的问题）
@@ -211,10 +212,10 @@ export default function UnilokHeader() {
     >
       <div className="container flex h-16 items-center justify-between gap-4">
         {/* Logo：优先后台配置，无则使用本地品牌 Logo（与默认模板一致） */}
-        <Link href="/" className="flex shrink-0 items-center" aria-label="VALTRIX">
+        <Link href="/" className="flex shrink-0 items-center" aria-label={getBrandNameEn()}>
           <Image
             src={logoUrl || "/images/logo.png"}
-            alt="VALTRIX"
+            alt={getBrandNameEn()}
             width={200}
             height={44}
             className="h-9 w-auto object-contain"
@@ -418,7 +419,7 @@ export default function UnilokHeader() {
               <Link href="/" className="flex items-center" onClick={() => setMobileOpen(false)}>
                 <Image
                   src={logoUrl || "/images/logo.png"}
-                  alt="VALTRIX"
+                  alt={getBrandNameEn()}
                   width={160}
                   height={36}
                   className="h-8 w-auto object-contain"

@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { Clock, Mail, MapPin, Phone, Send } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
-import UnilokPageHero from "./PageHero";
 import { getContactEmail, getContactPhone } from "@/lib/brand";
+import UnilokPageHero from "./PageHero";
 
 /**
  * UNILOK 精密工业风 · 联系页
@@ -129,44 +129,31 @@ export default function UnilokContactPage() {
   };
 
   // 多地址列表
-  // G2：地址只能来自后台 contact_info；未配置时**不渲染地址条目**，绝不回退到词条默认值
   const addressList = contactData
     ? (() => {
         const arr = loc.getArray(contactData, "addresses");
         if (arr.length > 0) return arr.map(addrText);
         const single = loc.get(contactData, "address");
         if (single) return [String(single)];
-        return [];
+        return [t("footerAddressDefault")];
       })()
-    : [];
-
-  // 展示用联系方式：DB 优先，兜底取部署级 env；均为空 → 该条目不渲染
-  const displayPhone = String(contactData?.phone || getContactPhone()).trim();
-  const displayEmail = String(contactData?.email || getContactEmail()).trim();
+    : [t("footerAddressDefault")];
 
   const contactItems: { icon: any; label: string; value: string; sub?: string }[] =
     contactData
       ? [
-          ...(displayPhone
-            ? [
-                {
-                  icon: Phone,
-                  label: t("phone"),
-                  value: displayPhone,
-                  sub: loc.get(contactData, "workTime") || "",
-                },
-              ]
-            : []),
-          ...(displayEmail
-            ? [
-                {
-                  icon: Mail,
-                  label: t("email"),
-                  value: displayEmail,
-                  sub: loc.get(contactData, "replyTime") || "",
-                },
-              ]
-            : []),
+          {
+            icon: Phone,
+            label: t("phone"),
+            value: String(contactData.phone || getContactPhone()).trim(),
+            sub: loc.get(contactData, "workTime") || "",
+          },
+          {
+            icon: Mail,
+            label: t("email"),
+            value: String(contactData.email || getContactEmail()).trim(),
+            sub: loc.get(contactData, "replyTime") || "",
+          },
           ...addressList.map((addr, i) => ({
             icon: MapPin,
             label: i === 0 ? t("address") : `${t("address")} ${i + 1}`,

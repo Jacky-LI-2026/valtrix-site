@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ArrowRight, Calendar, ChevronLeft, Tag } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
+import { preserveLeadingSpaces } from "@/lib/rich-text";
+import { getBrandNameEn } from "@/lib/brand";
 import UnilokPageHero from "./PageHero";
 
 interface NewsItem {
@@ -188,10 +190,10 @@ export default function UnilokNewsDetailPage({ params }: PageProps) {
   // 动态设置浏览器标题（必须在条件 return 之前声明，保证 hooks 顺序一致）
   useEffect(() => {
     if (mode === "detail" && article) {
-      document.title = `${loc.get(article, "title")} - VALTRIX`;
+      document.title = `${loc.get(article, "title")} - ${getBrandNameEn()}`;
     } else if (mode === "category" && categoryData) {
       const n = loc.get(categoryData.category, "name");
-      document.title = `${n} - VALTRIX`;
+      document.title = `${n} - ${getBrandNameEn()}`;
     }
   }, [mode, article, categoryData]);
 
@@ -342,7 +344,7 @@ export default function UnilokNewsDetailPage({ params }: PageProps) {
             <article
               className="prose max-w-none leading-relaxed text-dark-600"
               dangerouslySetInnerHTML={{
-                __html: loc.get(article, "content") || loc.get(article, "summary"),
+                __html: preserveLeadingSpaces(loc.get(article, "content") || loc.get(article, "summary")),
               }}
             />
 

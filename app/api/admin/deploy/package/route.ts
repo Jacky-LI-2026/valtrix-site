@@ -7,7 +7,79 @@ import path from "path";
 import fs from "fs";
 import { auth } from "@/auth";
 
+// ⛔ 排除规则**唯一真源** = `scripts/_deploy_fileset.js`（L1#坑26）。
+//    同一份规则曾在此文件与那个模块各写一份，改一处≠改完，已造成 `.bak-*` 备份文件
+//    被打进部署包的事故。此处**只允许**引用，不得再在本地另写排除正则/清单。
+//    ⚠️ 路径说明：`scripts/` 整目录被排除（不进客户包），但本文件会随包交付且要在
+//    **客户机上 `pnpm build`**，故第 "2a" 步会把被引用的这一个模块**单独带进包里**，
+//    保持同一相对层级（`<包根>/scripts/_deploy_fileset.js`）。
+import deployFileset from "../../../../../scripts/_deploy_fileset";
+
 const execFileAsync = promisify(execFile);
+
+/**
+ * 排除规则唯一真源 = `scripts/_deploy_fileset.js`（L1#坑26）
+ * ==========================================================================
+ * 2026-09-16 重构：本文件原先自带 `EXCLUDE_DIRS` / `EXCLUDE_FILES` /
+ * `EXCLUDE_PATTERNS` **三份**列表，与 `scripts/_deploy_fileset.js`（部署/核对/门禁
+ * 共用的实现）各维护一份 —— 改一条规则要改两处。现三份列表**全部删除**，判据一律取自 A。
+ *
+ * ⚠️ 逐条语义差异（改造前本接口是「**根级条目名**」口径；A 是「**路径前缀**」+「文件名」口径）
+ *   1) `PACKAGER_KEEP_PREFIXES` 豁免（**必须**，否则是功能回归，不是"更严"）：
+ *      A 的 `SKIP_PATH_PREFIXES` 含 `public` / `docs` / `industry-packs`，而这三项在 A 的
+ *      调用方（只遍历 `RUNTIME_ROOTS` 的服务端同步）里是**惰性条目**；本接口却是
+ *      「整根 cp 的客户交付包」，三项都必须在包里：
+ *        · `public/`         站点静态资源（本机 157 个文件，uploads 内是线上内容）
+ *        · `industry-packs/` 运行时由 `lib/server/pack-manager.ts` 以 `process.cwd()` 读取
+ *        · `docs/`           `install.sh` 与 README-DEPLOY 均引用 `docs/<nginx 配置>`
+ *      ⇒ 显式豁免这三项；其余前缀规则 100% 交给 A，不再本地重写。
+ *   2) 原 `EXCLUDE_DIRS` 的 `node_modules`/`.next`/`.git` → A 的 `HARD_SKIP_DIRS`；
+ *      `backups`/`_backups`/`_pgsql`/`项目备份`/`tmp`/`logs`/`data`/`_local_backup`/
+ *      `_archive`/`会话记录`/`scripts` → A 的 `isSkippedPath`（同为根锚定，语义一致）。
+ *      ⚠️ 保留原加固理由（勿因"简化"而回退，G8）：这些目录含**生产库快照 / `.env` /
+ *      RSA 私钥 / `config-keys/` 站点数据**，而第 2 步是「按根级条目整棵 cp」
+ *      ⇒ 一旦漏排除，客户交付包里就会出现我们的私钥与密钥。其中 `scripts/` 另有约
+ *      200 个开发/运维脚本，含**两台生产服务器 IP**、部署路径与 SSH 调用逻辑
+ *      （`install.sh` 全流程 install → db push → build → pm2 **完全不依赖**它）
+ *      ⇒ 整目录排除；**仅**允许第 "2a" 步单独携带 `_deploy_fileset.js` 这一个无敏感信息的模块。
+ *   3) A 的 `SKIP_FILE_RE` **严格强于**原 `EXCLUDE_FILES` + `EXCLUDE_PATTERNS`：
+ *      覆盖原有全部条目（`.env` / `.env.local` / 各 `*.log` / `*.tsbuildinfo` / `*.zip` /
+ *      `*.dump` / `_db_backup.sql` / `*.bak(-*)`），并**新增**排除 `AGENTS.md`（内部规则
+ *      文档，本不该外发）与 `*.tmp<N>` 临时文件 ⇒ 判定只会更严，绝不会比改造前宽松。
+ *      注：根级 `.env.example`（若存在）也被 `^\.env.*` 排除，但第 3 步会**重新生成**一份
+ *          干净模板写入包内 ⇒ 交付包内仍有 `.env.example`，净效果不变。
+ *   4) 原 B 独有、A 未覆盖的条目保留在 `PACKAGER_EXTRA_EXCLUDES`（见其注释）。
+ *      这些条目**若将来能上提到 A，应当上提**，否则仍是第二真源（本区块的红线）。
+ *   5) **残留缺口（本次未改，行为与改造前一致）**：A 是**全树遍历**，能命中嵌套前缀
+ *      （如 `lib/generated` = 本地 Windows 版 Prisma 引擎，A 明令必须排除）；本接口只判
+ *      **根级条目**，`lib/` 是整棵照拷 ⇒ `lib/generated/**` 仍会进包（客户机 install.sh
+ *      第 7 步会先 `npx prisma generate` 重新生成，故当前无实际故障）。
+ *      ⇒ 引用 A 不等于 A 的全部规则都已生效，改这类规则时**不要**以为改 A 就够了。
+ *
+ * ⚠️ 判定范围：本接口**仍然只作用于根级条目**（与改造前完全一致：遍历深度既未放宽也
+ *    未收紧）。嵌套路径的文件名判据（如 `lib/x.bak-2026`）不在本次范围，仍由第 "2c" 步的
+ *    敏感文件终检兜底 —— 本次**未**改变该行为。
+ */
+
+/** 见上文差异 1)：客户交付包必须保留的根目录（A 的前缀表里有，但此处不能排除） */
+const PACKAGER_KEEP_PREFIXES = new Set(["public", "docs", "industry-packs"]);
+
+/** 见上文差异 4)：A 未覆盖的、本接口专属的排除条目（根级条目名；含改造前 EXCLUDE_DIRS/EXCLUDE_FILES 的全部独有项） */
+const PACKAGER_EXTRA_EXCLUDES = new Set([
+  "db_backup.sql", "temp_screenshot.png", "_tmp_screenshot.png", "full", "viewport",
+  ".tmp_check", "_valve_sync_bak", "_qa_audit_20260909", "public/uploads/_old",
+]);
+
+/**
+ * 根级条目是否排除 = A（唯一真源）的三类判据 + 本接口的 KEEP 豁免与专属补充。
+ * 相比改造前**不会更宽松**（详见上方差异 2)/3)/4)）。
+ */
+function isExcludedRootEntry(name: string): boolean {
+  if (deployFileset.HARD_SKIP_DIRS.has(name)) return true; // A：构建/依赖产物目录名
+  if (deployFileset.isSkippedFileName(name)) return true; // A：文件名判据（唯一真源）
+  if (!PACKAGER_KEEP_PREFIXES.has(name) && deployFileset.isSkippedPath(name)) return true; // A：路径前缀判据
+  return PACKAGER_EXTRA_EXCLUDES.has(name); // 本接口专属补充
+}
 
 /**
  * 交付物命名配置（去品牌化，2026-09-15）
@@ -61,30 +133,12 @@ export async function POST(req: NextRequest) {
     await rm(packageDir, { recursive: true, force: true });
     await mkdir(packageDir, { recursive: true });
 
-    // 2. 复制项目代码（排除大目录和敏感文件）
-    const EXCLUDE_DIRS = new Set([
-      "node_modules", ".next", ".git", "backups", "_backups", "_pgsql",
-      "项目备份", "tmp", "logs", ".tmp_check", "public/uploads/_old",
-      "data", // 商用授权记录 license.json 等，不应随部署包分发
-      // 🔒 2026-09-15 G8 加固：以下目录含 **生产库快照 / .env / RSA 私钥 / 站点数据**。
-      //    加固前它们**不在排除集里**，而下面第 48-61 行是「按根级条目整棵 cp -r」
-      //    ⇒ 生成的客户交付包会连同 _local_backup/**/config-keys/ 一起外发私钥与密钥。
-      "_local_backup", "_archive", "会话记录", "_valve_sync_bak", "_qa_audit_20260909",
-    ]);
-    const EXCLUDE_FILES = new Set([
-      ".env", ".env.local", "dev_server.log", "dev_server_err.log",
-      "tsconfig.tsbuildinfo", "tsconfig.check.tsbuildinfo", "products_ml.log",
-      "products_ml_err.log", "temp_screenshot.png", "_tmp_screenshot.png",
-      "temp_screenshot.png", "db_backup.sql", "full", "viewport",
-    ]);
-    const EXCLUDE_PATTERNS = [/_db_backup\.sql$/, /\.zip$/, /\.dump$/, /\.log$/];
-
+    // 2. 复制项目代码（排除规则见文件顶部「唯一真源」区块，判据全部取自
+    //    `scripts/_deploy_fileset.js`；此处不再自带任何排除清单）
     const entries = await readdir(projectRoot, { withFileTypes: true });
     for (const entry of entries) {
       const name = entry.name;
-      if (EXCLUDE_DIRS.has(name)) continue;
-      if (EXCLUDE_FILES.has(name)) continue;
-      if (EXCLUDE_PATTERNS.some((re) => re.test(name))) continue;
+      if (isExcludedRootEntry(name)) continue;
       const src = path.join(projectRoot, name);
       const dest = path.join(packageDir, name);
       try {
@@ -92,6 +146,26 @@ export async function POST(req: NextRequest) {
       } catch (e) {
         console.error(`复制 ${name} 失败:`, e);
       }
+    }
+
+    // 2a. 随包携带「排除规则唯一真源」模块 `scripts/_deploy_fileset.js`
+    //     **为什么必须**：`scripts/` 整目录被排除（G8 加固），而本文件（随包交付给客户）
+    //     在**客户机上执行 `pnpm build`** 时要能解析顶部那条 import —— 少了它，
+    //     `next build` 直接报 `Module not found`，客户**装不上**。
+    //     只带这一个文件：纯文件集工具（无服务器 IP / 无凭据 / 无 SSH 逻辑）。
+    //     失败即整体中止（闸门必须能失败，AGENTS §7-22）：静默继续会产出一个构建不了的包。
+    try {
+      await mkdir(path.join(packageDir, "scripts"), { recursive: true });
+      await cp(
+        path.join(projectRoot, "scripts", "_deploy_fileset.js"),
+        path.join(packageDir, "scripts", "_deploy_fileset.js"),
+        { force: true },
+      );
+    } catch (e) {
+      console.error("随包携带 scripts/_deploy_fileset.js 失败:", e);
+      throw new Error(
+        "打包中止：共享排除模块 scripts/_deploy_fileset.js 未能随包携带，客户机将无法构建（Module not found）",
+      );
     }
 
     // 2b. 删除授权私钥目录（scripts/license-keys/private.pem），严禁进客户部署包
@@ -106,8 +180,8 @@ export async function POST(req: NextRequest) {
     } catch {}
 
     // 2c. 🔒 敏感文件终检（2026-09-15 新增，G8 硬闸门）
-    //     为什么必须有：上面的 EXCLUDE_DIRS 只匹配**根级条目名**，嵌套目录
-    //     （如 `_local_backup/2026.../config-keys/`）不受它约束；而任何一条漏网
+    //     为什么必须有：上面的根级排除判据（`isExcludedRootEntry`）只作用于**根级条目名**，
+    //     嵌套目录（如 `_local_backup/2026.../config-keys/`）不受它约束；而任何一条漏网
     //     都意味着**客户拿到我们的 RSA 私钥与数据库/邮件/翻译密钥**。
     //     ⇒ 拷贝完成后**逐个文件**扫描；命中即**整体失败并删除半成品包**，
     //       绝不"先生成再提醒"。这条闸门必须能失败（AGENTS §7-22）。
@@ -160,6 +234,10 @@ DATABASE_URL="postgresql://用户名:密码@127.0.0.1:5432/${dbName}?schema=publ
 NEXTAUTH_SECRET="请生成随机密钥"
 NEXTAUTH_URL="http://127.0.0.1:3000"
 
+# 插件市场兑换码签名密钥（**生产必填**：未配置时插件兑换功能会拒绝服务）
+# 生成：openssl rand -base64 32
+PLUGIN_MARKET_SECRET="请生成随机密钥"
+
 # ===== 邮件服务（可选，用于留言通知）=====
 SMTP_HOST="smtp.example.com"
 SMTP_PORT="465"
@@ -175,8 +253,10 @@ NEXT_PUBLIC_SITE_URL="https://www.example.com"
 # 品牌名：邮件发件人、AI 客服欢迎语、JSON-LD 兜底
 NEXT_PUBLIC_BRAND_NAME="公司简称"
 NEXT_PUBLIC_BRAND_NAME_EN="COMPANY NAME"
-# 通用联系邮箱（DB contact_info.email 为空时兜底）
+# 通用联系邮箱（DB contact_info.email 为空时兜底，兜底为空则不显示）
 NEXT_PUBLIC_CONTACT_EMAIL=""
+# 通用联系电话（DB contact_info.phone 为空时兜底，兜底为空则不显示电话/不生成 tel: 链接）
+NEXT_PUBLIC_CONTACT_PHONE=""
 # 商城订单通知收件人（为空时跳过发送并告警）
 SHOP_ORDER_NOTICE_EMAIL=""
 # SEO 兜底（DB seo_config 未配置时使用，留空则该字段不输出）

@@ -7,10 +7,13 @@ import Industries from "@/components/sections/Industries";
 import CaseShowcase from "@/components/sections/CaseShowcase";
 import Services from "@/components/sections/Services";
 import CTA from "@/components/sections/CTA";
+import { getHomeSectionConfig } from "@/lib/home-sections";
 import UnilokHome from "@/components/theme-unilok/UnilokHome";
 import KitzHome from "@/components/theme-kitzsct/KitzHome";
-import { getHomeSectionConfig } from "@/lib/home-sections";
 import { getActiveTemplateSlug, UNILOK_INDUSTRIAL_SLUG, KITZ_CLEAN_SLUG } from "@/lib/templates/get-active-template";
+
+// 模板判定依赖请求头（Host / ?__template=），静态预渲染会拿不到 → 必须逐请求渲染
+export const dynamic = "force-dynamic";
 
 const SECTION_MAP: Record<string, any> = {
   hero: Hero,
@@ -25,7 +28,7 @@ const SECTION_MAP: Record<string, any> = {
 };
 
 export default async function HomePage() {
-  // UNILOK 精密工业风模板（templateSlug === 'unilok-industrial'）整页替换
+  // UNILOK 精密工业风模板：整页替换（双 fork 合并 D3）
   const templateSlug = await getActiveTemplateSlug();
   if (templateSlug === UNILOK_INDUSTRIAL_SLUG) {
     return <UnilokHome />;
@@ -36,7 +39,7 @@ export default async function HomePage() {
     return <KitzHome />;
   }
 
-  // 默认模板：前台组件市场，按后台配置启停/排序渲染（默认全部显示）
+  // 前台组件市场：按后台配置启停/排序渲染（默认全部显示）
   let order: string[] = [];
   try {
     const cfg = await getHomeSectionConfig();

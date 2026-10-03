@@ -20,6 +20,15 @@ export interface PluginEntry {
   marketSource?: "remote" | "builtin";
   /** 市场价（元），随安装记录持久化 */
   price?: number;
+  /**
+   * 记录该插件**最近一次被写入状态时**的 manifest 版本（2026-09-18 新增）。
+   *
+   * 为什么需要：目录版本在代码里（`manifest.version`），而状态在数据库里，两者原本没有任何关联
+   *   ⇒ 插件升级/改名后，后台无法判断"这个站点装的是哪个版本"。
+   * 现在：安装与每次启停/改配置都会把当前 manifest 版本写进来，后台可据此提示版本不一致。
+   * ⚠️ 不是"已安装版本"的权威记录（没有真正的包管理），只是**上次状态变更时看到的版本**。
+   */
+  version?: string;
 }
 
 const CONFIG_KEY = "plugin_state";
@@ -67,40 +76,9 @@ export async function listEnabledPlugins(): Promise<string[]> {
   }).map((p) => p.key);
 }
 
-/**
- * 切换插件启用状态并触发生命周期 hooks（onEnable / onDisable）。
- * @returns { enabled, hooksOk } hooksOk=false 表示生命周期回调执行失败（状态已保存，仅告警）。
+/*
+ * 说明（2026-09-05 死代码清理）：
+ * 原 togglePlugin() / setPluginConfig() 已删除——两者在仓库内零调用点，
+ * 唯一实现该逻辑的是 app/api/admin/plugins/route.ts 的 POST action=toggle|config 与 PUT，
+ * 且 route 版本带完整的鉴权与错误处理。保留两份实现会导致 hooks 触发语义分叉。
  */
-export async function togglePlugin(key: string): Promise<{ enabled: boolean; hooksOk: boolean }> {
-  const manifest = getPluginManifest(key);
-  const state = await getPluginState();
-  const initialEnabled = manifest ? manifest.defaultEnabled : false;
-  const entry: PluginEntry = state[key] || { enabled: initialEnabled, config: {} };
-  const previous = !!entry.enabled;
-  entry.enabled = !entry.enabled;
-  state[key] = entry;
-  await savePluginState(state);
-
-  // 触发生命周期（加载 hooks 模块，避免循环依赖）
-  const { runPluginHook } = await import("./hooks");
-  const phase = entry.enabled ? "onEnable" : "onDisable";
-  const hooksOk = await runPluginHook(key, phase, { previous, next: !!entry.enabled, config: entry.config || {} });
-  return { enabled: !!entry.enabled, hooksOk };
-}
-
-/**
- * 保存插件配置并触发 onConfigChange 生命周期。
- */
-export async function setPluginConfig(key: string, config: Record<string, any>): Promise<{ config: Record<string, any>; hooksOk: boolean }> {
-  const manifest = getPluginManifest(key);
-  const state = await getPluginState();
-  const initialEnabled = manifest ? manifest.defaultEnabled : true;
-  const entry: PluginEntry = state[key] || { enabled: initialEnabled, config: {} };
-  entry.config = config || {};
-  state[key] = entry;
-  await savePluginState(state);
-
-  const { runPluginHook } = await import("./hooks");
-  const hooksOk = await runPluginHook(key, "onConfigChange", { previous: !!entry.enabled, next: !!entry.enabled, config: entry.config || {} });
-  return { config: entry.config, hooksOk };
-}

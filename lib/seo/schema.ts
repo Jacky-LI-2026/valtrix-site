@@ -10,26 +10,8 @@ import { getBrandName, getBrandNameEn } from '@/lib/brand';
 // （双 fork 合并 D1 = 单码多库：同一份代码服务多个独立域名站点）
 const BASE_URL = getSiteBaseUrl();
 
-/**
- * 联系信息取值守卫：只接受非空字符串，并排除对象被字符串化后的损坏值（如 "[object Object]"）。
- * 返回 "" 表示"视为无效/未配置"，调用方据此**不输出该字段**。
- */
-function usableContactValue(v: unknown): string {
-  if (typeof v !== "string") return "";
-  const s = v.trim();
-  if (!s) return "";
-  if (s.includes("[object ")) return ""; // 数据损坏（对象被 String() 化），不得写入结构化数据
-  return s;
-}
-
-/**
- * 站点机构（Organization + LocalBusiness 可选地址）
- * @param seo     seo_config（SEO 优化）—— 字段优先级最高
- * @param contact site_config.contact_info（站点设置）—— seo 字段为空时的回退真源，可选
- *
- * 联系信息单一真源回退链：`seo.x` 有值 → 用 `seo.x`；否则用 `contact.x`；都没有 → 不输出该字段。
- */
-export function organizationSchema(seo: any, contact?: any): object {
+/** 站点机构（Organization + LocalBusiness 可选地址） */
+export function organizationSchema(seo: any): object {
   const schema: any = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -42,22 +24,16 @@ export function organizationSchema(seo: any, contact?: any): object {
     description: seo?.defaultDesc || "",
     sameAs: [],
   };
-  // 联系信息：先取 seo_config（SEO 优化），为空则回退 site_config.contact_info（站点设置真源）
-  const email = usableContactValue(seo?.email) || usableContactValue(contact?.email);
-  const telephone = usableContactValue(seo?.phone) || usableContactValue(contact?.phone);
-  const address = usableContactValue(seo?.companyAddress) || usableContactValue(contact?.address);
-  const geoRegion = usableContactValue(seo?.geoRegion);
-
-  if (email) schema.email = email;
-  if (telephone) schema.telephone = telephone;
-  if (address) {
+  if (seo?.email) schema.email = seo.email;
+  if (seo?.phone) schema.telephone = seo.phone;
+  if (seo?.companyAddress) {
     schema.address = {
       "@type": "PostalAddress",
-      streetAddress: address,
+      streetAddress: seo.companyAddress,
       addressCountry: "CN",
     };
   }
-  if (geoRegion) schema.areaServed = geoRegion;
+  if (seo?.geoRegion) schema.areaServed = seo.geoRegion;
   return schema;
 }
 

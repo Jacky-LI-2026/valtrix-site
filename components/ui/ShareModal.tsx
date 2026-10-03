@@ -53,6 +53,10 @@ export default function ShareModal({ open, onClose, url, title }: ShareModalProp
     }
   };
 
+  /** 平台分享链接要用的两个 URL 编码片段 */
+  const shareUrl = encodeURIComponent(url || "");
+  const shareTitle = encodeURIComponent(title || "");
+
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
@@ -82,6 +86,46 @@ export default function ShareModal({ open, onClose, url, title }: ShareModalProp
           )}
         </div>
         <p className="text-xs text-dark-400 text-center break-all mb-4">{url}</p>
+
+        {/*
+          一键分享到具体平台（owner 2026-10-01「国内和国外的都要」）：
+          国内 —— 微博 / QQ / 微信（微信无网页分享协议，用上方二维码扫码）；
+          海外 —— X / Facebook / LinkedIn / Telegram / WhatsApp。
+          这些都是**平台官方分享链接协议**（无门槛、不依赖登录我们的系统）。
+        */}
+        <div className="grid grid-cols-4 gap-2 mb-4">
+          {[
+            { name: "微博", href: `https://service.weibo.com/share/share.php?url=${shareUrl}&title=${shareTitle}`, color: "text-red-500" },
+            { name: "QQ", href: `https://connect.qq.com/widget/shareqq/index.html?url=${shareUrl}&title=${shareTitle}`, color: "text-sky-500" },
+            { name: "X", href: `https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`, color: "text-gray-900" },
+            { name: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`, color: "text-blue-600" },
+            { name: "LinkedIn", href: `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`, color: "text-blue-700" },
+            { name: "Telegram", href: `https://t.me/share/url?url=${shareUrl}&text=${shareTitle}`, color: "text-sky-600" },
+            { name: "WhatsApp", href: `https://api.whatsapp.com/send?text=${shareTitle}%20${shareUrl}`, color: "text-green-600" },
+            { name: "微信", href: "", color: "text-green-500" },
+          ].map((p) =>
+            p.href ? (
+              <a
+                key={p.name}
+                href={p.href}
+                target="_blank"
+                rel="noreferrer"
+                className={`flex items-center justify-center px-2 py-2 border border-dark-100 rounded-lg text-xs font-medium hover:bg-dark-50 transition-colors ${p.color}`}
+              >
+                {p.name}
+              </a>
+            ) : (
+              <span
+                key={p.name}
+                title={t("scanToShare")}
+                className={`flex items-center justify-center px-2 py-2 border border-dark-100 rounded-lg text-xs font-medium opacity-70 ${p.color}`}
+              >
+                {p.name}
+              </span>
+            )
+          )}
+        </div>
+
         <div className="flex gap-2">
           <button
             onClick={copyLink}

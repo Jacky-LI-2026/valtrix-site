@@ -21,9 +21,9 @@ export default function SeoAlternates() {
 
   useEffect(() => {
     // ---- 服务端已输出则**完全不介入** ----
-    // canonical / hreflang 现由服务端 generateMetadata 输出
+    // canonical / hreflang 现在由服务端 generateMetadata 输出
     // （app/layout.tsx → lib/seo-metadata.ts 的 buildCurrentPageAlternates）。
-    // 本组件退化为**兜底**：仅当服务端没输出时才补齐。
+    // 本组件退化为**兜底**：仅当服务端没输出时（例如某些未接 metadata 的路由）才补齐。
     // 为什么必须先判断：本组件此前会**无条件覆盖** canonical 并删除全部 hreflang，
     // 若继续运行会把服务端刚输出的正确值改掉，等于白做。
     const serverCanonical = document.head.querySelector('link[rel="canonical"]');
@@ -32,7 +32,7 @@ export default function SeoAlternates() {
 
     const base = window.location.origin;
     const path = pathname && pathname !== "/" ? pathname : "";
-    // 兜底口径与服务端保持一致：canonical 指向**当前语种自身**（非中文带 ?lang=）
+    // 兜底口径与服务端保持一致：canonical 指向**当前语种自身**
     const selfHref = base + path + (locale && locale !== "zh" ? `?lang=${locale}` : "");
     const zhHref = base + path;
 

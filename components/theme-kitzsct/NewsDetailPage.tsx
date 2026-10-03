@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Calendar, ChevronLeft, Tag } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
+import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { getBrandNameEn } from "@/lib/brand";
 import KitzPageHero from "./PageHero";
 import KitzCornerAccent from "./CornerAccent";
@@ -386,7 +387,7 @@ export default function KitzNewsDetailPage({ params }: PageProps) {
             <article
               className="prose max-w-none leading-relaxed text-dark-600"
               dangerouslySetInnerHTML={{
-                __html: loc.get(article, "content") || loc.get(article, "summary"),
+                __html: preserveLeadingSpaces(loc.get(article, "content") || loc.get(article, "summary")),
               }}
             />
 
