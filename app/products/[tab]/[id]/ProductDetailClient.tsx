@@ -9,6 +9,7 @@ import { createLocalizedGetter } from "@/lib/localized";
 import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { useCanSocialPublish } from "@/lib/api/useSocialPublish";
 import SpecPicker from "@/components/ui/SpecPicker";
+import { buildConnFields, connOverview, type ConnField } from "@/lib/conn-spec";
 import { addToQuoteCart } from "@/lib/quote-cart";
 import { groupSpecs } from "@/lib/spec-grouping";
 import { useProductBySlug } from "@/lib/api/useProducts";
@@ -786,6 +787,80 @@ export default function ProductDetailClient() {
                   <div className="w-1 h-6 bg-primary rounded" />
                   {t("technicalSpecs")}
                 </h2>
+                {/*
+                  接口 / 端接 总览（owner 2026-10-06：「要对接口详细描述，类似世伟洛克」）
+                  —— Swagelok 产品页把端接写成 `Connection N Type + Connection N Size` 成对描述；
+                  这里把该产品**所有变体**的端接（型式 + 尺寸）去重汇总，材质/压力同理，**只搬运不发明**。
+                */}
+                {specsArray.length > 0 && (
+                  <div className="mb-5 border border-dark-100 rounded-xl overflow-hidden">
+                    <div className="bg-dark-50 px-4 py-2.5 text-sm font-semibold text-dark">
+                      {locale === "zh" ? "接口与端接" : "Connections & End Fittings"}
+                    </div>
+                    <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {(() => {
+                        const allFields: ConnField[][] = specsArray.map((s: any) =>
+                          buildConnFields(
+                            String(loc.get(s, "value") || "")
+                              .split(/[;；؛]/)
+                              .map((seg: string) => {
+                                const g = String(seg).trim();
+                                const i = g.indexOf(":") >= 0 ? g.indexOf(":") : g.indexOf("：");
+                                return i > 0 ? ([g.slice(0, i).trim(), g.slice(i + 1).trim()] as [string, string]) : null;
+                              })
+                              .filter(Boolean) as [string, string][],
+                            String(loc.get(s, "label") || ""),
+                            ""
+                          )
+                        );
+                        const conns = connOverview(allFields, 8);
+                        const materials: string[] = Array.from(
+                          new Set<string>(allFields.flatMap((f: ConnField[]) => f.filter((x) => x.group === "body" && x.zh === "本体材质").map((x) => String(x.value))))
+                        ).slice(0, 4);
+                        const pressures: string[] = Array.from(
+                          new Set<string>(allFields.flatMap((f: ConnField[]) => f.filter((x) => x.group === "pressure").map((x) => `${x.zh} ${x.value}`)))
+                        ).slice(0, 6);
+                        return (
+                          <>
+                            <div>
+                              <div className="text-xs text-dark-400 mb-2">{locale === "zh" ? "端接型式 / 尺寸" : "End connections"}</div>
+                              <div className="flex flex-wrap gap-1.5">
+                                {conns.map((c) => (
+                                  <span key={c.label} className="text-[11px] px-2 py-1 rounded-md bg-primary/5 text-dark-600 border border-dark-100">
+                                    {c.label} <span className="text-dark-300">×{c.count}</span>
+                                  </span>
+                                ))}
+                                {conns.length === 0 && <span className="text-xs text-dark-300">—</span>}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-dark-400 mb-2">{locale === "zh" ? "本体材质" : "Body material"}</div>
+                              <div className="flex flex-wrap gap-1.5">
+                                {materials.map((m) => (
+                                  <span key={m} className="text-[11px] px-2 py-1 rounded-md bg-dark-50 text-dark-600 border border-dark-100">
+                                    {m}
+                                  </span>
+                                ))}
+                                {materials.length === 0 && <span className="text-xs text-dark-300">—</span>}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-dark-400 mb-2">{locale === "zh" ? "工作压力" : "Working pressure"}</div>
+                              <div className="flex flex-wrap gap-1.5">
+                                {pressures.map((p) => (
+                                  <span key={p} className="text-[11px] px-2 py-1 rounded-md bg-dark-50 text-dark-600 border border-dark-100">
+                                    {p}
+                                  </span>
+                                ))}
+                                {pressures.length === 0 && <span className="text-xs text-dark-300">—</span>}
+                              </div>
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                )}
                 {/* owner 2026-10-06：规格特别多的产品（如 G 系列 184 条）改成**选型器**呈现；
                     完整规格表一条不丢，折叠在选型器里由 SpecPicker 渲染 children */}
                 <SpecPicker specs={specsArray} loc={loc} locale={locale} onAddToCart={(code) => addToCart(code)}>

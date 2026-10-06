@@ -19,11 +19,11 @@
  */
 import { useMemo, useState } from "react";
 import { ChevronDown, Copy, Search, ShoppingCart, X } from "lucide-react";
+import { parseSpecRow, deriveFacets, rowMatches, naturalCompare, LABEL_FACET, type LocGetter } from "@/lib/spec-facets";
+import { buildConnFields, connSummary } from "@/lib/conn-spec";
 
 /** `createLocalizedGetter(locale)` 的返回类型（只用到 get） */
-interface LocFn {
-  get(obj: any, key: string): string;
-}
+type LocFn = LocGetter;
 
 export interface SpecPickerProps {
   /** 原始 specs（含多语种字段，由 loc 取值） */
@@ -49,64 +49,12 @@ const T: Record<string, Record<string, string>> = {
   ar: { title: "محدد سريع", label: "النوع", all: "الكل", matched: "مطابق", items: "عنصر", clear: "مسح", empty: "لا توجد مواصفات مطابقة للشروط الحالية — جرّب توسيعها: ", search: "بحث بالرقم / المقاس / كلمة", copy: "نسخ رقم القطعة", copied: "تم النسخ", add: "أضف إلى سلة العرض", full: "عرض جدول المواصفات الكامل", code: "رقم القطعة", more: "عرض كل المطابقات", collapse: "طي" },
 };
 
-const SPLIT = /[;；؛]/;
-const LABEL_FACET = " __label__";
-
-/** 把一行规格解析成 { label, code, attrs } */
-function parseRow(spec: any, loc: LocFn) {
-  const label = String(loc.get(spec, "label") || "").trim();
-  const value = String(loc.get(spec, "value") || "").trim();
-  const attrs: [string, string][] = [];
-  for (const seg of value.split(SPLIT)) {
-    const s = seg.trim();
-    if (!s) continue;
-    const i = s.indexOf(":") >= 0 ? s.indexOf(":") : s.indexOf("：");
-    if (i <= 0) continue;
-    const k = s.slice(0, i).trim();
-    const v = s.slice(i + 1).trim();
-    if (k && v) attrs.push([k, v]);
-  }
-  return { label, value, code: String(spec?.groupName || "").trim(), attrs };
-}
-
-/** 自然序比较（1/8 < 1/4 < 1/2 < 3/4 < 1） */
-function naturalCompare(a: string, b: string) {
-  const num = (s: string) => {
-    const m = s.match(/^(\d+)\/(\d+)$/);
-    if (m) return Number(m[1]) / Number(m[2]);
-    const n = Number(s.replace(/[^\d.]/g, ""));
-    return Number.isFinite(n) ? n : NaN;
-  };
-  const na = num(a);
-  const nb = num(b);
-  if (!Number.isNaN(na) && !Number.isNaN(nb) && na !== nb) return na - nb;
-  return a.localeCompare(b);
-}
-
 export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onAddToCart, children }: SpecPickerProps) {
   const dict = T[locale] || T.zh;
-  const rows = useMemo(() => (Array.isArray(specs) ? specs.map((s) => parseRow(s, loc)) : []), [specs, loc]);
+  const rows = useMemo(() => (Array.isArray(specs) ? specs.map((s) => parseSpecRow(s, loc)) : []), [specs, loc]);
 
   /** 从数据自动推导选型维度（出现够多 + 取值个数适中） */
-  const facets = useMemo(() => {
-    const stat = new Map<string, { count: number; values: Set<string> }>();
-    for (const r of rows) {
-      for (const [k, v] of r.attrs) {
-        if (v.length > 24) continue;
-        const s = stat.get(k) || { count: 0, values: new Set<string>() };
-        s.count += 1;
-        s.values.add(v);
-        stat.set(k, s);
-      }
-    }
-    const keyFacets = Array.from(stat.entries())
-      .filter(([, s]) => s.values.size >= 2 && s.values.size <= 12 && s.count >= Math.max(3, Math.floor(rows.length * 0.05)))
-      .sort((a, b) => b[1].count - a[1].count)
-      .slice(0, 3)
-      .map(([key, s]) => ({ key, values: Array.from(s.values).sort(naturalCompare) }));
-    const labels = Array.from(new Set(rows.map((r) => r.label).filter(Boolean)));
-    return labels.length >= 2 ? [{ key: LABEL_FACET, values: labels.sort(naturalCompare) }, ...keyFacets] : keyFacets;
-  }, [rows]);
+  const facets = useMemo(() => deriveFacets(rows, { max: 3 }), [rows]);
 
   const [picked, setPicked] = useState<Record<string, string>>({});
   const [q, setQ] = useState("");
@@ -118,9 +66,7 @@ export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onA
     return rows.filter((r) => {
       for (const [k, v] of Object.entries(picked)) {
         if (!v) continue;
-        if (k === LABEL_FACET) {
-          if (r.label !== v) return false;
-        } else if (!r.attrs.some(([ak, av]) => ak === k && av === v)) return false;
+        if (!rowMatches(r, k, v)) return false;
       }
       if (kw && !`${r.code} ${r.label} ${r.value}`.toLowerCase().includes(kw)) return false;
       return true;
@@ -142,12 +88,10 @@ export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onA
       for (const v of f.values) {
         let n = 0;
         for (const r of rows) {
-          if (f.key === LABEL_FACET ? r.label !== v : !r.attrs.some(([ak, av]) => ak === f.key && av === v)) continue;
+          if (!rowMatches(r, f.key, v)) continue;
           let ok = true;
           for (const [ok2, ov] of others) {
-            if (ok2 === LABEL_FACET) {
-              if (r.label !== ov) { ok = false; break; }
-            } else if (!r.attrs.some(([ak, av]) => ak === ok2 && av === ov)) { ok = false; break; }
+            if (!rowMatches(r, ok2, ov)) { ok = false; break; }
           }
           if (ok) n += 1;
         }
@@ -266,9 +210,13 @@ export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onA
               )}
             </div>
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-              {r.attrs.slice(0, 6).map(([k, v]) => (
-                <span key={k} className="text-[11px] text-dark-500">
-                  <span className="text-dark-300">{k}:</span> {v}
+              {/*
+                接口/端接按 Swagelok 口径展示（owner 2026-10-06：「要对接口详细描述，类似世伟洛克」）：
+                规范成「端接 1（面密封（NPT））: 1/4」这种 (型式, 尺寸) 成对描述，而不是原始规格键名。
+              */}
+              {buildConnFields(r.attrs, r.label, "").slice(0, 5).map((f, fi) => (
+                <span key={`${f.zh}-${fi}`} className="text-[11px] text-dark-500">
+                  <span className="text-dark-300">{locale === "zh" ? f.zh : f.en}:</span> {f.value}
                 </span>
               ))}
             </div>
