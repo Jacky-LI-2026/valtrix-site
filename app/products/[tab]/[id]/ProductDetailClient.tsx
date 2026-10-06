@@ -863,7 +863,13 @@ export default function ProductDetailClient() {
                 )}
                 {/* owner 2026-10-06：规格特别多的产品（如 G 系列 184 条）改成**选型器**呈现；
                     完整规格表一条不丢，折叠在选型器里由 SpecPicker 渲染 children */}
-                <SpecPicker specs={specsArray} loc={loc} locale={locale} onAddToCart={(code) => addToCart(code)}>
+                <SpecPicker
+                  specs={specsArray}
+                  loc={loc}
+                  locale={locale}
+                  productModel={String(model?.model || modelId || "")}
+                  onAddToCart={(code) => addToCart(code)}
+                >
                 <div className="border border-dark-100 rounded-lg overflow-hidden">
                   <table className="w-full">
                     <tbody>

@@ -21,6 +21,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, Copy, FileText, Search, ShoppingCart, Wrench, X } from "lucide-react";
 import { parseSpecRow, deriveFacets, rowMatches, naturalCompare, LABEL_FACET, type LocGetter } from "@/lib/spec-facets";
 import { buildConnFields, connSummary } from "@/lib/conn-spec";
+import { findManualSeries } from "@/lib/manual-codes";
 
 /** `createLocalizedGetter(locale)` 的返回类型（只用到 get） */
 type LocFn = LocGetter;
@@ -35,6 +36,8 @@ export interface SpecPickerProps {
   minRows?: number;
   /** 传入后，每个选型结果卡片会出现「加入询价车」按钮（把该**货号**一起带进询价车） */
   onAddToCart?: (code: string) => void;
+  /** 当前产品型号（如 `DV1`、`ZW-10D`）：命中手册系列时，货号生成器改用**手册权威段位** */
+  productModel?: string;
   /** 完整规格表（原样渲染，折叠在选型器下方） */
   children?: React.ReactNode;
 }
@@ -63,8 +66,10 @@ function rowMaxBar(attrs: [string, string][]): number {
   return max;
 }
 
-export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onAddToCart, children }: SpecPickerProps) {
+export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onAddToCart, productModel, children }: SpecPickerProps) {
   const dict = T[locale] || T.zh;
+  /** 手册权威规则（命中则货号生成器用它；未命中则退回"从已有机型货号推导"） */
+  const manual = useMemo(() => (productModel ? findManualSeries(productModel) : null), [productModel]);
   const rows = useMemo(() => (Array.isArray(specs) ? specs.map((s) => parseSpecRow(s, loc)) : []), [specs, loc]);
 
   /** 从数据自动推导选型维度（出现够多 + 取值个数适中） */
@@ -132,10 +137,43 @@ export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onA
     return out.length >= 2 && out.length <= 6 ? out : [];
   }, [rows]);
 
+  /**
+   * 生成器的段位：**优先手册权威段位**（带中文含义）——
+   * 手册把「系列 + 流道形式」连写（示例 `DV13A` = DV1 + 3A），故这里把这两段合并成一个选择项。
+   */
+  const genSegments = useMemo(() => {
+    if (manual) {
+      const s2 = manual.segments.find((s) => s.no === 2);
+      const s3 = manual.segments.find((s) => s.no === 3);
+      const combos: { code: string; label: string }[] = [];
+      if (s2 && s3) {
+        for (const a of s2.options)
+          for (const b of s3.options) combos.push({ code: `${a.code}${b.code}`, label: `${a.code}${b.code} — ${a.label} · ${b.label}` });
+      }
+      return manual.segments
+        .filter((s) => s.no !== 3)
+        .map((s) => ({
+          key: `m${s.no}`,
+          label: s.no === 2 ? `${s.name} + 流道形式` : s.name,
+          note: s.note || "",
+          values: s.no === 2 ? combos : s.options.map((o) => ({ code: o.code, label: o.label })),
+        }));
+    }
+    return codeSegments.map((seg, i) => ({
+      key: `a${i}`,
+      label: `#${i + 1}`,
+      note: "",
+      values: seg.values.map((v) => ({ code: v, label: v })),
+    }));
+  }, [manual, codeSegments]);
+
   const generatedCode = useMemo(() => {
-    if (!codeSegments.length || segPicks.filter(Boolean).length !== codeSegments.length) return "";
-    return segPicks.join("-");
-  }, [codeSegments, segPicks]);
+    if (!genSegments.length) return "";
+    // 缺省项（手册里留空/省略）不参与拼接，其余按段位顺序用 "-" 连接
+    const values = segPicks.slice(0, genSegments.length).map((v) => v || "");
+    if (values.filter(Boolean).length !== values.length) return "";
+    return values.join("-");
+  }, [genSegments, segPicks]);
   const generatedHit = useMemo(() => (generatedCode ? rows.find((r) => r.code === generatedCode) || null : null), [generatedCode, rows]);
 
   /**
@@ -291,7 +329,7 @@ tr:nth-child(even) td{background:#fafafa}
           <button
             type="button"
             onClick={() => setShowGen((v) => !v)}
-            disabled={!codeSegments.length}
+            disabled={!genSegments.length}
             className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 border border-dark-100 rounded-lg hover:bg-dark-50 disabled:opacity-40"
             title={dict.genHint}
           >
@@ -308,13 +346,21 @@ tr:nth-child(even) td{background:#fafafa}
           </button>
         </div>
 
-        {showGen && codeSegments.length > 0 && (
+        {showGen && genSegments.length > 0 && (
           <div className="border-t border-dark-100 pt-3">
-            <div className="text-[11px] text-dark-400 mb-2">{dict.genHint}</div>
+            <div className="text-[11px] text-dark-400 mb-2">
+              {manual
+                ? locale === "zh"
+                  ? `按手册《型号说明-${manual.key}系列》生成（来源：${manual.source}）· 手册示例：${manual.example}`
+                  : `Built from the catalog rule for series ${manual.key}. Example: ${manual.example}`
+                : dict.genHint}
+            </div>
             <div className="flex flex-wrap gap-2">
-              {codeSegments.map((seg, i) => (
-                <label key={seg.index} className="inline-flex items-center gap-1.5">
-                  <span className="text-[11px] text-dark-300">#{i + 1}</span>
+              {genSegments.map((seg, i) => (
+                <label key={seg.key} className="inline-flex items-center gap-1.5">
+                  <span className="text-[11px] text-dark-300" title={seg.note || ""}>
+                    {manual ? seg.label : `#${i + 1}`}
+                  </span>
                   <span className="relative inline-block">
                     <select
                       value={segPicks[i] || ""}
@@ -329,8 +375,8 @@ tr:nth-child(even) td{background:#fafafa}
                     >
                       <option value="">—</option>
                       {seg.values.map((v) => (
-                        <option key={v} value={v}>
-                          {v}
+                        <option key={v.code} value={v.code}>
+                          {v.label}
                         </option>
                       ))}
                     </select>
