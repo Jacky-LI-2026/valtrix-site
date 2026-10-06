@@ -22,6 +22,7 @@ import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
 import { addToQuoteCart } from "@/lib/quote-cart";
 import { deriveFacets, rowMatches, naturalCompare, LABEL_FACET, type SpecRow } from "@/lib/spec-facets";
+import { MANUAL_CATEGORIES, MANUAL_GROUPS, matchManualSeries, type ManualCategory } from "@/lib/manual-catalog";
 
 /** 选型器界面词（i18n 字典暂无对应键，就地兜底 6 语种） */
 const T: Record<string, Record<string, string>> = {
@@ -60,9 +61,13 @@ export default function ProductSelector() {
   const [loading, setLoading] = useState(true);
   const [step, setStep] = useState(1);
   const [catKey, setCatKey] = useState(""); // `${tabId}::${catId}`
+  /** 手册系列筛选（owner：细分严格按手册 —— 系列清单来自手册，不是我们从库里推的） */
+  const [seriesKey, setSeriesKey] = useState("");
   const [picked, setPicked] = useState<Record<string, string>>({});
   const [q, setQ] = useState("");
   const [added, setAdded] = useState("");
+  /** 工况：工作压力下限（bar）——数值从产品规格解析，不猜测 */
+  const [minBar, setMinBar] = useState("");
 
   useEffect(() => {
     let alive = true;
@@ -126,22 +131,69 @@ export default function ProductSelector() {
     };
   }, [loc]);
 
-  /** 类别（二级目录 + 分类）聚合：卡片展示用 */
-  const categories = useMemo(() => {
-    const map = new Map<string, { key: string; tabId: string; tabName: string; name: string; desc: string; image: string; count: number; values: string[] }>();
-    for (const it of items) {
-      const key = `${it.tabId}::${it.catId}`;
-      const e = map.get(key) || { key, tabId: it.tabId, tabName: it.tabName, name: it.catName, desc: it.catDesc, image: it.image, count: 0, values: [] };
-      e.count += 1;
-      if (!e.image && it.image) e.image = it.image;
-      // 卡片上的"关键规格"：取该类别里出现最多的前若干属性值
-      for (const [, v] of it.attrs.slice(0, 2)) if (e.values.length < 3 && !e.values.includes(v)) e.values.push(v);
-      map.set(key, e);
-    }
-    return Array.from(map.values());
+  /**
+   * 手册品类目录（owner 口径：**细分严格从 PDF 手册取**）
+   * —— 品类/系列/维度名来自 `lib/manual-catalog.ts`（手册实测抽取）；
+   *    这里只把**官网产品**按型号归到手册系列上，用来显示"官网在售数量/图片"与后续匹配。
+   */
+  const catalog = useMemo(() => {
+    return MANUAL_CATEGORIES.map((c) => {
+      const matched = items.filter((it) => {
+        const m = matchManualSeries(`${it.model} ${it.name}`);
+        return m?.category.key === c.key;
+      });
+      const bySeries = c.series.map((s) => ({
+        series: s,
+        count: matched.filter((it) => matchManualSeries(`${it.model} ${it.name}`)?.series === s).length,
+      }));
+      return {
+        cat: c,
+        matched,
+        count: matched.length,
+        image: matched.find((x) => x.image)?.image || "",
+        bySeries,
+      };
+    });
   }, [items]);
 
-  const catItems = useMemo(() => (catKey ? items.filter((it) => `${it.tabId}::${it.catId}` === catKey) : []), [items, catKey]);
+  /** 目录页分组（原型 GROUP 顺序） */
+  const catGroups = useMemo(
+    () =>
+      MANUAL_GROUPS.map((g) => ({
+        key: g.key,
+        tabId: g.key,
+        tabName: g.zh,
+        tabEn: g.en,
+        cats: catalog.filter((c) => c.cat.group === g.key).map((c) => ({
+          key: c.cat.key,
+          name: c.cat.zh,
+          desc: c.cat.en,
+          image: c.image,
+          count: c.count,
+          values: c.cat.series,
+          dims: c.cat.dimensions,
+          rulePages: c.cat.rulePages || "",
+        })),
+      })).filter((g) => g.cats.length > 0),
+    [catalog]
+  );
+
+  const tabsCount = catGroups.length;
+  /** 统计卡：材料体系/洁净工艺 —— 从**官网产品规格**里汇总（手册未给全站常量） */
+  const statsMaterials = useMemo(
+    () => Array.from(new Set(items.flatMap((it) => it.attrs.filter(([k]) => /材质|material/i.test(k)).map(([, v]) => v)))).slice(0, 4),
+    [items]
+  );
+  const statsClean = useMemo(
+    () => Array.from(new Set(items.flatMap((it) => it.attrs.filter(([k]) => /洁净|clean/i.test(k)).map(([, v]) => v)))).slice(0, 3),
+    [items]
+  );
+
+  /** 该手册品类下的**官网产品**（按型号归到手册系列） */
+  const catItems = useMemo(
+    () => (catKey ? items.filter((it) => matchManualSeries(`${it.model} ${it.name}`)?.category.key === catKey) : []),
+    [items, catKey]
+  );
 
   /** 该类别下的可筛维度（**从产品规格自动推导**，含「规格项」伪维度） */
   const facets = useMemo(() => {
@@ -167,10 +219,22 @@ export default function ProductSelector() {
         }
         if (!it.attrs.some(([ak, av]) => ak === k && av === v)) return false;
       }
+      // 手册系列筛选
+      if (seriesKey && matchManualSeries(`${it.model} ${it.name}`)?.series !== seriesKey) return false;
+      // 工况：工作压力 ≥ 输入值（数值取自产品规格文本；解析不出则不参与过滤）
+      const min = Number(minBar);
+      if (minBar.trim() !== "" && Number.isFinite(min) && min > 0) {
+        const max = it.attrs
+          .filter(([k]) => /压力|pressure/i.test(k))
+          .map(([, v]) => Number((String(v).match(/\d+(?:\.\d+)?/) || [""])[0]))
+          .filter((n) => Number.isFinite(n) && n > 0)
+          .reduce((a, b) => Math.max(a, b), -1);
+        if (max >= 0 && max < min) return false;
+      }
       if (kw && !`${it.name} ${it.model} ${it.attrs.map(([k, v]) => `${k} ${v}`).join(" ")}`.toLowerCase().includes(kw)) return false;
       return true;
     });
-  }, [catItems, picked, q]);
+  }, [catItems, picked, q, seriesKey, minBar]);
 
   /** chip 可用性预判（选了它会 0 条的置灰）——与产品页选型器同口径 */
   const availability = useMemo(() => {
@@ -210,7 +274,9 @@ export default function ProductSelector() {
     setAdded(it.id);
     setTimeout(() => setAdded(""), 2000);
   };
-  const activeCat = categories.find((c) => c.key === catKey);
+  /** 当前选中的手册品类（来自手册目录） */
+  const activeCat = catalog.find((c) => c.cat.key === catKey) || null;
+  const activeManual: ManualCategory | null = activeCat?.cat || null;
   const activeCount = Object.values(picked).filter(Boolean).length;
 
   if (loading) {
@@ -222,81 +288,105 @@ export default function ProductSelector() {
   }
 
   return (
-    <div className="bg-[#f6f4f0] min-h-screen">
-      {/* 页头（原型：深色渐变 + 品牌红底边） */}
-      <div className="bg-[linear-gradient(135deg,#0b0b0d_0%,#17181c_55%,#241a1b_100%)] text-white border-b-[3px] border-[#a8141a]">
-        <div className="max-w-[1180px] mx-auto px-5 py-6 flex items-center gap-4 flex-wrap">
-          <div className="flex-1 min-w-[220px]">
-            <h1 className="text-xl font-extrabold tracking-wide">{dict.title}</h1>
-            <p className="text-[12.5px] text-[#a6adb8] mt-1">{dict.sub}</p>
-          </div>
-          <Link href="/products" className="inline-flex items-center gap-1.5 text-[13px] px-4 py-2 rounded-full border border-white/25 hover:bg-white/10">
-            {t("productsPageTitle")} <ChevronRight size={14} className="rtl-flip" />
-          </Link>
+    /*
+      目录页 —— **严格按芯阀产品手册 html 原型 `产品目录页.html` 移植**：
+      样式来自 `app/globals.css` 里 `#vs-catalog` 作用域（由原型 <style> 逐条搬运，变量与数值未改），
+      这里只用原型的类名（.crumb/.hero/.stats/.sec/.cards/.card/.thumb/.cbody/.cname/.chips/.chip/.go/footer）。
+      说明：**站点自身的顶栏/页脚已由 layout 提供**，故此处不重复原型里那份独立 topbar（避免双导航）。
+    */
+    <div id="vs-catalog">
+      {/* 面包屑（原型 .crumb） */}
+      <div className="wrap">
+        <div className="crumb">
+          <Link href="/">{locale === "zh" ? "首页" : "Home"}</Link> &gt; <b>{t("productsPageTitle")}</b>
         </div>
       </div>
 
-      {/* 步骤条 */}
-      <div className="bg-[#111214] text-white border-b-[3px] border-[#a8141a]">
-        <div className="max-w-[1180px] mx-auto px-5 flex">
-          {[
-            { n: 1, label: dict.s1 },
-            { n: 2, label: dict.s2 },
-            { n: 3, label: dict.s3 },
-          ].map((s) => (
-            <button
-              key={s.n}
-              onClick={() => (s.n === 1 || catKey ? setStep(s.n) : null)}
-              className={`flex-1 py-3 text-center text-[13.5px] border-b-[3px] transition-colors ${
-                step === s.n ? "text-white border-[#a8141a] bg-[#a8141a]/10" : "text-[#9aa1ac] border-transparent hover:text-white"
-              } ${s.n !== 1 && !catKey ? "opacity-50 cursor-not-allowed" : ""}`}
-            >
-              <b className={`block text-[11px] mb-0.5 ${step === s.n ? "text-[#c63036]" : "text-[#6e757f]"}`}>{s.n}</b>
-              {s.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="max-w-[1180px] mx-auto px-5 py-6">
-        {/* ===== 第 1 步：选类别 ===== */}
-        {step === 1 && (
-          <section className="bg-white border border-[#e4e0d8] rounded-[14px] p-6">
-            <h2 className="text-[18px] font-extrabold flex items-center gap-2.5 mb-1">
-              <span className="bg-[#a8141a] text-white w-[26px] h-[26px] rounded-[7px] inline-flex items-center justify-center text-[14px]">1</span>
-              {dict.h1}
-            </h2>
-            <p className="text-[#5c6169] text-[13px] mb-4">{dict.h1s}</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-              {categories.map((c) => (
-                <button
-                  key={c.key}
-                  onClick={() => pickCategory(c.key)}
-                  className="text-start border-2 border-[#e4e0d8] rounded-xl overflow-hidden bg-white hover:border-[#c63036] hover:-translate-y-0.5 hover:shadow-[0_6px_18px_rgba(168,20,26,.08)] transition-all"
-                >
-                  <div className="h-[110px] bg-white flex items-center justify-center p-2 border-b border-[#e4e0d8]">
-                    {c.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={c.image} alt={c.name} className="max-w-full max-h-full object-contain" />
-                    ) : (
-                      <span className="text-[#c63036] font-bold">{c.name.slice(0, 1)}</span>
-                    )}
-                  </div>
-                  <div className="p-3">
-                    <div className="font-extrabold text-[15px]">{c.name}</div>
-                    <div className="text-[12px] text-[#5c6169] mt-1 min-h-[34px] line-clamp-2">{c.desc}</div>
-                    <div className="text-[11.5px] text-[#5c6169] mt-1.5 flex flex-wrap gap-x-2">
-                      <span>{c.count} {dict.models}</span>
-                      {c.values.slice(0, 2).map((v, i) => (
-                        <span key={i} className="text-[#2a2d33]">{v}</span>
-                      ))}
-                    </div>
-                    <div className="mt-2 text-[11.5px] text-[#5c6169]">{c.tabName}</div>
-                  </div>
-                </button>
-              ))}
+      {/* Hero + 四统计（原型 .hero / .stats / .stat）*/}
+      {step === 1 && (
+        <section className="hero">
+          <div className="wrap">
+            <div className="kicker">{locale === "zh" ? "PRODUCTS · 产品目录" : "PRODUCTS · CATALOG"}</div>
+            <h1>{locale === "zh" ? "高纯管阀件全品类" : "High-purity valves & fittings"}</h1>
+            <p className="desc">
+              {locale === "zh"
+                ? "接头、隔膜阀、球阀、针阀、波纹管阀、减压阀、单向阀、计量阀、过滤器与阀组，面向半导体、生物制药与高纯流体输送应用；316L 不锈钢，支持 GP / HP / UHP 工艺规范。"
+                : "Fittings, diaphragm/ball/needle/bellows/regulator/check/metering valves, filters and manifolds for semiconductor, biopharma and UHP fluid systems. 316L stainless steel, GP / HP / UHP process specifications."}
+            </p>
+            <div className="stats">
+              <div className="stat">
+                <div className="l">{locale === "zh" ? "产品品类" : "Categories"}</div>
+                <div className="v">{MANUAL_CATEGORIES.length}</div>
+                <div className="s">{tabsCount} {locale === "zh" ? "个二级目录" : "sections"}</div>
+              </div>
+              <div className="stat">
+                <div className="l">{locale === "zh" ? "型号" : "Models"}</div>
+                <div className="v">{items.length}</div>
+                <div className="s">{locale === "zh" ? "全部可询价" : "quotable"}</div>
+              </div>
+              <div className="stat">
+                <div className="l">{locale === "zh" ? "材料体系" : "Materials"}</div>
+                <div className="v">{statsMaterials[0] || "316L"}</div>
+                <div className="s">{statsMaterials.slice(1, 4).join(" · ") || "316L SS"}</div>
+              </div>
+              <div className="stat">
+                <div className="l">{locale === "zh" ? "洁净工艺" : "Cleanliness"}</div>
+                <div className="v">{statsClean.join(" / ") || "GP / HP / UHP"}</div>
+                <div className="s">{locale === "zh" ? "按产品规格汇总" : "from product specs"}</div>
+              </div>
             </div>
-          </section>
+          </div>
+        </section>
+      )}
+
+      <div className="wrap">
+        {/* ===== 第 1 步：品类目录（原型 .sec / .ghead / .cards / .card）===== */}
+        {step === 1 && (
+          catGroups.map((g) => (
+            <section className="sec" key={g.tabId}>
+              <div className="ghead">
+                <span className="en">{g.tabEn || g.tabId}</span>
+                <h2>{g.tabName}</h2>
+                <span className="cnt">
+                  {g.cats.reduce((n, c) => n + c.count, 0)} {locale === "zh" ? "个型号" : "models"}
+                </span>
+              </div>
+              <div className="cards">
+                {g.cats.map((c) => (
+                  <button key={c.key} className="card" onClick={() => pickCategory(c.key)} style={{ textAlign: "start" }}>
+                    {c.count > 0 && <span className="st live">{locale === "zh" ? "官网在售" : "Available"}</span>}
+                    <div className="thumb">
+                      {c.image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={c.image} alt={c.name} loading="lazy" />
+                      ) : (
+                        <svg className="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <rect x="3" y="4" width="7" height="7" rx="1" />
+                          <rect x="14" y="4" width="7" height="7" rx="1" />
+                          <rect x="3" y="13" width="7" height="7" rx="1" />
+                          <rect x="14" y="13" width="7" height="7" rx="1" />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="cbody">
+                      <div className="cname">
+                        {c.name}
+                        <span className="en">{c.desc.slice(0, 18)}</span>
+                      </div>
+                      <div className="chips">
+                        {c.values.slice(0, 6).map((v, i) => (
+                          <span className="chip" key={i}>
+                            {v}
+                          </span>
+                        ))}
+                      </div>
+                      <span className="go">{locale === "zh" ? "进入选型" : "Start selecting"}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </section>
+          ))
         )}
 
         {/* ===== 第 2 步：选参数 + 实时结果 ===== */}
@@ -306,9 +396,72 @@ export default function ProductSelector() {
               <h2 className="text-[18px] font-extrabold flex items-center gap-2.5 mb-1">
                 <span className="bg-[#a8141a] text-white w-[26px] h-[26px] rounded-[7px] inline-flex items-center justify-center text-[14px]">2</span>
                 {dict.h2}
-                <span className="text-[12px] font-medium text-[#5c6169] ms-2">{activeCat?.name}</span>
+                <span className="text-[12px] font-medium text-[#5c6169] ms-2">{activeManual?.zh || ""}</span>
               </h2>
               <p className="text-[#5c6169] text-[13px] mb-4">{dict.hint}</p>
+
+              {/* 手册系列（owner 口径：细分严格按手册；系列清单来自手册目录页） */}
+              {activeCat && activeCat.bySeries.length > 0 && (
+                <div className="mb-4">
+                  <div className="text-[13px] font-bold text-[#2a2d33] mb-2">
+                    {locale === "zh" ? "手册系列" : "Catalog series"}
+                    <span className="text-[11px] font-normal text-[#5f666b] ms-2">
+                      {activeManual?.series.length} {locale === "zh" ? "个系列" : "series"}
+                      {activeManual?.rulePages ? ` · ${locale === "zh" ? "编码规则见" : "code rules:"} ${activeManual.rulePages}` : ""}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSeriesKey("")}
+                      className={`border-[1.5px] rounded-lg px-3 py-1.5 text-[12.5px] transition-all ${
+                        seriesKey === "" ? "bg-[#111214] border-[#111214] text-white" : "border-[#e4e0d8] bg-white text-[#2a2d33] hover:border-[#c63036]"
+                      }`}
+                    >
+                      {dict.all}
+                    </button>
+                    {activeCat.bySeries.map((s) => (
+                      <button
+                        key={s.series}
+                        type="button"
+                        onClick={() => setSeriesKey(seriesKey === s.series ? "" : s.series)}
+                        title={s.count === 0 ? (locale === "zh" ? "手册有此系列，官网暂无型号" : "In catalog, not on site yet") : ""}
+                        className={`border-[1.5px] rounded-lg px-3 py-1.5 text-[12.5px] transition-all ${
+                          seriesKey === s.series
+                            ? "bg-[#111214] border-[#111214] text-white"
+                            : s.count === 0
+                              ? "border-dashed border-[#e4e0d8] text-[#9aa1ac]"
+                              : "border-[#e4e0d8] bg-white text-[#2a2d33] hover:border-[#c63036]"
+                        }`}
+                      >
+                        <span className="font-bold">{s.series}</span>
+                        {s.count > 0 && <span className="ms-1 text-[10.5px]">({s.count})</span>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 手册给出的筛选维度（维度名严格来自手册；下方取值取自官网产品规格） */}
+              {activeManual && activeManual.dimensions.length > 0 && (
+                <div className="mb-4 text-[11.5px] text-[#5f666b] bg-[#f4f5f6] border border-[#e2e4e6] rounded-lg px-3 py-2">
+                  {locale === "zh" ? "手册筛选维度" : "Catalog filter dimensions"}：
+                  <b className="text-[#2a2d33] font-semibold">{activeManual.dimensions.join(" · ")}</b>
+                  <span className="ms-2">（{locale === "zh" ? "下方可选值取自官网产品规格" : "options come from product specs"}）</span>
+                </div>
+              )}
+
+              {/* 工况：工作压力下限（车间常用"我要 ≥N bar"的选型方式） */}
+              <label className="inline-flex items-center gap-2 text-[12.5px] text-[#5f666b] mb-4">
+                <span className="font-medium text-[#2a2d33]">{locale === "zh" ? "工作压力 ≥" : "Working pressure ≥"}</span>
+                <input
+                  value={minBar}
+                  onChange={(e) => setMinBar(e.target.value.replace(/[^\d.]/g, ""))}
+                  placeholder="300"
+                  className="w-20 px-2 py-1.5 text-[13px] border border-[#e4e0d8] rounded-lg outline-none focus:border-[#c63036]"
+                />
+                <span>bar</span>
+              </label>
 
               <div className="relative mb-4">
                 <Search size={14} className="absolute start-3 top-1/2 -translate-y-1/2 text-[#9aa1ac]" />
@@ -425,7 +578,10 @@ export default function ProductSelector() {
                 <span className="bg-[#a8141a] text-white w-[26px] h-[26px] rounded-[7px] inline-flex items-center justify-center text-[14px]">3</span>
                 {dict.h3}
               </h2>
-              <span className="text-[12.5px] text-[#5c6169]">{activeCat?.name}{activeCount > 0 ? ` · ${activeCount} 项条件` : ""}</span>
+              <span className="text-[12.5px] text-[#5c6169]">
+                {activeManual?.zh || ""}
+                {activeCount > 0 ? ` · ${activeCount} 项条件` : ""}
+              </span>
               <button onClick={() => setStep(2)} className="ms-auto text-[12.5px] px-3 py-1.5 border border-[#e4e0d8] rounded-lg hover:bg-[#f6f4f0]">
                 {dict.backP}
               </button>
