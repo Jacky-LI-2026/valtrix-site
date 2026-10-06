@@ -8,6 +8,7 @@ import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
 import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { useCanSocialPublish } from "@/lib/api/useSocialPublish";
+import SpecPicker from "@/components/ui/SpecPicker";
 import { groupSpecs } from "@/lib/spec-grouping";
 import { useProductBySlug } from "@/lib/api/useProducts";
 import ThreeSixtyViewer from "@/components/ui/ThreeSixtyViewer";
@@ -795,6 +796,9 @@ export default function ProductDetailClient() {
                   <div className="w-1 h-6 bg-primary rounded" />
                   {t("technicalSpecs")}
                 </h2>
+                {/* owner 2026-10-06：规格特别多的产品（如 G 系列 184 条）改成**选型器**呈现；
+                    完整规格表一条不丢，折叠在选型器里由 SpecPicker 渲染 children */}
+                <SpecPicker specs={specsArray} loc={loc} locale={locale}>
                 <div className="border border-dark-100 rounded-lg overflow-hidden">
                   <table className="w-full">
                     <tbody>
@@ -815,6 +819,7 @@ export default function ProductDetailClient() {
                     </tbody>
                   </table>
                 </div>
+                </SpecPicker>
               </div>
             </div>
           </div>
