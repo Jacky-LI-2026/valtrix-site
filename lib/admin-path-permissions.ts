@@ -65,6 +65,8 @@ export const PATH_PERMISSION: [string, string][] = [
   ['/admin/maintenance', 'config:site'],
   // 社媒一键发布（2026-10-01，与左文站同步）：与 /api/admin/social-publish、manifest 入口成对同码
   ['/admin/social-publish', 'social-publish:config'],
+  // 产品快速选型（2026-10-06，与左文站同步）：仅站点配置权限；用现有 /api/admin/plugins 读写，无新接口
+  ['/admin/product-selector', 'config:site'],
   ['/admin/members', 'member:view'],
   ['/admin/member-levels', 'member-level:view'],
   ['/admin/shop/orders', 'order:view'],

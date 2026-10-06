@@ -906,6 +906,25 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     adminUrl: "/admin/social-publish",
   },
 
+  // ===== 2026-10-06 owner 新增：产品快速选型（产品手册 html 原型风格）=====
+  {
+    key: "product-selector",
+    name: "产品快速选型",
+    description:
+      "按「类别 → 参数 → 匹配产品」三步式选型：维度从产品中心的产品规格**自动推导**，" +
+      "结果直接对应产品中心的型号，可跳详情页 / 加入询价车。",
+    category: "marketing",
+    version: "1.0.0",
+    builtin: true,
+    defaultEnabled: true,
+    configurable: false,
+    features: ["三步式选型（类别→参数→结果）", "维度自动推导", "规格条件实时匹配", "结果直连产品中心详情与询价车", "产品中心页入口按钮"],
+    impact:
+      "启用后：前台出现 /products/selector 选型页，并在产品中心页显示「快速选型」入口；停用则入口隐藏（页面仍可直达）。",
+    permissions: ["产品选型"],
+    adminUrl: "/admin/product-selector",
+  },
+
 ];
 
 export function getPluginManifest(key: string): PluginManifest | undefined {

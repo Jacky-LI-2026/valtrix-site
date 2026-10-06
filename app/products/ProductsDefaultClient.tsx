@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense, Fragment } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import PageHero from "@/components/ui/PageHero";
 import Link from "next/link";
-import { ArrowRight, LayoutGrid, Rows3 } from "lucide-react";
+import { ArrowRight, LayoutGrid, Rows3, Sparkles } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
 import { useProductTabs } from "@/lib/api/useProducts";
@@ -70,6 +70,14 @@ function ProductsContent() {
   const loc = createLocalizedGetter(locale);
   const [pageConfig, setPageConfig] = useState<any>(null);
   const viewLabels = VIEW_LABELS[locale] || VIEW_LABELS.zh;
+  /** 插件状态：`product-selector` 启用时，产品中心右上角显示「快速选型」入口 */
+  const [pluginOn, setPluginOn] = useState(false);
+  useEffect(() => {
+    fetch("/api/public/plugins", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => setPluginOn(!!(d?.state && d.state["product-selector"])))
+      .catch(() => {});
+  }, []);
 
   // 获取页面配置
   useEffect(() => {
@@ -283,7 +291,18 @@ function ProductsContent() {
           <>
           {/* 展示方式切换（owner 2026-10-01 二次口径：放在**产品列表区域**右上角，
               不要挤进上面的分类条 —— 那里横向溢出会把按钮裁掉） */}
-          <div className="flex justify-end mb-6">
+          <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
+            {pluginOn ? (
+              <Link
+                href="/products/selector"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium bg-primary/10 text-primary hover:bg-primary/15"
+                title="按参数逐步筛选，直接给出可询价的型号"
+              >
+                <Sparkles size={14} /> {locale === "zh" ? "快速选型" : locale === "ja" ? "クイック選定" : locale === "ko" ? "간편 선택" : locale === "fr" ? "Sélecteur rapide" : locale === "ar" ? "محدد سريع" : "Quick Selector"}
+              </Link>
+            ) : (
+              <span />
+            )}
             <div
               className="flex items-center gap-1 rounded-lg bg-dark-50 p-1"
               role="group"
