@@ -10,6 +10,8 @@ import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { useCanSocialPublish } from "@/lib/api/useSocialPublish";
 import SpecPicker from "@/components/ui/SpecPicker";
 import { buildConnFields, connOverview, type ConnField } from "@/lib/conn-spec";
+import { findManualSeries } from "@/lib/manual-codes";
+import { MANUAL_SPECS } from "@/lib/manual-specs";
 import { addToQuoteCart } from "@/lib/quote-cart";
 import { groupSpecs } from "@/lib/spec-grouping";
 import { useProductBySlug } from "@/lib/api/useProducts";
@@ -85,6 +87,33 @@ export default function ProductDetailClient() {
       ? productDetail.specs
       : model?.specs || [];
   const groupedSpecs = groupSpecs(specsArray, loc);
+
+  /**
+   * 规格是"变体型"还是"规格清单"？（与基地/左文站同一口径）
+   *   · 变体型（G 系列：184 条同名列 + 货号编码）→ 值得"按参数快速筛选"；
+   *   · 规格清单（DV2：18 条不同规格项）→ 按参数筛无意义且与完整规格表重复（owner 2026-10-06 反馈）
+   */
+  const isVariantSpec = (() => {
+    const arr = specsArray as any[];
+    if (!Array.isArray(arr) || arr.length < 8) return false;
+    const withCode = arr.filter((s) => s && s.groupName).length;
+    const freq = new Map<string, number>();
+    for (const s of arr) {
+      const l = String(loc.get(s, "label") || "").trim();
+      if (l) freq.set(l, (freq.get(l) || 0) + 1);
+    }
+    const maxShare = freq.size ? Math.max(...Array.from(freq.values())) / arr.length : 0;
+    return withCode >= arr.length * 0.3 || maxShare >= 0.3;
+  })();
+
+  /** 该产品所属手册系列的数值规格行（「接口与端接」为空时用它补齐） */
+  const manualSeriesRows = (() => {
+    const hit = findManualSeries(String(model?.model || modelId || ""));
+    if (!hit) return null;
+    const cat = MANUAL_SPECS.find((c) => c.category === hit.key);
+    const s = cat?.series.find((x) => x.id === hit.key);
+    return s && s.rows.length ? { columns: cat!.columns, rows: s.rows } : null;
+  })();
 
   // ---- 询价车（RFQ 自动报价）----
   const [quoteQty, setQuoteQty] = useState(1);
@@ -820,39 +849,60 @@ export default function ProductDetailClient() {
                         const pressures: string[] = Array.from(
                           new Set<string>(allFields.flatMap((f: ConnField[]) => f.filter((x) => x.group === "pressure").map((x) => `${x.zh} ${x.value}`)))
                         ).slice(0, 6);
+                        /** 兜底：从本产品规格推断不出来时，改用**手册数值行**（owner 2026-10-06：「这几个参数在哪取信息？」） */
+                        const manualPorts: string[] = manualSeriesRows
+                          ? Array.from(new Set(manualSeriesRows.rows.map((r) => r[1]).filter(Boolean))).slice(0, 8)
+                          : [];
+                        const manualPress: string[] = manualSeriesRows
+                          ? Array.from(new Set(manualSeriesRows.rows.map((r) => r[2]).filter(Boolean))).slice(0, 6)
+                          : [];
+                        const manualMat: string[] = manualSeriesRows
+                          ? Array.from(new Set(manualSeriesRows.rows.map((r) => r[r.length - 1]).filter(Boolean))).slice(0, 4)
+                          : [];
+                        const connList = conns.length ? conns.map((c) => `${c.label} ×${c.count}`) : manualPorts;
+                        const matList = materials.length ? materials : manualMat;
+                        const pressList = pressures.length ? pressures : manualPress;
+                        const fromManual = !conns.length && manualPorts.length > 0;
                         return (
                           <>
+                            {fromManual && (
+                              <div className="md:col-span-3 -mb-1 text-[11px] text-dark-400">
+                                {locale === "zh"
+                                  ? "以下数值取自**产品手册**（本产品规格里未直接给出端接/材质/压力字段）"
+                                  : "Values below come from the **catalog** (this product's own specs don't carry port/material/pressure fields)"}
+                              </div>
+                            )}
                             <div>
                               <div className="text-xs text-dark-400 mb-2">{locale === "zh" ? "端接型式 / 尺寸" : "End connections"}</div>
                               <div className="flex flex-wrap gap-1.5">
-                                {conns.map((c) => (
-                                  <span key={c.label} className="text-[11px] px-2 py-1 rounded-md bg-primary/5 text-dark-600 border border-dark-100">
-                                    {c.label} <span className="text-dark-300">×{c.count}</span>
+                                {connList.map((c, i) => (
+                                  <span key={`${c}-${i}`} className="text-[11px] px-2 py-1 rounded-md bg-primary/5 text-dark-600 border border-dark-100">
+                                    {c}
                                   </span>
                                 ))}
-                                {conns.length === 0 && <span className="text-xs text-dark-300">—</span>}
+                                {connList.length === 0 && <span className="text-xs text-dark-300">—</span>}
                               </div>
                             </div>
                             <div>
                               <div className="text-xs text-dark-400 mb-2">{locale === "zh" ? "本体材质" : "Body material"}</div>
                               <div className="flex flex-wrap gap-1.5">
-                                {materials.map((m) => (
-                                  <span key={m} className="text-[11px] px-2 py-1 rounded-md bg-dark-50 text-dark-600 border border-dark-100">
+                                {matList.map((m, i) => (
+                                  <span key={`${m}-${i}`} className="text-[11px] px-2 py-1 rounded-md bg-dark-50 text-dark-600 border border-dark-100">
                                     {m}
                                   </span>
                                 ))}
-                                {materials.length === 0 && <span className="text-xs text-dark-300">—</span>}
+                                {matList.length === 0 && <span className="text-xs text-dark-300">—</span>}
                               </div>
                             </div>
                             <div>
                               <div className="text-xs text-dark-400 mb-2">{locale === "zh" ? "工作压力" : "Working pressure"}</div>
                               <div className="flex flex-wrap gap-1.5">
-                                {pressures.map((p) => (
-                                  <span key={p} className="text-[11px] px-2 py-1 rounded-md bg-dark-50 text-dark-600 border border-dark-100">
+                                {pressList.map((p, i) => (
+                                  <span key={`${p}-${i}`} className="text-[11px] px-2 py-1 rounded-md bg-dark-50 text-dark-600 border border-dark-100">
                                     {p}
                                   </span>
                                 ))}
-                                {pressures.length === 0 && <span className="text-xs text-dark-300">—</span>}
+                                {pressList.length === 0 && <span className="text-xs text-dark-300">—</span>}
                               </div>
                             </div>
                           </>
@@ -868,6 +918,7 @@ export default function ProductDetailClient() {
                   loc={loc}
                   locale={locale}
                   productModel={String(model?.model || modelId || "")}
+                  variantMode={isVariantSpec}
                   onAddToCart={(code) => addToCart(code)}
                 >
                 <div className="border border-dark-100 rounded-lg overflow-hidden">

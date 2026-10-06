@@ -313,7 +313,11 @@ export default function ProductSelector() {
       {/* 面包屑（原型 .crumb） */}
       <div className="wrap">
         <div className="crumb">
-          <Link href="/">{locale === "zh" ? "首页" : "Home"}</Link> &gt; <b>{t("productsPageTitle")}</b>
+          {/* 面包屑要下沉到「快速选型」这一级（owner 2026-10-06）：
+              首页 > 产品中心 > 快速选型（当前页=加粗红字） */}
+          <Link href="/">{locale === "zh" ? "首页" : "Home"}</Link> &gt;{" "}
+          <Link href="/products">{t("productsPageTitle")}</Link> &gt;{" "}
+          <b>{locale === "zh" ? "快速选型" : "Quick Selector"}</b>
         </div>
       </div>
 

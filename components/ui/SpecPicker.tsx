@@ -22,6 +22,7 @@ import { ChevronDown, Copy, FileText, Search, ShoppingCart, Wrench, X } from "lu
 import { parseSpecRow, deriveFacets, rowMatches, naturalCompare, LABEL_FACET, type LocGetter } from "@/lib/spec-facets";
 import { buildConnFields, connSummary } from "@/lib/conn-spec";
 import { findManualSeries } from "@/lib/manual-codes";
+import { MANUAL_SPECS } from "@/lib/manual-specs";
 
 /** `createLocalizedGetter(locale)` 的返回类型（只用到 get） */
 type LocFn = LocGetter;
@@ -38,6 +39,13 @@ export interface SpecPickerProps {
   onAddToCart?: (code: string) => void;
   /** 当前产品型号（如 `DV1`、`ZW-10D`）：命中手册系列时，货号生成器改用**手册权威段位** */
   productModel?: string;
+  /**
+   * 规格是否属于**变体型**（同一规格项名重复出现、或带货号编码，如 G 系列 184 条变体）。
+   * `false` 时（如 DV2 的 18 项规格清单）不显示"按参数快速筛选"——
+   *   owner 2026-10-06 反馈：那种产品下列出「按钮/包装袋/阀帽…」这些"规格项"没有意义，
+   *   且与下方「完整规格表」重复。此时只显示**手册规格表 + 货号生成器 + 完整规格表**。
+   */
+  variantMode?: boolean;
   /** 完整规格表（原样渲染，折叠在选型器下方） */
   children?: React.ReactNode;
 }
@@ -66,10 +74,26 @@ function rowMaxBar(attrs: [string, string][]): number {
   return max;
 }
 
-export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onAddToCart, productModel, children }: SpecPickerProps) {
+export default function SpecPicker({
+  specs,
+  loc,
+  locale = "zh",
+  minRows = 9,
+  onAddToCart,
+  productModel,
+  variantMode = true,
+  children,
+}: SpecPickerProps) {
   const dict = T[locale] || T.zh;
   /** 手册权威规则（命中则货号生成器用它；未命中则退回"从已有机型货号推导"） */
   const manual = useMemo(() => (productModel ? findManualSeries(productModel) : null), [productModel]);
+  /** 该产品所属系列的手册数值规格行（用于"手册规格"表；DV2 → 手册 p013 的值） */
+  const manualRows = useMemo(() => {
+    if (!manual) return null;
+    const cat = MANUAL_SPECS.find((c) => c.category === manual.key);
+    const s = cat?.series.find((x) => x.id === manual.key);
+    return s && s.rows.length ? { columns: cat!.columns, rows: s.rows, series: s } : null;
+  }, [manual]);
   const rows = useMemo(() => (Array.isArray(specs) ? specs.map((s) => parseSpecRow(s, loc)) : []), [specs, loc]);
 
   /** 从数据自动推导选型维度（出现够多 + 取值个数适中） */
@@ -169,11 +193,16 @@ export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onA
 
   const generatedCode = useMemo(() => {
     if (!genSegments.length) return "";
-    // 缺省项（手册里留空/省略）不参与拼接，其余按段位顺序用 "-" 连接
+    /**
+     * ⚠️ owner 2026-10-06 报障：「当某一项为空时，不显示货号」——
+     *   原因是这里要求**每一段都选了才拼**，而手册里"缺省项"（如驱动=手动、阀座=PCTFE）本来就该留空。
+     *   现改为：**按段位顺序拼接，缺省段留空占位**，永远显示（未选完的部分用 `—` 标出，便于对照手册段位）。
+     */
     const values = segPicks.slice(0, genSegments.length).map((v) => v || "");
-    if (values.filter(Boolean).length !== values.length) return "";
-    return values.join("-");
+    return values.map((v) => v || "—").join("-");
   }, [genSegments, segPicks]);
+  /** 货号是否已选全（全填或显式留空缺省段才算"可核对"） */
+  const codeIncomplete = generatedCode.includes("—");
   const generatedHit = useMemo(() => (generatedCode ? rows.find((r) => r.code === generatedCode) || null : null), [generatedCode, rows]);
 
   /**
@@ -250,6 +279,53 @@ tr:nth-child(even) td{background:#fafafa}
 
   return (
     <div className="space-y-4">
+      {/* 手册数值规格表（owner：数值取自手册）—— 变体型/普通型都显示 */}
+      {manualRows && (
+        <div className="bg-white border border-dark-100 rounded-xl overflow-hidden">
+          <div className="bg-dark-50 px-4 py-2.5 text-sm font-semibold text-dark flex items-center justify-between flex-wrap gap-2">
+            <span>
+              {locale === "zh" ? "手册规格（数值）" : "Catalog specifications"}
+              <span className="ms-2 text-[11px] font-normal text-dark-400">
+                {manual?.name} · {manual?.source}
+              </span>
+            </span>
+            <span className="text-[11px] font-normal text-dark-400">{manualRows.rows.length} {locale === "zh" ? "行" : "rows"}</span>
+          </div>
+          <div className="overflow-x-auto max-h-[320px]">
+            <table className="w-full text-[12px] border-collapse">
+              <thead>
+                <tr className="bg-primary text-white">
+                  {manualRows.columns.map((c, i) => (
+                    <th key={i} className="text-start px-3 py-2 font-semibold whitespace-nowrap">
+                      {c}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {manualRows.rows.map((r, ri) => (
+                  <tr key={ri} className={ri % 2 ? "bg-dark-50/40" : "bg-white"}>
+                    {r.map((v, vi) => (
+                      <td key={vi} className="px-3 py-2 align-top text-dark-600 border-b border-dark-50">
+                        {v}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="px-4 py-2 text-[11px] text-dark-400 bg-white">
+            {locale === "zh"
+              ? "数值原样取自手册（未换算、未加工）；「待确认」表示手册未给出该值。"
+              : "Values as printed in the catalog; “待确认” = not stated."}
+          </div>
+        </div>
+      )}
+
+      {/* 变体型规格才显示"按参数快速筛选"（否则与下方完整规格表重复且无意义） */}
+      {variantMode && (
+      <>
       <div className="bg-white border border-dark-100 rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="text-sm font-bold text-dark">{dict.title}</div>
@@ -324,6 +400,16 @@ tr:nth-child(even) td{background:#fafafa}
             />
             <span>{dict.bar}</span>
           </label>
+        </div>
+      </div>
+      </>
+      )}
+
+      {/* ===== 货号生成器 / 选型单（owner 2026-10-06：**两种形态都给**，
+              原来嵌在"变体型"分支里 ⇒ DV2 这类产品看不到生成器） ===== */}
+      <div className="bg-white border border-dark-100 rounded-xl p-4 space-y-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-[12px] font-semibold text-dark">{dict.codeGen}</span>
           <span className="text-dark-200">|</span>
           {/* 货号生成器开关 */}
           <button
@@ -388,7 +474,14 @@ tr:nth-child(even) td{background:#fafafa}
             {generatedCode && (
               <div className="mt-3 flex items-center gap-3 flex-wrap">
                 <span className="font-mono text-sm px-3 py-1.5 bg-dark text-white rounded-lg">{generatedCode}</span>
-                {generatedHit ? (
+                {codeIncomplete ? (
+                  <span className="text-xs text-dark-400">
+                    {locale === "zh"
+                      ? `还有 {{n}} 段未选（「—」= 缺省段，手册里本来就留空，例如驱动=手动 / 阀座=PCTFE）`
+                          .replace("{{n}}", String((generatedCode.match(/—/g) || []).length))
+                      : `{{n}} segment(s) pending ("—" = default segment, left blank in the catalog)`}
+                  </span>
+                ) : generatedHit ? (
                   <>
                     <span className="text-xs text-green-600">{dict.genMatch}：{generatedHit.label}</span>
                     <button
@@ -421,6 +514,8 @@ tr:nth-child(even) td{background:#fafafa}
         )}
       </div>
 
+      {/* 选型结果列表：仅"变体型规格"产品有意义（owner 2026-10-06：DV2 那种 18 项规格清单下这堆卡片与完整表重复） */}
+      {variantMode && (
       <div className="space-y-2">
         {list.map((r, i) => (
           <div key={`${r.code}-${i}`} className="bg-white border border-dark-100 rounded-xl p-3.5">
@@ -488,10 +583,12 @@ tr:nth-child(even) td{background:#fafafa}
           </button>
         )}
       </div>
+      )}
 
+      {/* 完整规格表（原样保留；非变体型产品它就是主内容） */}
       <details className="bg-white border border-dark-100 rounded-xl">
         <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-dark select-none">
-          {dict.full}（{rows.length}）
+          {variantMode ? `${dict.full}（${rows.length}）` : locale === "zh" ? `完整规格表（${rows.length}）` : `Full specification table (${rows.length})`}
         </summary>
         <div className="px-4 pb-4 overflow-x-auto">{children}</div>
       </details>
