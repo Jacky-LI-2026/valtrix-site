@@ -9,6 +9,7 @@ import { createLocalizedGetter } from "@/lib/localized";
 import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { useCanSocialPublish } from "@/lib/api/useSocialPublish";
 import SpecPicker from "@/components/ui/SpecPicker";
+import { addToQuoteCart } from "@/lib/quote-cart";
 import { groupSpecs } from "@/lib/spec-grouping";
 import { useProductBySlug } from "@/lib/api/useProducts";
 import ThreeSixtyViewer from "@/components/ui/ThreeSixtyViewer";
@@ -152,29 +153,18 @@ export default function ProductDetailClient() {
     if (model?.moq) setQuoteQty(Number(model.moq) || 1);
   }, [model?.id]);
 
-  const addToCart = () => {
-    const key = "quote_cart";
-    let cart: { id: string; qty: number }[] = [];
-    try {
-      const raw = localStorage.getItem(key);
-      cart = raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      cart = [];
-    }
-    if (!Array.isArray(cart)) cart = [];
-    const qty = Math.max(1, quoteQty || 1);
-    const exist = cart.find((x) => x.id === modelId);
-    if (exist) exist.qty = qty;
-    else cart.push({ id: modelId, qty });
-    localStorage.setItem(key, JSON.stringify(cart));
+  /**
+   * 加购（可带**货号**）。
+   * ⚠️ 2026-10-06 与基地（左文）对齐：本仓此前是 fork 早期的**自写 localStorage 版**加购逻辑
+   *   （基地 2026-09-14 已收敛到 `lib/quote-cart.ts` 单一真源），它既不认货号，也是重复实现。
+   *   现统一走 addToQuoteCart（含派发 `quote-cart-updated` 事件，Header 徽标照常同步）。
+   * ⚠️ 本函数也被 `onClick={addToCart}` 直接用作处理器 ⇒ 首参可能是事件对象，故只认字符串。
+   */
+  const addToCart = (variant?: string | unknown) => {
+    const v = typeof variant === "string" ? variant : undefined;
+    const cart = addToQuoteCart(modelId, Math.max(1, quoteQty || 1), v);
     setCartAdded(true);
     setCartCount(cart.length);
-    // 通知其他组件（Header 徽标等）同步
-    try {
-      window.dispatchEvent(new Event("quote-cart-updated"));
-    } catch (e) {
-      /* ignore */
-    }
     setTimeout(() => setCartAdded(false), 2500);
   };
 
@@ -798,7 +788,7 @@ export default function ProductDetailClient() {
                 </h2>
                 {/* owner 2026-10-06：规格特别多的产品（如 G 系列 184 条）改成**选型器**呈现；
                     完整规格表一条不丢，折叠在选型器里由 SpecPicker 渲染 children */}
-                <SpecPicker specs={specsArray} loc={loc} locale={locale}>
+                <SpecPicker specs={specsArray} loc={loc} locale={locale} onAddToCart={(code) => addToCart(code)}>
                 <div className="border border-dark-100 rounded-lg overflow-hidden">
                   <table className="w-full">
                     <tbody>

@@ -24,6 +24,17 @@ export const QUOTE_CART_EVENT = "quote-cart-updated";
 export interface QuoteCartItem {
   id: string;
   qty: number;
+  /**
+   * 所选**货号**（选型器里选中的具体型号，如 `316L-GE-MR4-N2`）。
+   * owner 2026-10-06：规格多的产品要能"按选定货号询价" ⇒ 同一产品的不同货号算**两行**，不合并。
+   * 兼容旧数据：老购物车里的项没有该字段，一切照旧。
+   */
+  variant?: string;
+}
+
+/** 行标识：同产品 + 不同货号 = 不同行（用于去重/改数量/删除） */
+export function cartLineKey(x: { id: string; variant?: string }): string {
+  return x.variant ? `${x.id}::${x.variant}` : x.id;
 }
 
 /** 读取询价车（容错：解析失败/非数组一律返回空数组） */
@@ -56,15 +67,17 @@ export function writeQuoteCart(items: QuoteCartItem[]): QuoteCartItem[] {
 
 /**
  * 加入询价车：已存在则**更新数量**（不重复叠加），否则追加。
- * @param id  产品 slug（同 `/api/public/products` 的 `models[].id`）
- * @param qty 数量，最小 1
+ * @param id      产品 slug（同 `/api/public/products` 的 `models[].id`）
+ * @param qty     数量，最小 1
+ * @param variant 可选：所选**货号**（选型器选中项）；同一产品不同货号会各占一行
  */
-export function addToQuoteCart(id: string, qty = 1): QuoteCartItem[] {
+export function addToQuoteCart(id: string, qty = 1, variant?: string): QuoteCartItem[] {
   if (!id) return readQuoteCart();
   const items = readQuoteCart();
   const n = Math.max(1, Number(qty) || 1);
-  const exist = items.find((x) => x.id === id);
+  const v = String(variant || "").trim() || undefined;
+  const exist = items.find((x) => x.id === id && (x.variant || undefined) === v);
   if (exist) exist.qty = n;
-  else items.push({ id, qty: n });
+  else items.push(v ? { id, qty: n, variant: v } : { id, qty: n });
   return writeQuoteCart(items);
 }

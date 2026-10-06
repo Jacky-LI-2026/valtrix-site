@@ -18,7 +18,7 @@
  * ⚠️ 过滤是**纯前端**的（数据已在页面里），不额外发请求。
  */
 import { useMemo, useState } from "react";
-import { ChevronDown, Copy, Search, X } from "lucide-react";
+import { ChevronDown, Copy, Search, ShoppingCart, X } from "lucide-react";
 
 /** `createLocalizedGetter(locale)` 的返回类型（只用到 get） */
 interface LocFn {
@@ -33,18 +33,20 @@ export interface SpecPickerProps {
   locale?: string;
   /** 少于这么多条规格就不启用选型器（默认 9） */
   minRows?: number;
+  /** 传入后，每个选型结果卡片会出现「加入询价车」按钮（把该**货号**一起带进询价车） */
+  onAddToCart?: (code: string) => void;
   /** 完整规格表（原样渲染，折叠在选型器下方） */
   children?: React.ReactNode;
 }
 
 /** 选型器界面词（i18n 字典暂无对应键，就地兜底 6 语种） */
 const T: Record<string, Record<string, string>> = {
-  zh: { title: "快速选型", label: "规格项", all: "全部", matched: "匹配", items: "项", clear: "清空", empty: "当前条件下没有匹配的规格，试试放宽条件：", search: "搜索货号 / 尺寸 / 关键字", copy: "复制货号", copied: "已复制", full: "查看完整规格表", code: "货号", more: "显示全部匹配项", collapse: "收起" },
-  en: { title: "Quick selector", label: "Type", all: "All", matched: "Matched", items: "items", clear: "Clear", empty: "No specification matches the current filters — try relaxing them: ", search: "Search part no. / size / keyword", copy: "Copy part no.", copied: "Copied", full: "View full specification table", code: "Part no.", more: "Show all matches", collapse: "Collapse" },
-  ja: { title: "かんたん選定", label: "種類", all: "すべて", matched: "該当", items: "件", clear: "クリア", empty: "現在の条件に合う仕様がありません。条件を緩めてください：", search: "品番 / サイズ / キーワードで検索", copy: "品番をコピー", copied: "コピー済み", full: "仕様表をすべて表示", code: "品番", more: "該当をすべて表示", collapse: "閉じる" },
-  ko: { title: "간편 선택", label: "유형", all: "전체", matched: "일치", items: "개", clear: "초기화", empty: "현재 조건에 맞는 사양이 없습니다. 조건을 완화해 보세요: ", search: "품번 / 크기 / 키워드 검색", copy: "품번 복사", copied: "복사됨", full: "전체 사양표 보기", code: "품번", more: "전체 일치 항목 보기", collapse: "접기" },
-  fr: { title: "Sélecteur rapide", label: "Type", all: "Tous", matched: "Correspondances", items: "éléments", clear: "Effacer", empty: "Aucune spécification ne correspond aux filtres — élargissez-les : ", search: "Réf. / dimension / mot-clé", copy: "Copier la réf.", copied: "Copié", full: "Voir le tableau complet", code: "Réf.", more: "Voir toutes les correspondances", collapse: "Réduire" },
-  ar: { title: "محدد سريع", label: "النوع", all: "الكل", matched: "مطابق", items: "عنصر", clear: "مسح", empty: "لا توجد مواصفات مطابقة للشروط الحالية — جرّب توسيعها: ", search: "بحث بالرقم / المقاس / كلمة", copy: "نسخ رقم القطعة", copied: "تم النسخ", full: "عرض جدول المواصفات الكامل", code: "رقم القطعة", more: "عرض كل المطابقات", collapse: "طي" },
+  zh: { title: "快速选型", label: "规格项", all: "全部", matched: "匹配", items: "项", clear: "清空", empty: "当前条件下没有匹配的规格，试试放宽条件：", search: "搜索货号 / 尺寸 / 关键字", copy: "复制货号", copied: "已复制", add: "加入询价车", full: "查看完整规格表", code: "货号", more: "显示全部匹配项", collapse: "收起" },
+  en: { title: "Quick selector", label: "Type", all: "All", matched: "Matched", items: "items", clear: "Clear", empty: "No specification matches the current filters — try relaxing them: ", search: "Search part no. / size / keyword", copy: "Copy part no.", copied: "Copied", add: "Add to quote cart", full: "View full specification table", code: "Part no.", more: "Show all matches", collapse: "Collapse" },
+  ja: { title: "かんたん選定", label: "種類", all: "すべて", matched: "該当", items: "件", clear: "クリア", empty: "現在の条件に合う仕様がありません。条件を緩めてください：", search: "品番 / サイズ / キーワードで検索", copy: "品番をコピー", copied: "コピー済み", add: "見積に追加", full: "仕様表をすべて表示", code: "品番", more: "該当をすべて表示", collapse: "閉じる" },
+  ko: { title: "간편 선택", label: "유형", all: "전체", matched: "일치", items: "개", clear: "초기화", empty: "현재 조건에 맞는 사양이 없습니다. 조건을 완화해 보세요: ", search: "품번 / 크기 / 키워드 검색", copy: "품번 복사", copied: "복사됨", add: "견적 카트에 추가", full: "전체 사양표 보기", code: "품번", more: "전체 일치 항목 보기", collapse: "접기" },
+  fr: { title: "Sélecteur rapide", label: "Type", all: "Tous", matched: "Correspondances", items: "éléments", clear: "Effacer", empty: "Aucune spécification ne correspond aux filtres — élargissez-les : ", search: "Réf. / dimension / mot-clé", copy: "Copier la réf.", copied: "Copié", add: "Ajouter au panier", full: "Voir le tableau complet", code: "Réf.", more: "Voir toutes les correspondances", collapse: "Réduire" },
+  ar: { title: "محدد سريع", label: "النوع", all: "الكل", matched: "مطابق", items: "عنصر", clear: "مسح", empty: "لا توجد مواصفات مطابقة للشروط الحالية — جرّب توسيعها: ", search: "بحث بالرقم / المقاس / كلمة", copy: "نسخ رقم القطعة", copied: "تم النسخ", add: "أضف إلى سلة العرض", full: "عرض جدول المواصفات الكامل", code: "رقم القطعة", more: "عرض كل المطابقات", collapse: "طي" },
 };
 
 const SPLIT = /[;；؛]/;
@@ -81,7 +83,7 @@ function naturalCompare(a: string, b: string) {
   return a.localeCompare(b);
 }
 
-export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, children }: SpecPickerProps) {
+export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onAddToCart, children }: SpecPickerProps) {
   const dict = T[locale] || T.zh;
   const rows = useMemo(() => (Array.isArray(specs) ? specs.map((s) => parseRow(s, loc)) : []), [specs, loc]);
 
@@ -236,18 +238,31 @@ export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, chi
                 )}
               </div>
               {r.code && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard?.writeText(r.code);
-                    setCopied(r.code);
-                    setTimeout(() => setCopied(""), 1500);
-                  }}
-                  className="shrink-0 inline-flex items-center gap-1 text-[11px] px-2 py-1 border border-dark-100 rounded-md hover:bg-dark-50"
-                >
-                  <Copy size={11} />
-                  {copied === r.code ? dict.copied : dict.copy}
-                </button>
+                <div className="shrink-0 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(r.code);
+                      setCopied(r.code);
+                      setTimeout(() => setCopied(""), 1500);
+                    }}
+                    className="inline-flex items-center gap-1 text-[11px] px-2 py-1 border border-dark-100 rounded-md hover:bg-dark-50"
+                  >
+                    <Copy size={11} />
+                    {copied === r.code ? dict.copied : dict.copy}
+                  </button>
+                  {/* owner 2026-10-06：把选定的**货号**一起加进询价车（同产品不同货号算两行） */}
+                  {onAddToCart && (
+                    <button
+                      type="button"
+                      onClick={() => onAddToCart(r.code)}
+                      className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 bg-primary text-white rounded-md hover:bg-primary-600"
+                    >
+                      <ShoppingCart size={11} />
+                      {dict.add}
+                    </button>
+                  )}
+                </div>
               )}
             </div>
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
