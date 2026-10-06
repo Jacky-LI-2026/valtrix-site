@@ -23,6 +23,7 @@ import { createLocalizedGetter } from "@/lib/localized";
 import { addToQuoteCart } from "@/lib/quote-cart";
 import { deriveFacets, rowMatches, naturalCompare, LABEL_FACET, type SpecRow } from "@/lib/spec-facets";
 import { MANUAL_CATEGORIES, MANUAL_GROUPS, matchManualSeries, type ManualCategory } from "@/lib/manual-catalog";
+import { MANUAL_SPECS } from "@/lib/manual-specs";
 
 /** 选型器界面词（i18n 字典暂无对应键，就地兜底 6 语种） */
 const T: Record<string, Record<string, string>> = {
@@ -279,6 +280,20 @@ export default function ProductSelector() {
   const activeManual: ManualCategory | null = activeCat?.cat || null;
   const activeCount = Object.values(picked).filter(Boolean).length;
 
+  /**
+   * 手册**数值规格表**（owner 2026-10-06：「不要加工图片，只把数值取出即可」）
+   * 数据来自 `lib/manual-specs.ts`（由各品类目录页原型的 SERIES.rows 抽出，未做任何加工）。
+   */
+  const manualSpecTables = useMemo(() => {
+    if (!activeManual) return [];
+    const cat = MANUAL_SPECS.find((c) => c.category === activeManual.key);
+    if (!cat) return [];
+    const list = seriesKey ? cat.series.filter((s) => s.id === seriesKey) : cat.series;
+    return list
+      .filter((s) => s.rows.length > 0)
+      .map((s) => ({ id: s.id, name: s.nameZh || s.nameEn, columns: cat.columns, rows: s.rows, forms: s.formsZh }));
+  }, [activeManual, seriesKey]);
+
   if (loading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center text-[#5c6169]">
@@ -448,6 +463,53 @@ export default function ProductSelector() {
                   {locale === "zh" ? "手册筛选维度" : "Catalog filter dimensions"}：
                   <b className="text-[#2a2d33] font-semibold">{activeManual.dimensions.join(" · ")}</b>
                   <span className="ms-2">（{locale === "zh" ? "下方可选值取自官网产品规格" : "options come from product specs"}）</span>
+                </div>
+              )}
+
+              {/* 手册数值规格表（owner：只把数值取出，不加工图片） */}
+              {manualSpecTables.length > 0 && (
+                <div className="mb-4 border border-[#e2e4e6] rounded-lg overflow-hidden">
+                  <div className="bg-[#f4f5f6] px-3 py-2 text-[12px] font-bold text-[#2a2d33] flex items-center justify-between">
+                    <span>{locale === "zh" ? "手册规格（数值）" : "Catalog specifications"}</span>
+                    <span className="font-normal text-[#5f666b]">
+                      {locale === "zh" ? "来源：手册目录页" : "from catalog"} · {manualSpecTables.reduce((n, t) => n + t.rows.length, 0)}{" "}
+                      {locale === "zh" ? "行" : "rows"}
+                    </span>
+                  </div>
+                  <div className="max-h-[420px] overflow-auto">
+                    <table className="w-full text-[12px] border-collapse">
+                      <thead>
+                        <tr className="bg-[#a8141a] text-white">
+                          {(manualSpecTables[0].columns.length
+                            ? manualSpecTables[0].columns
+                            : ["1", "2", "3", "4", "5"].map((n) => `列${n}`)
+                          ).map((c, i) => (
+                            <th key={i} className="text-start px-3 py-2 font-semibold whitespace-nowrap">
+                              {c}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {manualSpecTables.map((t) =>
+                          t.rows.map((r, ri) => (
+                            <tr key={`${t.id}-${ri}`} className={ri % 2 === 1 ? "bg-[#fafafa]" : "bg-white"}>
+                              {r.map((v, vi) => (
+                                <td key={vi} className="px-3 py-2 align-top text-[#2a2d33] border-b border-[#eee]">
+                                  {v}
+                                </td>
+                              ))}
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="px-3 py-2 text-[11px] text-[#5f666b] bg-white">
+                    {locale === "zh"
+                      ? "以上为手册原始数值（未做换算/加工）；「待确认」表示手册未给出该值。"
+                      : "Values as printed in the catalog (no conversion); “待确认” = not stated in the catalog."}
+                  </div>
                 </div>
               )}
 
