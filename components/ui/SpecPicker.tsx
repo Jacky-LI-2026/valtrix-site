@@ -17,8 +17,8 @@
  *
  * ⚠️ 过滤是**纯前端**的（数据已在页面里），不额外发请求。
  */
-import { useMemo, useState } from "react";
-import { ChevronDown, Copy, Search, ShoppingCart, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronDown, Copy, FileText, Search, ShoppingCart, Wrench, X } from "lucide-react";
 import { parseSpecRow, deriveFacets, rowMatches, naturalCompare, LABEL_FACET, type LocGetter } from "@/lib/spec-facets";
 import { buildConnFields, connSummary } from "@/lib/conn-spec";
 
@@ -41,7 +41,8 @@ export interface SpecPickerProps {
 
 /** 选型器界面词（i18n 字典暂无对应键，就地兜底 6 语种） */
 const T: Record<string, Record<string, string>> = {
-  zh: { title: "快速选型", label: "规格项", all: "全部", matched: "匹配", items: "项", clear: "清空", empty: "当前条件下没有匹配的规格，试试放宽条件：", search: "搜索货号 / 尺寸 / 关键字", copy: "复制货号", copied: "已复制", add: "加入询价车", full: "查看完整规格表", code: "货号", more: "显示全部匹配项", collapse: "收起" },
+  zh: { title: "快速选型", label: "规格项", all: "全部", matched: "匹配", items: "项", clear: "清空", empty: "当前条件下没有匹配的规格，试试放宽条件：", search: "搜索货号 / 尺寸 / 关键字", copy: "复制货号", copied: "已复制", add: "加入询价车", full: "查看完整规格表", code: "货号", more: "显示全部匹配项", collapse: "收起",
+        minBar: "工况：工作压力 ≥", bar: "bar", codeGen: "货号生成器", genHint: "按段位选择生成货号（段位取值来自本产品已有机型）", genMatch: "命中已有机型", genNoMatch: "库里暂无该组合，可作为定制需求提交（复制货号发给客服）", sheet: "生成选型单", sheetTitle: "产品选型单", conditions: "筛选条件", none: "无", connCol: "接口 / 端接", pressureCol: "工作压力", generated: "生成货号" },
   en: { title: "Quick selector", label: "Type", all: "All", matched: "Matched", items: "items", clear: "Clear", empty: "No specification matches the current filters — try relaxing them: ", search: "Search part no. / size / keyword", copy: "Copy part no.", copied: "Copied", add: "Add to quote cart", full: "View full specification table", code: "Part no.", more: "Show all matches", collapse: "Collapse" },
   ja: { title: "かんたん選定", label: "種類", all: "すべて", matched: "該当", items: "件", clear: "クリア", empty: "現在の条件に合う仕様がありません。条件を緩めてください：", search: "品番 / サイズ / キーワードで検索", copy: "品番をコピー", copied: "コピー済み", add: "見積に追加", full: "仕様表をすべて表示", code: "品番", more: "該当をすべて表示", collapse: "閉じる" },
   ko: { title: "간편 선택", label: "유형", all: "전체", matched: "일치", items: "개", clear: "초기화", empty: "현재 조건에 맞는 사양이 없습니다. 조건을 완화해 보세요: ", search: "품번 / 크기 / 키워드 검색", copy: "품번 복사", copied: "복사됨", add: "견적 카트에 추가", full: "전체 사양표 보기", code: "품번", more: "전체 일치 항목 보기", collapse: "접기" },
@@ -49,29 +50,93 @@ const T: Record<string, Record<string, string>> = {
   ar: { title: "محدد سريع", label: "النوع", all: "الكل", matched: "مطابق", items: "عنصر", clear: "مسح", empty: "لا توجد مواصفات مطابقة للشروط الحالية — جرّب توسيعها: ", search: "بحث بالرقم / المقاس / كلمة", copy: "نسخ رقم القطعة", copied: "تم النسخ", add: "أضف إلى سلة العرض", full: "عرض جدول المواصفات الكامل", code: "رقم القطعة", more: "عرض كل المطابقات", collapse: "طي" },
 };
 
+/** 从一条机型的所有规格值里取**最大工作压力（bar）**；解析不出则返回 -1（不参与压力筛选） */
+function rowMaxBar(attrs: [string, string][]): number {
+  let max = -1;
+  for (const [k, v] of attrs) {
+    if (!/压力|pressure/i.test(k)) continue;
+    const m = String(v).match(/\d+(?:\.\d+)?/);
+    if (!m) continue;
+    const n = Number(m[0]);
+    if (Number.isFinite(n) && n > max) max = n;
+  }
+  return max;
+}
+
 export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onAddToCart, children }: SpecPickerProps) {
   const dict = T[locale] || T.zh;
   const rows = useMemo(() => (Array.isArray(specs) ? specs.map((s) => parseSpecRow(s, loc)) : []), [specs, loc]);
 
   /** 从数据自动推导选型维度（出现够多 + 取值个数适中） */
-  const facets = useMemo(() => deriveFacets(rows, { max: 3 }), [rows]);
+  /**
+   * 后台可覆盖的维度名 / 隐藏维度（`/admin/product-selector` 配置）：
+   * 自动推导出来的键名可能不干净（实测有 `MR尺 (in.`、`础订购号` 这类脏键）⇒ 允许改名与隐藏。
+   * 配置经 `/api/public/plugins` 的 **configs 白名单**下发（只含非敏感配置）。
+   */
+  const [facetLabels, setFacetLabels] = useState<Record<string, string>>({});
+  const [hiddenFacets, setHiddenFacets] = useState<string[]>([]);
+  useEffect(() => {
+    fetch("/api/public/plugins", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => {
+        const cfg = d?.configs?.["product-selector"];
+        if (cfg?.facetLabels && typeof cfg.facetLabels === "object") setFacetLabels(cfg.facetLabels);
+        if (Array.isArray(cfg?.hiddenFacets)) setHiddenFacets(cfg.hiddenFacets.map(String));
+      })
+      .catch(() => {});
+  }, []);
+
+  const facets = useMemo(
+    () => deriveFacets(rows, { max: 3 }).filter((f) => !hiddenFacets.includes(f.key)),
+    [rows, hiddenFacets]
+  );
 
   const [picked, setPicked] = useState<Record<string, string>>({});
   const [q, setQ] = useState("");
   const [showAll, setShowAll] = useState(false);
   const [copied, setCopied] = useState("");
+  const [minBar, setMinBar] = useState("");
+  const [showGen, setShowGen] = useState(false);
+  const [segPicks, setSegPicks] = useState<string[]>([]);
 
   const matched = useMemo(() => {
     const kw = q.trim().toLowerCase();
+    const min = Number(minBar);
+    const useMin = minBar.trim() !== "" && Number.isFinite(min) && min > 0;
     return rows.filter((r) => {
       for (const [k, v] of Object.entries(picked)) {
         if (!v) continue;
         if (!rowMatches(r, k, v)) return false;
       }
+      // 工况筛选：该型号的**最大工作压力**须 ≥ 输入值（数值从规格里解析，不猜测）
+      if (useMin && rowMaxBar(r.attrs) < min) return false;
       if (kw && !`${r.code} ${r.label} ${r.value}`.toLowerCase().includes(kw)) return false;
       return true;
     });
-  }, [rows, picked, q]);
+  }, [rows, picked, q, minBar]);
+
+  /**
+   * 货号生成器：段位取值**从本产品已有机型的货号里推导**（如 316L-GE-MR4-N2 → 材质/系列/端接1/端接2/其他）。
+   * ⚠️ 不发明段位含义：界面只显示"段位 N + 可选值"，含义由数据决定；生成的货号若命中已有机型即给出该机型。
+   */
+  const codeSegments = useMemo(() => {
+    const codes = rows.map((r) => r.code).filter(Boolean);
+    if (codes.length < 3) return [];
+    const split = codes.map((c) => c.split("-"));
+    const maxLen = Math.max(...split.map((x) => x.length));
+    const out: { index: number; values: string[] }[] = [];
+    for (let i = 0; i < maxLen; i++) {
+      const vals = Array.from(new Set(split.map((x) => x[i]).filter(Boolean))) as string[];
+      if (vals.length >= 1 && vals.length <= 80) out.push({ index: i, values: vals.sort(naturalCompare) });
+    }
+    return out.length >= 2 && out.length <= 6 ? out : [];
+  }, [rows]);
+
+  const generatedCode = useMemo(() => {
+    if (!codeSegments.length || segPicks.filter(Boolean).length !== codeSegments.length) return "";
+    return segPicks.join("-");
+  }, [codeSegments, segPicks]);
+  const generatedHit = useMemo(() => (generatedCode ? rows.find((r) => r.code === generatedCode) || null : null), [generatedCode, rows]);
 
   /**
    * **级联可用性预判**：某个维度的某个取值，在当前其它条件不变的前提下还能命中几行？
@@ -107,6 +172,44 @@ export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onA
   const activeCount = Object.values(picked).filter(Boolean).length;
   const list = showAll ? matched : matched.slice(0, 12);
 
+  /** 生成并打开「选型单」（浏览器打印/另存为 PDF）——内容 = 当前筛选条件 + 匹配机型 */
+  const openSheet = () => {
+    if (typeof window === "undefined") return;
+    const cond = [
+      q.trim() ? `${dict.search}: ${q.trim()}` : "",
+      minBar.trim() ? `${dict.minBar} ${minBar} ${dict.bar}` : "",
+      ...Object.entries(picked).filter(([, v]) => v).map(([k, v]) => `${k === LABEL_FACET ? dict.label : k}: ${v}`),
+    ].filter(Boolean);
+    const rowsHtml = matched
+      .map((r) => {
+        const f = buildConnFields(r.attrs, r.label, "");
+        const conn = connSummary(f, " · ") || "—";
+        const press = f.filter((x) => x.group === "pressure").map((x) => `${x.zh} ${x.value}`).join(" / ") || "—";
+        return `<tr><td>${r.code || "—"}</td><td>${r.label || "—"}</td><td>${conn}</td><td>${press}</td></tr>`;
+      })
+      .join("");
+    const html = `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"><title>${dict.sheetTitle}</title>
+<style>body{font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;color:#111214;margin:24px}
+h1{font-size:20px;margin:0 0 6px} .sub{color:#5c6169;font-size:12px;margin-bottom:14px}
+.cond{background:#f6f4f0;border:1px solid #e4e0d8;border-radius:8px;padding:10px 12px;font-size:12px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+th{background:#a8141a;color:#fff;text-align:left;padding:7px 8px}
+td{border-bottom:1px solid #eee;padding:7px 8px;word-break:break-all}
+tr:nth-child(even) td{background:#fafafa}
+.ft{margin-top:14px;color:#9aa1ac;font-size:11px}</style></head><body>
+<h1>${dict.sheetTitle}</h1>
+<div class="sub">${typeof window !== "undefined" ? location.origin : ""} · ${new Date().toLocaleString(locale === "zh" ? "zh-CN" : "en-US")}</div>
+<div class="cond"><b>${dict.conditions}:</b> ${cond.length ? cond.join(" ｜ ") : dict.none} ｜ ${dict.matched} ${matched.length} / ${rows.length} ${dict.items}</div>
+<table><thead><tr><th style="width:22%">${dict.code}</th><th style="width:26%">${dict.label}</th><th style="width:30%">${dict.connCol}</th><th style="width:22%">${dict.pressureCol}</th></tr></thead><tbody>${rowsHtml}</tbody></table>
+<div class="ft">${dict.sheetTitle} · ${dict.more}</div>
+<script>window.onload=function(){window.print()}</script></body></html>`;
+    const w = window.open("", "_blank");
+    if (w) {
+      w.document.write(html);
+      w.document.close();
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="bg-white border border-dark-100 rounded-xl p-4">
@@ -125,8 +228,8 @@ export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onA
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {facets.map((f) => (
             <label key={f.key} className="block">
-              <span className="block text-[11px] text-dark-400 mb-1 truncate" title={f.key === LABEL_FACET ? dict.label : f.key}>
-                {f.key === LABEL_FACET ? dict.label : f.key}
+              <span className="block text-[11px] text-dark-400 mb-1 truncate" title={f.key === LABEL_FACET ? dict.label : facetLabels[f.key] || f.key}>
+                {f.key === LABEL_FACET ? dict.label : facetLabels[f.key] || f.key}
               </span>
               <span className="relative block">
                 <select
@@ -167,6 +270,109 @@ export default function SpecPicker({ specs, loc, locale = "zh", minRows = 9, onA
             </span>
           </label>
         </div>
+      </div>
+
+      {/* ===== 高级工具（owner 2026-10-06「全做」）：工况筛选 / 货号生成器 / 选型单 ===== */}
+      <div className="bg-white border border-dark-100 rounded-xl p-4 space-y-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* 工况：工作压力下限 */}
+          <label className="inline-flex items-center gap-2 text-xs text-dark-500">
+            <span className="font-medium text-dark-600">{dict.minBar}</span>
+            <input
+              value={minBar}
+              onChange={(e) => setMinBar(e.target.value.replace(/[^\d.]/g, ""))}
+              placeholder="300"
+              className="w-20 px-2 py-1.5 text-sm border border-dark-100 rounded-lg outline-none focus:ring-2 focus:ring-primary/30"
+            />
+            <span>{dict.bar}</span>
+          </label>
+          <span className="text-dark-200">|</span>
+          {/* 货号生成器开关 */}
+          <button
+            type="button"
+            onClick={() => setShowGen((v) => !v)}
+            disabled={!codeSegments.length}
+            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 border border-dark-100 rounded-lg hover:bg-dark-50 disabled:opacity-40"
+            title={dict.genHint}
+          >
+            <Wrench size={13} /> {dict.codeGen}
+          </button>
+          {/* 选型单 */}
+          <button
+            type="button"
+            onClick={openSheet}
+            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 bg-dark text-white rounded-lg hover:opacity-90"
+            title={dict.sheetTitle}
+          >
+            <FileText size={13} /> {dict.sheet}
+          </button>
+        </div>
+
+        {showGen && codeSegments.length > 0 && (
+          <div className="border-t border-dark-100 pt-3">
+            <div className="text-[11px] text-dark-400 mb-2">{dict.genHint}</div>
+            <div className="flex flex-wrap gap-2">
+              {codeSegments.map((seg, i) => (
+                <label key={seg.index} className="inline-flex items-center gap-1.5">
+                  <span className="text-[11px] text-dark-300">#{i + 1}</span>
+                  <span className="relative inline-block">
+                    <select
+                      value={segPicks[i] || ""}
+                      onChange={(e) =>
+                        setSegPicks((p) => {
+                          const next = [...p];
+                          next[i] = e.target.value;
+                          return next;
+                        })
+                      }
+                      className="appearance-none ps-2.5 pe-7 py-1.5 text-sm border border-dark-100 rounded-lg bg-white outline-none focus:ring-2 focus:ring-primary/30"
+                    >
+                      <option value="">—</option>
+                      {seg.values.map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown size={12} className="absolute end-2 top-1/2 -translate-y-1/2 text-dark-400 pointer-events-none" />
+                  </span>
+                </label>
+              ))}
+            </div>
+            {generatedCode && (
+              <div className="mt-3 flex items-center gap-3 flex-wrap">
+                <span className="font-mono text-sm px-3 py-1.5 bg-dark text-white rounded-lg">{generatedCode}</span>
+                {generatedHit ? (
+                  <>
+                    <span className="text-xs text-green-600">{dict.genMatch}：{generatedHit.label}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard?.writeText(generatedCode);
+                        setCopied(generatedCode);
+                        setTimeout(() => setCopied(""), 1500);
+                      }}
+                      className="text-xs px-2.5 py-1 border border-dark-100 rounded-lg hover:bg-dark-50 inline-flex items-center gap-1"
+                    >
+                      <Copy size={11} /> {copied === generatedCode ? dict.copied : dict.copy}
+                    </button>
+                    {onAddToCart && (
+                      <button
+                        type="button"
+                        onClick={() => onAddToCart(generatedCode)}
+                        className="text-xs px-2.5 py-1 bg-primary text-white rounded-lg hover:bg-primary-600 inline-flex items-center gap-1"
+                      >
+                        <ShoppingCart size={11} /> {dict.add}
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-xs text-amber-600">{dict.genNoMatch}</span>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">

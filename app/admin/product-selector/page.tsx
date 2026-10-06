@@ -11,24 +11,92 @@
  * 关联关系：选型结果就是**产品中心**的那棵树（`/api/public/products`），
  *   点结果卡片进的是产品详情页，加购走 `lib/quote-cart.ts`。
  */
-import { useCallback, useEffect, useState } from "react";
-import { ExternalLink, Loader2, Power, Sparkles } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ExternalLink, Loader2, Power, Save, Sparkles } from "lucide-react";
+import { deriveFacets, parseSpecRow } from "@/lib/spec-facets";
 
 export default function ProductSelectorAdminPage() {
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  /** 维度覆盖配置：改名 / 隐藏（存到插件 config，经 /api/public/plugins 的 configs 白名单下发给前台） */
+  const [facetLabels, setFacetLabels] = useState<Record<string, string>>({});
+  const [hiddenFacets, setHiddenFacets] = useState<string[]>([]);
+  const [facetKeys, setFacetKeys] = useState<{ key: string; samples: string[]; count: number }[]>([]);
+  const [loadingKeys, setLoadingKeys] = useState(true);
 
   const load = useCallback(async () => {
     const r = await fetch("/api/admin/plugins", { cache: "no-store" });
     const d = await r.json();
     const row = (d?.list || []).find((x: any) => x.key === "product-selector");
     setEnabled(!!row?.enabled);
+    const cfg = row?.config || {};
+    setFacetLabels(cfg.facetLabels && typeof cfg.facetLabels === "object" ? cfg.facetLabels : {});
+    setHiddenFacets(Array.isArray(cfg.hiddenFacets) ? cfg.hiddenFacets.map(String) : []);
   }, []);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  /**
+   * 自动推导全站选型维度键名（**在前端算**：直接用公开产品接口，不需要新增后台接口）。
+   * 目的：把自动推导出来的脏键名（实测有 `MR尺 (in.`、`础订购号`）暴露给管理员改名/隐藏。
+   */
+  useEffect(() => {
+    let alive = true;
+    const loc = { get: (o: any, k: string) => String(o?.[k] || "") };
+    fetch("/api/public/products?specs=40&lite=1", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => {
+        if (!alive) return;
+        const rows: any[] = [];
+        for (const tab of d?.data || [])
+          for (const c of tab.categories || [])
+            for (const m of c.models || [])
+              for (const s of m.specs || []) {
+                try {
+                  rows.push(parseSpecRow(s, loc));
+                } catch {
+                  /* ignore */
+                }
+              }
+        const stat = new Map<string, { count: number; samples: Set<string> }>();
+        for (const r of rows)
+          for (const [k, v] of r.attrs) {
+            const e = stat.get(k) || { count: 0, samples: new Set<string>() };
+            e.count += 1;
+            if (e.samples.size < 4) e.samples.add(v);
+            stat.set(k, e);
+          }
+        const list = Array.from(stat.entries())
+          .sort((a, b) => b[1].count - a[1].count)
+          .slice(0, 40)
+          .map(([key, s]) => ({ key, count: s.count, samples: Array.from(s.samples) }));
+        setFacetKeys(list);
+      })
+      .catch(() => {})
+      .finally(() => alive && setLoadingKeys(false));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const saveConfig = async () => {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const r = await fetch("/api/admin/plugins", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action: "config", key: "product-selector", config: { facetLabels, hiddenFacets } }),
+      });
+      const d = await r.json();
+      setMsg(d?.ok ? { ok: true, text: "维度配置已保存（前台选型器即时生效）" } : { ok: false, text: d?.error || "保存失败" });
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const toggle = async () => {
     setBusy(true);
@@ -102,6 +170,78 @@ export default function ProductSelectorAdminPage() {
           <div>· 选型维度（如「管外径 D(in.)」「MR尺寸 (in.)」）由产品规格自动推导，新增产品/规格后自动跟随，无需在此配置。</div>
           <div>· 结果卡片点进去就是产品中心的产品详情页；「加入询价车」与产品页同一套实现（货号/数量一并带入询价单）。</div>
         </div>
+      </div>
+
+      {/* ===== 维度改名 / 隐藏（P0-3）===== */}
+      <div className="bg-white rounded-xl border border-dark-100 p-5">
+        <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
+          <div>
+            <div className="font-semibold text-dark">选型维度显示名</div>
+            <div className="text-xs text-dark-400 mt-0.5">
+              自动推导的键名可能不干净（如 <code className="text-dark-500">MR尺 (in.</code>）—— 这里可以改成规范名称，或直接隐藏不展示。
+              改完立即对前台选型器生效。
+            </div>
+          </div>
+          <button
+            onClick={saveConfig}
+            disabled={busy}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm disabled:opacity-50"
+          >
+            {busy ? <Loader2 className="animate-spin" size={15} /> : <Save size={15} />} 保存维度配置
+          </button>
+        </div>
+
+        {loadingKeys ? (
+          <div className="text-sm text-dark-400 py-6 text-center">
+            <Loader2 className="animate-spin inline me-2" size={15} /> 正在统计全站选型维度…
+          </div>
+        ) : facetKeys.length === 0 ? (
+          <div className="text-sm text-dark-400 py-6 text-center">暂无可配置维度（产品规格为空时不会出现）</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-dark-50 text-dark-400 text-xs">
+                <tr>
+                  <th className="text-left px-3 py-2">原始键名</th>
+                  <th className="text-left px-3 py-2">示例取值</th>
+                  <th className="text-center px-3 py-2 w-24">出现</th>
+                  <th className="text-left px-3 py-2 w-64">显示名（留空=用原名）</th>
+                  <th className="text-center px-3 py-2 w-20">隐藏</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-dark-50">
+                {facetKeys.map((f) => (
+                  <tr key={f.key}>
+                    <td className="px-3 py-2 font-mono text-xs text-dark-600 max-w-[220px] truncate" title={f.key}>
+                      {f.key}
+                    </td>
+                    <td className="px-3 py-2 text-xs text-dark-400 max-w-[220px] truncate" title={f.samples.join(" | ")}>
+                      {f.samples.join(" | ")}
+                    </td>
+                    <td className="px-3 py-2 text-center text-xs text-dark-400">{f.count}</td>
+                    <td className="px-3 py-2">
+                      <input
+                        value={facetLabels[f.key] || ""}
+                        onChange={(e) => setFacetLabels((p) => ({ ...p, [f.key]: e.target.value }))}
+                        placeholder={f.key}
+                        className="w-full px-2 py-1.5 text-sm border border-dark-100 rounded-lg outline-none focus:ring-2 focus:ring-primary/30"
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-center">
+                      <input
+                        type="checkbox"
+                        checked={hiddenFacets.includes(f.key)}
+                        onChange={(e) =>
+                          setHiddenFacets((p) => (e.target.checked ? Array.from(new Set([...p, f.key])) : p.filter((x) => x !== f.key)))
+                        }
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

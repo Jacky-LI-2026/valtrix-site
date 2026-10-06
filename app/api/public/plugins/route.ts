@@ -28,8 +28,19 @@ export async function GET() {
         if (stored[key].enabled) enabled.push(key);
       }
     }
-    return NextResponse.json({ ok: true, enabled, state: out });
+    /**
+     * 公开配置（**白名单**）：只放"给前台用的非敏感配置"，绝不整表下发
+     * （`plugin_state` 里可能含 smtp/API key 等密钥）。
+     * 目前只放 `product-selector` 的「选型维度改名/隐藏」——见 /admin/product-selector。
+     */
+    const PUBLIC_CONFIG_KEYS = ["product-selector"];
+    const configs: Record<string, any> = {};
+    for (const k of PUBLIC_CONFIG_KEYS) {
+      const c = stored[k]?.config;
+      if (c && typeof c === "object") configs[k] = c;
+    }
+    return NextResponse.json({ ok: true, enabled, state: out, configs });
   } catch (e: any) {
-    return NextResponse.json({ ok: false, enabled: [], state: {} }, { status: 500 });
+    return NextResponse.json({ ok: false, enabled: [], state: {}, configs: {} }, { status: 500 });
   }
 }
