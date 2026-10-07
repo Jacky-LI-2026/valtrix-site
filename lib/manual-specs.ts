@@ -27,6 +27,8 @@ export interface ManualCategorySpec {
   source: string;
   /** 规格表列头（手册原文） */
   columns: string[];
+  /** 规格表列头的**英文版**（手册原型 `I18N.en.th` 原文；英文页用） */
+  columnsEn: string[];
   /** 该品类的筛选维度与可选值（手册原文代号） */
   facets: { key: string; items: string[] }[];
   series: ManualSeriesSpec[];
@@ -42,6 +44,13 @@ export const MANUAL_SPECS: ManualCategorySpec[] = [
       "入口压力 · 出口压力",
       "Cv",
       "温度 · 阀座材料"
+    ],
+    "columnsEn": [
+      "Model",
+      "Port · End",
+      "Inlet · Outlet pressure",
+      "Cv",
+      "Temp · Seat"
     ],
     "facets": [
       {
@@ -403,6 +412,13 @@ export const MANUAL_SPECS: ManualCategorySpec[] = [
       "最大工作压力",
       "工作温度"
     ],
+    "columnsEn": [
+      "Model",
+      "Port · End",
+      "Cracking pressure",
+      "Max working pressure",
+      "Working temp"
+    ],
     "facets": [
       {
         "key": "mat",
@@ -543,6 +559,13 @@ export const MANUAL_SPECS: ManualCategorySpec[] = [
       "端接 / 密封",
       "表面粗糙度",
       "工作温度"
+    ],
+    "columnsEn": [
+      "Model",
+      "Material",
+      "End / Seal",
+      "Surface finish",
+      "Working temp"
     ],
     "facets": [
       {
@@ -771,6 +794,13 @@ export const MANUAL_SPECS: ManualCategorySpec[] = [
       "Cv",
       "工作温度 · 材料"
     ],
+    "columnsEn": [
+      "Model",
+      "Port size",
+      "Pressure rating",
+      "Cv",
+      "Temp · Material"
+    ],
     "facets": [
       {
         "key": "cat",
@@ -877,6 +907,13 @@ export const MANUAL_SPECS: ManualCategorySpec[] = [
       "工作压力",
       "Cv",
       "工作温度 · 材料"
+    ],
+    "columnsEn": [
+      "Series",
+      "Port size / Bore",
+      "Working pressure",
+      "Cv",
+      "Temp · Material"
     ],
     "facets": [
       {
@@ -1106,6 +1143,13 @@ export const MANUAL_SPECS: ManualCategorySpec[] = [
       "最大工作压力",
       "工作温度"
     ],
+    "columnsEn": [
+      "Model",
+      "Inlet · End",
+      "Stem · Cv",
+      "Max working pressure",
+      "Working temp"
+    ],
     "facets": [
       {
         "key": "mat",
@@ -1244,6 +1288,13 @@ export const MANUAL_SPECS: ManualCategorySpec[] = [
       "过滤精度",
       "额定流量",
       "最大工作压力 · 材料"
+    ],
+    "columnsEn": [
+      "Model",
+      "Port · End",
+      "Rating",
+      "Rated flow",
+      "Max pressure · Material"
     ],
     "facets": [
       {
@@ -1550,6 +1601,13 @@ export const MANUAL_SPECS: ManualCategorySpec[] = [
       "Cv",
       "工作温度 · 填料"
     ],
+    "columnsEn": [
+      "Model",
+      "Port size",
+      "Pressure rating",
+      "Cv",
+      "Temp · Packing"
+    ],
     "facets": [
       {
         "key": "cat",
@@ -1699,6 +1757,13 @@ export const MANUAL_SPECS: ManualCategorySpec[] = [
       "Cv",
       "温度 · 材料"
     ],
+    "columnsEn": [
+      "Series / Type",
+      "Port · End",
+      "Working pressure",
+      "Cv",
+      "Temp · Material"
+    ],
     "facets": [
       {
         "key": "type",
@@ -1832,6 +1897,13 @@ export const MANUAL_SPECS: ManualCategorySpec[] = [
       "工作压力",
       "Cv",
       "工作温度 · 阀座"
+    ],
+    "columnsEn": [
+      "Model",
+      "Port · End",
+      "Working pressure",
+      "Cv",
+      "Temp · Seat"
     ],
     "facets": [
       {

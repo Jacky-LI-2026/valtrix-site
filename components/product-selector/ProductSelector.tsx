@@ -3,696 +3,941 @@
 /**
  * 产品快速选型器（插件 product-selector 的前台主体）
  * ==========================================================================
- * owner 2026-10-06：
- *   「使用（产品手册\html版）原型页面风格，制作一个产品快速选型插件，要求和产品中心的产品关联」
+ * owner 2026-10-07：
+ *   「"D:\业务类\...\产品手册\html版\所有产品页\所有产品页.html" 按这个所有产品页的原型方式重构」
  *
- * 与原型（`选型页/隔膜阀选型中心.html`）的对应关系：
- *   · 原型三步：① 选系列 → ② 配参数（chips，实时结果框）→ ③ 型号代码规则；
- *   · 本实现三步：① 选类别（产品中心的二级目录 + 分类）→ ② 选参数（**从该类别产品规格自动推导**的 chips，
- *     右侧实时结果框）→ ③ 全部匹配产品（可直接跳产品详情 / 加询价车）。
- *   · 视觉沿用原型：浅纸底 `#f6f4f0`、深色页头 + 品牌红底边、步骤条、红编号、白卡片、chip、红框结果区。
+ * **版式来源**：`产品手册/html版/所有产品页/所有产品页.html`
+ *   · 样式 = 原型 <style> 原样移植到 `app/globals.css` 的 `#vs-all` 作用域块
+ *     （种子脚本 `scripts/_port_allproducts_css.js`，变量与数值逐条未改）；
+ *   · 本组件只用原型自己的类名，不另造视觉：
+ *     面包屑 `.crumb` → Hero `.hero/.kicker/h1/.desc/.searchbar/.stats/.stat`
+ *     → 主体 `.main`（左 `.facets/.fg/.opt/.rg` 粘性筛选栏 + 右 `.results`）
+ *     → 结果条 `.bar` → 每品类 `.cathead` → 每系列 `.group`（`.ghead` + `.gbody`
+ *       = 左 `.thumb` 图 + 右 `.ginfo`（`.chips` 型号片段 + `.ptable` 规格表））
+ *     → 空态 `.empty` → 型号解读 `.explain` → 服务中心 `.svc` → 安全提示 `.safety` → `.toast`。
  *
- * **与产品中心关联**：数据源就是产品中心那棵树（`/api/public/products`），
- *   结果卡片点进去就是产品详情页；「加入询价车」走 `lib/quote-cart.ts`。
+ * **数据来源（owner 口径：规格与细分严格从 PDF 手册取）**：
+ *   · 品类 / 系列 / 列头 / **数值规格行** 全部来自 `lib/manual-specs.ts`
+ *     （由 `scripts/_extract_manual_specs.js` 从各"品类目录页"原型抽出，未加工）；
+ *   · 品类中英文名、分组顺序来自 `lib/manual-catalog.ts`。
+ *
+ * **与产品中心关联**：另外拉 `/api/public/products` 拿到官网在售产品，
+ *   用 `matchManualSeries()` 把官网型号归到手册系列上 ⇒ 每组显示官网在售图/型号，
+ *   型号可直接跳产品详情页、也可一键加入询价车（`lib/quote-cart.ts`）。
+ *
+ * 说明：站点自身的顶栏/页脚由 layout 提供，故不重复原型里那份独立 `.topbar` 与 `<footer>`。
  */
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, ChevronRight, Loader2, RotateCcw, Search, ShoppingCart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
 import { addToQuoteCart } from "@/lib/quote-cart";
-import { deriveFacets, rowMatches, naturalCompare, LABEL_FACET, type SpecRow } from "@/lib/spec-facets";
-import { MANUAL_CATEGORIES, MANUAL_GROUPS, matchManualSeries, type ManualCategory } from "@/lib/manual-catalog";
+import { MANUAL_CATEGORIES, MANUAL_GROUPS, matchManualSeries } from "@/lib/manual-catalog";
 import { MANUAL_SPECS } from "@/lib/manual-specs";
+import PageHero from "@/components/ui/PageHero";
 
-/** 选型器界面词（i18n 字典暂无对应键，就地兜底 6 语种） */
+/* ==========================================================================
+   一、界面文案（**中文 + 英文两套**）
+   ==========================================================================
+   owner 2026-10-07：「完善此页面中英文多语种，**非中文语种自动跳转英文**」
+   ⇒ 只维护 zh / en 两套；ja / ko / fr / ar 等一律回退英文（不显示半成品翻译，也不回退中文）。
+      组件内用 `isZh` 统一判定（见 `ProductSelector()` 里 `const isZh = locale === "zh"`）。
+   ========================================================================== */
 const T: Record<string, Record<string, string>> = {
-  zh: { title: "产品快速选型", sub: "按应用与参数逐步筛选，直接给出可询价的产品型号", s1: "选择类别", s2: "选择参数", s3: "匹配产品", h1: "先选一个产品类别", h1s: "按流量、压力、端口与材质需求选择类别，再进入参数筛选。", h2: "按参数筛选", h3: "全部匹配产品", hint: "点击参数即时筛选，右侧实时显示匹配结果。", matched: "匹配", items: "个产品", viewAll: "查看全部匹配", clear: "重置", detail: "查看详情", addCart: "加入询价车", added: "已加入询价车", backP: "返回上一步", next: "下一步", search: "搜索名称 / 型号 / 参数", detailSpecs: "关键参数", noMatch: "没有匹配的产品，试试放宽条件", models: "个型号" },
-  en: { title: "Product Quick Selector", sub: "Filter by application and parameters to get quotable part numbers", s1: "Select category", s2: "Select parameters", s3: "Matched products", h1: "Start with a product category", h1s: "Choose by flow, pressure, port and material needs, then refine with parameters.", h2: "Filter by parameters", h3: "All matched products", hint: "Click a parameter to filter; results update live on the right.", matched: "Matched", items: "products", viewAll: "View all matches", clear: "Reset", detail: "View details", addCart: "Add to quote cart", added: "Added", backP: "Back", next: "Next", search: "Search name / model / specs", detailSpecs: "Key specs", noMatch: "No product matches — try relaxing the filters", models: "models" },
-  ja: { title: "製品クイック選定", sub: "用途とパラメータで絞り込み、見積可能な型番を提示します", s1: "カテゴリ選択", s2: "パラメータ選択", s3: "該当製品", h1: "まずカテゴリを選択", h1s: "流量・圧力・ポート・材質の要件でカテゴリを選び、パラメータで絞り込みます。", h2: "パラメータで絞り込み", h3: "該当製品一覧", hint: "パラメータをクリックすると右側に結果が即時表示されます。", matched: "該当", items: "件", viewAll: "該当をすべて表示", clear: "リセット", detail: "詳細を見る", addCart: "見積に追加", added: "追加しました", backP: "戻る", next: "次へ", search: "名称 / 型番 / 仕様で検索", detailSpecs: "主要仕様", noMatch: "該当製品がありません。条件を緩めてください", models: "型番" },
-  ko: { title: "제품 간편 선택", sub: "용도와 파라미터로 좁혀 견적 가능한 모델을 제시합니다", s1: "카테고리 선택", s2: "파라미터 선택", s3: "일치 제품", h1: "먼저 카테고리를 선택하세요", h1s: "유량·압력·포트·재질 요건으로 카테고리를 고른 뒤 파라미터로 좁힙니다.", h2: "파라미터 필터", h3: "전체 일치 제품", hint: "파라미터를 클릭하면 오른쪽에 결과가 즉시 표시됩니다.", matched: "일치", items: "개", viewAll: "전체 일치 보기", clear: "초기화", detail: "상세 보기", addCart: "견적 카트에 추가", added: "추가됨", backP: "이전", next: "다음", search: "이름 / 모델 / 사양 검색", detailSpecs: "주요 사양", noMatch: "일치하는 제품이 없습니다. 조건을 완화해 보세요", models: "모델" },
-  fr: { title: "Sélecteur rapide", sub: "Filtrez par application et paramètres pour obtenir des références chiffrables", s1: "Catégorie", s2: "Paramètres", s3: "Produits correspondants", h1: "Commencez par une catégorie", h1s: "Choisissez selon débit, pression, ports et matériau, puis affinez par paramètres.", h2: "Filtrer par paramètres", h3: "Tous les produits correspondants", hint: "Cliquez un paramètre : les résultats s'actualisent à droite.", matched: "Correspondances", items: "produits", viewAll: "Voir tout", clear: "Réinitialiser", detail: "Voir le détail", addCart: "Ajouter au panier", added: "Ajouté", backP: "Retour", next: "Suivant", search: "Nom / référence / specs", detailSpecs: "Specs clés", noMatch: "Aucun produit ne correspond — élargissez les filtres", models: "modèles" },
-  ar: { title: "محدد المنتجات السريع", sub: "رشّح حسب التطبيق والمعايير للحصول على أرقام قابلة للتسعير", s1: "اختر الفئة", s2: "اختر المعايير", s3: "المنتجات المطابقة", h1: "ابدأ باختيار فئة المنتج", h1s: "اختر حسب التدفق والضغط والمنافذ والمادة ثم رشّح بالمعايير.", h2: "الترشيح بالمعايير", h3: "كل المنتجات المطابقة", hint: "اضغط أي معيار ليُحدَّث الناتج فوراً على اليمين.", matched: "مطابق", items: "منتج", viewAll: "عرض كل المطابقات", clear: "إعادة تعيين", detail: "عرض التفاصيل", addCart: "أضف إلى السلة", added: "تمت الإضافة", backP: "السابق", next: "التالي", search: "ابحث بالاسم / الطراز / المواصفات", detailSpecs: "أهم المواصفات", noMatch: "لا يوجد منتج مطابق — جرّب توسيع الشروط", models: "طراز" },
+  zh: {
+    crumbHome: "首页", crumbCat: "产品中心", crumbCur: "快速选型",
+    kicker: "ALL PRODUCTS · 所有产品",
+    title: "高纯管阀件全产品目录",
+    desc: "接头、隔膜阀、减压阀、单向阀、计量阀、过滤器、球阀、针阀、波纹管阀与阀组全部系列集中展示，支持多维筛选与型号搜索。316L 不锈钢锻件/棒料，电解抛光表面，GP / HP / UHP 工艺规范。",
+    ph: "搜索型号，如 DV12A / PRE1C / FT4 / 316L-CEJ",
+    st1: "产品品类", st1s: "接头 · 阀门 · 过滤器 · 阀组",
+    st2: "系列", st2s: "I/B/G/O · ALD · DV1–7 · PRE/PRT 等",
+    st3: "型号", st3s: "覆盖端口 / 驱动 / 阀座 / 洁净度组合",
+    st4: "材料体系", st4s: "316L · 6V (VAR) · 6VV (VIM-VAR) · 316",
+    show: "显示", units: "个型号", reset: "重置筛选",
+    empty: "未找到匹配产品，请调整筛选条件或搜索词。",
+    fCat: "类别", fMat: "材料", fPress: "压力范围 (bar)", fSize: "端口尺寸", fClean: "洁净工艺", fDrive: "驱动方式",
+    pressPh: "最大 bar，如 100", sizePh: "最大尺寸", sizeUnit: "单位：", mm: "mm", inch: "inch",
+    explainT: "型号解读 · 代码即产品",
+    explainP: "VALTRIX 型号由「材料前缀 + 系列 + 端口/驱动/阀座/洁净度」各段依次排列组成，读懂规则即可自助确认型号：",
+    exK1: "材料前缀",
+    exK2: "系列 · 流道",
+    exK3: "功能段", exD3: "入口 – 出口 – 其余端口 – 驱动 – 阀座 – 洁净度，依系列而定（端口 FMR / MR / SMR / TB / F 等）",
+    exNote: "数据依据 2026-10-04 版《高纯管阀件》产品手册；标「待确认」的参数项为手册未披露，确认后统一更新。",
+    svcP: "您当地的 VALTRIX 授权销售与服务中心可能有其他选项与定制方案。",
+    svcBtn: "联系我们",
+    safetyT: "安全的产品选择",
+    safetyP: "选择产品时必须考虑总体系统设计，以保证安全、无故障的性能。功能、材料兼容性、充分的额定值、正确的安装、使用和维护是系统设计者和用户的重要责任。请勿将 VALTRIX 产品或不符合工业设计标准的元件与其他制造商的产品或元件混用/互换。",
+    inSale: "官网在售", addCart: "加入询价车", added: "已加入", detail: "查看产品详情",
+    copyHint: "手册示例型号（点击复制）", copied: "已复制型号", noSite: "官网暂无对应型号",
+    pending: "待确认", fromManual: "规格取自产品手册",
+    dMan: "手动", dNC: "常闭气动 NC", dNO: "常开气动 NO",
+    dMNC: "常闭气动 M5/10-32", dMNO: "常开气动 M5/10-32", dPneu: "气动执行器可选",
+  },
+  en: {
+    crumbHome: "Home", crumbCat: "Products", crumbCur: "Quick Selector",
+    kicker: "ALL PRODUCTS · CATALOG",
+    title: "High-Purity Valves & Fittings Catalog",
+    desc: "All series of fittings, diaphragm, regulator, check, metering, filter, ball, needle, bellows valves and manifolds in one view, with multi-facet filtering and part-number search. 316L stainless forgings/bar, electropolished, GP / HP / UHP clean specs.",
+    ph: "Search part no., e.g. DV12A / PRE1C / FT4 / 316L-CEJ",
+    st1: "Categories", st1s: "Fittings · Valves · Filters · Manifolds",
+    st2: "Series", st2s: "I/B/G/O · ALD · DV1–7 · PRE/PRT etc.",
+    st3: "Part numbers", st3s: "Covering port / drive / seat / clean combos",
+    st4: "Materials", st4s: "316L · 6V (VAR) · 6VV (VIM-VAR) · 316",
+    show: "Showing", units: "models", reset: "Reset",
+    empty: "No matching products. Adjust the filters or the search term.",
+    fCat: "Category", fMat: "Body material", fPress: "Pressure range (bar)", fSize: "Port size", fClean: "Clean spec", fDrive: "Actuation",
+    pressPh: "max bar e.g. 100", sizePh: "max size", sizeUnit: "Unit:", mm: "mm", inch: "inch",
+    explainT: "Model decoding · the code is the product",
+    explainP: "A VALTRIX model is built from material prefix + series + port/drive/seat/clean segments. Read the rule and confirm the model yourself:",
+    exK1: "Material prefix",
+    exK2: "Series · flow path",
+    exK3: "Function segments", exD3: "inlet – outlet – remaining ports – actuation – seat – clean spec, depending on series (ports FMR / MR / SMR / TB / F etc.)",
+    exNote: "Data per the 2026-10-04 \"High-Purity Valves & Fittings\" catalog; items marked “待确认” are not disclosed by the catalog and will be updated once confirmed.",
+    svcP: "Your local VALTRIX authorized sales & service center may have additional options and custom solutions.",
+    svcBtn: "Contact us",
+    safetyT: "Safe product selection",
+    safetyP: "Consider the overall system design to ensure safe, trouble-free performance. Function, material compatibility, adequate ratings, correct installation, use and maintenance are the responsibility of the system designer and user. Do not mix VALTRIX products or non-industry-standard components with products of other manufacturers.",
+    inSale: "On site", addCart: "Add to quote cart", added: "Added", detail: "View product",
+    copyHint: "Catalog example models (click to copy)", copied: "Part number copied", noSite: "Not listed on site yet",
+    pending: "TBD", fromManual: "Specs from the catalog",
+    dMan: "Manual", dNC: "NC pneumatic", dNO: "NO pneumatic",
+    dMNC: "MNC pneumatic M5/10-32", dMNO: "MNO pneumatic M5/10-32", dPneu: "Pneumatic actuator optional",
+  },
 };
 
-interface Item {
+/* ==========================================================================
+   二、手册代号 → 显示标签
+   —— 材料/洁净代号本身就是手册原文（拉丁字符，跨语种通用），
+      只有「驱动方式」是需要翻译的自然语言，故按语种给标签。
+   ========================================================================== */
+const MAT_ORDER = ["316L", "6V", "6VV", "316"];
+const MAT_LABEL: Record<string, string> = {
+  "316L": "316L SS",
+  "6V": "316L VAR (6V)",
+  "6VV": "316L VIM-VAR (6VV)",
+  "316": "316 SS",
+};
+const CLEAN_ORDER = ["GP", "HP", "UHP", "-"];
+const CLEAN_LABEL: Record<string, string> = {
+  GP: "GP",
+  HP: "HP",
+  UHP: "UHP",
+  "-": "—",
+};
+const DRIVE_ORDER = ["man", "NC", "NO", "MNC", "MNO", "pneu"];
+const DRIVE_KEY: Record<string, string> = {
+  man: "dMan",
+  NC: "dNC",
+  NO: "dNO",
+  MNC: "dMNC",
+  MNO: "dMNO",
+  pneu: "dPneu",
+};
+
+/* ==========================================================================
+   三、手册数据 → 选型器数据模型（模块级常量，服务端/客户端完全一致）
+   ========================================================================== */
+interface CatRow {
+  /** 手册规格行原文（与品类 columns 一一对应） */
+  cells: string[];
+  /** 行内出现过的最大压力（bar）—— 解析不出为 null */
+  bar: number | null;
+  /** 行内最小端口尺寸（inch）—— 解析不出为 null */
+  inch: number | null;
+}
+interface CatSeries {
+  key: string;
+  catKey: string;
   id: string;
-  slug: string;
-  name: string;
+  nameZh: string;
+  nameEn: string;
+  formsZh: string;
+  formsEn: string;
+  models: string[];
+  mats: string[];
+  cleans: string[];
+  drives: string[];
+  rows: CatRow[];
+  /** 搜索用的大写无关长串 */
+  hay: string;
+}
+interface CatBlock {
+  key: string;
+  zh: string;
+  en: string;
+  columns: string[];
+  /** 手册列头的**英文版**（原型 `I18N.en.th` 原文）；英文页用它，缺省回退中文列头 */
+  columnsEn: string[];
+  series: CatSeries[];
+}
+interface SiteItem {
+  id: string;
   model: string;
+  name: string;
   image: string;
   href: string;
-  tabId: string;
-  tabName: string;
-  catId: string;
-  catName: string;
-  catDesc: string;
-  attrs: [string, string][]; // 该产品全部规格键值（去重后）
-  keySpecs: [string, string][]; // 展示用：前 4 条
 }
 
-const pick = (loc: any, obj: any, base: string) => String(loc.get(obj, base) || "").trim();
+/** 与原型 `parseBar()` 同一口径：只认 bar / psig，取最大值（1 psig = 0.06895 bar） */
+function parseBar(text: string): number | null {
+  let max: number | null = null;
+  const reBar = /(\d+(?:\.\d+)?)\s*bar/gi;
+  const rePsi = /(\d+(?:\.\d+)?)\s*psig?/gi;
+  let m: RegExpExecArray | null;
+  while ((m = reBar.exec(text))) {
+    const v = parseFloat(m[1]);
+    if (max === null || v > max) max = v;
+  }
+  while ((m = rePsi.exec(text))) {
+    const v = parseFloat(m[1]) * 0.06895;
+    if (max === null || v > max) max = v;
+  }
+  return max;
+}
+
+/** 与原型 `parseInch()` 同一口径：mm / 分数 / 小数英寸，取**最小值**（最小端口） */
+function parseInch(text: string): number | null {
+  const vals: number[] = [];
+  let m: RegExpExecArray | null;
+  const reMm = /(\d+(?:\.\d+)?)\s*mm/gi;
+  while ((m = reMm.exec(text))) vals.push(parseFloat(m[1]) / 25.4);
+  const reFrac = /(\d+)\s*\/\s*(\d+)(?:\s*["″]|\s*in\.|\s*英寸)?/gi;
+  while ((m = reFrac.exec(text))) {
+    const den = parseFloat(m[2]);
+    if (den) vals.push(parseFloat(m[1]) / den);
+  }
+  const reDec = /(\d+(?:\.\d+)?)(?:\s*["″]|\s*in\.|\s*英寸)/gi;
+  while ((m = reDec.exec(text))) vals.push(parseFloat(m[1]));
+  return vals.length ? Math.min(...vals) : null;
+}
+
+const CAT_META = new Map(MANUAL_CATEGORIES.map((c) => [c.key, c]));
+const GROUP_ORDER = MANUAL_GROUPS.map((g) => g.key);
+
+/** 品类展示顺序：先按 `MANUAL_GROUPS` 分组（接头 → 阀门 → 过滤·阀组），再按手册目录顺序 */
+function catRank(key: string): number {
+  const meta = CAT_META.get(key);
+  const gi = meta ? GROUP_ORDER.indexOf(meta.group) : 99;
+  const ci = MANUAL_CATEGORIES.findIndex((c) => c.key === key);
+  return (gi < 0 ? 99 : gi) * 1000 + (ci < 0 ? 999 : ci);
+}
+
+function normCodes(list: unknown): string[] {
+  if (!Array.isArray(list)) return [];
+  const out: string[] = [];
+  for (const v of list) {
+    const s = String(v ?? "").trim();
+    if (s && !out.includes(s)) out.push(s);
+  }
+  return out;
+}
+
+const CATALOG: CatBlock[] = MANUAL_SPECS.map((c) => {
+  const meta = CAT_META.get(c.category);
+  const series: CatSeries[] = c.series.map((s) => {
+    const rows: CatRow[] = s.rows.map((cells) => {
+      const all = cells.join(" ");
+      return {
+        cells,
+        bar: parseBar(all),
+        inch: parseInch(cells.slice(0, 2).join(" ")),
+      };
+    });
+    const dims = (s.dims || {}) as Record<string, unknown>;
+    const mats = normCodes(dims.mats).length ? normCodes(dims.mats) : normCodes(dims.mat);
+    const cleans = normCodes(dims.cleans).length ? normCodes(dims.cleans) : normCodes(dims.procs);
+    const drives = normCodes(dims.drives).length ? normCodes(dims.drives) : normCodes(dims.drive);
+    return {
+      key: `${c.category}::${s.id}`,
+      catKey: c.category,
+      id: s.id,
+      nameZh: s.nameZh || s.nameEn || s.id,
+      nameEn: s.nameEn || s.nameZh || s.id,
+      formsZh: s.formsZh || "",
+      formsEn: s.formsEn || "",
+      models: s.models || [],
+      mats,
+      cleans,
+      drives,
+      rows,
+      hay: [
+        meta?.zh || "",
+        meta?.en || "",
+        s.nameZh || "",
+        s.nameEn || "",
+        s.formsZh || "",
+        s.formsEn || "",
+        (s.models || []).join(" "),
+        rows.map((r) => r.cells.join(" ")).join(" "),
+      ]
+        .join(" ")
+        .toLowerCase(),
+    };
+  });
+  return {
+    key: c.category,
+    zh: meta?.zh || c.category,
+    en: meta?.en || c.category,
+    columns: c.columns,
+    columnsEn: c.columnsEn || [],
+    series,
+  };
+}).sort((a, b) => catRank(a.key) - catRank(b.key));
+
+const ALL_SERIES = CATALOG.flatMap((c) => c.series);
+const TOTAL_ROWS = ALL_SERIES.reduce((n, s) => n + s.rows.length, 0);
+
+function pickOptions(found: string[], order: string[]): string[] {
+  const set = new Set(found);
+  const out = order.filter((o) => set.has(o));
+  for (const f of found) if (!out.includes(f)) out.push(f);
+  return out;
+}
+const MAT_OPTIONS = pickOptions(ALL_SERIES.flatMap((s) => s.mats), MAT_ORDER);
+const CLEAN_OPTIONS = pickOptions(ALL_SERIES.flatMap((s) => s.cleans), CLEAN_ORDER);
+const DRIVE_OPTIONS = pickOptions(ALL_SERIES.flatMap((s) => s.drives), DRIVE_ORDER);
+
+/**
+ * 把 `matchManualSeries()` 给出的系列名对齐到 `MANUAL_SPECS` 的系列 id。
+ * 起因：手册目录页写的是「I 系列 / I Series」，而数值表里的 id 是 `I`；
+ *      隔膜阀目录页又写 `ALD3/ALD3T`，数值表里只有 `ALD`。三种写法都要能落到同一行数据上。
+ */
+function seriesIdOf(catKey: string, label: string): string | null {
+  const spec = MANUAL_SPECS.find((c) => c.category === catKey);
+  if (!spec) return null;
+  const up = String(label || "").toUpperCase().replace(/\s/g, "");
+  if (!up) return null;
+  const ids = spec.series.map((s) => s.id);
+  const direct = ids.find((id) => id.toUpperCase().replace(/\s/g, "") === up);
+  if (direct) return direct;
+  const head = /^([A-Z0-9]+)/.exec(up);
+  if (head) {
+    const hit = ids.find((id) => id.toUpperCase() === head[1]);
+    if (hit) return hit;
+  }
+  const prefix = ids.find((id) => up.startsWith(id.toUpperCase()));
+  return prefix || null;
+}
+
+type FacetKey = "cat" | "mat" | "press" | "size" | "clean" | "drive";
+type Sel = Record<"cat" | "mat" | "clean" | "drive", string[]>;
+type NumRange = Record<"pressMin" | "pressMax" | "sizeMin" | "sizeMax", string>;
 
 export default function ProductSelector() {
   const { t, locale } = useI18n();
-  const loc = createLocalizedGetter(locale);
-  const dict = T[locale] || T.zh;
+  /**
+   * 本页**语种策略**（owner 2026-10-07：「完善此页面中英文多语种，非中文语种自动跳转英文」）：
+   *   · 中文 → 中文；**其余任何语种（en/ja/ko/fr/ar…）一律英文**；
+   *   · 页面文案与**本页解析出来的数据**（产品名等）都按这个口径走，
+   *     避免出现"英文外壳 + 半成品他语翻译"的混排。
+   */
+  const isZh = locale === "zh";
+  const L = isZh ? T.zh : T.en;
 
-  const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [step, setStep] = useState(1);
-  const [catKey, setCatKey] = useState(""); // `${tabId}::${catId}`
-  /** 手册系列筛选（owner：细分严格按手册 —— 系列清单来自手册，不是我们从库里推的） */
-  const [seriesKey, setSeriesKey] = useState("");
-  const [picked, setPicked] = useState<Record<string, string>>({});
+  /**
+   * 页头数据源：**与产品中心同一份** `page-config?page=products`
+   * （owner 2026-10-07：「这个页面需要继承产品中心的页头」）。
+   * 这样后台"页面配置 → 产品中心"里改标题/副标题/面包屑，选型页跟着一起变；
+   * 背景图/遮罩由 `PageHero` 按**路径前缀**自动继承（`/products/selector` 前缀匹配到 `/products`）。
+   */
+  const [pageConfig, setPageConfig] = useState<any>(null);
+  useEffect(() => {
+    fetch("/api/public/page-config?page=products")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.success && d.data) setPageConfig(d.data);
+      })
+      .catch(() => {});
+  }, []);
+
   const [q, setQ] = useState("");
-  const [added, setAdded] = useState("");
-  /** 工况：工作压力下限（bar）——数值从产品规格解析，不猜测 */
-  const [minBar, setMinBar] = useState("");
+  const [sel, setSel] = useState<Sel>({ cat: [], mat: [], clean: [], drive: [] });
+  const [num, setNum] = useState<NumRange>({ pressMin: "", pressMax: "", sizeMin: "", sizeMax: "" });
+  const [sizeUnit, setSizeUnit] = useState<"in" | "mm">("in");
+  const [folded, setFolded] = useState<Record<FacetKey, boolean>>({
+    cat: false,
+    mat: false,
+    press: true,
+    size: true,
+    clean: true,
+    drive: true,
+  });
+  /** 手册系列 key → 官网在售产品 */
+  const [siteMap, setSiteMap] = useState<Record<string, SiteItem[]>>({});
+  const [toast, setToast] = useState("");
+  /** 刚加入询价车的系列 key（按钮短暂显示「已加入」） */
+  const [addedKey, setAddedKey] = useState("");
+
+  // 数据取值也走同一策略：非中文一律取英文字段（取不到时 `getLocalizedField` 会回退中文，属数据缺失）
+  const loc = useMemo(() => createLocalizedGetter(isZh ? "zh" : "en"), [isZh]);
 
   useEffect(() => {
     let alive = true;
-    // 选型需要**较多规格行**才能推导维度（普通列表接口只给 3 条）⇒ 这里要 40 条 + lite（省掉六语种富文本）
     fetch("/api/public/products?specs=40&lite=1", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => {
         if (!alive) return;
+        const map: Record<string, SiteItem[]> = {};
         const tabs: any[] = d?.data || [];
-        const out: Item[] = [];
         for (const tab of tabs) {
           for (const cat of tab.categories || []) {
             for (const m of cat.models || []) {
-              const specs: any[] = Array.isArray(m.specs) ? m.specs : [];
-              const attrs: [string, string][] = [];
-              const seen = new Set<string>();
-              for (const s of specs) {
-                const label = pick(loc, s, "label");
-                const value = pick(loc, s, "value");
-                for (const seg of value.split(/[;；؛]/)) {
-                  const g = seg.trim();
-                  const i = g.indexOf(":") >= 0 ? g.indexOf(":") : g.indexOf("：");
-                  if (i <= 0) continue;
-                  const k = g.slice(0, i).trim();
-                  const v = g.slice(i + 1).trim();
-                  if (!k || !v || v.length > 40) continue;
-                  const kk = `${k}=${v}`;
-                  if (seen.has(kk)) continue;
-                  seen.add(kk);
-                  attrs.push([k, v]);
-                }
-                if (label && !seen.has(`L=${label}`)) {
-                  seen.add(`L=${label}`);
-                  attrs.push(["#label", label]);
-                }
-              }
-              out.push({
+              const model = String(m.model || "").trim();
+              const name = String(loc.get(m, "name") || model).trim();
+              const hit = matchManualSeries(`${model} ${name}`);
+              if (!hit) continue;
+              const sid = seriesIdOf(hit.category.key, hit.series);
+              if (!sid) continue;
+              const key = `${hit.category.key}::${sid}`;
+              const list = (map[key] = map[key] || []);
+              if (list.some((x) => x.id === String(m.id))) continue;
+              list.push({
                 id: String(m.id),
-                slug: String(m.id),
-                name: pick(loc, m, "name") || String(m.model || m.id),
-                model: String(m.model || ""),
+                model,
+                name,
                 image: String(m.image || (Array.isArray(m.images) ? m.images[0] : "") || ""),
-                href: `/products/${encodeURIComponent(tab.id)}/${encodeURIComponent(m.id)}`,
-                tabId: String(tab.id),
-                tabName: pick(loc, tab, "name"),
-                catId: String(cat.id),
-                catName: pick(loc, cat, "name"),
-                catDesc: pick(loc, cat, "description"),
-                attrs,
-                keySpecs: attrs.filter(([k]) => k !== "#label").slice(0, 4),
+                href: `/products/${encodeURIComponent(String(tab.id))}/${encodeURIComponent(String(m.id))}`,
               });
             }
           }
         }
-        setItems(out);
+        setSiteMap(map);
       })
-      .catch(() => {})
-      .finally(() => alive && setLoading(false));
+      .catch(() => {});
     return () => {
       alive = false;
     };
   }, [loc]);
 
   /**
-   * 手册品类目录（owner 口径：**细分严格从 PDF 手册取**）
-   * —— 品类/系列/维度名来自 `lib/manual-catalog.ts`（手册实测抽取）；
-   *    这里只把**官网产品**按型号归到手册系列上，用来显示"官网在售数量/图片"与后续匹配。
+   * 按型号把手册规格行/示例型号对到官网在售产品上。
+   * 命中口径（实测阀门站在售型号就是系列级产品页，如 `DV2` / `I Series` / `FT4系列`）：
+   *   ① 等值；② 官网型号更长（`DV2` vs `DV2-...`）；③ **loose** 时还允许官网型号是规格型号的前缀
+   *   （`DV2` → `DV22A-MR8`，用于规格表的型号列给出「去该系列产品页」的入口）；
+   *   比对前先剥掉型号尾部的非字母数字（`FT4系列` → `FT4`）。
+   * 型号片段（chips）用严格口径，避免把每个手册示例都染成链接。
    */
-  const catalog = useMemo(() => {
-    return MANUAL_CATEGORIES.map((c) => {
-      const matched = items.filter((it) => {
-        const m = matchManualSeries(`${it.model} ${it.name}`);
-        return m?.category.key === c.key;
-      });
-      const bySeries = c.series.map((s) => ({
-        series: s,
-        count: matched.filter((it) => matchManualSeries(`${it.model} ${it.name}`)?.series === s).length,
-      }));
-      return {
-        cat: c,
-        matched,
-        count: matched.length,
-        image: matched.find((x) => x.image)?.image || "",
-        bySeries,
-      };
-    });
-  }, [items]);
-
-  /** 目录页分组（原型 GROUP 顺序） */
-  const catGroups = useMemo(
-    () =>
-      MANUAL_GROUPS.map((g) => ({
-        key: g.key,
-        tabId: g.key,
-        tabName: g.zh,
-        tabEn: g.en,
-        cats: catalog.filter((c) => c.cat.group === g.key).map((c) => ({
-          key: c.cat.key,
-          name: c.cat.zh,
-          desc: c.cat.en,
-          image: c.image,
-          count: c.count,
-          values: c.cat.series,
-          dims: c.cat.dimensions,
-          rulePages: c.cat.rulePages || "",
-        })),
-      })).filter((g) => g.cats.length > 0),
-    [catalog]
-  );
-
-  const tabsCount = catGroups.length;
-  /** 统计卡：材料体系/洁净工艺 —— 从**官网产品规格**里汇总（手册未给全站常量） */
-  const statsMaterials = useMemo(
-    () => Array.from(new Set(items.flatMap((it) => it.attrs.filter(([k]) => /材质|material/i.test(k)).map(([, v]) => v)))).slice(0, 4),
-    [items]
-  );
-  const statsClean = useMemo(
-    () => Array.from(new Set(items.flatMap((it) => it.attrs.filter(([k]) => /洁净|clean/i.test(k)).map(([, v]) => v)))).slice(0, 3),
-    [items]
-  );
-
-  /** 该手册品类下的**官网产品**（按型号归到手册系列） */
-  const catItems = useMemo(
-    () => (catKey ? items.filter((it) => matchManualSeries(`${it.model} ${it.name}`)?.category.key === catKey) : []),
-    [items, catKey]
-  );
-
-  /** 该类别下的可筛维度（**从产品规格自动推导**，含「规格项」伪维度） */
-  const facets = useMemo(() => {
-    if (!catItems.length) return [];
-    const rows: SpecRow[] = catItems.map((it) => ({
-      label: it.attrs.find(([k]) => k === "#label")?.[1] || it.name,
-      value: "",
-      code: it.model,
-      attrs: it.attrs.filter(([k]) => k !== "#label"),
-    }));
-    return deriveFacets(rows, { max: 4, includeLabel: true });
-  }, [catItems]);
-
-  const matched = useMemo(() => {
-    const kw = q.trim().toLowerCase();
-    return catItems.filter((it) => {
-      for (const [k, v] of Object.entries(picked)) {
-        if (!v) continue;
-        if (k === LABEL_FACET) {
-          const lbl = it.attrs.find(([ak]) => ak === "#label")?.[1] || it.name;
-          if (lbl !== v) return false;
-          continue;
-        }
-        if (!it.attrs.some(([ak, av]) => ak === k && av === v)) return false;
-      }
-      // 手册系列筛选
-      if (seriesKey && matchManualSeries(`${it.model} ${it.name}`)?.series !== seriesKey) return false;
-      // 工况：工作压力 ≥ 输入值（数值取自产品规格文本；解析不出则不参与过滤）
-      const min = Number(minBar);
-      if (minBar.trim() !== "" && Number.isFinite(min) && min > 0) {
-        const max = it.attrs
-          .filter(([k]) => /压力|pressure/i.test(k))
-          .map(([, v]) => Number((String(v).match(/\d+(?:\.\d+)?/) || [""])[0]))
-          .filter((n) => Number.isFinite(n) && n > 0)
-          .reduce((a, b) => Math.max(a, b), -1);
-        if (max >= 0 && max < min) return false;
-      }
-      if (kw && !`${it.name} ${it.model} ${it.attrs.map(([k, v]) => `${k} ${v}`).join(" ")}`.toLowerCase().includes(kw)) return false;
-      return true;
-    });
-  }, [catItems, picked, q, seriesKey, minBar]);
-
-  /** chip 可用性预判（选了它会 0 条的置灰）——与产品页选型器同口径 */
-  const availability = useMemo(() => {
-    const map: Record<string, Record<string, number>> = {};
-    const rows: SpecRow[] = catItems.map((it) => ({
-      label: it.attrs.find(([k]) => k === "#label")?.[1] || it.name,
-      value: "",
-      code: it.model,
-      attrs: it.attrs.filter(([k]) => k !== "#label"),
-    }));
-    for (const f of facets) {
-      map[f.key] = {};
-      const others = Object.entries(picked).filter(([k, v]) => v && k !== f.key);
-      for (const v of f.values) {
-        let n = 0;
-        for (let i = 0; i < rows.length; i++) {
-          if (!rowMatches(rows[i], f.key, v)) continue;
-          let ok = true;
-          for (const [ok2, ov] of others) if (!rowMatches(rows[i], ok2, ov)) { ok = false; break; }
-          if (ok) n += 1;
-        }
-        map[f.key][v] = n;
-      }
+  const siteFor = (series: CatSeries, code: string, loose = false): SiteItem | null => {
+    const list = siteMap[series.key];
+    if (!list || !list.length) return null;
+    const c = code.toUpperCase().replace(/\s+/g, "");
+    if (!c) return null;
+    for (const it of list) {
+      const m = it.model.toUpperCase().replace(/\s+/g, "").replace(/[^A-Z0-9]+$/, "");
+      if (!m) continue;
+      if (m === c || m.startsWith(c) || (loose && m.length >= 2 && c.startsWith(m))) return it;
     }
-    return map;
-  }, [facets, picked, catItems]);
+    return null;
+  };
 
-  const pickCategory = (key: string) => {
-    setCatKey(key);
-    setPicked({});
-    setStep(2);
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  const numBag = {
+    pressMin: num.pressMin.trim() === "" ? null : Number(num.pressMin),
+    pressMax: num.pressMax.trim() === "" ? null : Number(num.pressMax),
+    sizeMin: num.sizeMin.trim() === "" ? null : Number(num.sizeMin),
+    sizeMax: num.sizeMax.trim() === "" ? null : Number(num.sizeMax),
   };
-  const toggle = (key: string, v: string) => setPicked((p) => ({ ...p, [key]: p[key] === v ? "" : v }));
-  const addCart = (it: Item) => {
-    addToQuoteCart(it.slug, 1);
-    setAdded(it.id);
-    setTimeout(() => setAdded(""), 2000);
+  const sizeToInch = (v: number | null) => (v === null ? null : sizeUnit === "mm" ? v / 25.4 : v);
+  const pMin = Number.isFinite(numBag.pressMin as number) ? (numBag.pressMin as number) : null;
+  const pMax = Number.isFinite(numBag.pressMax as number) ? (numBag.pressMax as number) : null;
+  const sMin = sizeToInch(Number.isFinite(numBag.sizeMin as number) ? (numBag.sizeMin as number) : null);
+  const sMax = sizeToInch(Number.isFinite(numBag.sizeMax as number) ? (numBag.sizeMax as number) : null);
+
+  /** 数值区间只过滤**规格行**（与原型一致：区间匹配的行才算「显示」） */
+  const rowPass = (r: CatRow): boolean => {
+    if (pMin === null && pMax === null && sMin === null && sMax === null) return true;
+    if (pMin !== null || pMax !== null) {
+      if (r.bar === null) return false;
+      if (pMin !== null && r.bar < pMin) return false;
+      if (pMax !== null && r.bar > pMax) return false;
+    }
+    if (sMin !== null || sMax !== null) {
+      if (r.inch === null) return false;
+      if (sMin !== null && r.inch < sMin) return false;
+      if (sMax !== null && r.inch > sMax) return false;
+    }
+    return true;
   };
-  /** 当前选中的手册品类（来自手册目录） */
-  const activeCat = catalog.find((c) => c.cat.key === catKey) || null;
-  const activeManual: ManualCategory | null = activeCat?.cat || null;
-  const activeCount = Object.values(picked).filter(Boolean).length;
+
+  const hasOption = (s: CatSeries, facet: FacetKey, v: string): boolean => {
+    if (facet === "cat") return s.catKey === v;
+    if (facet === "mat") return s.mats.includes(v);
+    if (facet === "clean") return s.cleans.includes(v);
+    if (facet === "drive") return s.drives.includes(v);
+    return true;
+  };
+
+  const seriesPass = (s: CatSeries, ignore?: FacetKey): boolean => {
+    for (const f of ["cat", "mat", "clean", "drive"] as const) {
+      if (f === ignore) continue;
+      const want = sel[f];
+      if (!want.length) continue;
+      if (!want.some((v) => hasOption(s, f, v))) return false;
+    }
+    const kw = q.trim().toLowerCase();
+    if (kw && !s.hay.includes(kw)) return false;
+    return true;
+  };
+
+  /** 每个选项后面的计数（其余条件生效时，该选项还能命中多少条规格行） */
+  const optionCount = (facet: FacetKey, v: string): number => {
+    let n = 0;
+    for (const s of ALL_SERIES) {
+      if (!hasOption(s, facet, v)) continue;
+      if (!seriesPass(s, facet)) continue;
+      for (const r of s.rows) if (rowPass(r)) n += 1;
+    }
+    return n;
+  };
 
   /**
-   * 手册**数值规格表**（owner 2026-10-06：「不要加工图片，只把数值取出即可」）
-   * 数据来自 `lib/manual-specs.ts`（由各品类目录页原型的 SERIES.rows 抽出，未做任何加工）。
+   * 结果分组。总行数只有 101 行 —— 直接在渲染期算，不套 `useMemo`
+   * （少一层依赖数组的坑：`seriesPass`/`rowPass` 每次渲染都新建）。
    */
-  const manualSpecTables = useMemo(() => {
-    if (!activeManual) return [];
-    const cat = MANUAL_SPECS.find((c) => c.category === activeManual.key);
-    if (!cat) return [];
-    const list = seriesKey ? cat.series.filter((s) => s.id === seriesKey) : cat.series;
-    return list
-      .filter((s) => s.rows.length > 0)
-      .map((s) => ({ id: s.id, name: s.nameZh || s.nameEn, columns: cat.columns, rows: s.rows, forms: s.formsZh }));
-  }, [activeManual, seriesKey]);
+  const view = (() => {
+    const blocks: { cat: CatBlock; groups: { s: CatSeries; rows: CatRow[] }[] }[] = [];
+    let shown = 0;
+    for (const c of CATALOG) {
+      const groups: { s: CatSeries; rows: CatRow[] }[] = [];
+      for (const s of c.series) {
+        if (!seriesPass(s)) continue;
+        const rows = s.rows.filter(rowPass);
+        if (!rows.length) continue;
+        groups.push({ s, rows });
+        shown += rows.length;
+      }
+      if (groups.length) blocks.push({ cat: c, groups });
+    }
+    return { blocks, shown };
+  })();
 
-  if (loading) {
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center text-[#5c6169]">
-        <Loader2 className="animate-spin me-2" size={18} /> {t("loading")}
-      </div>
-    );
-  }
+  const toggle = (facet: "cat" | "mat" | "clean" | "drive", v: string) =>
+    setSel((p) => ({ ...p, [facet]: p[facet].includes(v) ? p[facet].filter((x) => x !== v) : [...p[facet], v] }));
+
+  const resetAll = () => {
+    setSel({ cat: [], mat: [], clean: [], drive: [] });
+    setNum({ pressMin: "", pressMax: "", sizeMin: "", sizeMax: "" });
+    setQ("");
+  };
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    window.setTimeout(() => setToast(""), 1800);
+  };
+  const copyCode = (code: string) => {
+    try {
+      navigator.clipboard?.writeText(code);
+      showToast(`${L.copied} · ${code}`);
+    } catch {
+      showToast(code);
+    }
+  };
+  const addSeries = (key: string, list: SiteItem[]) => {
+    for (const it of list) addToQuoteCart(it.id, 1);
+    setAddedKey(key);
+    showToast(`${L.added} · ${list.length}`);
+    window.setTimeout(() => setAddedKey(""), 2000);
+  };
+
+  const statModels = TOTAL_ROWS;
 
   return (
-    /*
-      目录页 —— **严格按芯阀产品手册 html 原型 `产品目录页.html` 移植**：
-      样式来自 `app/globals.css` 里 `#vs-catalog` 作用域（由原型 <style> 逐条搬运，变量与数值未改），
-      这里只用原型的类名（.crumb/.hero/.stats/.sec/.cards/.card/.thumb/.cbody/.cname/.chips/.chip/.go/footer）。
-      说明：**站点自身的顶栏/页脚已由 layout 提供**，故此处不重复原型里那份独立 topbar（避免双导航）。
-    */
-    <div id="vs-catalog">
-      {/* 面包屑（原型 .crumb） */}
-      <div className="wrap">
-        <div className="crumb">
-          {/* 面包屑要下沉到「快速选型」这一级（owner 2026-10-06）：
-              首页 > 产品中心 > 快速选型（当前页=加粗红字） */}
-          <Link href="/">{locale === "zh" ? "首页" : "Home"}</Link> &gt;{" "}
-          <Link href="/products">{t("productsPageTitle")}</Link> &gt;{" "}
-          <b>{locale === "zh" ? "快速选型" : "Quick Selector"}</b>
+    <div id="vs-all">
+      {/*
+        页头：**继承产品中心**（owner 2026-10-07）
+        —— 用同一个 `PageHero` 组件 + 同一份 `/api/public/page-config?page=products`：
+           标题 / 副标题 / 面包屑跟着产品中心走（后台改一处，两页同时变）；
+           背景图与遮罩由 `PageHero` 的**路径前缀匹配**自动继承 `/products` 的配置。
+        原来这里是原型自带的面包屑 + kicker/h1/desc 自造页头，已移除（避免双层页头）。
+      */}
+      <PageHero
+        title={pageConfig?.title || t("productsPageTitle")}
+        titleEn={pageConfig?.titleEn || "Products"}
+        subtitle={pageConfig?.subtitle || t("productsPageSubtitle")}
+        subtitleEn={pageConfig?.subtitleEn || ""}
+        breadcrumb={pageConfig?.breadcrumb || t("productsPageTitle")}
+        breadcrumbEn={pageConfig?.breadcrumbEn || "Products"}
+      />
+
+      {/* 搜索 + 四统计（原型的 .searchbar / .stats **保留**：它们是选型器的功能件，不属于页头） */}
+      <section className="hero">
+        <div className="wrap">
+          <div className="searchbar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20 20l-3.5-3.5" />
+            </svg>
+            <input
+              type="text"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={L.ph}
+              aria-label={L.ph}
+            />
+            <span className="q">
+              {q.trim() ? `${view.shown} / ${statModels}` : view.shown === statModels ? "" : String(view.shown)}
+            </span>
+          </div>
+          <div className="stats">
+            <div className="stat">
+              <div className="l">{L.st1}</div>
+              <div className="v">{CATALOG.length}</div>
+              <div className="s">{L.st1s}</div>
+            </div>
+            <div className="stat">
+              <div className="l">{L.st2}</div>
+              <div className="v">{ALL_SERIES.length}</div>
+              <div className="s">{L.st2s}</div>
+            </div>
+            <div className="stat">
+              <div className="l">{L.st3}</div>
+              <div className="v">{statModels}</div>
+              <div className="s">{L.st3s}</div>
+            </div>
+            <div className="stat">
+              <div className="l">{L.st4}</div>
+              <div className="v">{MAT_OPTIONS[0] || "316L"}</div>
+              <div className="s">{L.st4s}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 主体：左筛选栏 + 右结果（原型 .main / .facets / .results） */}
+      <div className="main wrap">
+        <aside className="facets">
+          {/* 类别 */}
+          <div className={"fg" + (folded.cat ? " folded" : "")}>
+            <h3 onClick={() => setFolded((f) => ({ ...f, cat: !f.cat }))}>
+              {L.fCat}
+              <span className="ar">▼</span>
+            </h3>
+            <div className="opts">
+              {CATALOG.map((c) => {
+                const n = optionCount("cat", c.key);
+                const on = sel.cat.includes(c.key);
+                const dis = n === 0 && !on;
+                return (
+                  /**
+                   * ⚠️ 勾选必须走 input 的 `onChange`，**不要**在 `<label>` 上挂 onClick：
+                   *   点 label 时浏览器会把激活再转发给内部 checkbox，于是 click 事件冒泡两次
+                   *   ⇒ 两次 toggle 相互抵消（实测「点了没反应」）。原型是原生 JS 不受影响，
+                   *   这里必须换成受控 checkbox。
+                   */
+                  <label key={c.key} className={"opt" + (on ? " sel" : "") + (dis ? " dis" : "")}>
+                    <input type="checkbox" checked={on} disabled={dis} onChange={() => toggle("cat", c.key)} />
+                    <span className="nm">{isZh ? c.zh : c.en}</span>
+                    <span className="n">({n})</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 材料 */}
+          <div className={"fg" + (folded.mat ? " folded" : "")}>
+            <h3 onClick={() => setFolded((f) => ({ ...f, mat: !f.mat }))}>
+              {L.fMat}
+              <span className="ar">▼</span>
+            </h3>
+            <div className="opts">
+              {MAT_OPTIONS.map((v) => {
+                const n = optionCount("mat", v);
+                const on = sel.mat.includes(v);
+                const dis = n === 0 && !on;
+                return (
+                  <label key={v} className={"opt" + (on ? " sel" : "") + (dis ? " dis" : "")}>
+                    <input type="checkbox" checked={on} disabled={dis} onChange={() => toggle("mat", v)} />
+                    <span className="nm">{MAT_LABEL[v] || v}</span>
+                    <span className="n">({n})</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 压力范围 */}
+          <div className={"fg" + (folded.press ? " folded" : "")}>
+            <h3 onClick={() => setFolded((f) => ({ ...f, press: !f.press }))}>
+              {L.fPress}
+              <span className="ar">▼</span>
+            </h3>
+            <div className="opts">
+              <div className="rg">
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="0"
+                  value={num.pressMin}
+                  onChange={(e) => setNum((p) => ({ ...p, pressMin: e.target.value }))}
+                />
+                <span className="dash">–</span>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder={L.pressPh}
+                  value={num.pressMax}
+                  onChange={(e) => setNum((p) => ({ ...p, pressMax: e.target.value }))}
+                />
+                <button className="clr" onClick={() => setNum((p) => ({ ...p, pressMin: "", pressMax: "" }))}>
+                  ×
+                </button>
+              </div>
+              <div style={{ fontSize: 11, color: "var(--mut)", paddingBottom: 8 }}>{L.pressPh}</div>
+            </div>
+          </div>
+
+          {/* 端口尺寸 */}
+          <div className={"fg" + (folded.size ? " folded" : "")}>
+            <h3 onClick={() => setFolded((f) => ({ ...f, size: !f.size }))}>
+              {L.fSize}
+              <span className="ar">▼</span>
+            </h3>
+            <div className="opts">
+              <div className="rg">
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="0"
+                  value={num.sizeMin}
+                  onChange={(e) => setNum((p) => ({ ...p, sizeMin: e.target.value }))}
+                />
+                <span className="dash">–</span>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder={L.sizePh}
+                  value={num.sizeMax}
+                  onChange={(e) => setNum((p) => ({ ...p, sizeMax: e.target.value }))}
+                />
+                <button className="clr" onClick={() => setNum((p) => ({ ...p, sizeMin: "", sizeMax: "" }))}>
+                  ×
+                </button>
+              </div>
+              <div className="unit">
+                {L.sizeUnit}
+                <button className={sizeUnit === "in" ? "on" : ""} onClick={() => setSizeUnit("in")}>
+                  {L.inch}
+                </button>
+                <button className={sizeUnit === "mm" ? "on" : ""} onClick={() => setSizeUnit("mm")}>
+                  {L.mm}
+                </button>
+              </div>
+              <div style={{ fontSize: 11, color: "var(--mut)", paddingBottom: 8 }}>{L.sizePh}</div>
+            </div>
+          </div>
+
+          {/* 洁净工艺 */}
+          <div className={"fg" + (folded.clean ? " folded" : "")}>
+            <h3 onClick={() => setFolded((f) => ({ ...f, clean: !f.clean }))}>
+              {L.fClean}
+              <span className="ar">▼</span>
+            </h3>
+            <div className="opts">
+              {CLEAN_OPTIONS.map((v) => {
+                const n = optionCount("clean", v);
+                const on = sel.clean.includes(v);
+                const dis = n === 0 && !on;
+                return (
+                  <label key={v} className={"opt" + (on ? " sel" : "") + (dis ? " dis" : "")}>
+                    <input type="checkbox" checked={on} disabled={dis} onChange={() => toggle("clean", v)} />
+                    <span className="nm">{CLEAN_LABEL[v] || v}</span>
+                    <span className="n">({n})</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 驱动方式 */}
+          <div className={"fg" + (folded.drive ? " folded" : "")}>
+            <h3 onClick={() => setFolded((f) => ({ ...f, drive: !f.drive }))}>
+              {L.fDrive}
+              <span className="ar">▼</span>
+            </h3>
+            <div className="opts">
+              {DRIVE_OPTIONS.map((v) => {
+                const n = optionCount("drive", v);
+                const on = sel.drive.includes(v);
+                const dis = n === 0 && !on;
+                return (
+                  <label key={v} className={"opt" + (on ? " sel" : "") + (dis ? " dis" : "")}>
+                    <input type="checkbox" checked={on} disabled={dis} onChange={() => toggle("drive", v)} />
+                    <span className="nm">{L[DRIVE_KEY[v]] || v}</span>
+                    <span className="n">({n})</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        </aside>
+
+        <div className="results">
+          <div className="bar">
+            <span className="cnt">
+              {L.show} <b>{view.shown}</b> / <b>{statModels}</b> {L.units}
+            </span>
+            <button className="btn-reset" onClick={resetAll}>
+              {L.reset}
+            </button>
+          </div>
+
+          {view.blocks.map(({ cat, groups }) => (
+            <div key={cat.key}>
+              <div className="cathead">
+                <span className="cn">{isZh ? cat.zh : cat.en}</span>
+                <span className="ce">{isZh ? cat.en : cat.zh}</span>
+                <span className="ct">{groups.reduce((n, g) => n + g.rows.length, 0)}</span>
+              </div>
+
+              {groups.map(({ s, rows }) => {
+                const list = siteMap[s.key] || [];
+                const img = list.find((x) => x.image)?.image || "";
+                const chips = [...list.map((x) => ({ code: x.model, href: x.href })), ...s.models.map((code) => ({ code, href: siteFor(s, code)?.href || "" }))].filter(
+                  (c, i, arr) => c.code && arr.findIndex((x) => x.code.toUpperCase() === c.code.toUpperCase()) === i
+                );
+                const forms = isZh ? s.formsZh : s.formsEn;
+                return (
+                  <div className="group" key={s.key}>
+                    <div className="ghead">
+                      <span className="gh">{isZh ? s.nameZh : s.nameEn}</span>
+                      {list.length > 0 ? (
+                        <span className="chip" style={{ marginLeft: 4 }}>
+                          {L.inSale} {list.length}
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: 11.5, color: "var(--mut)" }}>{L.noSite}</span>
+                      )}
+                      {forms ? <span className="ge">{forms}</span> : <span className="ge" />}
+                    </div>
+                    <div className="gbody">
+                      <div className="thumb">
+                        {img ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={img} alt={isZh ? s.nameZh : s.nameEn} loading="lazy" />
+                        ) : (
+                          <span style={{ fontFamily: "Consolas,Menlo,monospace", fontWeight: 700, color: "var(--mut)", fontSize: 18 }}>
+                            {s.id}
+                          </span>
+                        )}
+                      </div>
+                      <div className="ginfo">
+                        <div className="chips">
+                          {chips.map((c) =>
+                            c.href ? (
+                              <Link key={c.code} className="chip" href={c.href} title={L.detail} style={{ color: "var(--red)" }}>
+                                {c.code}
+                              </Link>
+                            ) : (
+                              <button key={c.code} className="chip" type="button" onClick={() => copyCode(c.code)} title={L.copyHint}>
+                                {c.code}
+                              </button>
+                            )
+                          )}
+                        </div>
+                        <table className="ptable">
+                          <thead>
+                            <tr>
+                              {(isZh || !cat.columnsEn.length ? cat.columns : cat.columnsEn).map((c, i) => (
+                                <th key={i}>{c}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {rows.map((r, ri) => (
+                              <tr key={ri}>
+                                {r.cells.map((cell, ci) => {
+                                  const hit = ci === 0 ? siteFor(s, cell, true) : null;
+                                  const tbd = cell === "待确认";
+                                  return (
+                                    <td key={ci}>
+                                      {ci === 0 ? <b>{cell}</b> : tbd ? <i style={{ color: "var(--red)" }}>{L.pending}</i> : cell}
+                                      {hit && (
+                                        <Link href={hit.href} title={L.detail} className="vsa-lnk">
+                                          ↗
+                                        </Link>
+                                      )}
+                                    </td>
+                                  );
+                                })}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <div className="vsa-row">
+                          <span className="vsa-hint">{L.fromManual}</span>
+                          {list.length > 0 && (
+                            <button type="button" className="vsa-btn" onClick={() => addSeries(s.key, list)}>
+                              {addedKey === s.key ? L.added : `${L.addCart}（${list.length}）`}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+
+          <div className="empty" style={{ display: view.shown === 0 ? "block" : "none" }}>
+            {L.empty}
+          </div>
         </div>
       </div>
 
-      {/* Hero + 四统计（原型 .hero / .stats / .stat）*/}
-      {step === 1 && (
-        <section className="hero">
-          <div className="wrap">
-            <div className="kicker">{locale === "zh" ? "PRODUCTS · 产品目录" : "PRODUCTS · CATALOG"}</div>
-            <h1>{locale === "zh" ? "高纯管阀件全品类" : "High-purity valves & fittings"}</h1>
-            <p className="desc">
-              {locale === "zh"
-                ? "接头、隔膜阀、球阀、针阀、波纹管阀、减压阀、单向阀、计量阀、过滤器与阀组，面向半导体、生物制药与高纯流体输送应用；316L 不锈钢，支持 GP / HP / UHP 工艺规范。"
-                : "Fittings, diaphragm/ball/needle/bellows/regulator/check/metering valves, filters and manifolds for semiconductor, biopharma and UHP fluid systems. 316L stainless steel, GP / HP / UHP process specifications."}
-            </p>
-            <div className="stats">
-              <div className="stat">
-                <div className="l">{locale === "zh" ? "产品品类" : "Categories"}</div>
-                <div className="v">{MANUAL_CATEGORIES.length}</div>
-                <div className="s">{tabsCount} {locale === "zh" ? "个二级目录" : "sections"}</div>
-              </div>
-              <div className="stat">
-                <div className="l">{locale === "zh" ? "型号" : "Models"}</div>
-                <div className="v">{items.length}</div>
-                <div className="s">{locale === "zh" ? "全部可询价" : "quotable"}</div>
-              </div>
-              <div className="stat">
-                <div className="l">{locale === "zh" ? "材料体系" : "Materials"}</div>
-                <div className="v">{statsMaterials[0] || "316L"}</div>
-                <div className="s">{statsMaterials.slice(1, 4).join(" · ") || "316L SS"}</div>
-              </div>
-              <div className="stat">
-                <div className="l">{locale === "zh" ? "洁净工艺" : "Cleanliness"}</div>
-                <div className="v">{statsClean.join(" / ") || "GP / HP / UHP"}</div>
-                <div className="s">{locale === "zh" ? "按产品规格汇总" : "from product specs"}</div>
-              </div>
-            </div>
+      {/* 型号解读（原型 .explain） */}
+      <section className="wrap">
+        <div className="explain">
+          <div className="xh">
+            <span className="mk" />
+            <span>{L.explainT}</span>
           </div>
-        </section>
-      )}
-
-      <div className="wrap">
-        {/* ===== 第 1 步：品类目录（原型 .sec / .ghead / .cards / .card）===== */}
-        {step === 1 && (
-          catGroups.map((g) => (
-            <section className="sec" key={g.tabId}>
-              <div className="ghead">
-                <span className="en">{g.tabEn || g.tabId}</span>
-                <h2>{g.tabName}</h2>
-                <span className="cnt">
-                  {g.cats.reduce((n, c) => n + c.count, 0)} {locale === "zh" ? "个型号" : "models"}
-                </span>
-              </div>
-              <div className="cards">
-                {g.cats.map((c) => (
-                  <button key={c.key} className="card" onClick={() => pickCategory(c.key)} style={{ textAlign: "start" }}>
-                    {c.count > 0 && <span className="st live">{locale === "zh" ? "官网在售" : "Available"}</span>}
-                    <div className="thumb">
-                      {c.image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={c.image} alt={c.name} loading="lazy" />
-                      ) : (
-                        <svg className="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <rect x="3" y="4" width="7" height="7" rx="1" />
-                          <rect x="14" y="4" width="7" height="7" rx="1" />
-                          <rect x="3" y="13" width="7" height="7" rx="1" />
-                          <rect x="14" y="13" width="7" height="7" rx="1" />
-                        </svg>
-                      )}
-                    </div>
-                    <div className="cbody">
-                      <div className="cname">
-                        {c.name}
-                        <span className="en">{c.desc.slice(0, 18)}</span>
-                      </div>
-                      <div className="chips">
-                        {c.values.slice(0, 6).map((v, i) => (
-                          <span className="chip" key={i}>
-                            {v}
-                          </span>
-                        ))}
-                      </div>
-                      <span className="go">{locale === "zh" ? "进入选型" : "Start selecting"}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </section>
-          ))
-        )}
-
-        {/* ===== 第 2 步：选参数 + 实时结果 ===== */}
-        {step === 2 && (
-          <div className="grid grid-cols-1 lg:grid-cols-[1.55fr_1fr] gap-5">
-            <section className="bg-white border border-[#e4e0d8] rounded-[14px] p-6">
-              <h2 className="text-[18px] font-extrabold flex items-center gap-2.5 mb-1">
-                <span className="bg-[#a8141a] text-white w-[26px] h-[26px] rounded-[7px] inline-flex items-center justify-center text-[14px]">2</span>
-                {dict.h2}
-                <span className="text-[12px] font-medium text-[#5c6169] ms-2">{activeManual?.zh || ""}</span>
-              </h2>
-              <p className="text-[#5c6169] text-[13px] mb-4">{dict.hint}</p>
-
-              {/* 手册系列（owner 口径：细分严格按手册；系列清单来自手册目录页） */}
-              {activeCat && activeCat.bySeries.length > 0 && (
-                <div className="mb-4">
-                  <div className="text-[13px] font-bold text-[#2a2d33] mb-2">
-                    {locale === "zh" ? "手册系列" : "Catalog series"}
-                    <span className="text-[11px] font-normal text-[#5f666b] ms-2">
-                      {activeManual?.series.length} {locale === "zh" ? "个系列" : "series"}
-                      {activeManual?.rulePages ? ` · ${locale === "zh" ? "编码规则见" : "code rules:"} ${activeManual.rulePages}` : ""}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setSeriesKey("")}
-                      className={`border-[1.5px] rounded-lg px-3 py-1.5 text-[12.5px] transition-all ${
-                        seriesKey === "" ? "bg-[#111214] border-[#111214] text-white" : "border-[#e4e0d8] bg-white text-[#2a2d33] hover:border-[#c63036]"
-                      }`}
-                    >
-                      {dict.all}
-                    </button>
-                    {activeCat.bySeries.map((s) => (
-                      <button
-                        key={s.series}
-                        type="button"
-                        onClick={() => setSeriesKey(seriesKey === s.series ? "" : s.series)}
-                        title={s.count === 0 ? (locale === "zh" ? "手册有此系列，官网暂无型号" : "In catalog, not on site yet") : ""}
-                        className={`border-[1.5px] rounded-lg px-3 py-1.5 text-[12.5px] transition-all ${
-                          seriesKey === s.series
-                            ? "bg-[#111214] border-[#111214] text-white"
-                            : s.count === 0
-                              ? "border-dashed border-[#e4e0d8] text-[#9aa1ac]"
-                              : "border-[#e4e0d8] bg-white text-[#2a2d33] hover:border-[#c63036]"
-                        }`}
-                      >
-                        <span className="font-bold">{s.series}</span>
-                        {s.count > 0 && <span className="ms-1 text-[10.5px]">({s.count})</span>}
-                      </button>
-                    ))}
-                  </div>
+          <div className="xb">
+            <p>{L.explainP}</p>
+            <div className="steps">
+              <div className="st">
+                <div className="k">{L.exK1}</div>
+                <div className="d">
+                  <code>316L</code> / <code>316</code> · <code>6V</code> · <code>6VV</code>
                 </div>
-              )}
-
-              {/* 手册给出的筛选维度（维度名严格来自手册；下方取值取自官网产品规格） */}
-              {activeManual && activeManual.dimensions.length > 0 && (
-                <div className="mb-4 text-[11.5px] text-[#5f666b] bg-[#f4f5f6] border border-[#e2e4e6] rounded-lg px-3 py-2">
-                  {locale === "zh" ? "手册筛选维度" : "Catalog filter dimensions"}：
-                  <b className="text-[#2a2d33] font-semibold">{activeManual.dimensions.join(" · ")}</b>
-                  <span className="ms-2">（{locale === "zh" ? "下方可选值取自官网产品规格" : "options come from product specs"}）</span>
+              </div>
+              <div className="st">
+                <div className="k">{L.exK2}</div>
+                <div className="d">
+                  <code>I/B/G/O</code> <code>ALD</code> <code>DV1–DV7</code> <code>PRE/PRT1–3</code> <code>CV3</code>{" "}
+                  <code>BSM</code> <code>FT4–FT6</code> <code>BV</code> <code>NV</code> <code>BSV</code>
                 </div>
-              )}
-
-              {/* 手册数值规格表（owner：只把数值取出，不加工图片） */}
-              {manualSpecTables.length > 0 && (
-                <div className="mb-4 border border-[#e2e4e6] rounded-lg overflow-hidden">
-                  <div className="bg-[#f4f5f6] px-3 py-2 text-[12px] font-bold text-[#2a2d33] flex items-center justify-between">
-                    <span>{locale === "zh" ? "手册规格（数值）" : "Catalog specifications"}</span>
-                    <span className="font-normal text-[#5f666b]">
-                      {locale === "zh" ? "来源：手册目录页" : "from catalog"} · {manualSpecTables.reduce((n, t) => n + t.rows.length, 0)}{" "}
-                      {locale === "zh" ? "行" : "rows"}
-                    </span>
-                  </div>
-                  <div className="max-h-[420px] overflow-auto">
-                    <table className="w-full text-[12px] border-collapse">
-                      <thead>
-                        <tr className="bg-[#a8141a] text-white">
-                          {(manualSpecTables[0].columns.length
-                            ? manualSpecTables[0].columns
-                            : ["1", "2", "3", "4", "5"].map((n) => `列${n}`)
-                          ).map((c, i) => (
-                            <th key={i} className="text-start px-3 py-2 font-semibold whitespace-nowrap">
-                              {c}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {manualSpecTables.map((t) =>
-                          t.rows.map((r, ri) => (
-                            <tr key={`${t.id}-${ri}`} className={ri % 2 === 1 ? "bg-[#fafafa]" : "bg-white"}>
-                              {r.map((v, vi) => (
-                                <td key={vi} className="px-3 py-2 align-top text-[#2a2d33] border-b border-[#eee]">
-                                  {v}
-                                </td>
-                              ))}
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className="px-3 py-2 text-[11px] text-[#5f666b] bg-white">
-                    {locale === "zh"
-                      ? "以上为手册原始数值（未做换算/加工）；「待确认」表示手册未给出该值。"
-                      : "Values as printed in the catalog (no conversion); “待确认” = not stated in the catalog."}
-                  </div>
-                </div>
-              )}
-
-              {/* 工况：工作压力下限（车间常用"我要 ≥N bar"的选型方式） */}
-              <label className="inline-flex items-center gap-2 text-[12.5px] text-[#5f666b] mb-4">
-                <span className="font-medium text-[#2a2d33]">{locale === "zh" ? "工作压力 ≥" : "Working pressure ≥"}</span>
-                <input
-                  value={minBar}
-                  onChange={(e) => setMinBar(e.target.value.replace(/[^\d.]/g, ""))}
-                  placeholder="300"
-                  className="w-20 px-2 py-1.5 text-[13px] border border-[#e4e0d8] rounded-lg outline-none focus:border-[#c63036]"
-                />
-                <span>bar</span>
-              </label>
-
-              <div className="relative mb-4">
-                <Search size={14} className="absolute start-3 top-1/2 -translate-y-1/2 text-[#9aa1ac]" />
-                <input
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder={dict.search}
-                  className="w-full ps-9 pe-3 py-2 text-[13px] border border-[#e4e0d8] rounded-lg outline-none focus:border-[#c63036]"
-                />
               </div>
-
-              {facets.map((f) => (
-                <div key={f.key} className="mb-4">
-                  <div className="text-[13px] font-bold text-[#2a2d33] mb-2">{f.key === LABEL_FACET ? dict.s2 : f.key}</div>
-                  <div className="flex flex-wrap gap-2">
-                    {f.values.map((v) => {
-                      const n = availability[f.key]?.[v] ?? 0;
-                      const dis = n === 0 && picked[f.key] !== v;
-                      const on = picked[f.key] === v;
-                      return (
-                        <button
-                          key={v}
-                          disabled={dis}
-                          onClick={() => toggle(f.key, v)}
-                          className={`border-[1.5px] rounded-lg px-3 py-1.5 text-[12.5px] transition-all ${
-                            on
-                              ? "bg-[#111214] border-[#111214] text-white"
-                              : dis
-                                ? "opacity-35 border-[#e4e0d8] text-[#5c6169] cursor-not-allowed"
-                                : "border-[#e4e0d8] bg-white text-[#2a2d33] hover:border-[#c63036] hover:text-[#a8141a]"
-                          }`}
-                          title={dis ? dict.noMatch : ""}
-                        >
-                          <span className="font-bold">{v}</span>
-                          {!dis && n > 0 && n < catItems.length && <span className={`ms-1 text-[10.5px] ${on ? "text-[#c9cdd4]" : "text-[#5c6169]"}`}>({n})</span>}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-
-              <div className="flex items-center gap-3 pt-3 border-t border-[#e4e0d8]">
-                <button onClick={() => setStep(1)} className="text-[12.5px] px-3 py-1.5 border border-[#e4e0d8] rounded-lg hover:bg-[#f6f4f0]">
-                  {dict.backP}
-                </button>
-                <button
-                  onClick={() => { setPicked({}); setQ(""); }}
-                  className="text-[12.5px] px-3 py-1.5 border border-[#e4e0d8] rounded-lg hover:bg-[#f6f4f0] inline-flex items-center gap-1"
-                >
-                  <RotateCcw size={12} /> {dict.clear}
-                </button>
-                <button onClick={() => setStep(3)} className="ms-auto text-[12.5px] px-4 py-1.5 bg-[#a8141a] text-white rounded-lg hover:bg-[#7d0f13] inline-flex items-center gap-1">
-                  {dict.next} <ArrowRight size={13} className="rtl-flip" />
-                </button>
+              <div className="st">
+                <div className="k">{L.exK3}</div>
+                <div className="d">{L.exD3}</div>
               </div>
-            </section>
-
-            {/* 实时结果框（原型 .result） */}
-            <section className="border-2 border-[#a8141a] rounded-[14px] overflow-hidden bg-[linear-gradient(180deg,#fff,#fbf7f7)] self-start">
-              <div className="bg-[#a8141a] text-white px-4 py-2.5 font-extrabold text-[14px] flex items-center justify-between">
-                <span>{dict.matched}</span>
-                <span className="text-[13px] font-semibold">
-                  {matched.length} / {catItems.length} {dict.items}
-                </span>
-              </div>
-              <div className="p-4 space-y-3">
-                {matched.slice(0, 4).map((it) => (
-                  <div key={it.id} className="bg-white border border-[#e4e0d8] rounded-xl p-3">
-                    <div className="flex items-start gap-3">
-                      {it.image && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={it.image} alt={it.name} className="w-14 h-14 object-contain rounded-lg border border-[#e4e0d8] shrink-0" />
-                      )}
-                      <div className="min-w-0">
-                        <div className="font-bold text-[13.5px] truncate">{it.name}</div>
-                        <div className="text-[11.5px] text-[#5c6169] font-mono">{it.model}</div>
-                        <div className="mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
-                          {it.keySpecs.slice(0, 2).map(([k, v]) => (
-                            <span key={k} className="text-[10.5px] text-[#5c6169]">
-                              <span className="text-[#9aa1ac]">{k}:</span> {v}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-2 flex items-center gap-2">
-                      <Link href={it.href} className="text-[11.5px] px-2.5 py-1 border border-[#e4e0d8] rounded-lg hover:bg-[#f6f4f0] inline-flex items-center gap-1">
-                        {dict.detail} <ChevronRight size={11} className="rtl-flip" />
-                      </Link>
-                      <button onClick={() => addCart(it)} className="text-[11.5px] px-2.5 py-1 bg-[#a8141a] text-white rounded-lg hover:bg-[#7d0f13] inline-flex items-center gap-1">
-                        {added === it.id ? <Check size={11} /> : <ShoppingCart size={11} />}
-                        {added === it.id ? dict.added : dict.addCart}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                {matched.length === 0 && <div className="text-center text-[12.5px] text-[#5c6169] py-6">{dict.noMatch}</div>}
-                {matched.length > 4 && (
-                  <button onClick={() => setStep(3)} className="w-full text-[12px] py-2 border border-[#e4e0d8] rounded-lg hover:bg-[#f6f4f0]">
-                    {dict.viewAll}（{matched.length}）
-                  </button>
-                )}
-              </div>
-            </section>
+            </div>
+            <p className="note">{L.exNote}</p>
           </div>
-        )}
+        </div>
+      </section>
 
-        {/* ===== 第 3 步：全部匹配产品 ===== */}
-        {step === 3 && (
-          <section className="bg-white border border-[#e4e0d8] rounded-[14px] p-6">
-            <div className="flex items-center gap-3 flex-wrap mb-4">
-              <h2 className="text-[18px] font-extrabold flex items-center gap-2.5">
-                <span className="bg-[#a8141a] text-white w-[26px] h-[26px] rounded-[7px] inline-flex items-center justify-center text-[14px]">3</span>
-                {dict.h3}
-              </h2>
-              <span className="text-[12.5px] text-[#5c6169]">
-                {activeManual?.zh || ""}
-                {activeCount > 0 ? ` · ${activeCount} 项条件` : ""}
-              </span>
-              <button onClick={() => setStep(2)} className="ms-auto text-[12.5px] px-3 py-1.5 border border-[#e4e0d8] rounded-lg hover:bg-[#f6f4f0]">
-                {dict.backP}
-              </button>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-              {matched.map((it) => (
-                <div key={it.id} className="border border-[#e4e0d8] rounded-xl overflow-hidden bg-white flex flex-col">
-                  <div className="h-[150px] bg-white border-b border-[#e4e0d8] flex items-center justify-center p-2">
-                    {it.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={it.image} alt={it.name} className="max-w-full max-h-full object-contain" loading="lazy" />
-                    ) : (
-                      <span className="text-[#c63036] font-bold">{it.name.slice(0, 1)}</span>
-                    )}
-                  </div>
-                  <div className="p-3.5 flex-1 flex flex-col">
-                    <div className="font-bold text-[14px]">{it.name}</div>
-                    <div className="text-[11.5px] text-[#5c6169] font-mono mt-0.5">{it.model}</div>
-                    <div className="mt-2 space-y-0.5 flex-1">
-                      {it.keySpecs.slice(0, 3).map(([k, v]) => (
-                        <div key={k} className="text-[11px] flex justify-between gap-2">
-                          <span className="text-[#9aa1ac] truncate">{k}</span>
-                          <span className="text-[#2a2d33] font-medium text-end">{v}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-3 flex items-center gap-2">
-                      <Link href={it.href} className="flex-1 text-center text-[12px] py-1.5 border border-[#e4e0d8] rounded-lg hover:bg-[#f6f4f0]">
-                        {dict.detail}
-                      </Link>
-                      <button onClick={() => addCart(it)} className="flex-1 text-[12px] py-1.5 bg-[#a8141a] text-white rounded-lg hover:bg-[#7d0f13] inline-flex items-center justify-center gap-1">
-                        {added === it.id ? <Check size={12} /> : <ShoppingCart size={12} />}
-                        {added === it.id ? dict.added : dict.addCart}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {matched.length === 0 && <div className="text-center text-[13px] text-[#5c6169] py-10">{dict.noMatch}</div>}
-          </section>
-        )}
+      {/* 服务中心提示（原型 .svc） */}
+      <section className="wrap">
+        <div className="svc">
+          <p>{L.svcP}</p>
+          <Link className="btn" href="/contact">
+            {L.svcBtn}
+          </Link>
+        </div>
+      </section>
 
-        <p className="text-center text-[11.5px] text-[#9aa1ac] mt-6">{dict.sub}</p>
-      </div>
+      {/* 安全提示（原型 .safety） */}
+      <section className="wrap">
+        <div className="safety">
+          <div className="t">{L.safetyT}</div>
+          <p>{L.safetyP}</p>
+        </div>
+      </section>
+
+      <div className={"toast" + (toast ? " on" : "")}>{toast}</div>
     </div>
   );
 }
