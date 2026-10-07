@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import PageHero from "@/components/ui/PageHero";
 import Link from "next/link";
 import { ArrowRight, LayoutGrid, Rows3, Sparkles } from "lucide-react";
+import FitImage from "@/components/ui/FitImage";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
 import { useProductTabs } from "@/lib/api/useProducts";
@@ -195,24 +196,17 @@ function ProductsContent() {
       {/* 正方形 1:1 + 图片铺满（owner 2026-09-25：两者同时生效） */}
       <div className="aspect-square bg-dark-50 relative overflow-hidden">
         {model.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          /*
+            owner 2026-10-07：「透明背景的图片，如果是长方形，不要切割图片，按长和宽的数值的最大值补齐图片为正方形」
+            ⇒ 交给统一的 `FitImage`：透明背景图自动 `object-contain`（不裁切），其余照旧 `object-cover`（铺满）；
+              加载失败也会退到本站 LOGO 占位。调用方**不要**再自己写 object-cover / onError。
+          */
+          <FitImage
             src={model.image}
             alt={model.name}
-            /* 铺满图片区（owner 2026-09-25：「产品图片充满背景」）：object-contain + p-4 → object-cover */
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            /* 图片**加载失败**（URL 失效/文件被删）也走同一套"灰底 + 45% 透明 LOGO"占位，
-               而不是留一个破图 —— 与"没有图片"的观感保持一致。
-               LOGO 取**本站**的 `/api/public/site-config?key=logo`（兜底 /images/logo.png）
-               ⇒ 两站各自显示自己的 LOGO（owner 2026-10-07：左文用左文的 LOGO）。 */
-            onError={(e) => {
-              const el = e.currentTarget
-              el.onerror = null // 防死循环：LOGO 自己也失败时不再递归触发
-              el.src = logoUrl || "/images/logo.png"
-              el.className = "object-contain opacity-[0.45]"
-              el.style.cssText =
-                "position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:70%;max-height:45%;width:auto;height:auto;"
-            }}
+            fallbackSrc={logoUrl || "/images/logo.png"}
+            /* 铺满图片区（owner 2026-09-25：「产品图片充满背景」），仍保留悬浮放大动效 */
+            className="w-full h-full group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
           /*

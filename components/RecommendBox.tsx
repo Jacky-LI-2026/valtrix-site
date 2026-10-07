@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Sparkles, Calendar, ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import FitImage from "@/components/ui/FitImage";
 
 interface RecItem {
   id: string;
@@ -69,15 +70,6 @@ export default function RecommendBox({
       .catch(() => {});
   }, []);
 
-  /** 图片加载失败 → 换成"灰底 + 45% 透明 LOGO"占位（与列表/详情同一套观感） */
-  const onImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const el = e.currentTarget;
-    el.onerror = null; // 防死循环
-    el.src = siteLogo || "/images/logo.png";
-    el.className = "object-contain opacity-[0.45]";
-    el.style.cssText =
-      "position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:70%;max-height:45%;width:auto;height:auto;";
-  };
   const [active, setActive] = useState(false);
 
   const fmtDate = (v?: string) => {
@@ -167,8 +159,13 @@ export default function RecommendBox({
                       现统一为**灰底 + 45% 透明 LOGO**，与产品列表/详情页完全一致。
                     */}
                     {it.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={it.image} alt={it.name} loading="lazy" className="w-full h-full object-cover relative" onError={onImgError} />
+                      <FitImage
+                        src={it.image}
+                        alt={it.name}
+                        loading="lazy"
+                        fallbackSrc={siteLogo || "/images/logo.png"}
+                        className="w-full h-full relative"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-dark-50">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -210,8 +207,13 @@ export default function RecommendBox({
                       （owner 2026-09-25：比例与铺满要**同时**生效；产品图是 1000×1000 方图，不裁切） */}
                   <div className="aspect-square bg-gray-100 relative overflow-hidden">
                     {it.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={it.image} alt={it.name} loading="lazy" className="w-full h-full object-cover relative" onError={onImgError} />
+                      <FitImage
+                        src={it.image}
+                        alt={it.name}
+                        loading="lazy"
+                        fallbackSrc={siteLogo || "/images/logo.png"}
+                        className="w-full h-full relative"
+                      />
                     ) : (
                       /* 无图占位：与列表/详情页统一（灰底 + 45% 透明 LOGO），不再用首字母块 */
                       <div className="w-full h-full flex items-center justify-center bg-dark-50">

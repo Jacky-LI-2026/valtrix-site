@@ -18,6 +18,7 @@ import { useProductBySlug } from "@/lib/api/useProducts";
 import ThreeSixtyViewer from "@/components/ui/ThreeSixtyViewer";
 import DownloadGateButton from "@/components/ui/DownloadGateButton";
 import RecommendBox from "@/components/RecommendBox";
+import FitImage from "@/components/ui/FitImage";
 import { HeroBackground } from "@/lib/page-hero-config";
 import PriceDisplay, { usePricingContext } from "@/components/PriceDisplay";
 import { getContactEmail, getContactPhone } from "@/lib/brand";
@@ -482,24 +483,18 @@ export default function ProductDetailClient() {
                   /* 加载中：中性骨架（不再放占位图，避免"先读到一张错图"） */
                   <div className="w-full h-full bg-gradient-to-br from-dark-50 to-dark-100 animate-pulse" />
                 ) : currentImage ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  /*
+                    owner 2026-10-07（批注 3「同批注1」）：透明背景的长方形图**不裁切** ——
+                    交给统一的 `FitImage`（透明背景自动 object-contain，否则照旧 object-cover）。
+                  */
+                  <FitImage
                     src={currentImage}
                     alt={`${model.name} - ${model.model} - ${t("view")} ${currentImageIndex + 1}`}
-                    /* 铺满正方形主图区（产品图为 1000×1000 方图 ⇒ 不裁切） */
-                    className="w-full h-full object-cover transition-transform"
+                    fallbackSrc={siteLogo || "/images/logo.png"}
+                    /* 铺满正方形主图区（方形产品图不会裁切） */
+                    className="w-full h-full transition-transform"
                     style={{ transform: imageTransform, transitionDuration: isDragging || isHovering ? "0ms" : "200ms" }}
                     draggable={false}
-                    /* 加载失败（URL 失效/文件被删）→ 与列表卡片同一套"灰底 + 45% 透明 LOGO"占位，
-                       而不是留一个破图（owner 2026-10-07：「占位图也适用于产品详情页」）。 */
-                    onError={(e) => {
-                      const el = e.currentTarget
-                      el.onerror = null // 防死循环：LOGO 自己也失败时不再递归
-                      el.src = siteLogo || "/images/logo.png"
-                      el.className = "object-contain opacity-[0.45]"
-                      el.style.cssText =
-                        "position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:60%;max-height:60%;width:auto;height:auto;"
-                    }}
                   />
                 ) : (
                   /*
@@ -569,12 +564,19 @@ export default function ProductDetailClient() {
 
                             {/* Thumbnails - 缩略图导航：360入口独立，后面跟产品图片缩略图 */}
               {(model.frames360 || images.length > 1) && (
-                <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
+                /*
+                  owner 2026-10-07（批注 2）：「当图片比较少时，图片显示尺寸的比例不要变大，
+                  保持 6 张图片的长和宽比例」——
+                  原来是 `flex` + 每项 `flex-1`：2 张图时每张占一半宽（尺寸被放大），
+                  与 6 张图时的大小完全不一致。现改为**固定 6 列栅格**：不论几张图，
+                  每格始终是"6 张那一档"的尺寸，超过 6 张自动换行（不再越挤越小）。
+                */
+                <div className="grid grid-cols-6 gap-2 mt-4">
                   {/* 360度视图入口（独立，不占用产品图片位置，背景用第一张产品图） */}
                   {model.frames360 && (
                     <button
                       onClick={() => setViewMode("360")}
-                      className={`relative flex-1 aspect-square rounded-lg overflow-hidden border-2 transition-all min-w-0 ${
+                      className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all min-w-0 ${
                         viewMode === "360"
                           ? "border-primary shadow-md ring-2 ring-primary/20"
                           : "border-dark-200 hover:border-dark-400"
@@ -607,19 +609,20 @@ export default function ProductDetailClient() {
                           setShowDragHint(false);
                           setViewMode("static");
                         }}
-                        className={`relative flex-1 aspect-square rounded-lg overflow-hidden border-2 transition-all min-w-0 ${
+                        className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all min-w-0 ${
                           isActive
                             ? "border-primary shadow-md ring-2 ring-primary/20"
                             : "border-dark-200 hover:border-dark-400"
                         }`}
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                        {/* 缩略图同样走 FitImage：透明背景的长方图不裁切 */}
+                        <FitImage
                           src={toThumbUrl(img)}
                           alt={`${model.model} ${t("view")} ${index + 1}`}
-                          className="w-full h-full object-cover bg-dark-50"
+                          /* 回退链：`_thumb.webp` 不存在 → 先退回**原图**，原图也失败才用 LOGO 占位 */
+                          fallbackSrc={[img, siteLogo || "/images/logo.png"]}
+                          className="w-full h-full bg-dark-50"
                           loading="lazy"
-                          onError={(e) => { if (e.currentTarget.src !== img) e.currentTarget.src = img; }}
                         />
                         <span className="absolute bottom-0.5 right-0.5 bg-black/50 text-white text-[9px] px-1 rounded">{index + 1}</span>
                       </button>
