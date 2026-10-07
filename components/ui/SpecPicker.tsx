@@ -32,6 +32,7 @@ import {
 import { buildConnFields, connSummary } from "@/lib/conn-spec";
 import { findManualSeries } from "@/lib/manual-codes";
 import { MANUAL_SPECS } from "@/lib/manual-specs";
+import { manualCellToEn } from "@/lib/manual-i18n";
 
 /** `createLocalizedGetter(locale)` 的返回类型（只用到 get） */
 type LocFn = LocGetter;
@@ -73,11 +74,16 @@ const T: Record<string, Record<string, string>> = {
   zh: { title: "快速选型", label: "规格项", port: "端口", all: "全部", matched: "匹配", items: "项", clear: "清空", empty: "当前条件下没有匹配的规格，试试放宽条件：", search: "搜索货号 / 尺寸 / 关键字", copy: "复制货号", copied: "已复制", add: "加入询价车", full: "查看完整规格表", code: "货号", more: "显示全部匹配项", collapse: "收起",
         minBar: "工况：工作压力 ≥", bar: "bar", codeGen: "货号生成器", genHint: "按段位选择生成货号（段位取值来自本产品已有机型）", genMatch: "命中已有机型", genNoMatch: "库里暂无该组合，可作为定制需求提交（复制货号发给客服）", sheet: "生成选型单", sheetTitle: "产品选型单", conditions: "筛选条件", none: "无", connCol: "接口 / 端接", pressureCol: "工作压力", generated: "生成货号" },
   en: { title: "Quick selector", label: "Type", port: "Port", all: "All", matched: "Matched", items: "items", clear: "Clear", empty: "No specification matches the current filters — try relaxing them: ", search: "Search part no. / size / keyword", copy: "Copy part no.", copied: "Copied", add: "Add to quote cart", full: "View full specification table", code: "Part no.", more: "Show all matches", collapse: "Collapse",
-        minBar: "Service: working pressure ≥", bar: "bar" },
-  ja: { title: "かんたん選定", label: "種類", port: "ポート", all: "すべて", matched: "該当", items: "件", clear: "クリア", empty: "現在の条件に合う仕様がありません。条件を緩めてください：", search: "品番 / サイズ / キーワードで検索", copy: "品番をコピー", copied: "コピー済み", add: "見積に追加", full: "仕様表をすべて表示", code: "品番", more: "該当をすべて表示", collapse: "閉じる", minBar: "使用条件：使用圧力 ≥", bar: "bar" },
-  ko: { title: "간편 선택", label: "유형", port: "포트", all: "전체", matched: "일치", items: "개", clear: "초기화", empty: "현재 조건에 맞는 사양이 없습니다. 조건을 완화해 보세요: ", search: "품번 / 크기 / 키워드 검색", copy: "품번 복사", copied: "복사됨", add: "견적 카트에 추가", full: "전체 사양표 보기", code: "품번", more: "전체 일치 항목 보기", collapse: "접기", minBar: "사용 조건: 사용 압력 ≥", bar: "bar" },
-  fr: { title: "Sélecteur rapide", label: "Type", port: "Port", all: "Tous", matched: "Correspondances", items: "éléments", clear: "Effacer", empty: "Aucune spécification ne correspond aux filtres — élargissez-les : ", search: "Réf. / dimension / mot-clé", copy: "Copier la réf.", copied: "Copié", add: "Ajouter au panier", full: "Voir le tableau complet", code: "Réf.", more: "Voir toutes les correspondances", collapse: "Réduire", minBar: "Service : pression de service ≥", bar: "bar" },
-  ar: { title: "محدد سريع", label: "النوع", port: "منفذ", all: "الكل", matched: "مطابق", items: "عنصر", clear: "مسح", empty: "لا توجد مواصفات مطابقة للشروط الحالية — جرّب توسيعها: ", search: "بحث بالرقم / المقاس / كلمة", copy: "نسخ رقم القطعة", copied: "تم النسخ", add: "أضف إلى سلة العرض", full: "عرض جدول المواصفات الكامل", code: "رقم القطعة", more: "عرض كل المطابقات", collapse: "طي", minBar: "الخدمة: ضغط العمل ≥", bar: "bar" },
+        minBar: "Service: working pressure ≥", bar: "bar",
+        codeGen: "Part number generator", genHint: "Build a part number by choosing each segment (values come from this product's existing models)", genMatch: "Matches an existing model", genNoMatch: "No such combination in the catalog — submit it as a custom request (copy the part no. and send it to us)", sheet: "Generate selection sheet", sheetTitle: "Product selection sheet", conditions: "Filters", none: "None", connCol: "Connection / end", pressureCol: "Working pressure", generated: "Generated part no." },
+  ja: { title: "かんたん選定", label: "種類", port: "ポート", all: "すべて", matched: "該当", items: "件", clear: "クリア", empty: "現在の条件に合う仕様がありません。条件を緩めてください：", search: "品番 / サイズ / キーワードで検索", copy: "品番をコピー", copied: "コピー済み", add: "見積に追加", full: "仕様表をすべて表示", code: "品番", more: "該当をすべて表示", collapse: "閉じる", minBar: "使用条件：使用圧力 ≥", bar: "bar",
+        codeGen: "品番ジェネレーター", genHint: "セグメントを選んで品番を生成します（値は本製品の既存モデルから取得）", genMatch: "既存モデルに一致", genNoMatch: "この組み合わせはカタログにありません。カスタム依頼として送信できます（品番をコピーしてご連絡ください）", sheet: "選定シートを作成", sheetTitle: "製品選定シート", conditions: "絞り込み条件", none: "なし", connCol: "接続 / 端部", pressureCol: "使用圧力", generated: "生成品番" },
+  ko: { title: "간편 선택", label: "유형", port: "포트", all: "전체", matched: "일치", items: "개", clear: "초기화", empty: "현재 조건에 맞는 사양이 없습니다. 조건을 완화해 보세요: ", search: "품번 / 크기 / 키워드 검색", copy: "품번 복사", copied: "복사됨", add: "견적 카트에 추가", full: "전체 사양표 보기", code: "품번", more: "전체 일치 항목 보기", collapse: "접기", minBar: "사용 조건: 사용 압력 ≥", bar: "bar",
+        codeGen: "품번 생성기", genHint: "세그먼트를 선택해 품번을 생성합니다(값은 본 제품의 기존 모델에서 가져옴)", genMatch: "기존 모델과 일치", genNoMatch: "해당 조합은 카탈로그에 없습니다. 맞춤 요청으로 제출할 수 있습니다(품번을 복사해 전달해 주세요)", sheet: "선정 시트 생성", sheetTitle: "제품 선정 시트", conditions: "필터 조건", none: "없음", connCol: "연결 / 엔드", pressureCol: "사용 압력", generated: "생성 품번" },
+  fr: { title: "Sélecteur rapide", label: "Type", port: "Port", all: "Tous", matched: "Correspondances", items: "éléments", clear: "Effacer", empty: "Aucune spécification ne correspond aux filtres — élargissez-les : ", search: "Réf. / dimension / mot-clé", copy: "Copier la réf.", copied: "Copié", add: "Ajouter au panier", full: "Voir le tableau complet", code: "Réf.", more: "Voir toutes les correspondances", collapse: "Réduire", minBar: "Service : pression de service ≥", bar: "bar",
+        codeGen: "Générateur de référence", genHint: "Composez la référence segment par segment (les valeurs proviennent des modèles existants de ce produit)", genMatch: "Correspond à un modèle existant", genNoMatch: "Combinaison absente du catalogue — à soumettre comme demande personnalisée (copiez la référence et envoyez-la nous)", sheet: "Générer la fiche de sélection", sheetTitle: "Fiche de sélection produit", conditions: "Filtres", none: "Aucun", connCol: "Raccord / extrémité", pressureCol: "Pression de service", generated: "Référence générée" },
+  ar: { title: "محدد سريع", label: "النوع", port: "منفذ", all: "الكل", matched: "مطابق", items: "عنصر", clear: "مسح", empty: "لا توجد مواصفات مطابقة للشروط الحالية — جرّب توسيعها: ", search: "بحث بالرقم / المقاس / كلمة", copy: "نسخ رقم القطعة", copied: "تم النسخ", add: "أضف إلى سلة العرض", full: "عرض جدول المواصفات الكامل", code: "رقم القطعة", more: "عرض كل المطابقات", collapse: "طي", minBar: "الخدمة: ضغط العمل ≥", bar: "bar",
+        codeGen: "مُنشئ رقم القطعة", genHint: "أنشئ رقم القطعة باختيار كل مقطع (القيم مأخوذة من الموديلات الحالية لهذا المنتج)", genMatch: "مطابق لموديل حالي", genNoMatch: "لا يوجد هذا التوليف في الكتالوج — يمكن إرساله كطلب مخصص (انسخ رقم القطعة وأرسله إلينا)", sheet: "إنشاء ورقة الاختيار", sheetTitle: "ورقة اختيار المنتج", conditions: "عوامل التصفية", none: "لا شيء", connCol: "الوصلة / النهاية", pressureCol: "ضغط العمل", generated: "رقم القطعة المُنشأ" },
 };
 
 /** 从一条机型的所有规格值里取**最大工作压力（bar）**；解析不出则返回 -1（不参与压力筛选） */
@@ -112,7 +118,7 @@ export default function SpecPicker({
     if (!manual) return null;
     const cat = MANUAL_SPECS.find((c) => c.category === manual.key);
     const s = cat?.series.find((x) => x.id === manual.key);
-    return s && s.rows.length ? { columns: cat!.columns, rows: s.rows, series: s } : null;
+    return s && s.rows.length ? { columns: cat!.columns, columnsEn: cat!.columnsEn || [], rows: s.rows, series: s } : null;
   }, [manual]);
   const rows = useMemo(() => (Array.isArray(specs) ? specs.map((s) => parseSpecRow(s, loc)) : []), [specs, loc]);
 
@@ -371,7 +377,7 @@ tr:nth-child(even) td{background:#fafafa}
             <table className="w-full text-[12px] border-collapse">
               <thead>
                 <tr className="bg-primary text-white">
-                  {manualRows.columns.map((c, i) => (
+                  {(locale === "zh" || !manualRows.columnsEn.length ? manualRows.columns : manualRows.columnsEn).map((c, i) => (
                     <th key={i} className="text-start px-3 py-2 font-semibold whitespace-nowrap">
                       {c}
                     </th>
@@ -383,7 +389,7 @@ tr:nth-child(even) td{background:#fafafa}
                   <tr key={ri} className={ri % 2 ? "bg-dark-50/40" : "bg-white"}>
                     {r.map((v, vi) => (
                       <td key={vi} className="px-3 py-2 align-top text-dark-600 border-b border-dark-50">
-                        {v}
+                        {locale === "zh" ? v : manualCellToEn(v)}
                       </td>
                     ))}
                   </tr>

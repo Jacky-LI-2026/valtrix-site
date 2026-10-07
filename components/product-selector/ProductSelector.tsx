@@ -34,6 +34,7 @@ import { createLocalizedGetter } from "@/lib/localized";
 import { addToQuoteCart } from "@/lib/quote-cart";
 import { MANUAL_CATEGORIES, MANUAL_GROUPS, matchManualSeries } from "@/lib/manual-catalog";
 import { MANUAL_SPECS } from "@/lib/manual-specs";
+import { manualCellToEn } from "@/lib/manual-i18n";
 import PageHero from "@/components/ui/PageHero";
 
 /* ==========================================================================
@@ -849,9 +850,10 @@ export default function ProductSelector() {
                                 {r.cells.map((cell, ci) => {
                                   const hit = ci === 0 ? siteFor(s, cell, true) : null;
                                   const tbd = cell === "待确认";
+                                  const shown = isZh ? cell : manualCellToEn(cell);
                                   return (
                                     <td key={ci}>
-                                      {ci === 0 ? <b>{cell}</b> : tbd ? <i style={{ color: "var(--red)" }}>{L.pending}</i> : cell}
+                                      {ci === 0 ? <b>{shown}</b> : tbd ? <i style={{ color: "var(--red)" }}>{L.pending}</i> : shown}
                                       {hit && (
                                         <Link href={hit.href} title={L.detail} className="vsa-lnk">
                                           ↗

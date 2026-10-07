@@ -22,6 +22,7 @@ import FitImage from "@/components/ui/FitImage";
 import { HeroBackground } from "@/lib/page-hero-config";
 import PriceDisplay, { usePricingContext } from "@/components/PriceDisplay";
 import { getContactEmail, getContactPhone } from "@/lib/brand";
+import { manualCellToEn } from "@/lib/manual-i18n";
 
 const DEFAULT_MANUAL_URL = "/downloads/valtrix-product-catalog-2026.pdf";
 const DRAG_THRESHOLD = 100; // 拖拽切换图片的阈值（像素），释放时超过此距离才切换
@@ -97,14 +98,22 @@ export default function ProductDetailClient() {
   const isVariantSpec = (() => {
     const arr = specsArray as any[];
     if (!Array.isArray(arr) || arr.length < 8) return false;
-    const withCode = arr.filter((s) => s && s.groupName).length;
+    /**
+     * 🔴 owner 2026-10-07（`/products/valves/316l-dv1-2a-fmr4-nc-hp`）：右侧一堆卡片的 `Part no.` 全是「基本参数」
+     *   ——「这些数据有什么意义？」根因：老判据只看"**有没有** groupName"，而这个产品每条规格都带 groupName，
+     *   但它们只是栏目名（`基本参数` / `气动执行器` / `工作温度` / `泄漏率（氦气）`），**不是货号** ⇒ 被误判成变体型。
+     * 现判据（与基地/左文站同一口径，阈值由线上真实数据定）：**唯一货号数 / 行数 ≥ 0.8**
+     *   （真·变体型实测 G 系列/双卡套/螺纹都是 1.00；DV1 这类参数清单只有 4 个栏目名 ⇒ 0.40 → 正确判为"清单"），
+     *   或 **同一规格项名占比 ≥ 30%**（同名列重复的合并表，如 1913 行的双卡套接头）。
+     */
+    const uniqueCodes = new Set(arr.map((s) => String(s?.groupName || "").trim()).filter(Boolean)).size;
     const freq = new Map<string, number>();
     for (const s of arr) {
       const l = String(loc.get(s, "label") || "").trim();
       if (l) freq.set(l, (freq.get(l) || 0) + 1);
     }
     const maxShare = freq.size ? Math.max(...Array.from(freq.values())) / arr.length : 0;
-    return withCode >= arr.length * 0.3 || maxShare >= 0.3;
+    return uniqueCodes >= arr.length * 0.8 || maxShare >= 0.3;
   })();
 
   /** 该产品所属手册系列的数值规格行（「接口与端接」为空时用它补齐） */
@@ -913,14 +922,16 @@ export default function ProductDetailClient() {
                           new Set<string>(allFields.flatMap((f: ConnField[]) => f.filter((x) => x.group === "pressure").map((x) => `${x.zh} ${x.value}`)))
                         ).slice(0, 6);
                         /** 兜底：从本产品规格推断不出来时，改用**手册数值行**（owner 2026-10-06：「这几个参数在哪取信息？」） */
+                        /** 手册数值是中文原文 ⇒ 英文页过一遍术语级翻译（`lib/manual-i18n.ts`，不发明数值） */
+                        const mt = (v: string) => (locale === "zh" ? v : manualCellToEn(v));
                         const manualPorts: string[] = manualSeriesRows
-                          ? Array.from(new Set(manualSeriesRows.rows.map((r) => r[1]).filter(Boolean))).slice(0, 8)
+                          ? Array.from(new Set(manualSeriesRows.rows.map((r) => r[1]).filter(Boolean))).slice(0, 8).map(mt)
                           : [];
                         const manualPress: string[] = manualSeriesRows
-                          ? Array.from(new Set(manualSeriesRows.rows.map((r) => r[2]).filter(Boolean))).slice(0, 6)
+                          ? Array.from(new Set(manualSeriesRows.rows.map((r) => r[2]).filter(Boolean))).slice(0, 6).map(mt)
                           : [];
                         const manualMat: string[] = manualSeriesRows
-                          ? Array.from(new Set(manualSeriesRows.rows.map((r) => r[r.length - 1]).filter(Boolean))).slice(0, 4)
+                          ? Array.from(new Set(manualSeriesRows.rows.map((r) => r[r.length - 1]).filter(Boolean))).slice(0, 4).map(mt)
                           : [];
                         const connList = conns.length ? conns.map((c) => `${c.label} ×${c.count}`) : manualPorts;
                         const matList = materials.length ? materials : manualMat;
