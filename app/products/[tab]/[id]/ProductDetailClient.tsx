@@ -125,6 +125,24 @@ export default function ProductDetailClient() {
   /** 是否显示「发布到社媒」（仅登录且有发布权限的后台用户） */
   const canSocialPublish = useCanSocialPublish();
 
+  /**
+   * 插件 `product-selector` 是否启用（与产品中心同源接口 `/api/public/plugins`）。
+   *
+   * owner 2026-10-07：
+   *   「快速选型只针对于阀门网站，左文科技的后台如果没有启动这个插件，产品详情显示方式还是维持原样」
+   *   「或者将接口与端接及货号生成器隐藏」
+   * ⇒ 插件**停用**时，详情页回到原来的样子：不出现「接口与端接」汇总、不出现「快速选型 / 货号生成器 / 生成选型单」，
+   *   规格区就是原来的分组规格表（SpecPicker 会把 `children` 原样渲染）。
+   * ⚠️ 初值 false = 按"原样/未启用"渲染首帧：启用的站点随后补上插件 UI（不闪、不把插件 UI 留在停用站点上）。
+   */
+  const [selectorPluginOn, setSelectorPluginOn] = useState(false);
+  useEffect(() => {
+    fetch("/api/public/plugins", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => setSelectorPluginOn(!!(d?.state && d.state["product-selector"])))
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     const pid = model?.id;
@@ -821,11 +839,23 @@ export default function ProductDetailClient() {
                   —— Swagelok 产品页把端接写成 `Connection N Type + Connection N Size` 成对描述；
                   这里把该产品**所有变体**的端接（型式 + 尺寸）去重汇总，材质/压力同理，**只搬运不发明**。
                 */}
-                {specsArray.length > 0 && (
-                  <div className="mb-5 border border-dark-100 rounded-xl overflow-hidden">
-                    <div className="bg-dark-50 px-4 py-2.5 text-sm font-semibold text-dark">
-                      {locale === "zh" ? "接口与端接" : "Connections & End Fittings"}
-                    </div>
+                {/* 插件停用 ⇒ 不显示「接口与端接」（owner 2026-10-07：「或者将接口与端接及货号生成器隐藏」） */}
+                {selectorPluginOn && specsArray.length > 0 && (
+                  /*
+                    owner 2026-10-07：「此处默认折叠」
+                    —— 接口与端接的明细较长（G 系列 184 条变体的端接/材质/压力汇总），
+                       默认收起，标题行保留为可展开的 summary（与「完整规格表」同一套折叠写法）。
+                  */
+                  <details className="mb-5 border border-dark-100 rounded-xl overflow-hidden group">
+                    <summary className="cursor-pointer bg-dark-50 px-4 py-2.5 text-sm font-semibold text-dark select-none flex items-center justify-between gap-3">
+                      <span>{locale === "zh" ? "接口与端接" : "Connections & End Fittings"}</span>
+                      <span className="text-[11px] font-normal text-dark-400 group-open:hidden">
+                        {locale === "zh" ? "展开明细" : "Show details"}
+                      </span>
+                      <span className="hidden text-[11px] font-normal text-dark-400 group-open:inline">
+                        {locale === "zh" ? "收起" : "Collapse"}
+                      </span>
+                    </summary>
                     <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                       {(() => {
                         const allFields: ConnField[][] = specsArray.map((s: any) =>
@@ -909,7 +939,7 @@ export default function ProductDetailClient() {
                         );
                       })()}
                     </div>
-                  </div>
+                  </details>
                 )}
                 {/* owner 2026-10-06：规格特别多的产品（如 G 系列 184 条）改成**选型器**呈现；
                     完整规格表一条不丢，折叠在选型器里由 SpecPicker 渲染 children */}
@@ -917,6 +947,7 @@ export default function ProductDetailClient() {
                   specs={specsArray}
                   loc={loc}
                   locale={locale}
+                  enabled={selectorPluginOn}
                   productModel={String(model?.model || modelId || "")}
                   variantMode={isVariantSpec}
                   onAddToCart={(code) => addToCart(code)}

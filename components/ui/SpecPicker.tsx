@@ -19,7 +19,16 @@
  */
 import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, Copy, FileText, Search, ShoppingCart, Wrench, X } from "lucide-react";
-import { parseSpecRow, deriveFacets, rowMatches, naturalCompare, LABEL_FACET, type LocGetter } from "@/lib/spec-facets";
+import {
+  parseSpecRow,
+  deriveFacets,
+  derivePortFacets,
+  portFacetIndex,
+  rowMatches,
+  naturalCompare,
+  LABEL_FACET,
+  type LocGetter,
+} from "@/lib/spec-facets";
 import { buildConnFields, connSummary } from "@/lib/conn-spec";
 import { findManualSeries } from "@/lib/manual-codes";
 import { MANUAL_SPECS } from "@/lib/manual-specs";
@@ -31,6 +40,15 @@ export interface SpecPickerProps {
   /** 原始 specs（含多语种字段，由 loc 取值） */
   specs: any[];
   loc: LocFn;
+  /**
+   * 插件 `product-selector` 是否启用（默认 true）。
+   *
+   * owner 2026-10-07：「快速选型只针对于阀门网站，左文科技的后台如果没有启动这个插件，
+   *   产品详情显示方式还是维持原样」「或者将接口与端接及货号生成器隐藏」
+   * ⇒ 传 `false` 时本组件**只渲染原始规格表**（`children`），
+   *   快速选型 / 货号生成器 / 生成选型单 / 匹配结果列表一律不出现。
+   */
+  enabled?: boolean;
   /** 当前语种（界面词兜底用；缺省 zh） */
   locale?: string;
   /** 少于这么多条规格就不启用选型器（默认 9） */
@@ -52,13 +70,14 @@ export interface SpecPickerProps {
 
 /** 选型器界面词（i18n 字典暂无对应键，就地兜底 6 语种） */
 const T: Record<string, Record<string, string>> = {
-  zh: { title: "快速选型", label: "规格项", all: "全部", matched: "匹配", items: "项", clear: "清空", empty: "当前条件下没有匹配的规格，试试放宽条件：", search: "搜索货号 / 尺寸 / 关键字", copy: "复制货号", copied: "已复制", add: "加入询价车", full: "查看完整规格表", code: "货号", more: "显示全部匹配项", collapse: "收起",
+  zh: { title: "快速选型", label: "规格项", port: "端口", all: "全部", matched: "匹配", items: "项", clear: "清空", empty: "当前条件下没有匹配的规格，试试放宽条件：", search: "搜索货号 / 尺寸 / 关键字", copy: "复制货号", copied: "已复制", add: "加入询价车", full: "查看完整规格表", code: "货号", more: "显示全部匹配项", collapse: "收起",
         minBar: "工况：工作压力 ≥", bar: "bar", codeGen: "货号生成器", genHint: "按段位选择生成货号（段位取值来自本产品已有机型）", genMatch: "命中已有机型", genNoMatch: "库里暂无该组合，可作为定制需求提交（复制货号发给客服）", sheet: "生成选型单", sheetTitle: "产品选型单", conditions: "筛选条件", none: "无", connCol: "接口 / 端接", pressureCol: "工作压力", generated: "生成货号" },
-  en: { title: "Quick selector", label: "Type", all: "All", matched: "Matched", items: "items", clear: "Clear", empty: "No specification matches the current filters — try relaxing them: ", search: "Search part no. / size / keyword", copy: "Copy part no.", copied: "Copied", add: "Add to quote cart", full: "View full specification table", code: "Part no.", more: "Show all matches", collapse: "Collapse" },
-  ja: { title: "かんたん選定", label: "種類", all: "すべて", matched: "該当", items: "件", clear: "クリア", empty: "現在の条件に合う仕様がありません。条件を緩めてください：", search: "品番 / サイズ / キーワードで検索", copy: "品番をコピー", copied: "コピー済み", add: "見積に追加", full: "仕様表をすべて表示", code: "品番", more: "該当をすべて表示", collapse: "閉じる" },
-  ko: { title: "간편 선택", label: "유형", all: "전체", matched: "일치", items: "개", clear: "초기화", empty: "현재 조건에 맞는 사양이 없습니다. 조건을 완화해 보세요: ", search: "품번 / 크기 / 키워드 검색", copy: "품번 복사", copied: "복사됨", add: "견적 카트에 추가", full: "전체 사양표 보기", code: "품번", more: "전체 일치 항목 보기", collapse: "접기" },
-  fr: { title: "Sélecteur rapide", label: "Type", all: "Tous", matched: "Correspondances", items: "éléments", clear: "Effacer", empty: "Aucune spécification ne correspond aux filtres — élargissez-les : ", search: "Réf. / dimension / mot-clé", copy: "Copier la réf.", copied: "Copié", add: "Ajouter au panier", full: "Voir le tableau complet", code: "Réf.", more: "Voir toutes les correspondances", collapse: "Réduire" },
-  ar: { title: "محدد سريع", label: "النوع", all: "الكل", matched: "مطابق", items: "عنصر", clear: "مسح", empty: "لا توجد مواصفات مطابقة للشروط الحالية — جرّب توسيعها: ", search: "بحث بالرقم / المقاس / كلمة", copy: "نسخ رقم القطعة", copied: "تم النسخ", add: "أضف إلى سلة العرض", full: "عرض جدول المواصفات الكامل", code: "رقم القطعة", more: "عرض كل المطابقات", collapse: "طي" },
+  en: { title: "Quick selector", label: "Type", port: "Port", all: "All", matched: "Matched", items: "items", clear: "Clear", empty: "No specification matches the current filters — try relaxing them: ", search: "Search part no. / size / keyword", copy: "Copy part no.", copied: "Copied", add: "Add to quote cart", full: "View full specification table", code: "Part no.", more: "Show all matches", collapse: "Collapse",
+        minBar: "Service: working pressure ≥", bar: "bar" },
+  ja: { title: "かんたん選定", label: "種類", port: "ポート", all: "すべて", matched: "該当", items: "件", clear: "クリア", empty: "現在の条件に合う仕様がありません。条件を緩めてください：", search: "品番 / サイズ / キーワードで検索", copy: "品番をコピー", copied: "コピー済み", add: "見積に追加", full: "仕様表をすべて表示", code: "品番", more: "該当をすべて表示", collapse: "閉じる", minBar: "使用条件：使用圧力 ≥", bar: "bar" },
+  ko: { title: "간편 선택", label: "유형", port: "포트", all: "전체", matched: "일치", items: "개", clear: "초기화", empty: "현재 조건에 맞는 사양이 없습니다. 조건을 완화해 보세요: ", search: "품번 / 크기 / 키워드 검색", copy: "품번 복사", copied: "복사됨", add: "견적 카트에 추가", full: "전체 사양표 보기", code: "품번", more: "전체 일치 항목 보기", collapse: "접기", minBar: "사용 조건: 사용 압력 ≥", bar: "bar" },
+  fr: { title: "Sélecteur rapide", label: "Type", port: "Port", all: "Tous", matched: "Correspondances", items: "éléments", clear: "Effacer", empty: "Aucune spécification ne correspond aux filtres — élargissez-les : ", search: "Réf. / dimension / mot-clé", copy: "Copier la réf.", copied: "Copié", add: "Ajouter au panier", full: "Voir le tableau complet", code: "Réf.", more: "Voir toutes les correspondances", collapse: "Réduire", minBar: "Service : pression de service ≥", bar: "bar" },
+  ar: { title: "محدد سريع", label: "النوع", port: "منفذ", all: "الكل", matched: "مطابق", items: "عنصر", clear: "مسح", empty: "لا توجد مواصفات مطابقة للشروط الحالية — جرّب توسيعها: ", search: "بحث بالرقم / المقاس / كلمة", copy: "نسخ رقم القطعة", copied: "تم النسخ", add: "أضف إلى سلة العرض", full: "عرض جدول المواصفات الكامل", code: "رقم القطعة", more: "عرض كل المطابقات", collapse: "طي", minBar: "الخدمة: ضغط العمل ≥", bar: "bar" },
 };
 
 /** 从一条机型的所有规格值里取**最大工作压力（bar）**；解析不出则返回 -1（不参与压力筛选） */
@@ -77,6 +96,7 @@ function rowMaxBar(attrs: [string, string][]): number {
 export default function SpecPicker({
   specs,
   loc,
+  enabled = true,
   locale = "zh",
   minRows = 9,
   onAddToCart,
@@ -115,10 +135,35 @@ export default function SpecPicker({
       .catch(() => {});
   }, []);
 
-  const facets = useMemo(
-    () => deriveFacets(rows, { max: 3 }).filter((f) => !hiddenFacets.includes(f.key)),
-    [rows, hiddenFacets]
-  );
+  /**
+   * 端口维度（owner 2026-10-07：「端口尺寸应该最少有两个端口，最多 4-5 个端口」）
+   * —— 见 `lib/spec-facets.ts#derivePortFacets` / `lib/conn-spec.ts#extractPorts`。
+   */
+  const portFacets = useMemo(() => derivePortFacets(rows), [rows]);
+
+  /**
+   * 顺序：**规格项 → 端口 1…N → 其它维度**。
+   * `excludePorts`：端口类原始键（`MR size (in.)` / `管外径 D(in.)` / `英制 MR size (in.)` …）
+   *   是同一个概念的不同拼写，已经由「端口 N」覆盖，不再各出一个下拉。
+   */
+  const facets = useMemo(() => {
+    const generic = deriveFacets(rows, { max: 3, excludePorts: portFacets.length > 0 });
+    const head = generic.filter((f) => f.key === LABEL_FACET);
+    const rest = generic.filter((f) => f.key !== LABEL_FACET);
+    return [...head, ...portFacets, ...rest].filter((f) => !hiddenFacets.includes(f.key));
+  }, [rows, portFacets, hiddenFacets]);
+
+  /**
+   * 维度显示名：规格项 / 端口 N / 其它（后台可改名，见 `/admin/product-selector`）
+   * owner 2026-10-07：端口尺寸要按**端口**给出（一个接头 2~5 个端口），
+   *   所以 `__portN` 一律显示成「端口 N」，不再把 `MR size (in.)` 这种原始键名丢给用户。
+   */
+  const facetName = (key: string): string => {
+    if (key === LABEL_FACET) return dict.label;
+    const pi = portFacetIndex(key);
+    if (pi) return `${dict.port} ${pi}`;
+    return facetLabels[key] || key;
+  };
 
   const [picked, setPicked] = useState<Record<string, string>>({});
   const [q, setQ] = useState("");
@@ -233,19 +278,21 @@ export default function SpecPicker({
     return map;
   }, [facets, picked, rows]);
 
-  // 规格太少：不启用选型器，原样渲染（⚠️ 必须在所有 hook 之后）
-  if (rows.length < minRows) return <>{children}</>;
+  // 插件停用、或规格太少：不启用选型器，原样渲染（⚠️ 必须在所有 hook 之后）
+  if (!enabled || rows.length < minRows) return <>{children}</>;
 
   const activeCount = Object.values(picked).filter(Boolean).length;
   const list = showAll ? matched : matched.slice(0, 12);
 
   /** 生成并打开「选型单」（浏览器打印/另存为 PDF）——内容 = 当前筛选条件 + 匹配机型 */
   const openSheet = () => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || typeof document === "undefined") return;
     const cond = [
       q.trim() ? `${dict.search}: ${q.trim()}` : "",
       minBar.trim() ? `${dict.minBar} ${minBar} ${dict.bar}` : "",
-      ...Object.entries(picked).filter(([, v]) => v).map(([k, v]) => `${k === LABEL_FACET ? dict.label : k}: ${v}`),
+      ...Object.entries(picked)
+        .filter(([, v]) => v)
+        .map(([k, v]) => `${facetName(k)}: ${v}`),
     ].filter(Boolean);
     const rowsHtml = matched
       .map((r) => {
@@ -265,16 +312,45 @@ td{border-bottom:1px solid #eee;padding:7px 8px;word-break:break-all}
 tr:nth-child(even) td{background:#fafafa}
 .ft{margin-top:14px;color:#9aa1ac;font-size:11px}</style></head><body>
 <h1>${dict.sheetTitle}</h1>
-<div class="sub">${typeof window !== "undefined" ? location.origin : ""} · ${new Date().toLocaleString(locale === "zh" ? "zh-CN" : "en-US")}</div>
+<div class="sub">${location.origin} · ${new Date().toLocaleString(locale === "zh" ? "zh-CN" : "en-US")}</div>
 <div class="cond"><b>${dict.conditions}:</b> ${cond.length ? cond.join(" ｜ ") : dict.none} ｜ ${dict.matched} ${matched.length} / ${rows.length} ${dict.items}</div>
 <table><thead><tr><th style="width:22%">${dict.code}</th><th style="width:26%">${dict.label}</th><th style="width:30%">${dict.connCol}</th><th style="width:22%">${dict.pressureCol}</th></tr></thead><tbody>${rowsHtml}</tbody></table>
-<div class="ft">${dict.sheetTitle} · ${dict.more}</div>
-<script>window.onload=function(){window.print()}</script></body></html>`;
-    const w = window.open("", "_blank");
-    if (w) {
-      w.document.write(html);
-      w.document.close();
+<div class="ft">${dict.sheetTitle} · ${dict.more}</div></body></html>`;
+    /**
+     * 🔴 owner 2026-10-07：「这个功能如果没有实现，就去掉」——功能是实现的，但原来用
+     *   `window.open()` 另开窗口 ⇒ **被浏览器弹窗拦截时表现为"点了没反应"**（等于没实现）。
+     * 现改为：把选型单写进一个**隐藏 iframe**，再从 iframe 里 `print()`。
+     *   好处：① 不依赖弹窗权限，点了必出打印预览；② 只打印选型单本身，不会把整页也打进去。
+     */
+    const FRAME_ID = "spec-sheet-frame";
+    let frame = document.getElementById(FRAME_ID) as HTMLIFrameElement | null;
+    if (!frame) {
+      frame = document.createElement("iframe");
+      frame.id = FRAME_ID;
+      frame.setAttribute("aria-hidden", "true");
+      frame.style.cssText = "position:fixed;width:0;height:0;border:0;inset-inline-start:-9999px;top:0;";
+      document.body.appendChild(frame);
     }
+    const target = frame;
+    let fired = false;
+    const fire = () => {
+      if (fired) return; // onload 与兜底定时器只允许触发一次（否则会弹两次打印）
+      fired = true;
+      try {
+        target.contentWindow?.focus();
+        target.contentWindow?.print();
+      } catch {
+        /* 打印被环境禁止时静默失败，不影响页面 */
+      }
+    };
+    target.onload = fire;
+    const doc = target.contentDocument;
+    if (!doc) return;
+    doc.open();
+    doc.write(html);
+    doc.close();
+    // `document.write` 到**已存在**的 iframe 时不一定再触发 load ⇒ 兜底一次
+    window.setTimeout(fire, 200);
   };
 
   return (
@@ -342,8 +418,8 @@ tr:nth-child(even) td{background:#fafafa}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {facets.map((f) => (
             <label key={f.key} className="block">
-              <span className="block text-[11px] text-dark-400 mb-1 truncate" title={f.key === LABEL_FACET ? dict.label : facetLabels[f.key] || f.key}>
-                {f.key === LABEL_FACET ? dict.label : facetLabels[f.key] || f.key}
+              <span className="block text-[11px] text-dark-400 mb-1 truncate" title={facetName(f.key)}>
+                {facetName(f.key)}
               </span>
               <span className="relative block">
                 <select
@@ -383,22 +459,23 @@ tr:nth-child(even) td{background:#fafafa}
               )}
             </span>
           </label>
-        </div>
-      </div>
-
-      {/* ===== 高级工具（owner 2026-10-06「全做」）：工况筛选 / 货号生成器 / 选型单 ===== */}
-      <div className="bg-white border border-dark-100 rounded-xl p-4 space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          {/* 工况：工作压力下限 */}
-          <label className="inline-flex items-center gap-2 text-xs text-dark-500">
-            <span className="font-medium text-dark-600">{dict.minBar}</span>
-            <input
-              value={minBar}
-              onChange={(e) => setMinBar(e.target.value.replace(/[^\d.]/g, ""))}
-              placeholder="300"
-              className="w-20 px-2 py-1.5 text-sm border border-dark-100 rounded-lg outline-none focus:ring-2 focus:ring-primary/30"
-            />
-            <span>{dict.bar}</span>
+          {/*
+            工况：工作压力 ≥（owner 2026-10-07：「放在快速选型中」）
+            —— 原来单独占一张「高级工具」卡片，现已并入本卡片（与其它维度同一网格）。
+          */}
+          <label className="block">
+            <span className="block text-[11px] text-dark-400 mb-1 truncate" title={dict.minBar}>
+              {dict.minBar}
+            </span>
+            <span className="relative block">
+              <input
+                value={minBar}
+                onChange={(e) => setMinBar(e.target.value.replace(/[^\d.]/g, ""))}
+                placeholder="300"
+                className="w-full ps-3 pe-11 py-2 text-sm border border-dark-100 rounded-lg outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <span className="absolute end-3 top-1/2 -translate-y-1/2 text-[11px] text-dark-400 pointer-events-none">{dict.bar}</span>
+            </span>
           </label>
         </div>
       </div>

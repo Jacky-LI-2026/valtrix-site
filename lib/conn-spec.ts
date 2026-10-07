@@ -56,12 +56,134 @@ function classify(key: string): { zh: string; en: string; group: ConnField["grou
       ? { zh: `工作压力（${qual}）`, en: `Working Pressure (${qual})`, group: "pressure" }
       : { zh: "工作压力", en: "Working Pressure", group: "pressure" };
   }
-  if (key.includes("壁厚")) return { zh: "壁厚", en: "Wall Thickness", group: "dim" };
-  if (k.includes("管外径")) return { zh: "管外径", en: "Tube OD", group: "conn" };
-  if (key.includes("尺寸 MM") || /尺寸\s*MM/.test(key)) return { zh: "外形尺寸", en: "Dimensions", group: "dim" };
-  if (k.includes("MR") || key.includes("面密封") || k.includes("NPT") || k.includes("PT") || k.includes("R尺寸"))
+  /**
+   * ⚠️ 2026-10-07：以下三项原本**只认中文**，而手册数值里同一个键中英两种拼写都有
+   *   （实测同一产品内既有 `管外径 D(in.)` 也有 `pipe outer diameter D(in.)`）⇒
+   *   英文拼写的行会被静默丢掉（少一个端接）。现补齐英文拼写。
+   */
+  if (key.includes("壁厚") || k.includes("WALL THICKNESS")) return { zh: "壁厚", en: "Wall Thickness", group: "dim" };
+  if (k.includes("管外径") || k.includes("OUTER DIAMETER") || k.includes("TUBE SIZE") || k.includes("FERRULE"))
+    return { zh: "管外径", en: "Tube OD", group: "conn" };
+  if (key.includes("尺寸 MM") || /尺寸\s*MM/.test(key) || k.includes("DIMENSION"))
+    return { zh: "外形尺寸", en: "Dimensions", group: "dim" };
+  if (k.includes("MR") || key.includes("面密封") || k.includes("NPT") || k.includes("PT") || k.includes("R尺寸") || k.includes("R SIZE"))
     return { zh: "端接", en: "Connection", group: "conn" };
   return null;
+}
+
+/* ==========================================================================
+   端口模型（owner 2026-10-07）
+   ==========================================================================
+   owner 在 `金属面密封接头 G系列`（184 条规格）的「快速选型」上报障：
+     「端口尺寸应该最少有两个端口，最多 4-5 个端口」。
+
+   根因（实测数据）：手册数值里**一行 = 一个端口尺寸**，而同一个"端口"在不同行用了**多种拼写**
+   （`MR尺寸 (in.)` / `MR size (in.)` / `英制 MR尺寸 (in.)`）⇒ 旧的"按原始键名推导维度"
+   把这一个概念拆成了 3 个下拉，且每个下拉只描述**一个**端口。
+   实测一行里本来就可能有两个端口，例如：
+     `英制 MR尺寸 (in.): 1/4; 管外径 D(in.): 1/8; 尺寸 mm (in.): …; 工作压力 316L…`
+     = 端口 1（面密封 1/4） + 端口 2（卡套/焊接管端 1/8）。
+
+   口径（**只归类、不发明尺寸**）：
+     · 端口「型式」由键名关键词判定（中英双写都认）；
+     · 端口「尺寸」**逐字搬运**原始值，不换算；
+     · 一个接头**至少 2 个端口**（直通/弯头/插焊管…），三通 3、四通 4，最多 5；
+       若手册只记了一个尺寸（同径本体），其余端口**沿用该尺寸**——这是"同径本体"的常识，
+       不是编造数值；垫片/堵头/管帽这类**非多端口件**不镜像。
+   ========================================================================== */
+
+/** 端口型式（null = 这个键不是端口，例如外形尺寸/壁厚/量规/订购号/材质/压力） */
+export function portTypeOf(key: string): string | null {
+  const raw = String(key || "");
+  const k = raw.toUpperCase();
+  if (!k) return null;
+  // —— 先排除"看着像端口其实不是"的键 ——
+  if (/GAUGE|RULER|量规|卡尺/.test(k)) return null; // 量规/卡尺是工具
+  if (/WALL\s*THICKNESS|壁厚/.test(k)) return null;
+  if (/DIMENSION|尺寸\s*MM|PANEL|面板|ORDER|订购|MATERIAL|材质|PRESSURE|压力|PARAMETER|参数|L\s*SIZE/.test(k)) return null;
+  // —— 端口型式 ——
+  if (k.includes("MR") || raw.includes("面密封")) return /NPT/.test(k) ? "面密封（NPT）" : "面密封";
+  if (k.includes("NPT")) return "NPT 螺纹";
+  if (/\bPT\b|PT\s*THREAD/.test(k)) return "PT 螺纹";
+  if (k.includes("THREAD") || raw.includes("螺纹")) return "螺纹";
+  /**
+   * SAE / MS / RS / RT 都是螺纹标准（手册里写作 `Px-SAE 尺寸`、`Px-RT 名义尺寸`、`P-SAE/MS 端螺纹尺寸`）。
+   * ⚠️ `\b` 不可省：`MM` 不能被 `MS` 命中。
+   */
+  if (/SAE|\bMS\b|\bRS\b|\bRT\b/.test(k)) return "螺纹";
+  /**
+   * O 形圈面密封（O 系列）：手册里的键被切得很碎（`OR 尺寸 (in.)` / `O R 尺寸 (in.)` / `O型圈 尺寸`），
+   * 故按**键首**判定，而不是要求 "OR"+ "SIZE" 紧邻。
+   */
+  if (/^\s*O\s*[-]?\s*R\b/.test(k) || /^\s*O\s*型?圈/.test(k) || /O[\s-]*RING/.test(k)) return "O 形圈面密封";
+  if (
+    k.includes("OUTER DIAMETER") ||
+    raw.includes("外径") ||
+    raw.includes("管尺寸") ||
+    k.includes("TUBE SIZE") ||
+    k.includes("FERRULE") ||
+    raw.includes("卡套")
+  )
+    return "卡套 / 焊接管端";
+  /**
+   * ⚠️ 必须用 `\bR` 而不是裸 `R SIZE` —— `OR size (in.)`（O 系列）里也含 "R SIZE"，
+   *   裸匹配会把 O 形圈面密封误判成 R 端接（`\b` 在 "OR" 中间不成立，故安全）。
+   */
+  if (/\bR\s*SIZE/.test(k) || k.includes("R尺寸")) return "R 端接";
+  return null;
+}
+
+/** 该本体型式的端口数（手册以「本体型式」命名，端口数由型式决定） */
+export function portCountFor(label: string, recorded: number): number {
+  const t = String(label || "").toUpperCase();
+  // 非多端口件（垫片 / 堵头 / 管帽）：按记录数显示，**不镜像**
+  if (/垫片|GASKET|堵头|PLUG|管帽|\bCAP\b|盲/.test(t)) return Math.min(Math.max(recorded, 0), 5);
+  if (/五通|FIVE[\s-]*WAY|5[\s-]*WAY/.test(t)) return 5;
+  if (/四通|FOUR[\s-]*WAY|4[\s-]*WAY/.test(t)) return 4;
+  if (/三通|THREE[\s-]*WAY|3[\s-]*WAY|(^|\W)TEE(\W|$)/.test(t)) return 3;
+  // 其余（直通 / 弯头 / 插焊管 / 对焊管 / 螺母 / 接管 …）：至少两个端口
+  return Math.min(Math.max(2, recorded), 5);
+}
+
+export interface PortValue {
+  /** 端口型式（面密封 / NPT 螺纹 / 卡套 / 焊接管端 …） */
+  type: string;
+  /** 端口尺寸（原始值逐字搬运） */
+  size: string;
+}
+
+/** 从一条型号的规格键值里取出它的端口序列（已按端口数补全，最多 5） */
+export function extractPorts(attrs: [string, string][], label = ""): PortValue[] {
+  const ports: PortValue[] = [];
+  const seen = new Set<string>();
+  for (const [key, value] of attrs) {
+    if (!key || !value || key === "#label") continue;
+    const type = portTypeOf(key);
+    if (!type) continue;
+    const sig = `${type}|${value}`;
+    if (seen.has(sig)) continue;
+    seen.add(sig);
+    ports.push({ type, size: value });
+  }
+  if (!ports.length) return [];
+  const want = portCountFor(label, ports.length);
+  while (ports.length < want) ports.push({ ...ports[0] });
+  return ports.slice(0, 5);
+}
+
+/** 端口显示名：`面密封 1/4`（型式 + 尺寸；型式推断不出时只给尺寸） */
+export function portLabel(p: PortValue): string {
+  return p.type ? `${p.type} ${p.size}` : p.size;
+}
+
+/**
+ * 本体外形尺寸类键 —— 这些**不该**当"选型维度"（下拉里选 `C 尺寸 = 48.8` 没有意义）。
+ * 判据只用于**过滤维度**，不参与任何显示/数值计算；端口类键由 `portTypeOf` 先拦下。
+ */
+export function isBodyDimension(key: string): boolean {
+  if (portTypeOf(key)) return false;
+  const k = String(key || "").toUpperCase();
+  return /尺寸|DIMENSION|THICKNESS|壁厚|孔径|PANEL|面板|L\s*SIZE|ORDER|订购|PARAMETER|参数/.test(k);
 }
 
 /**

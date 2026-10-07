@@ -79,6 +79,22 @@ function ProductsContent() {
       .catch(() => {});
   }, []);
 
+  /**
+   * 占位图用的站点 LOGO（owner 2026-10-07）：
+   *   「产品点位图使用灰底色加 45% 透明的 LOGO 显示占位」
+   * —— 与 Header 同源接口（`/api/public/site-config?key=logo`），兜底 `/images/logo.png`
+   *    （两站 public 下都有该文件，故不需要按站点写死品牌资源）。
+   */
+  const [logoUrl, setLogoUrl] = useState("");
+  useEffect(() => {
+    fetch("/api/public/site-config?key=logo", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.success && d?.data) setLogoUrl(String(d.data));
+      })
+      .catch(() => {});
+  }, []);
+
   // 获取页面配置
   useEffect(() => {
     fetch("/api/public/page-config?page=products")
@@ -158,7 +174,22 @@ function ProductsContent() {
   const tabBtnIdle = "bg-dark-50 text-dark-600 hover:bg-dark-100";
 
   /** 型号卡片（排列显示 / 分类显示共用同一份卡片，避免两处样式漂移） */
-  const renderCard = (tabId: string, model: (typeof productTabs)[number]["categories"][number]["models"][number]) => (
+  /**
+   * 列表卡片上只保留**单一取值、够短**的规格行（owner 2026-10-07：「此类内容在产品列表页不需要显示」）：
+   *   · 含 `;`/`；` 的一律是"多条键值拼在一起"的原始规格串（如本站 G 系列的
+   *     `MR尺寸 (in.): 1/4; 尺寸 mm (in.): 27.2 22.1 …`）⇒ 列表页不可读，丢掉；
+   *   · 超过 40 字的说明型长文本（如针阀那条"多种填料材料可选…温压曲线…"）同样丢掉；
+   *   · 剩余的最多显示 3 条（如「工作压力 / 工作温度范围」）。
+   */
+  const cardSpecsOf = (model: (typeof productTabs)[number]["categories"][number]["models"][number]) =>
+    (model.specs || [])
+      .map((spec) => ({ label: loc.get(spec, "label"), value: loc.get(spec, "value") }))
+      .filter((s) => s.label && s.value && !/[;；]/.test(s.value) && s.value.length <= 40)
+      .slice(0, 3);
+
+  const renderCard = (tabId: string, model: (typeof productTabs)[number]["categories"][number]["models"][number]) => {
+    const cardSpecs = cardSpecsOf(model);
+    return (
     <Link
       key={model.id}
       href={`/products/${tabId}/${model.id}`}
@@ -176,12 +207,17 @@ function ProductsContent() {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
+          /*
+            owner 2026-10-07：「产品点位图使用灰底色加 45% 透明的 LOGO 显示占位」
+            —— 原来无图时铺 `/placeholders/generic-tech.webp`（车间照），在列表里辨识度低、
+               且容易被误认成产品实拍；现改为**灰底 + 45% 透明站点 LOGO**的明确占位。
+          */
+          <div className="w-full h-full flex items-center justify-center bg-dark-50">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/placeholders/generic-tech.webp"
+              src={logoUrl || "/images/logo.png"}
               alt={model.name}
-              className="w-full h-full object-cover opacity-80"
+              className="max-w-[70%] max-h-[45%] w-auto h-auto object-contain opacity-[0.45]"
             />
           </div>
         )}
@@ -199,19 +235,26 @@ function ProductsContent() {
           {loc.get(model, "description")}
         </p>
 
-        {/* Key Specs */}
-        <div className="space-y-1.5 mb-4">
-          {model.specs.slice(0, 3).map((spec) => (
-            <div key={spec.label} className="flex justify-between text-xs">
-              <span className="text-dark-400">
-                {loc.get(spec, "label")}
-              </span>
-              <span className="text-dark-700 font-medium">
-                {loc.get(spec, "value")}
-              </span>
-            </div>
-          ))}
-        </div>
+        {/*
+          Key Specs —— owner 2026-10-07：「此类内容在产品列表页不需要显示」。
+          被点名的样例就是本页卡片的原始规格串：
+            `NPT 外螺纹弯头本体` → `MR尺寸 (in.): 1/4; 尺寸 mm (in.): 27.2 22.1 9.6 …`
+          这类值在列表页不可读、且与详情页重复 ⇒ 只保留**单一取值、够短**的规格行，整块为空时连容器一起不渲染。
+        */}
+        {cardSpecs.length > 0 && (
+          <div className="space-y-1.5 mb-4">
+            {cardSpecs.map((spec) => (
+              <div key={spec.label} className="flex justify-between text-xs">
+                <span className="text-dark-400">
+                  {spec.label}
+                </span>
+                <span className="text-dark-700 font-medium">
+                  {spec.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-1 text-primary text-sm font-medium group-hover:gap-2 transition-all">
@@ -234,7 +277,8 @@ function ProductsContent() {
         </div>
       </div>
     </Link>
-  );
+    );
+  };
 
   return (
     <>
@@ -292,14 +336,21 @@ function ProductsContent() {
           {/* 展示方式切换（owner 2026-10-01 二次口径：放在**产品列表区域**右上角，
               不要挤进上面的分类条 —— 那里横向溢出会把按钮裁掉） */}
           <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
+            {/* 「快速选型」入口（owner 2026-10-07：「做成一个类似排列显示的按钮风格」）
+                ⇒ 与右侧「排列显示 / 分类显示」同一套视觉：外层浅灰胶囊 `bg-dark-50 p-1`
+                  + 内层白底圆角按钮 `bg-white rounded-md shadow-sm text-primary`。
+                为什么**不并进右侧那一组**：快速选型是「跳转」，那两个是「视图开关」，
+                  混进同一个 group 语义会串；两枚胶囊左右分列，视觉仍属同一族。 */}
             {pluginOn ? (
-              <Link
-                href="/products/selector"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium bg-primary/10 text-primary hover:bg-primary/15"
-                title="按参数逐步筛选，直接给出可询价的型号"
-              >
-                <Sparkles size={14} /> {locale === "zh" ? "快速选型" : locale === "ja" ? "クイック選定" : locale === "ko" ? "간편 선택" : locale === "fr" ? "Sélecteur rapide" : locale === "ar" ? "محدد سريع" : "Quick Selector"}
-              </Link>
+              <div className="flex items-center gap-1 rounded-lg bg-dark-50 p-1">
+                <Link
+                  href="/products/selector"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium bg-white text-primary shadow-sm transition-all hover:bg-primary/5"
+                  title="按参数逐步筛选，直接给出可询价的型号"
+                >
+                  <Sparkles size={14} /> {locale === "zh" ? "快速选型" : locale === "ja" ? "クイック選定" : locale === "ko" ? "간편 선택" : locale === "fr" ? "Sélecteur rapide" : locale === "ar" ? "محدد سريع" : "Quick Selector"}
+                </Link>
+              </div>
             ) : (
               <span />
             )}
