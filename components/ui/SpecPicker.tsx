@@ -118,7 +118,12 @@ export default function SpecPicker({
   /** 该产品所属系列的手册数值规格行（用于"手册规格"表；DV2 → 手册 p013 的值） */
   const manualRows = useMemo(() => {
     if (!manual) return null;
-    const cat = MANUAL_SPECS.find((c) => c.category === manual.key);
+    /**
+     * ⚠️ owner 2026-10-07（「开」）：原写法 `c.category === manual.key` **永远不成立** ——
+     *   `manual.key` 是**系列**（DV1/DV2/…），`c.category` 是**品类**（diaphragm/fittings/…）⇒
+     *   这张「手册规格（数值）」表**从来没渲染过**。正确口径：找到**包含该系列**的品类。
+     */
+    const cat = MANUAL_SPECS.find((c) => c.series.some((x) => x.id === manual.key));
     const s = cat?.series.find((x) => x.id === manual.key);
     return s && s.rows.length ? { columns: cat!.columns, columnsEn: cat!.columnsEn || [], rows: s.rows, series: s } : null;
   }, [manual]);
@@ -377,7 +382,14 @@ tr:nth-child(even) td{background:#fafafa}
             <span>
               {locale === "zh" ? "手册规格（数值）" : "Catalog specifications"}
               <span className="ms-2 text-[11px] font-normal text-dark-400">
-                {manual?.name} · {manual?.source}
+                {/*
+                  owner 2026-10-07（英文版不留中文）：系列名用手册数据自带的 `nameEn`；
+                  来源串 `手册2 p010（型号说明-DV1系列）` 是中文 ⇒ 英文页只保留**可追溯**的部分
+                  （目录册号 + 页码 + 型号说明），不逐字翻译那串括号说明。
+                */}
+                {isZh
+                  ? `${manualRows.series.nameZh} · ${manual?.source}`
+                  : `${manualRows.series.nameEn} · catalog ${(manual?.source.match(/手册(\d+)/) || [])[1] || ""} ${(manual?.source.match(/p\d+/) || [])[0] || ""} · type designation`.replace(/\s+/g, " ").trim()}
               </span>
             </span>
             <span className="text-[11px] font-normal text-dark-400">{manualRows.rows.length} {locale === "zh" ? "行" : "rows"}</span>
@@ -409,7 +421,7 @@ tr:nth-child(even) td{background:#fafafa}
           <div className="px-4 py-2 text-[11px] text-dark-400 bg-white">
             {locale === "zh"
               ? "数值原样取自手册（未换算、未加工）；「待确认」表示手册未给出该值。"
-              : "Values as printed in the catalog; “待确认” = not stated."}
+              : "Values as printed in the catalog; “TBD” = not stated in the catalog."}
           </div>
         </div>
       )}

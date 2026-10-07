@@ -120,7 +120,12 @@ export default function ProductDetailClient() {
   const manualSeriesRows = (() => {
     const hit = findManualSeries(String(model?.model || modelId || ""));
     if (!hit) return null;
-    const cat = MANUAL_SPECS.find((c) => c.category === hit.key);
+    /**
+     * ⚠️ owner 2026-10-07（「开」）：原写法 `c.category === hit.key` **永远不成立** ——
+     *   `hit.key` 是**系列**（DV1/DV2/…），`c.category` 是**品类**（diaphragm/fittings/…）⇒
+     *   手册兜底与「手册规格（数值）」表都拿不到数据。正确口径：找到**包含该系列**的品类。
+     */
+    const cat = MANUAL_SPECS.find((c) => c.series.some((x) => x.id === hit.key));
     const s = cat?.series.find((x) => x.id === hit.key);
     return s && s.rows.length ? { columns: cat!.columns, rows: s.rows } : null;
   })();
@@ -924,15 +929,26 @@ export default function ProductDetailClient() {
                         /** 兜底：从本产品规格推断不出来时，改用**手册数值行**（owner 2026-10-06：「这几个参数在哪取信息？」） */
                         /** 手册数值是中文原文 ⇒ 英文页过一遍术语级翻译（`lib/manual-i18n.ts`，不发明数值） */
                         const mt = (v: string) => (locale === "zh" ? v : manualCellToEn(v));
-                        const manualPorts: string[] = manualSeriesRows
-                          ? Array.from(new Set(manualSeriesRows.rows.map((r) => r[1]).filter(Boolean))).slice(0, 8).map(mt)
-                          : [];
-                        const manualPress: string[] = manualSeriesRows
-                          ? Array.from(new Set(manualSeriesRows.rows.map((r) => r[2]).filter(Boolean))).slice(0, 6).map(mt)
-                          : [];
-                        const manualMat: string[] = manualSeriesRows
-                          ? Array.from(new Set(manualSeriesRows.rows.map((r) => r[r.length - 1]).filter(Boolean))).slice(0, 4).map(mt)
-                          : [];
+                        /**
+                         * ⚠️ 原来按**位置**取列（r[1]=端接 / r[2]=压力 / 末列=材质），但各品类列序不同
+                         *   （接头是 `型号|材料|端接/密封|…`，隔膜阀是 `型号|端口·端接|工作压力|…`）⇒
+                         *   会把"温度·阀座"当成"本体材质"。改为**按列头关键字定位**（找不到就留空，不臆造）。
+                         */
+                        const colIdx = (...res: RegExp[]) => {
+                          if (!manualSeriesRows) return -1;
+                          for (const re of res) {
+                            const i = manualSeriesRows.columns.findIndex((c) => re.test(c));
+                            if (i >= 0) return i;
+                          }
+                          return -1;
+                        };
+                        const pickCol = (i: number, n: number) =>
+                          manualSeriesRows && i >= 0
+                            ? Array.from(new Set(manualSeriesRows.rows.map((r) => r[i]).filter(Boolean))).slice(0, n).map(mt)
+                            : [];
+                        const manualPorts: string[] = pickCol(colIdx(/端口|端接/), 8);
+                        const manualPress: string[] = pickCol(colIdx(/工作压力|压力等级/, /压力/), 6);
+                        const manualMat: string[] = pickCol(colIdx(/材料|材质/), 4);
                         const connList = conns.length ? conns.map((c) => `${c.label} ×${c.count}`) : manualPorts;
                         const matList = materials.length ? materials : manualMat;
                         const pressList = pressures.length ? pressures : manualPress;
