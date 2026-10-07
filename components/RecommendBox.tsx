@@ -54,6 +54,30 @@ export default function RecommendBox({
 }) {
   const { t } = useI18n();
   const [items, setItems] = useState<RecItem[]>([]);
+  /**
+   * 占位图用的站点 LOGO（owner 2026-10-07：「占位图也适用于产品详情页 …… 以及猜你喜欢部分」）
+   * —— 与产品列表卡片 / 详情页主图同源：`/api/public/site-config?key=logo`，兜底 `/images/logo.png`；
+   *   两站各取本站配置 ⇒ 左文站显示左文 LOGO。
+   */
+  const [siteLogo, setSiteLogo] = useState("");
+  useEffect(() => {
+    fetch("/api/public/site-config?key=logo", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.success && d.data) setSiteLogo(String(d.data));
+      })
+      .catch(() => {});
+  }, []);
+
+  /** 图片加载失败 → 换成"灰底 + 45% 透明 LOGO"占位（与列表/详情同一套观感） */
+  const onImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const el = e.currentTarget;
+    el.onerror = null; // 防死循环
+    el.src = siteLogo || "/images/logo.png";
+    el.className = "object-contain opacity-[0.45]";
+    el.style.cssText =
+      "position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:70%;max-height:45%;width:auto;height:auto;";
+  };
   const [active, setActive] = useState(false);
 
   const fmtDate = (v?: string) => {
@@ -137,13 +161,24 @@ export default function RecommendBox({
                 <>
                   {/* 16:9 与「相关新闻」一致；无图用同款占位图（不再是纯色/首字母块） */}
                   <div className="aspect-[16/9] bg-gradient-to-br from-dark-100 to-dark-200 flex items-center justify-center overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={it.image || "/placeholders/generic-tech.webp"}
-                      alt={it.name}
-                      loading="lazy"
-                      className="w-full h-full object-cover"
-                    />
+                    {/*
+                      无图占位（owner 2026-10-07：「占位图也适用于 …… 猜你喜欢部分」）：
+                      原来铺 `/placeholders/generic-tech.webp`（车间照，易被误认为实拍），
+                      现统一为**灰底 + 45% 透明 LOGO**，与产品列表/详情页完全一致。
+                    */}
+                    {it.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={it.image} alt={it.name} loading="lazy" className="w-full h-full object-cover relative" onError={onImgError} />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-dark-50">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={siteLogo || "/images/logo.png"}
+                          alt={it.name}
+                          className="max-w-[70%] max-h-[45%] w-auto h-auto object-contain opacity-[0.45]"
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="p-6">
                     <div className="flex items-center gap-3 mb-3">
@@ -176,10 +211,16 @@ export default function RecommendBox({
                   <div className="aspect-square bg-gray-100 relative overflow-hidden">
                     {it.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={it.image} alt={it.name} loading="lazy" className="w-full h-full object-cover" />
+                      <img src={it.image} alt={it.name} loading="lazy" className="w-full h-full object-cover relative" onError={onImgError} />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-primary font-bold text-2xl">{(it.name || "?").charAt(0)}</span>
+                      /* 无图占位：与列表/详情页统一（灰底 + 45% 透明 LOGO），不再用首字母块 */
+                      <div className="w-full h-full flex items-center justify-center bg-dark-50">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={siteLogo || "/images/logo.png"}
+                          alt={it.name}
+                          className="max-w-[70%] max-h-[45%] w-auto h-auto object-contain opacity-[0.45]"
+                        />
                       </div>
                     )}
                   </div>

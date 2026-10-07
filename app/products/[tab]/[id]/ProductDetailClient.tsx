@@ -143,6 +143,21 @@ export default function ProductDetailClient() {
       .catch(() => {});
   }, []);
 
+  /**
+   * 占位图用的站点 LOGO（owner 2026-10-07：「占位图也适用于产品详情页」）
+   * —— 与产品列表卡片、Header 同源接口，兜底 `/images/logo.png`。
+   *   两站共用本组件，LOGO 各取**本站**配置 ⇒ 左文站显示左文的 LOGO。
+   */
+  const [siteLogo, setSiteLogo] = useState("");
+  useEffect(() => {
+    fetch("/api/public/site-config?key=logo", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.success && d.data) setSiteLogo(String(d.data));
+      })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     const pid = model?.id;
@@ -475,15 +490,30 @@ export default function ProductDetailClient() {
                     className="w-full h-full object-cover transition-transform"
                     style={{ transform: imageTransform, transitionDuration: isDragging || isHovering ? "0ms" : "200ms" }}
                     draggable={false}
+                    /* 加载失败（URL 失效/文件被删）→ 与列表卡片同一套"灰底 + 45% 透明 LOGO"占位，
+                       而不是留一个破图（owner 2026-10-07：「占位图也适用于产品详情页」）。 */
+                    onError={(e) => {
+                      const el = e.currentTarget
+                      el.onerror = null // 防死循环：LOGO 自己也失败时不再递归
+                      el.src = siteLogo || "/images/logo.png"
+                      el.className = "object-contain opacity-[0.45]"
+                      el.style.cssText =
+                        "position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:60%;max-height:60%;width:auto;height:auto;"
+                    }}
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-center">
-                      <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-primary font-bold text-2xl">{model.model.charAt(0)}</span>
-                      </div>
-                      <p className="text-dark-400 text-sm">{model.model}</p>
-                    </div>
+                  /*
+                    没有图片时的占位（owner 2026-10-07）：
+                    原来是"首字母圆圈 + 型号"，现改为**与产品列表卡片完全一致的灰底 + 45% 透明 LOGO**，
+                    两处占位观感统一；容器本身已是 `bg-dark-50`，这里只放 LOGO。
+                  */
+                  <div className="w-full h-full flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={siteLogo || "/images/logo.png"}
+                      alt={model.name}
+                      className="max-w-[60%] max-h-[45%] w-auto h-auto object-contain opacity-[0.45]"
+                    />
                   </div>
                 )}
 

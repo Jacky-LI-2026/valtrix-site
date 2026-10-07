@@ -162,18 +162,37 @@ export async function GET(req: NextRequest) {
       })),
     }))
 
-    // lite 模式：剥掉仅详情页需要的大字段（此处做，避免改动上面那段长映射的字面量，
-    // 降低漏字段的风险）。注意这是**传输层瘦身** —— 数据库仍会读出这几列，
-    // 若要连读取也省掉，需要把上面的 include 改成显式 select（后续可做）。
+    /**
+     * lite 模式：剥掉仅详情页需要的**大字段**（此处做，避免改动上面那段长映射的字面量，
+     * 降低漏字段的风险）。注意这是**传输层瘦身** —— 数据库仍会读出这几列，
+     * 若要连读取也省掉，需要把上面的 include 改成显式 select（后续可做）。
+     *
+     * owner 2026-10-07：「[产品卡片] 显示核心特性的前 3 条」——
+     *   卡片只用前 3 条，而 `features*` 六语种全量是大头（原注释：约占全量 7%）
+     *   ⇒ **lite 档不再整段丢弃 features，而是每语种只留前 3 条**：
+     *   既让列表卡片拿得到"核心特性",又不把整段卖点塞进列表首包。
+     *   （`detailContent*` 仍然整段丢弃 —— 它是详情页专属且体积最大。）
+     */
     if (lite) {
-      const DROP = [
+      const DROP_ALWAYS = [
         "detailContent", "detailContentEn", "detailContentJa", "detailContentKo", "detailContentFr", "detailContentAr",
-        "features", "featuresEn", "featuresJa", "featuresKo", "featuresFr", "featuresAr",
       ]
+      const FEATURE_KEYS = ["features", "featuresEn", "featuresJa", "featuresKo", "featuresFr", "featuresAr"]
+      /** 列表卡片要展示的条数（前端也只取前 3 条，这里对齐同一口径） */
+      const LITE_FEATURE_LIMIT = 3
       for (const tab of result) {
         for (const cat of tab.categories) {
           for (const m of cat.models) {
-            for (const k of DROP) delete (m as Record<string, unknown>)[k]
+            const row = m as Record<string, unknown>
+            for (const k of DROP_ALWAYS) delete row[k]
+            for (const k of FEATURE_KEYS) {
+              const v = row[k]
+              if (Array.isArray(v)) {
+                if (v.length > LITE_FEATURE_LIMIT) row[k] = v.slice(0, LITE_FEATURE_LIMIT)
+              } else {
+                delete row[k]
+              }
+            }
           }
         }
       }

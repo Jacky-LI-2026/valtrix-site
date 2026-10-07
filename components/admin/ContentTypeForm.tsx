@@ -52,6 +52,40 @@ function galleryToUrl(x: any): string {
 }
 
 /**
+ * 拖动替换主图（owner 2026-10-07：「可进行拖动替换主图」）
+ * ==========================================================================
+ * 数据形态：产品**主图 = 独立的 `coverImage` 字段**（详情页 `images = [coverImage, ...images]`），
+ *   而「产品图集」是另一个字段 ⇒ "替换主图" = 把图集里的某张图**拖到封面图那一栏**。
+ * 为什么用自定义 MIME：`dragover` 阶段浏览器**不允许读 dataTransfer 的内容**（只能读 types），
+ *   所以用 `application/x-cms-image` 作为"这是我们自己拖的图"的标记；
+ *   同时仍接受外部拖进来的图片地址（text/uri-list / text/plain）。
+ */
+const DRAG_IMAGE_MIME = 'application/x-cms-image'
+/** 看起来像图片地址才接受（站内相对路径 / http(s) / data:image） */
+const IMAGE_URL_RE = /^(?:https?:\/\/|\/|data:image\/)/i
+
+/** 拖拽中是否携带"图片"（dragover 阶段只能看 types，不能看内容） */
+function dragHasImage(e: React.DragEvent): boolean {
+  const types = e.dataTransfer?.types
+  if (!types) return false
+  const list = Array.from(types as unknown as string[])
+  return list.includes(DRAG_IMAGE_MIME) || list.includes('text/uri-list') || list.includes('text/plain')
+}
+
+/** 从 drop 事件里取出图片地址（取不到或不合法则返回空串） */
+function pickDroppedImageUrl(e: React.DragEvent): string {
+  const dt = e.dataTransfer
+  if (!dt) return ''
+  for (const t of [DRAG_IMAGE_MIME, 'text/uri-list', 'text/plain']) {
+    const raw = (dt.getData(t) || '').trim()
+    if (!raw) continue
+    const first = raw.split(/\r?\n/).map((s) => s.trim()).find((s) => s && !s.startsWith('#')) || ''
+    if (first && IMAGE_URL_RE.test(first)) return first
+  }
+  return ''
+}
+
+/**
  * 图集编辑器（gallery 单语数组）：URL 输入 + **本地上传** + 预览 + 删除。
  * owner 2026-10-03：「为何没有上传按钮」—— 本仓此前是 fork 早期版本，只有"填 URL"这一条路，
  *   现与基地（左文）对齐：支持多选图片直传 `/api/admin/upload`，上传后自动追加到图集。
@@ -60,9 +94,21 @@ function GalleryEditor({ value, onChange }: { value: any[]; onChange: (arr: stri
   const [draft, setDraft] = useState('')
   const [uploading, setUploading] = useState(false)
   const [err, setErr] = useState('')
+  /** 拖动排序用：正在拖的第几张 / 悬停到第几张 */
+  const [dragIdx, setDragIdx] = useState<number | null>(null)
+  const [overIdx, setOverIdx] = useState<number | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const urls = (Array.isArray(value) ? value : []).map(galleryToUrl).filter(Boolean)
+
+  /** 把第 from 张挪到第 to 位（拖动排序） */
+  const move = (from: number, to: number) => {
+    if (from === to || from < 0 || to < 0 || from >= urls.length || to >= urls.length) return
+    const next = [...urls]
+    const [item] = next.splice(from, 1)
+    next.splice(to, 0, item)
+    onChange(next)
+  }
 
   const add = () => {
     const u = draft.trim()
@@ -119,9 +165,44 @@ function GalleryEditor({ value, onChange }: { value: any[]; onChange: (arr: stri
       </div>
       {err && <p className="mt-1 text-xs text-red-600">{err}</p>}
       {urls.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="mt-2">
+        {/* owner 2026-10-07：「可进行拖动替换主图」——图集内可拖动排序；
+            把某张图**拖到「封面图」那一栏**即替换主图（封面图是独立字段）。 */}
+        <p className="mb-1.5 text-[11px] text-gray-400">
+          拖动可调整顺序；把图片拖到「封面图」区域即可替换主图
+        </p>
+        <div className="flex flex-wrap gap-2">
           {urls.map((u, i) => (
-            <div key={i} className="relative group">
+            <div
+              key={i}
+              draggable
+              onDragStart={(e) => {
+                setDragIdx(i)
+                e.dataTransfer.effectAllowed = 'move'
+                // 自定义标记：dragover 阶段读不到内容，只能靠 types 判断"这是图片"
+                e.dataTransfer.setData(DRAG_IMAGE_MIME, u)
+                e.dataTransfer.setData('text/plain', u)
+              }}
+              onDragEnd={() => { setDragIdx(null); setOverIdx(null) }}
+              onDragOver={(e) => {
+                if (dragIdx === null || dragIdx === i) return
+                e.preventDefault()
+                e.dataTransfer.dropEffect = 'move'
+                setOverIdx(i)
+              }}
+              onDrop={(e) => {
+                if (dragIdx === null) return
+                e.preventDefault()
+                e.stopPropagation()
+                move(dragIdx, i)
+                setDragIdx(null)
+                setOverIdx(null)
+              }}
+              className={`relative group cursor-grab active:cursor-grabbing rounded ${
+                overIdx === i && dragIdx !== null && dragIdx !== i ? 'ring-2 ring-red-400 ring-offset-1' : ''
+              }`}
+              title="拖动可排序；拖到「封面图」区域可设为主图"
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={u} alt={`图${i + 1}`} className="h-20 w-24 object-cover rounded border border-gray-200"
                 onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0.25' }} />
@@ -131,6 +212,7 @@ function GalleryEditor({ value, onChange }: { value: any[]; onChange: (arr: stri
               </button>
             </div>
           ))}
+        </div>
         </div>
       )}
     </div>
@@ -440,6 +522,8 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
   // 产品增强：技术规格（productSpecs 关联表）
   const isProduct = typeName === 'products'
   const [specs, setSpecs] = useState<SpecRow[]>([])
+  /** 拖动替换主图：当前正被拖到哪个"图片字段"上（用于高亮；空串=没有） */
+  const [imgDropTarget, setImgDropTarget] = useState('')
 
   const { form, setForm, handleChange, handleValuesChange, getLangValues, buildFieldMap, getFormValues, updateFormValue } =
     useAdminForm<any>({} as any, multiLangFields)
@@ -615,7 +699,29 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
         <div className="lg:col-span-2 space-y-4 min-w-0">
           {/* 媒体图 */}
           {sideFields.filter((f) => f.kind === 'image').map((f) => (
-            <div key={f.name} className="bg-white rounded-lg border border-gray-200 p-4">
+            /* owner 2026-10-07：「可进行拖动替换主图」——
+               把「产品图集」里的图片**拖到本栏**即把该图设为主图（封面图字段）。 */
+            <div
+              key={f.name}
+              onDragOver={(e) => {
+                if (!dragHasImage(e)) return
+                e.preventDefault()
+                e.dataTransfer.dropEffect = 'copy'
+                setImgDropTarget(f.name)
+              }}
+              onDragLeave={() => setImgDropTarget((cur) => (cur === f.name ? '' : cur))}
+              onDrop={(e) => {
+                const url = pickDroppedImageUrl(e)
+                setImgDropTarget('')
+                if (!url) return
+                e.preventDefault()
+                e.stopPropagation()
+                handleChange(f.name, url)
+              }}
+              className={`bg-white rounded-lg border p-4 transition-colors ${
+                imgDropTarget === f.name ? 'border-red-400 ring-2 ring-red-200' : 'border-gray-200'
+              }`}
+            >
               <label className="block text-sm font-medium text-gray-700 mb-1.5">{f.label}</label>
               <UrlUploadInput
                 value={form[f.name] || ''}
@@ -628,6 +734,9 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
                 <AiPlaceholderButton onPick={(url) => handleChange(f.name, url)} label={f.label} />
                 <AiImagePicker value={form[f.name] || ''} onResult={(url) => handleChange(f.name, url)} />
               </div>
+              <p className={`mt-1.5 text-[11px] ${imgDropTarget === f.name ? 'text-red-600 font-medium' : 'text-gray-400'}`}>
+                {imgDropTarget === f.name ? `松手即用这张图替换${f.label}` : `可把「产品图集」里的图片拖到这里替换${f.label}`}
+              </p>
             </div>
           ))}
           {sideFields.filter((f) => f.kind === 'gallery').map((f) => (

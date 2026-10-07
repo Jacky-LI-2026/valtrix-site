@@ -174,21 +174,17 @@ function ProductsContent() {
   const tabBtnIdle = "bg-dark-50 text-dark-600 hover:bg-dark-100";
 
   /** 型号卡片（排列显示 / 分类显示共用同一份卡片，避免两处样式漂移） */
-  /**
-   * 列表卡片上只保留**单一取值、够短**的规格行（owner 2026-10-07：「此类内容在产品列表页不需要显示」）：
-   *   · 含 `;`/`；` 的一律是"多条键值拼在一起"的原始规格串（如本站 G 系列的
-   *     `MR尺寸 (in.): 1/4; 尺寸 mm (in.): 27.2 22.1 …`）⇒ 列表页不可读，丢掉；
-   *   · 超过 40 字的说明型长文本（如针阀那条"多种填料材料可选…温压曲线…"）同样丢掉；
-   *   · 剩余的最多显示 3 条（如「工作压力 / 工作温度范围」）。
-   */
-  const cardSpecsOf = (model: (typeof productTabs)[number]["categories"][number]["models"][number]) =>
-    (model.specs || [])
-      .map((spec) => ({ label: loc.get(spec, "label"), value: loc.get(spec, "value") }))
-      .filter((s) => s.label && s.value && !/[;；]/.test(s.value) && s.value.length <= 40)
-      .slice(0, 3);
-
   const renderCard = (tabId: string, model: (typeof productTabs)[number]["categories"][number]["models"][number]) => {
-    const cardSpecs = cardSpecsOf(model);
+    /**
+     * 卡片正文区 = **核心特性前 3 条**（owner 2026-10-07）：
+     *   「这里[应该]显示核心特性前三条，右对齐」+「按批注1，显示核心特性的前3条」
+     * ⇒ 不再展示规格行（原始规格串在列表页本就不可读，见上一轮反馈），改展示 `features`；
+     *   多语言取当前语种、取不到自动回退中文（`loc.getArray`）；`lite` 档接口也只下发前 3 条。
+     */
+    const cardFeatures = (loc.getArray(model, "features") as unknown[])
+      .map((f) => String(f ?? "").trim())
+      .filter(Boolean)
+      .slice(0, 3);
     return (
     <Link
       key={model.id}
@@ -205,6 +201,18 @@ function ProductsContent() {
             alt={model.name}
             /* 铺满图片区（owner 2026-09-25：「产品图片充满背景」）：object-contain + p-4 → object-cover */
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            /* 图片**加载失败**（URL 失效/文件被删）也走同一套"灰底 + 45% 透明 LOGO"占位，
+               而不是留一个破图 —— 与"没有图片"的观感保持一致。
+               LOGO 取**本站**的 `/api/public/site-config?key=logo`（兜底 /images/logo.png）
+               ⇒ 两站各自显示自己的 LOGO（owner 2026-10-07：左文用左文的 LOGO）。 */
+            onError={(e) => {
+              const el = e.currentTarget
+              el.onerror = null // 防死循环：LOGO 自己也失败时不再递归触发
+              el.src = logoUrl || "/images/logo.png"
+              el.className = "object-contain opacity-[0.45]"
+              el.style.cssText =
+                "position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:70%;max-height:45%;width:auto;height:auto;"
+            }}
           />
         ) : (
           /*
@@ -236,21 +244,17 @@ function ProductsContent() {
         </p>
 
         {/*
-          Key Specs —— owner 2026-10-07：「此类内容在产品列表页不需要显示」。
-          被点名的样例就是本页卡片的原始规格串：
-            `NPT 外螺纹弯头本体` → `MR尺寸 (in.): 1/4; 尺寸 mm (in.): 27.2 22.1 9.6 …`
-          这类值在列表页不可读、且与详情页重复 ⇒ 只保留**单一取值、够短**的规格行，整块为空时连容器一起不渲染。
+          核心特性前 3 条（owner 2026-10-07：「显示核心特性的前3条，右对齐」）
+          —— 原来这里放的是**规格行**（含 `MR尺寸 (in.): 1/4; 尺寸 mm…` 这类原始串），
+             上一轮已确认"此类内容在产品列表页不需要显示"，本轮改为展示核心特性。
+          ⚠️ 用 `text-end`（逻辑方向）而不是 `text-right`：站点支持 RTL（阿拉伯语），
+             `text-end` 在 RTL 下会自动贴左边。
         */}
-        {cardSpecs.length > 0 && (
+        {cardFeatures.length > 0 && (
           <div className="space-y-1.5 mb-4">
-            {cardSpecs.map((spec) => (
-              <div key={spec.label} className="flex justify-between text-xs">
-                <span className="text-dark-400">
-                  {spec.label}
-                </span>
-                <span className="text-dark-700 font-medium">
-                  {spec.value}
-                </span>
+            {cardFeatures.map((f, i) => (
+              <div key={i} className="text-xs text-dark-500 leading-relaxed text-end" title={f}>
+                {f}
               </div>
             ))}
           </div>
