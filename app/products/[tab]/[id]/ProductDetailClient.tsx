@@ -9,7 +9,7 @@ import { createLocalizedGetter } from "@/lib/localized";
 import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { useCanSocialPublish } from "@/lib/api/useSocialPublish";
 import SpecPicker from "@/components/ui/SpecPicker";
-import { buildConnFields, connOverview, type ConnField } from "@/lib/conn-spec";
+import { buildConnFields, connLabelEn, connOverview, type ConnField } from "@/lib/conn-spec";
 import { findManualSeries } from "@/lib/manual-codes";
 import { MANUAL_SPECS } from "@/lib/manual-specs";
 import { addToQuoteCart } from "@/lib/quote-cart";
@@ -924,7 +924,14 @@ export default function ProductDetailClient() {
                           new Set<string>(allFields.flatMap((f: ConnField[]) => f.filter((x) => x.group === "body" && x.zh === "本体材质").map((x) => String(x.value))))
                         ).slice(0, 4);
                         const pressures: string[] = Array.from(
-                          new Set<string>(allFields.flatMap((f: ConnField[]) => f.filter((x) => x.group === "pressure").map((x) => `${x.zh} ${x.value}`)))
+                          new Set<string>(
+                            allFields.flatMap((f: ConnField[]) =>
+                              f
+                                .filter((x) => x.group === "pressure")
+                                /* 非中文语种用字段的英文名（`x.zh` 是「工作压力（316L）」这类中文） */
+                                .map((x) => `${locale === "zh" ? x.zh : x.en} ${x.value}`)
+                            )
+                          )
                         ).slice(0, 6);
                         /** 兜底：从本产品规格推断不出来时，改用**手册数值行**（owner 2026-10-06：「这几个参数在哪取信息？」） */
                         /** 手册数值是中文原文 ⇒ 英文页过一遍术语级翻译（`lib/manual-i18n.ts`，不发明数值） */
@@ -949,7 +956,9 @@ export default function ProductDetailClient() {
                         const manualPorts: string[] = pickCol(colIdx(/端口|端接/), 8);
                         const manualPress: string[] = pickCol(colIdx(/工作压力|压力等级/, /压力/), 6);
                         const manualMat: string[] = pickCol(colIdx(/材料|材质/), 4);
-                        const connList = conns.length ? conns.map((c) => `${c.label} ×${c.count}`) : manualPorts;
+                        const connList = conns.length
+                          ? conns.map((c) => `${locale === "zh" ? c.label : connLabelEn(c.label)} ×${c.count}`)
+                          : manualPorts;
                         const matList = materials.length ? materials : manualMat;
                         const pressList = pressures.length ? pressures : manualPress;
                         const fromManual = !conns.length && manualPorts.length > 0;

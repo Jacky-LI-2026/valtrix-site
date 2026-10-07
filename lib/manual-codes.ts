@@ -31,11 +31,22 @@ export interface CodeSegment {
   options: CodeOption[];
   /** 手册说明（如"缺省：与入口相同"） */
   note?: string;
+  /**
+   * 本段与**下一段**在手册里是**连写**的（如 `DV1` + `3A` → `DV13A`）。
+   * 默认 `true`（手册2 的写法：系列+流道形式连写）；手册1 里有几个系列**不连写**，显式写 `false`。
+   */
+  mergeNext?: boolean;
 }
 
 export interface ManualSeries {
   /** 系列代号（用于匹配产品型号/货号） */
   key: string;
+  /**
+   * 匹配产品型号用的正则（**可省**）。
+   * 手册1 的接头系列是**单个字母**（I / B / G / O），且后面紧跟形态字母（`316L-GN-FMR4` 的 `GN`），
+   * 默认的"key 后面不能跟字母数字"规则会漏掉它们 ⇒ 这类系列必须自带 pattern。
+   */
+  pattern?: RegExp;
   /** 系列中文名（手册原文） */
   name: string;
   segments: CodeSegment[];
@@ -259,6 +270,297 @@ export const MANUAL_SERIES: ManualSeries[] = [
   },
 ];
 
+/* ==========================================================================
+ * 手册1《高纯管阀件》—— 型号规则
+ * ==========================================================================
+ * 口径（owner 2026-10-08「可以」）：与手册2 同一套做法，**逐字转录手册原文**，不推断。
+ *
+ * 手册1 有 **「型号说明-XXX系列」页** 的系列（→ 段位可逐段转录，货号生成器可用）：
+ *   p102 CV3 · p107 BSM · p112 FT4 · p115 FT5 · p118 FT6
+ * 手册1 **只给「订购信息」表**（没有型号说明页）的系列（→ 只登记系列，段位留空）：
+ *   焊接接头 I/B（p007–p017）· 面密封接头 G/O（p018–p048）
+ * 两本手册都**没有规则页**的系列（→ 只登记系列，段位留空；规格数值来自对应目录页）：
+ *   球阀 BV1–BV5 · 针阀 NV1/3/5 · 波纹管阀 BSV1/2 · 阀组 MAN/2V · 气体过滤器家族 GAS
+ *   —— 这些系列的手册只有"订购信息/尺寸表"，逐行枚举几百个基础订购号，没有段位规则可转录；
+ *      界面上**不硬造**生成器（仍退回"从已有机型货号推导"），但"手册规格（数值）"表与
+ *      「接口与端接」手册兜底**照常生效**。
+ *
+ * ⚠️ 段位留空的条目：`segments: []` + `example: ""` —— UI 会据此跳过"按手册生成"分支。
+ */
+
+const BODY_MATERIAL: CodeSegment = {
+  no: 1,
+  name: "阀体材料",
+  en: "Body material",
+  options: [
+    { code: "316L", label: "316L" },
+    { code: "6V", label: "316L VAR" },
+    { code: "6VV", label: "316L VIM-VAR" },
+  ],
+};
+const PROCESS_STD: CodeSegment = {
+  no: 5,
+  name: "工艺规范",
+  en: "Process spec",
+  options: [
+    { code: "GP", label: "标准工艺规范" },
+    { code: "HP", label: "高纯工艺规范" },
+    { code: "UHP", label: "超高纯工艺规范" },
+  ],
+};
+const OUTLET_SAME: (opts: CodeOption[]) => CodeSegment = (opts) => ({
+  no: 5,
+  name: "出口形式和尺寸",
+  en: "Outlet form & size",
+  note: "缺省：与入口相同；其他形式见「入口形式和尺寸」",
+  options: [{ code: "", label: "与入口相同（缺省）", isDefault: true }, ...opts],
+});
+
+export const MANUAL_SERIES_1: ManualSeries[] = [
+  /* —— 单向阀 CV3（手册1 p102）—— */
+  {
+    key: "CV3",
+    name: "CV3 系列 全焊接单向阀",
+    example: "316L-CV3-FMR4-N-HP",
+    source: "手册1 p102（型号说明-CV3系列）",
+    segments: [
+      BODY_MATERIAL,
+      { no: 2, name: "产品系列", en: "Series", mergeNext: false, options: [{ code: "CV3", label: "CV3 系列" }] },
+      {
+        no: 3,
+        name: "进出口形式和尺寸",
+        en: "Inlet/outlet form & size",
+        mergeNext: false,
+        options: [
+          { code: "FMR4", label: '1/4" 内螺纹面密封' },
+          { code: "MR4", label: '1/4" 整体外螺纹面密封' },
+          { code: "SMR4", label: '1/4" 可旋转外螺纹面密封' },
+          { code: "TB4", label: '1/4" 对焊接口' },
+          { code: "FMR8", label: '1/2" 内螺纹面密封' },
+          { code: "MR8", label: '1/2" 整体外螺纹面密封' },
+          { code: "SMR8", label: '1/2" 可旋转外螺纹面密封' },
+          { code: "TB8", label: '1/2" 对焊接口' },
+        ],
+      },
+      {
+        no: 4,
+        name: "密封材料",
+        en: "Seal material",
+        note: "缺省：氟橡胶（FKM）",
+        options: [
+          { code: "", label: "氟橡胶（FKM）（缺省）", isDefault: true },
+          { code: "N", label: "丁腈橡胶（NBR）" },
+          { code: "E", label: "三元乙丙橡胶（EPDM）" },
+          { code: "F", label: "全氟橡胶（FFKM）" },
+        ],
+      },
+      { ...PROCESS_STD, no: 5 },
+    ],
+  },
+  /* —— 计量阀 BSM（手册1 p107）—— */
+  {
+    key: "BSM",
+    name: "BSM 系列 波纹管计量阀",
+    example: "316-BSM2A-MR4-FMR4-G-W-HP",
+    source: "手册1 p107（型号说明-BSM系列）",
+    segments: [
+      {
+        no: 1,
+        name: "阀体材料",
+        en: "Body material",
+        options: [
+          { code: "316L", label: "316L" },
+          { code: "316", label: "316SS" },
+        ],
+      },
+      { no: 2, name: "阀门系列", en: "Series", options: [{ code: "BSM", label: "波纹管计量阀" }] },
+      { no: 3, name: "流道形式", en: "Flow pattern", options: [{ code: "2A", label: "直通" }] },
+      {
+        no: 4,
+        name: "入口形式和尺寸",
+        en: "Inlet",
+        mergeNext: false,
+        options: [
+          { code: "FMR4", label: '1/4" 金属面密封内螺纹' },
+          { code: "MR4", label: '1/4" 金属面密封整体外螺纹' },
+          { code: "FMR8", label: '1/2" 金属面密封内螺纹' },
+          { code: "F4", label: '1/4" 英制卡套端口' },
+          { code: "F6M", label: "6 mm 公制卡套端口" },
+          { code: "TW4", label: '1/4" 英制管承插焊或 3/8" 英制管对焊' },
+        ],
+      },
+      OUTLET_SAME([
+        { code: "FMR4", label: '1/4" 金属面密封内螺纹' },
+        { code: "MR4", label: '1/4" 金属面密封整体外螺纹' },
+        { code: "FMR8", label: '1/2" 金属面密封内螺纹' },
+        { code: "F4", label: '1/4" 英制卡套端口' },
+        { code: "F6M", label: "6 mm 公制卡套端口" },
+        { code: "TW4", label: '1/4" 英制管承插焊或 3/8" 英制管对焊' },
+      ]),
+      {
+        no: 6,
+        name: "阀杆头类型",
+        en: "Stem head",
+        options: [
+          { code: "G", label: "计量型" },
+          { code: "RG", label: "调节型" },
+        ],
+      },
+      {
+        no: 7,
+        name: "阀门密封形式",
+        en: "Seal form",
+        note: "缺省：垫片密封",
+        options: [
+          { code: "", label: "垫片密封（缺省）", isDefault: true },
+          { code: "W", label: "焊接形式" },
+        ],
+      },
+      { ...PROCESS_STD, no: 8, options: [{ code: "GP", label: "标准工艺规范" }, { code: "HP", label: "高纯工艺规范" }] },
+    ],
+  },
+  /* —— 气体过滤器 FT4 / FT5 / FT6（手册1 p112 / p115 / p118）—— */
+  {
+    key: "FT4",
+    name: "FT4 系列 粉末烧结滤芯过滤器",
+    example: "316L-FT4-MR4-05-HP",
+    source: "手册1 p112（型号说明-FT4系列）",
+    segments: [
+      { ...BODY_MATERIAL, options: [{ code: "316L", label: "316L" }, { code: "6V", label: "316L VAR" }] },
+      { no: 2, name: "产品系列", en: "Series", mergeNext: false, options: [{ code: "FT4", label: "粉末烧结滤芯气体过滤器" }] },
+      {
+        no: 3,
+        name: "入口形式和尺寸",
+        en: "Inlet form & size",
+        mergeNext: false,
+        options: [
+          { code: "MR2", label: '1/8" 外螺纹金属面密封' },
+          { code: "MR4", label: '1/4" 外螺纹金属面密封' },
+          { code: "MR8", label: '1/2" 外螺纹金属面密封' },
+          { code: "F2", label: '1/8" 双卡套' },
+          { code: "F4", label: '1/4" 双卡套' },
+          { code: "F8", label: '1/2" 双卡套' },
+          { code: "N2", label: '1/8" NPT 外螺纹' },
+          { code: "N4", label: '1/4" NPT 外螺纹' },
+          { code: "N8", label: '1/2" NPT 外螺纹' },
+        ],
+      },
+      OUTLET_SAME([
+        { code: "MR2", label: '1/8" 外螺纹金属面密封' },
+        { code: "MR4", label: '1/4" 外螺纹金属面密封' },
+        { code: "MR8", label: '1/2" 外螺纹金属面密封' },
+        { code: "F2", label: '1/8" 双卡套' },
+        { code: "F4", label: '1/4" 双卡套' },
+        { code: "F8", label: '1/2" 双卡套' },
+        { code: "N2", label: '1/8" NPT 外螺纹' },
+        { code: "N4", label: '1/4" NPT 外螺纹' },
+        { code: "N8", label: '1/2" NPT 外螺纹' },
+      ]),
+      {
+        no: 7,
+        name: "滤芯精度",
+        en: "Element rating",
+        options: [
+          { code: "05", label: "0.5 μm" },
+          { code: "2", label: "2 μm" },
+          { code: "5", label: "5 μm" },
+          { code: "15", label: "15 μm" },
+          { code: "40", label: "40 μm" },
+          { code: "60", label: "60 μm" },
+          { code: "80", label: "80 μm" },
+        ],
+      },
+      { ...PROCESS_STD, no: 8, options: [{ code: "GP", label: "标准工艺规范" }, { code: "HP", label: "高纯工艺规范" }] },
+    ],
+  },
+  ...([
+    ["FT5", "FT5 系列 陶瓷滤芯过滤器", "316L-FT5-MR4-F120-UHP", "手册1 p115（型号说明-FT5系列）", "陶瓷滤芯气体过滤器", [
+      ["F60", "60 标准升/分钟"],
+      ["F120", "120 标准升/分钟"],
+      ["F200", "200 标准升/分钟"],
+      ["F300", "300 标准升/分钟"],
+    ]] as [string, string, string, string, string, [string, string][]],
+    ["FT6", "FT6 系列 不锈钢滤芯过滤器", "316L-FT6-MR4-F120-UHP", "手册1 p118（型号说明-FT6系列）", "不锈钢滤芯气体过滤器", [
+      ["F15", "15 标准升/分钟"],
+      ["F120", "120 标准升/分钟"],
+      ["F300", "300 标准升/分钟"],
+    ]] as [string, string, string, string, string, [string, string][]],
+  ]).map(([key, name, example, source, seriesLabel, flows]) => ({
+    key,
+    name,
+    example,
+    source,
+    segments: [
+      { ...BODY_MATERIAL, options: [{ code: "316L", label: "316L" }, { code: "6V", label: "316L VAR" }] },
+      { no: 2, name: "产品系列", en: "Series", mergeNext: false, options: [{ code: key, label: seriesLabel }] },
+      {
+        no: 3,
+        name: "入口形式和尺寸",
+        en: "Inlet form & size",
+        mergeNext: false,
+        options: [
+          { code: "MR4", label: '1/4" 外螺纹金属面密封' },
+          { code: "MR8", label: '1/2" 外螺纹金属面密封' },
+        ],
+      },
+      OUTLET_SAME([
+        { code: "MR4", label: '1/4" 外螺纹金属面密封' },
+        { code: "MR8", label: '1/2" 外螺纹金属面密封' },
+      ]),
+      { no: 7, name: "额定流量", en: "Rated flow", options: flows.map(([code, label]) => ({ code, label })) },
+      { ...PROCESS_STD, no: 8, options: [{ code: "UHP", label: "超高纯工艺规范" }] },
+    ],
+  })),
+];
+
+/** 手册里**有规格数值、但没有型号段位规则**的系列（登记系列名即可：规格表与「接口与端接」兜底据此生效） */
+const SERIES_NO_RULE: [string, string, string, string][] = [
+  // key, 系列中文名, 手册出处, 手册里的一个真实订购号（仅作展示）
+  ["ALD", "ALD 系列 原子层沉积隔膜阀", "手册2 p007 / 手册1 p055（型号说明-ALD系列；段位含「电磁导阀/传感器」合并写法，暂不转录）", "6V-ALD33A-FMR4-FMR4-MR4-NC-VS-UHP"],
+  ["PRE1", "PRE1 系列 小流量减压阀", "手册1 p083（型号说明-PRE1系列；12 段中「入口压力+出口压力」连写为一个 2 字母段，暂不转录）", "316L-PRE1C-SMR4-BC-OG-PI1-P-HP"],
+  ["PRE2", "PRE2 系列 小流量灵敏减压阀", "手册1 p086（型号说明-PRE2系列；同上）", "316L-PRE2C-SMR4-BC-OG-PI-P-HP"],
+  ["PRE3", "PRE3 系列 大流量灵敏减压阀", "手册1 p089（型号说明-PRE3系列；同上）", "316L-PRE3C-SMR4-AC-OG-PI-P-HP"],
+  ["PRT1", "PRT1 系列 小流量减压阀（联结膜片）", "手册1 p092（型号说明-PRT1系列；同上）", "316L-PRT1C-SMR4-BC-OG-PI1-P-HP"],
+  ["PRT2", "PRT2 系列 小流量灵敏减压阀（联结膜片）", "手册1 p095（型号说明-PRT2系列；同上）", "316L-PRT2C-SMR4-BC-OG-PI-P-HP"],
+  ["PRT3", "PRT3 系列 大流量灵敏减压阀（联结膜片）", "手册1 p098（型号说明-PRT3系列；同上）", "316L-PRT3C-SMR4-AC-OG-PI-P-HP"],
+  ["I", "I 系列 微焊接接头", "手册1 p007–p014（I 系列订购信息表）", "316L-IU-TB8-TB4-HP"],
+  ["B", "B 系列 长焊接接头", "手册1 p015–p017（B 系列订购信息表）", "316L-BU-TB8-TB4-HP"],
+  ["G", "G 系列 金属面密封接头", "手册1 p018–p039（G 系列订购信息表）", "316L-GU-MR4-HP"],
+  ["O", "O 系列 O 形圈面密封接头", "手册1 p040–p048（O 系列订购信息表）", "316L-OU-OR4-N4-HP"],
+  ["BV1", "BV1 系列 一体式仪表球阀", "球阀目录页（两本手册均无型号规则页）", ""],
+  ["BV2", "BV2 系列 三片式球阀（低压）", "球阀目录页", ""],
+  ["BV3", "BV3 系列 三片式球阀（高压）", "球阀目录页", ""],
+  ["BV4", "BV4 系列 冷拔棒料球阀", "球阀目录页", ""],
+  ["BV5", "BV5 / BV5C 系列 六方棒料球阀", "球阀目录页", ""],
+  ["NV1", "NV1 系列 锻造阀体针阀", "针阀目录页", ""],
+  ["NV3", "NV3 系列 整体式阀帽针阀", "针阀目录页", ""],
+  ["NV5", "NV5 系列 活接阀帽针阀", "针阀目录页", ""],
+  ["BSV1", "BSV1 系列 波纹管阀", "波纹管阀目录页", ""],
+  ["BSV2", "BSV2 系列 波纹管阀", "波纹管阀目录页", ""],
+  ["MAN", "仪表阀组", "阀组目录页", ""],
+  ["2V", "二阀组 2D / 2R / 2DH / 2RH", "阀组目录页", ""],
+  ["GAS", "气体过滤器 · 高纯气体过滤家族", "过滤器目录页", ""],
+];
+
+for (const [key, name, source, example] of SERIES_NO_RULE) {
+  MANUAL_SERIES_1.push({
+    key,
+    name,
+    source,
+    example,
+    segments: [],
+    /**
+     * 单字母系列（I/B/G/O）与 2V：默认规则（"key 后面不能跟字母数字"）匹配不到两类真实型号 ——
+     *   · 形态连写：`316L-GN-FMR4` / `316L-IE-TB4`
+     *   · 系列级页面：`G Series` / `I Series` / `B Series` / `O Series`
+     * ⚠️ 形态字母后**只允许紧跟 `-`/空白/结尾**（不允许数字）——
+     *   否则 `BV6/BV6H` 会被 B（长焊接接头）抢走，`GV/GVH` 会被 G（金属面密封接头）抢走。
+     */
+    ...(key.length === 1 ? { pattern: new RegExp(`(^|[-\\s])${key}(?:[A-Z]{1,3})?(?=[-\\s]|$)`) } : {}),
+    ...(key === "2V" ? { pattern: /(^|[-\s])2[DR](H)?(?=[-\d]|$)/ } : {}),
+  });
+}
+
 /** 供 UI 展示的"段位速查"（ALD 系列 12 段，结构最复杂，单独给出） */
 export const ALD_SEGMENTS: { no: number; name: string; values: string }[] = [
   { no: 1, name: "阀体材料", values: "316L / 6V（316L VAR）/ 6VV（316L VIM-VAR）" },
@@ -279,9 +581,15 @@ export const ALD_SEGMENTS: { no: number; name: string; values: string }[] = [
 export function findManualSeries(text: string): ManualSeries | null {
   const t = String(text || "").toUpperCase();
   if (!t) return null;
-  // 先匹配更长的 key（DV1 先于 DV；ALD 单独）
-  const keys = [...MANUAL_SERIES].sort((a, b) => b.key.length - a.key.length);
-  return keys.find((s) => new RegExp(`${s.key}(?![0-9A-Z])`).test(t) || t.includes(`${s.key}3`) || t.includes(`${s.key}2`)) || null;
+  // 先匹配更长的 key（DV1 先于 DV；BSM 先于 B；GJS 无 → G）
+  const all = [...MANUAL_SERIES, ...MANUAL_SERIES_1].sort((a, b) => b.key.length - a.key.length);
+  return (
+    all.find((s) =>
+      s.pattern
+        ? s.pattern.test(t)
+        : new RegExp(`${s.key}(?![0-9A-Z])`).test(t) || t.includes(`${s.key}3`) || t.includes(`${s.key}2`)
+    ) || null
+  );
 }
 
 /**

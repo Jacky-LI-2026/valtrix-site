@@ -29,7 +29,7 @@ import {
   LABEL_FACET,
   type LocGetter,
 } from "@/lib/spec-facets";
-import { buildConnFields, connSummary } from "@/lib/conn-spec";
+import { buildConnFields, connLabelEn, connSummary } from "@/lib/conn-spec";
 import { findManualSeries } from "@/lib/manual-codes";
 import { MANUAL_SPECS } from "@/lib/manual-specs";
 import { manualCellToEn } from "@/lib/manual-i18n";
@@ -125,7 +125,11 @@ export default function SpecPicker({
      */
     const cat = MANUAL_SPECS.find((c) => c.series.some((x) => x.id === manual.key));
     const s = cat?.series.find((x) => x.id === manual.key);
-    return s && s.rows.length ? { columns: cat!.columns, columnsEn: cat!.columnsEn || [], rows: s.rows, series: s } : null;
+    /** ⚠️ 表头出处要用**这份数值行的出处**（`cat.source`，通常是「<品类>目录页」），
+     *  不是 `manual.source`（那是"型号规则页"，只该出现在货号生成器的提示里）。 */
+    return s && s.rows.length
+      ? { columns: cat!.columns, columnsEn: cat!.columnsEn || [], rows: s.rows, series: s, source: cat!.source }
+      : null;
   }, [manual]);
   const rows = useMemo(() => (Array.isArray(specs) ? specs.map((s) => parseSpecRow(s, loc)) : []), [specs, loc]);
 
@@ -227,9 +231,16 @@ export default function SpecPicker({
    * ⇒ **非中文语种**把段位名/取值一并过 `manualCellToEn`（术语级；段位名优先用手册数据自带的 `en`）。
    */
   const genSegments = useMemo(() => {
-    if (manual) {
-      const s2 = manual.segments.find((s) => s.no === 2);
-      const s3 = manual.segments.find((s) => s.no === 3);
+    /**
+     * 只有**手册给了段位规则**（`segments` 非空）才走"按手册生成"；
+     * 手册只登记了系列（如接头 I/B/G/O、球阀 BV*：手册仅有逐行枚举的订购信息表）时，
+     * 退回"从本产品已有机型货号推导"，**不硬造**规则。
+     */
+    if (manual && manual.segments.length > 0) {
+      /** 「系列 + 流道形式」连写（`DV1`+`3A`→`DV13A`）默认开启；手册1 的 CV3/FT* 显式 `mergeNext:false` */
+      const merge = manual.segments.some((s) => s.no === 2 && s.mergeNext !== false);
+      const s2 = merge ? manual.segments.find((s) => s.no === 2) : undefined;
+      const s3 = merge ? manual.segments.find((s) => s.no === 3) : undefined;
       /** 段位名：中文用手册原文；其它语种优先手册自带的英文名，缺失则术语级翻译 */
       const nm = (s: { name: string; en?: string }) => (isZh ? s.name : s.en || manualCellToEn(s.name));
       /** 取值描述：手册只有中文原文（`1/4" 金属面密封内螺纹` → `1/4" VCR female`） */
@@ -240,12 +251,12 @@ export default function SpecPicker({
           for (const b of s3.options) combos.push({ code: `${a.code}${b.code}`, label: `${a.code}${b.code} — ${vb(a.label)} · ${vb(b.label)}` });
       }
       return manual.segments
-        .filter((s) => s.no !== 3)
+        .filter((s) => !(s3 && s.no === 3))
         .map((s) => ({
           key: `m${s.no}`,
-          label: s.no === 2 ? `${nm(s)} + ${s3 ? nm(s3) : ""}`.trim() : nm(s),
+          label: s === s2 && s3 ? `${nm(s)} + ${nm(s3)}` : nm(s),
           note: s.note ? (isZh ? s.note : manualCellToEn(s.note)) : "",
-          values: s.no === 2 ? combos : s.options.map((o) => ({ code: o.code, label: vb(o.label) })),
+          values: s === s2 && s3 ? combos : s.options.map((o) => ({ code: o.code, label: vb(o.label) })),
         }));
     }
     return codeSegments.map((seg, i) => ({
@@ -298,8 +309,14 @@ export default function SpecPicker({
     return map;
   }, [facets, picked, rows]);
 
-  // 插件停用、或规格太少：不启用选型器，原样渲染（⚠️ 必须在所有 hook 之后）
-  if (!enabled || rows.length < minRows) return <>{children}</>;
+  /**
+   * 插件停用 ⇒ 原样渲染（⚠️ 必须在所有 hook 之后）。
+   * owner 2026-10-08（「可以」）：**规格少的产品**（< `minRows`）原先整块跳过选型器 —— 于是
+   * 过滤器/接头这类只有 5–8 条自有规格的详情页拿不到「手册规格（数值）」与货号生成器。
+   * 现口径：只要**能对上手册系列**（`manualRows`），这几块照给；本产品自己的规格表**原样平铺**（不折叠、不丢内容）。
+   */
+  const fewSpecs = rows.length < minRows;
+  if (!enabled || (fewSpecs && !manualRows)) return <>{children}</>;
 
   const activeCount = Object.values(picked).filter(Boolean).length;
   const list = showAll ? matched : matched.slice(0, 12);
@@ -317,8 +334,12 @@ export default function SpecPicker({
     const rowsHtml = matched
       .map((r) => {
         const f = buildConnFields(r.attrs, r.label, "");
-        const conn = connSummary(f, " · ") || "—";
-        const press = f.filter((x) => x.group === "pressure").map((x) => `${x.zh} ${x.value}`).join(" / ") || "—";
+        const conn = (isZh ? connSummary(f, " · ") : connLabelEn(connSummary(f, " · "))) || "—";
+        const press =
+          f
+            .filter((x) => x.group === "pressure")
+            .map((x) => `${isZh ? x.zh : x.en} ${x.value}`)
+            .join(" / ") || "—";
         return `<tr><td>${r.code || "—"}</td><td>${r.label || "—"}</td><td>${conn}</td><td>${press}</td></tr>`;
       })
       .join("");
@@ -388,8 +409,12 @@ tr:nth-child(even) td{background:#fafafa}
                   （目录册号 + 页码 + 型号说明），不逐字翻译那串括号说明。
                 */}
                 {isZh
-                  ? `${manualRows.series.nameZh} · ${manual?.source}`
-                  : `${manualRows.series.nameEn} · catalog ${(manual?.source.match(/手册(\d+)/) || [])[1] || ""} ${(manual?.source.match(/p\d+/) || [])[0] || ""} · type designation`.replace(/\s+/g, " ").trim()}
+                  ? `${manualRows.series.nameZh} · ${manualRows.source}`
+                  : `${manualRows.series.nameEn}${
+                      (manualRows.source.match(/手册(\d+)/) || [])[1] && (manualRows.source.match(/p\d+/) || [])[0]
+                        ? ` · catalog ${(manualRows.source.match(/手册(\d+)/) || [])[1]} ${(manualRows.source.match(/p\d+/) || [])[0]}`
+                        : ""
+                    }`}
               </span>
             </span>
             <span className="text-[11px] font-normal text-dark-400">{manualRows.rows.length} {locale === "zh" ? "行" : "rows"}</span>
@@ -458,9 +483,11 @@ tr:nth-child(even) td{background:#fafafa}
                   {f.values.map((v) => {
                     const n = availability[f.key]?.[v] ?? 0;
                     const disabled = n === 0 && picked[f.key] !== v;
+                    /** 非中文语种：选项**文字**换英文（端口型式里带中文），选项**值**保持原样（匹配用） */
+                    const dv = isZh ? v : connLabelEn(v);
                     return (
                       <option key={v} value={v} disabled={disabled}>
-                        {disabled ? `${v} —` : n > 0 && n < rows.length ? `${v}（${n}）` : v}
+                        {disabled ? `${dv} —` : n > 0 && n < rows.length ? `${dv}（${n}）` : dv}
                       </option>
                     );
                   })}
@@ -515,16 +542,17 @@ tr:nth-child(even) td{background:#fafafa}
         <div className="flex flex-wrap items-center gap-3">
           <span className="text-[12px] font-semibold text-dark">{dict.codeGen}</span>
           <span className="text-dark-200">|</span>
-          {/* 货号生成器开关 */}
-          <button
-            type="button"
-            onClick={() => setShowGen((v) => !v)}
-            disabled={!genSegments.length}
-            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 border border-dark-100 rounded-lg hover:bg-dark-50 disabled:opacity-40"
-            title={dict.genHint}
-          >
-            <Wrench size={13} /> {dict.codeGen}
-          </button>
+          {/* 货号生成器开关（没有任何可用段位时**整颗按钮不显示** —— 免得留一个永远灰着的"货号生成器"） */}
+          {genSegments.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowGen((v) => !v)}
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 border border-dark-100 rounded-lg hover:bg-dark-50"
+              title={dict.genHint}
+            >
+              <Wrench size={13} /> {dict.codeGen}
+            </button>
+          )}
           {/* 选型单 */}
           <button
             type="button"
@@ -539,10 +567,10 @@ tr:nth-child(even) td{background:#fafafa}
         {showGen && genSegments.length > 0 && (
           <div className="border-t border-dark-100 pt-3">
             <div className="text-[11px] text-dark-400 mb-2">
-              {manual
-                ? locale === "zh"
-                  ? `按手册《型号说明-${manual.key}系列》生成（来源：${manual.source}）· 手册示例：${manual.example}`
-                  : `Built from the catalog rule for series ${manual.key}. Example: ${manual.example}`
+              {manual && manual.segments.length > 0
+                ? isZh
+                  ? `按手册《型号说明-${manual.key}系列》生成（来源：${manual.source}）${manual.example ? `· 手册示例：${manual.example}` : ""}`
+                  : `Built from the catalog rule for series ${manual.key}.${manual.example ? ` Example: ${manual.example}` : ""}`
                 : dict.genHint}
             </div>
             <div className="flex flex-wrap gap-2">
@@ -667,7 +695,8 @@ tr:nth-child(even) td{background:#fafafa}
               */}
               {buildConnFields(r.attrs, r.label, "").slice(0, 5).map((f, fi) => (
                 <span key={`${f.zh}-${fi}`} className="text-[11px] text-dark-500">
-                  <span className="text-dark-300">{locale === "zh" ? f.zh : f.en}:</span> {f.value}
+                  {/* 非中文语种：字段名里的端接型式是中文（`Connection 1 (面密封)`）⇒ 过一遍显示层翻译 */}
+                  <span className="text-dark-300">{locale === "zh" ? f.zh : connLabelEn(f.en)}:</span> {f.value}
                 </span>
               ))}
             </div>
@@ -689,13 +718,18 @@ tr:nth-child(even) td{background:#fafafa}
       </div>
       )}
 
-      {/* 完整规格表（原样保留；非变体型产品它就是主内容） */}
+      {/* 完整规格表（原样保留；非变体型产品它就是主内容）
+          —— 规格本来就少（< minRows）时**不折叠**，避免把原本平铺的内容藏起来 */}
+      {fewSpecs ? (
+        <div className="bg-white border border-dark-100 rounded-xl px-4 py-3 overflow-x-auto">{children}</div>
+      ) : (
       <details className="bg-white border border-dark-100 rounded-xl">
         <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-dark select-none">
           {variantMode ? `${dict.full}（${rows.length}）` : locale === "zh" ? `完整规格表（${rows.length}）` : `Full specification table (${rows.length})`}
         </summary>
         <div className="px-4 pb-4 overflow-x-auto">{children}</div>
       </details>
+      )}
     </div>
   );
 }

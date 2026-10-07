@@ -269,3 +269,40 @@ export function connOverview(allFields: ConnField[][], limit = 12): { label: str
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
     .slice(0, limit);
 }
+
+/**
+ * 端口型式等中文显示串 → 英文（**只用于显示**）。
+ * ==========================================================================
+ * 为什么不在 `portTypeOf` 里直接出英文：那些中文字符串同时是**匹配/去重的主键**
+ * （`rowMatches()` 拿选项值与 `portLabel()` 比对、`connOverview()` 用 `f.zh` 去重）
+ * —— 两边口径必须一致，所以内部一律保留中文，**只在渲染时**换成英文。
+ *
+ * owner 2026-10-08：英文版详情页的「快速选型」选项与「接口与端接」里出现
+ * `卡套 / 焊接管端 6`、`端接 1（面密封）` 这类中文（来自本模块的型式推断）。
+ */
+const DISPLAY_EN: [string, string][] = [
+  ["面密封（NPT）", "VCR (NPT)"],
+  ["面密封（PT）", "VCR (PT)"],
+  ["O 形圈面密封", "O-ring face seal"],
+  ["卡套 / 焊接管端", "ferrule / weld end"],
+  ["面密封", "VCR"],
+  ["NPT 螺纹", "NPT thread"],
+  ["PT 螺纹", "PT thread"],
+  ["螺纹", "thread"],
+  ["R 端接", "R connection"],
+  ["端接", "Connection"],
+];
+
+/** 把含中文端接型式的显示串换成英文（数字/尺寸/型号一律原样保留） */
+export function connLabelEn(text: string): string {
+  let out = String(text ?? "");
+  for (const [zh, en] of [...DISPLAY_EN].sort((a, b) => b[0].length - a[0].length)) {
+    if (out.includes(zh)) out = out.split(zh).join(en);
+  }
+  return out
+    .replace(/（/g, " (")
+    .replace(/）/g, ")")
+    .replace(/\s+([,)])/g, "$1")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
