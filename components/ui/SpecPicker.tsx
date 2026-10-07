@@ -111,6 +111,8 @@ export default function SpecPicker({
   children,
 }: SpecPickerProps) {
   const dict = T[locale] || T.zh;
+  /** 中文语种用手册原文；**其余语种一律英文**（与 `/products/selector` 同一口径） */
+  const isZh = locale === "zh";
   /** 手册权威规则（命中则货号生成器用它；未命中则退回"从已有机型货号推导"） */
   const manual = useMemo(() => (productModel ? findManualSeries(productModel) : null), [productModel]);
   /** 该产品所属系列的手册数值规格行（用于"手册规格"表；DV2 → 手册 p013 的值） */
@@ -215,23 +217,30 @@ export default function SpecPicker({
   /**
    * 生成器的段位：**优先手册权威段位**（带中文含义）——
    * 手册把「系列 + 流道形式」连写（示例 `DV13A` = DV1 + 3A），故这里把这两段合并成一个选择项。
+   *
+   * owner 2026-10-07（「VCR 就是面密封的英文意思」）：手册只给中文取值描述，
+   * ⇒ **非中文语种**把段位名/取值一并过 `manualCellToEn`（术语级；段位名优先用手册数据自带的 `en`）。
    */
   const genSegments = useMemo(() => {
     if (manual) {
       const s2 = manual.segments.find((s) => s.no === 2);
       const s3 = manual.segments.find((s) => s.no === 3);
+      /** 段位名：中文用手册原文；其它语种优先手册自带的英文名，缺失则术语级翻译 */
+      const nm = (s: { name: string; en?: string }) => (isZh ? s.name : s.en || manualCellToEn(s.name));
+      /** 取值描述：手册只有中文原文（`1/4" 金属面密封内螺纹` → `1/4" VCR female`） */
+      const vb = (label: string) => (isZh ? label : manualCellToEn(label));
       const combos: { code: string; label: string }[] = [];
       if (s2 && s3) {
         for (const a of s2.options)
-          for (const b of s3.options) combos.push({ code: `${a.code}${b.code}`, label: `${a.code}${b.code} — ${a.label} · ${b.label}` });
+          for (const b of s3.options) combos.push({ code: `${a.code}${b.code}`, label: `${a.code}${b.code} — ${vb(a.label)} · ${vb(b.label)}` });
       }
       return manual.segments
         .filter((s) => s.no !== 3)
         .map((s) => ({
           key: `m${s.no}`,
-          label: s.no === 2 ? `${s.name} + 流道形式` : s.name,
-          note: s.note || "",
-          values: s.no === 2 ? combos : s.options.map((o) => ({ code: o.code, label: o.label })),
+          label: s.no === 2 ? `${nm(s)} + ${s3 ? nm(s3) : ""}`.trim() : nm(s),
+          note: s.note ? (isZh ? s.note : manualCellToEn(s.note)) : "",
+          values: s.no === 2 ? combos : s.options.map((o) => ({ code: o.code, label: vb(o.label) })),
         }));
     }
     return codeSegments.map((seg, i) => ({
@@ -240,7 +249,7 @@ export default function SpecPicker({
       note: "",
       values: seg.values.map((v) => ({ code: v, label: v })),
     }));
-  }, [manual, codeSegments]);
+  }, [manual, codeSegments, isZh]);
 
   const generatedCode = useMemo(() => {
     if (!genSegments.length) return "";
