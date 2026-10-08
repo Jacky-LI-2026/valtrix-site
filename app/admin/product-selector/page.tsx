@@ -139,7 +139,11 @@ export default function ProductSelectorAdminPage() {
             <div>
               <div className="font-semibold text-dark">插件状态</div>
               <div className="text-xs text-dark-400">
-                {enabled === null ? "读取中…" : enabled ? "已启用（前台显示「快速选型」入口）" : "已停用（前台入口隐藏，页面仍可直达）"}
+                {/**
+                  * owner 2026-10-08：「这些都是阀门网站独有功能」⇒ 插件停用后
+                  * `/products/selector` **直达也返回 404**（门闩在页面里），此处文案同步，别再说"页面仍可直达"。
+                  */}
+                {enabled === null ? "读取中…" : enabled ? "已启用（前台显示「快速选型」入口）" : "已停用（前台入口隐藏，该页直达返回 404）"}
               </div>
             </div>
           </div>
