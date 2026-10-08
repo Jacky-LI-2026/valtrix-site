@@ -42,6 +42,26 @@ function defaultSingleValue(f: ContentField): any {
   }
 }
 
+/**
+ * 给**非多语言字段**预置种子值，让它们从一开始就存在于表单状态里。
+ * ==========================================================================
+ * 🔴 owner 2026-10-08 报障：新建产品时留空「型号」，保存报
+ *    `Invalid prisma.product.create() invocation: … Argument 'model' is missing`。
+ * 根因：`useAdminForm` 只展开**多语言**字段的键（name/nameEn/…），
+ *   非多语言字段（model / slug / tabId / price / sortOrder…）**只有用户碰过才进 form**
+ *   ⇒ 空着不填时该键在提交体里**完全不存在**：NOT NULL 列直接抛 Prisma 英文错。
+ * 现口径：新建时按类型给一遍默认值 —— "空着的必填项"会作为**空值**提交，
+ *   由服务端必填校验给出「请填写必填项：型号」这类可读提示。
+ */
+function buildSingleFieldSeed(cfg?: ContentTypeConfig): Record<string, any> {
+  const seed: Record<string, any> = {}
+  for (const f of cfg?.fields || []) {
+    if (f.multiLang) continue
+    seed[f.name] = defaultSingleValue(f)
+  }
+  return seed
+}
+
 /** gallery 元素归一化成 URL（库里可能是字符串，也可能是 {url} 对象） */
 function galleryToUrl(x: any): string {
   if (!x) return ''
@@ -526,7 +546,7 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
   const [imgDropTarget, setImgDropTarget] = useState('')
 
   const { form, setForm, handleChange, handleValuesChange, getLangValues, buildFieldMap, getFormValues, updateFormValue } =
-    useAdminForm<any>({} as any, multiLangFields)
+    useAdminForm<any>(buildSingleFieldSeed(cfg), multiLangFields)
 
   // 加载关联下拉选项
   // 加载关联下拉选项 + 字段字数上限
@@ -597,6 +617,25 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
     setSaving(true)
     setError('')
     try {
+      /**
+       * 必填项前置校验（owner 2026-10-08：新建产品留空「型号」时，原来会提交到服务端
+       * 由 Prisma 抛 `Argument 'model' is missing`）。这里先在客户端拦下并给出中文字段名，
+       * 编辑器里的内容不会丢（表单不跳转，只显示红字）。
+       * ⚠️ 只在**新建**时强制 —— 编辑历史数据时不因早期空值卡死（服务端同样口径）。
+       */
+      if (!initialId) {
+        const missing = (cfg?.fields || [])
+          .filter((f) => f.required)
+          .filter((f) => {
+            const v = (form as any)[f.name]
+            return v === undefined || v === null || (typeof v === 'string' && !v.trim())
+          })
+        if (missing.length) {
+          setError(`请填写必填项：${missing.map((f) => f.label).join('、')}`)
+          setSaving(false)
+          return
+        }
+      }
       const payload: any = serializeJsonFields({ ...form }, cfg.fields as MultiLangFieldConfig[])
       // 产品增强：附带 specs（后端 service 事务同步 productSpecs 表）
       if (isProduct) payload.specs = specs

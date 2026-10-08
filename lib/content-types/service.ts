@@ -221,6 +221,39 @@ export function sanitizeData(type: string, data: any): Record<string, any> {
   return out;
 }
 
+/** 「空值」判定：undefined / null / 空串（数字 0、false、空数组都算**有值**） */
+function isEmptyFieldValue(v: any): boolean {
+  if (v === undefined || v === null) return true;
+  if (typeof v === "string") return v.trim() === "";
+  return false;
+}
+
+/**
+ * 必填字段校验（**服务端兜底**，返回可读中文提示）
+ * ==========================================================================
+ * 背景（owner 2026-10-08 报障）：新建产品的表单只把"用户碰过的"非多语言字段写进提交体，
+ *   而 `products.model` 是 `String @db.VarChar(100)`（NOT NULL、无默认值）⇒ 空着不填时
+ *   字段**整个键都不出现**，Prisma 直接抛
+ *   `Invalid prisma.product.create() invocation: { … } Argument 'model' is missing`
+ *   —— 后台界面上只能看到这一串英文。
+ *
+ * 口径：
+ *   · **create**：所有 `required` 字段必须齐（缺一个就拦，并列出字段中文名）；
+ *   · **update**：只在"显式提交了空值"时拦 —— 提交体里没有该键视为"不改动"，
+ *     避免编辑历史脏数据（早期可能存过空值）时被卡死。
+ */
+function assertRequiredFields(type: string, clean: Record<string, any>, mode: "create" | "update") {
+  const cfg = getContentType(type);
+  if (!cfg) return;
+  const miss: string[] = [];
+  for (const f of cfg.fields) {
+    if (!f.required) continue;
+    if (mode === "update" && !(f.name in clean)) continue;
+    if (isEmptyFieldValue(clean[f.name])) miss.push(f.label);
+  }
+  if (miss.length) throw new Error(`请填写必填项：${miss.join("、")}`);
+}
+
 function slugify(s: string): string {
   return String(s || "")
     .trim()
@@ -310,6 +343,8 @@ export const contentService = {
     const d = getDelegate(type);
     const clean = sanitizeData(type, siteData);
     if (viewSiteId) clean.siteId = viewSiteId;
+    // 必填校验：**在碰 Prisma 之前**拦下空值（否则抛的是英文 Prisma 报错）
+    assertRequiredFields(type, clean, "create");
     // 自动生成 slug（未提供时用标题）
     if (cfg?.slugField && !clean[cfg.slugField]) {
       const base = clean[cfg.titleField] || clean[langFieldName(cfg.titleField, "en" as (typeof LANGS)[number])] || "";
@@ -338,6 +373,8 @@ export const contentService = {
     if (await isDynamicType(type)) return dynamicService.update(type, id, data);
     const d = getDelegate(type);
     const clean = sanitizeData(type, data);
+    // 必填校验（update 只在"显式提交空值"时拦，不改动历史脏数据）
+    assertRequiredFields(type, clean, "update");
     if (type === "products" && Array.isArray(data?.specs)) {
       const specs = extractSpecs(data);
       const item = await prisma.$transaction(async (tx) => {

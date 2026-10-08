@@ -163,7 +163,12 @@ registerContentType({
   slugField: "slug",
   fields: [
     { name: "name", label: "产品名称", kind: "text", multiLang: true, required: true, capitalize: true, placeholder: "产品名称", placeholderEn: "Product Name" },
-    { name: "model", label: "型号", kind: "text", placeholder: "如：ZW-10D", placeholderEn: "e.g. ZW-10D" },
+    /**
+     * ⚠️ `model` 在库表里是 `String @db.VarChar(100)`（**NOT NULL、无默认值**），
+     *   以前没标 `required` ⇒ 新建时留空会从提交体里消失，直接抛
+     *   `Invalid prisma.product.create() invocation: … Argument 'model' is missing`（owner 2026-10-08 报障）。
+     */
+    { name: "model", label: "型号", kind: "text", required: true, placeholder: "如：ZW-10D", placeholderEn: "e.g. ZW-10D" },
     { name: "slug", label: "Slug（URL 标识）", kind: "text", required: true, placeholder: "如：zw-10d", placeholderEn: "e.g. zw-10d" },
     { name: "tabId", label: "所属产品线（Tab）", kind: "relation", relationModel: "ProductTab", relationLabelField: "name", required: true },
     { name: "categoryId", label: "所属分类", kind: "relation", relationModel: "ProductCategory", relationLabelField: "name" },
