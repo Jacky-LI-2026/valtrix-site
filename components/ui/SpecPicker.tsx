@@ -243,12 +243,16 @@ export default function SpecPicker({
       const s3 = merge ? manual.segments.find((s) => s.no === 3) : undefined;
       /** 段位名：中文用手册原文；其它语种优先手册自带的英文名，缺失则术语级翻译 */
       const nm = (s: { name: string; en?: string }) => (isZh ? s.name : s.en || manualCellToEn(s.name));
-      /** 取值描述：手册只有中文原文（`1/4" 金属面密封内螺纹` → `1/4" VCR female`） */
-      const vb = (label: string) => (isZh ? label : manualCellToEn(label));
+      /**
+       * 取值描述：手册只有中文原文（`1/4" 金属面密封内螺纹` → `1/4" VCR female`）；
+       * 数据**自带英文**时（如接头订购信息表的 `labelEn`）优先用它。
+       */
+      const vb = (label: string, labelEn?: string) => (isZh ? label : labelEn || manualCellToEn(label));
       const combos: { code: string; label: string }[] = [];
       if (s2 && s3) {
         for (const a of s2.options)
-          for (const b of s3.options) combos.push({ code: `${a.code}${b.code}`, label: `${a.code}${b.code} — ${vb(a.label)} · ${vb(b.label)}` });
+          for (const b of s3.options)
+            combos.push({ code: `${a.code}${b.code}`, label: `${a.code}${b.code} — ${vb(a.label, a.labelEn)} · ${vb(b.label, b.labelEn)}` });
       }
       return manual.segments
         .filter((s) => !(s3 && s.no === 3))
@@ -256,7 +260,7 @@ export default function SpecPicker({
           key: `m${s.no}`,
           label: s === s2 && s3 ? `${nm(s)} + ${nm(s3)}` : nm(s),
           note: s.note ? (isZh ? s.note : manualCellToEn(s.note)) : "",
-          values: s === s2 && s3 ? combos : s.options.map((o) => ({ code: o.code, label: vb(o.label) })),
+          values: s === s2 && s3 ? combos : s.options.map((o) => ({ code: o.code, label: vb(o.label, o.labelEn) })),
         }));
     }
     return codeSegments.map((seg, i) => ({
@@ -569,8 +573,12 @@ tr:nth-child(even) td{background:#fafafa}
             <div className="text-[11px] text-dark-400 mb-2">
               {manual && manual.segments.length > 0
                 ? isZh
-                  ? `按手册《型号说明-${manual.key}系列》生成（来源：${manual.source}）${manual.example ? `· 手册示例：${manual.example}` : ""}`
-                  : `Built from the catalog rule for series ${manual.key}.${manual.example ? ` Example: ${manual.example}` : ""}`
+                  ? manual.ruleKind === "order-table"
+                    ? `按手册**订购信息表**生成：材料 + 基础订购号 + 工艺规范（来源：${manual.source}）${manual.example ? `· 手册示例：${manual.example}` : ""}`
+                    : `按手册《型号说明-${manual.key}系列》生成（来源：${manual.source}）${manual.example ? `· 手册示例：${manual.example}` : ""}`
+                  : manual.ruleKind === "order-table"
+                    ? `Built from the catalog ordering table: material + base order no. + process spec.${manual.example ? ` Example: ${manual.example}` : ""}`
+                    : `Built from the catalog rule for series ${manual.key}.${manual.example ? ` Example: ${manual.example}` : ""}`
                 : dict.genHint}
             </div>
             <div className="flex flex-wrap gap-2">

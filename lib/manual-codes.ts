@@ -12,12 +12,15 @@
  * 用途：产品页「货号生成器」优先用这里的**手册权威段位**（带中文含义、带缺省值），
  *   没有对应手册规则的系列才退回"从已有机型货号自动推导"。
  */
+import { CONN_CODES } from "./manual-conn-codes";
 
 export interface CodeOption {
   /** 代号（写入货号的那一段） */
   code: string;
   /** 中文含义（手册原文） */
   label: string;
+  /** 英文含义（**可选**：数据自带英文时优先用它，避免术语表猜译，如接头订购信息表） */
+  labelEn?: string;
   /** 手册标注为缺省/默认值 */
   isDefault?: boolean;
 }
@@ -41,6 +44,13 @@ export interface CodeSegment {
 export interface ManualSeries {
   /** 系列代号（用于匹配产品型号/货号） */
   key: string;
+  /**
+   * 规则来源形态：
+   *   · `model-rule`（默认）= 手册有「型号说明-XXX系列」页，段位逐段转录；
+   *   · `order-table` = 手册只有「订购信息表」（接头 I/B/G/O）—— 段位是**枚举的基础订购号**。
+   * 只影响生成器提示文案（别把"型号说明"这四个字用在没有该页的系列上）。
+   */
+  ruleKind?: "model-rule" | "order-table";
   /**
    * 匹配产品型号用的正则（**可省**）。
    * 手册1 的接头系列是**单个字母**（I / B / G / O），且后面紧跟形态字母（`316L-GN-FMR4` 的 `GN`），
@@ -316,7 +326,374 @@ const OUTLET_SAME: (opts: CodeOption[]) => CodeSegment = (opts) => ({
   options: [{ code: "", label: "与入口相同（缺省）", isDefault: true }, ...opts],
 });
 
+/**
+ * **连写段**：手册把两个段位**不加分隔地拼在一起**（如 `PRE1`+`C`→`PRE1C`、入口压力`B`+出口压力`C`→`BC`），
+ * 于是生成器不能按段位逐个加 `-`，必须在数据层就给出**拼好的取值**。
+ * ⚠️ 拼出来为空串的组合（两个段位都是缺省）**直接丢弃** —— 那种情况等价于"这一段留空"。
+ */
+function crossOptions(
+  name: string,
+  en: string,
+  left: CodeOption[],
+  right: CodeOption[],
+  opts: { no?: number; note?: string; sep?: string; mergeNext?: boolean } = {}
+): CodeSegment {
+  const sep = opts.sep ?? " · ";
+  const out: CodeOption[] = [];
+  const seen = new Set<string>();
+  for (const x of left) {
+    for (const y of right) {
+      const code = `${x.code}${y.code}`;
+      if (!code || seen.has(code)) continue;
+      seen.add(code);
+      out.push({
+        code,
+        label: [x.label, y.label].filter(Boolean).join(sep),
+        isDefault: !!x.isDefault && !!y.isDefault,
+      });
+    }
+  }
+  return { no: opts.no ?? 0, name, en, note: opts.note, mergeNext: opts.mergeNext ?? false, options: out };
+}
+
+/** ALD 系列入口/出口/其余端口共用的端口清单（手册2 p007 原文） */
+const ALD_PORTS: CodeOption[] = [
+  { code: "FMR4", label: '1/4" 金属面密封内螺纹' },
+  { code: "MR4", label: '1/4" 金属面密封整体外螺纹' },
+  { code: "SMR4", label: '1/4" 金属面密封可旋转外螺纹' },
+  { code: "TB4", label: '1/4" 英制对焊管' },
+  { code: "FMR8", label: '1/2" 金属面密封内螺纹' },
+  { code: "SMR8", label: '1/2" 金属面密封可旋转外螺纹' },
+  { code: "TB8", label: '1/2" 英制对焊管' },
+  { code: "CS18-2", label: '1.125" 两孔 C-Seal' },
+  { code: "CS18-3", label: '1.125" 三孔 C-Seal' },
+  { code: "WS18-2", label: '1.125" 两孔 W-Seal' },
+  { code: "WS18-3", label: '1.125" 三孔 W-Seal' },
+  { code: "CS24-2", label: '1.5" 两孔 C-Seal' },
+  { code: "CS24-3", label: '1.5" 三孔 C-Seal' },
+  { code: "WS24-2", label: '1.5" 两孔 W-Seal' },
+  { code: "WS24-3", label: '1.5" 三孔 W-Seal' },
+  { code: "CS24H-2", label: '1.5" 两孔 C-Seal（高流量）' },
+  { code: "CS24H-3", label: '1.5" 三孔 C-Seal（高流量）' },
+];
+
+/* --------------------------------------------------------------------------
+ * 减压阀 6 系列（手册1 p083/086/089/092/095/098）
+ * --------------------------------------------------------------------------
+ * 这套 12 段位里手册把**三对**段位连写（不加分隔）：
+ *   ②产品系列 + ③端口配置     → `PRE1C`
+ *   ⑥入口压力 + ⑦出口压力     → `BC`
+ *   ⑨阀座材料 + ⑩流量系数     → `PI1`
+ * 所以生成器按段位逐个加 `-` 会拼出错号 ⇒ 用 `crossOptions()` 在**数据层**给出拼好的取值。
+ * ⑤出口形式（缺省=与入口相同）与⑪附加选项（缺省=无）在手册举例里直接省略 ⇒ 对应"整段留空"。
+ */
+interface RegulatorSpec {
+  key: string;
+  name: string;
+  example: string;
+  source: string;
+  portConfigs: [string, string][];
+  inlets: [string, string][];
+  inletPressure: [string, string][];
+  outletPressure: [string, string][];
+  /** 流量系数（第九/十段连写用）：`["", "0.09（缺省）"]` + 可选 `["1", "0.15"]` */
+  cv: [string, string][];
+}
+
+/** 端口配置 A/B/C/F（手册1 各减压阀页原文，B/C 的文字相同 ⇒ 加代号前缀便于区分） */
+const REG_PORT_CONFIGS: [string, string][] = [
+  ["A", "2通，无压力表端口"],
+  ["B", "3通，带出口压力表端口"],
+  ["C", "3通，带出口压力表端口"],
+  ["F", "4通，带出、入口压力表端口"],
+];
+/** 压力表配置（各系列原文一致） */
+const REG_GAUGE: CodeOption[] = [
+  { code: "", label: "无压力表（缺省）", isDefault: true },
+  { code: "OG", label: "出口压力表 psi/bar" },
+  { code: "IO", label: "出、入口压力表 psi/bar" },
+  { code: "PG", label: "堵头" },
+  { code: "OGM", label: "出口压力表 psi/MPa" },
+];
+const REG_EXTRA: CodeOption[] = [
+  { code: "", label: "无其他附加要求（缺省）", isDefault: true },
+  { code: "P", label: "面板安装" },
+];
+const REG_SEAT: CodeOption[] = [
+  { code: "", label: "PCTFE（缺省）", isDefault: true },
+  { code: "PI", label: "Vespel" },
+];
+
+function regulatorSeries(s: RegulatorSpec): ManualSeries {
+  const inletOpts: CodeOption[] = s.inlets.map(([code, label]) => ({ code, label }));
+  const cvOpts: CodeOption[] = s.cv.map(([code, label]) => ({ code, label, isDefault: !code }));
+  return {
+    key: s.key,
+    name: s.name,
+    example: s.example,
+    source: s.source,
+    segments: [
+      {
+        no: 1,
+        name: "材料",
+        en: "Material",
+        options: [
+          { code: "316L", label: "316L" },
+          { code: "6V", label: "316L VAR" },
+        ],
+      },
+      // ②+③ 连写：PRE1 + C → PRE1C
+      crossOptions("产品系列 + 端口配置", "Series + port config", [{ code: s.key, label: "" }], s.portConfigs.map(([c, l]) => ({ code: c, label: `${c}: ${l}` })), {
+        no: 2,
+        sep: "",
+        mergeNext: false,
+      }),
+      { no: 4, name: "入口形式和尺寸", en: "Inlet form & size", mergeNext: false, options: inletOpts },
+      OUTLET_SAME(inletOpts),
+      // ⑥+⑦ 连写：入口压力 B + 出口压力 C → BC
+      crossOptions("入口压力 + 出口压力", "Inlet + outlet pressure", s.inletPressure.map(([c, l]) => ({ code: c, label: l })), s.outletPressure.map(([c, l]) => ({ code: c, label: l })), {
+        no: 6,
+        mergeNext: false,
+      }),
+      { no: 8, name: "压力表配置", en: "Gauge config", note: "缺省：无压力表", options: REG_GAUGE },
+      // ⑨+⑩ 连写：阀座 PI + 流量系数 1 → PI1
+      crossOptions("阀座材料 + 流量系数", "Seat + flow coefficient", REG_SEAT, cvOpts, { no: 9, mergeNext: false }),
+      { no: 11, name: "附加选项", en: "Additional options", options: REG_EXTRA },
+      { ...PROCESS_STD, no: 12 },
+    ],
+  };
+}
+
 export const MANUAL_SERIES_1: ManualSeries[] = [
+  /* —— ALD 系列（12 段位；手册2 p007 / 手册1 p055）：②系列+③流道连写（`ALD3`+`3A`→`ALD33A`），
+        ⑨电磁导阀组件+⑩位置传感器 在手册举例里同样连写（`VS`）—— 该取值直接从手册型号举例取。 —— */
+  {
+    key: "ALD",
+    name: "ALD 系列 原子层沉积隔膜阀",
+    example: "6V-ALD33A-FMR4-FMR4-MR4-NC-VS-UHP",
+    source: "手册2 p007（型号说明-ALD系列；与手册1 p055 同页）",
+    segments: [
+      BODY_MATERIAL,
+      {
+        no: 2,
+        name: "产品系列",
+        en: "Series",
+        options: [
+          { code: "ALD3", label: "标准" },
+          { code: "ALD3T", label: "耐热" },
+          { code: "ALD6", label: "标准" },
+          { code: "ALD6T", label: "耐热" },
+        ],
+      },
+      {
+        no: 3,
+        name: "流道形式",
+        en: "Flow pattern",
+        note: "缺省：C-Seal 和 W-Seal；参照手册「流道形式示意图」",
+        options: ["2A", "2B", "2C", "2D", "3A", "3B", "3C", "3D", "3E", "3F", "3G", "4A", "4B", "4C", "4D"].map((c) => ({
+          code: c,
+          label: `${c.slice(0, 1)} 流道`,
+        })),
+      },
+      { no: 4, name: "入口形式和尺寸", en: "Inlet", mergeNext: false, options: ALD_PORTS },
+      OUTLET_SAME(ALD_PORTS),
+      { ...OUTLET_SAME(ALD_PORTS), no: 6, name: "其余端口形式和尺寸", en: "Other ports" },
+      {
+        no: 7,
+        name: "驱动类型",
+        en: "Actuation",
+        options: [
+          { code: "", label: "手动（缺省）", isDefault: true },
+          { code: "NO", label: "气动常开" },
+          { code: "NC", label: "气动常闭" },
+        ],
+      },
+      {
+        no: 9,
+        name: "电磁导阀组件 + 位置传感器",
+        en: "Solenoid valve + position sensor",
+        note: "手册把这两段连写（型号举例里为 `VS`）",
+        options: [
+          { code: "VS", label: "电磁阀组 + 位置传感器（手册型号举例用到）" },
+          { code: "V", label: "电磁阀组" },
+          { code: "VS1", label: "电磁阀组 + 常闭传感器" },
+          { code: "VS2", label: "电磁阀组 + 常开传感器" },
+        ],
+      },
+      {
+        no: 11,
+        name: "气源接口",
+        en: "Air supply port",
+        note: "缺省：1/8-27 NPT",
+        options: [
+          { code: "", label: "1/8-27 NPT（缺省）", isDefault: true },
+          { code: "PQ4", label: "4 mm 气动弯头" },
+          { code: "PU4", label: "4 mm 气动直通" },
+        ],
+      },
+      { ...PROCESS_STD, no: 12, options: [{ code: "UHP", label: "超高纯工艺规范" }] },
+    ],
+  },
+  /* —— 减压阀 PRE1/PRE2/PRE3 + PRT1/PRT2/PRT3（连写段已建模）—— */
+  regulatorSeries({
+    key: "PRE1",
+    name: "PRE1 系列 小流量减压阀",
+    example: "316L-PRE1C-SMR4-BC-OG-PI1-P-HP",
+    source: "手册1 p083（型号说明-PRE1系列）",
+    portConfigs: REG_PORT_CONFIGS,
+    inlets: [
+      ["SMR4", '1/4" 活接/外螺纹金属面密封'],
+      ["SMR8", '1/2" 活接/外螺纹金属面密封'],
+      ["FMR4", '1/4" 活接/内螺纹金属面密封'],
+      ["FMR8", '1/2" 活接/内螺纹金属面密封'],
+    ],
+    inletPressure: [
+      ["A", "0~300 psig（出口压力为 0.5~10 psig 时选择）"],
+      ["B", "0~3500 psig"],
+    ],
+    outletPressure: [
+      ["A", "0.5~10 psig"],
+      ["B", "1~30 psig"],
+      ["C", "2~60 psig"],
+      ["D", "2~100 psig"],
+      ["E", "5~150 psig"],
+      ["F", "5~300 psig"],
+    ],
+    cv: [
+      ["", "0.09（缺省）"],
+      ["1", "0.15"],
+    ],
+  }),
+  regulatorSeries({
+    key: "PRE2",
+    name: "PRE2 系列 小流量灵敏减压阀",
+    example: "316L-PRE2C-SMR4-BC-OG-PI-P-HP",
+    source: "手册1 p086（型号说明-PRE2系列）",
+    portConfigs: REG_PORT_CONFIGS,
+    inlets: [
+      ["SMR4", '1/4" 活接/外螺纹金属面密封'],
+      ["SMR8", '1/2" 活接/外螺纹金属面密封'],
+      ["FMR4", '1/4" 活接/内螺纹金属面密封'],
+      ["FMR8", '1/2" 活接/内螺纹金属面密封'],
+    ],
+    inletPressure: [
+      ["A", "0~100 psig（出口压力为 0.5~10 psig 时选择）"],
+      ["B", "0~3500 psig"],
+    ],
+    outletPressure: [
+      ["A", "0.5~10 psig"],
+      ["B", "1~30 psig"],
+      ["C", "2~60 psig"],
+      ["D", "2~100 psig"],
+      ["E", "5~150 psig"],
+    ],
+    cv: [["", "0.13（缺省）"]],
+  }),
+  regulatorSeries({
+    key: "PRE3",
+    name: "PRE3 系列 大流量灵敏减压阀",
+    example: "316L-PRE3C-SMR4-AC-OG-PI-P-HP",
+    source: "手册1 p089（型号说明-PRE3系列）",
+    portConfigs: REG_PORT_CONFIGS,
+    inlets: [
+      ["SMR4", '1/4" 活接/外螺纹金属面密封'],
+      ["SMR8", '1/2" 活接/外螺纹金属面密封'],
+      ["SMR12", '3/4" 活接/外螺纹金属面密封'],
+      ["FMR4", '1/4" 活接/内螺纹金属面密封'],
+      ["FMR8", '1/2" 活接/内螺纹金属面密封'],
+      ["FMR12", '3/4" 活接/内螺纹金属面密封'],
+    ],
+    inletPressure: [["A", "0~600 psig"]],
+    outletPressure: [
+      ["A", "1~30 psig"],
+      ["B", "2~60 psig"],
+      ["C", "2~100 psig"],
+      ["D", "5~150 psig"],
+    ],
+    cv: [["", "1.1（缺省）"]],
+  }),
+  regulatorSeries({
+    key: "PRT1",
+    name: "PRT1 系列 小流量减压阀（联结膜片）",
+    example: "316L-PRT1C-SMR4-BC-OG-PI1-P-HP",
+    source: "手册1 p092（型号说明-PRT1系列）",
+    portConfigs: REG_PORT_CONFIGS,
+    inlets: [
+      ["SMR4", '1/4" 活接/外螺纹金属面密封'],
+      ["SMR8", '1/2" 活接/外螺纹金属面密封'],
+      ["FMR4", '1/4" 活接/内螺纹金属面密封'],
+      ["FMR8", '1/2" 活接/内螺纹金属面密封'],
+    ],
+    inletPressure: [
+      ["A", "0~3500 psig"],
+      ["B", "0~4500 psig（当接口为 SMR8、FMR8 或流量系数为 0.15 时，不可选择此项）"],
+    ],
+    outletPressure: [
+      ["A", "1~30 psig"],
+      ["B", "2~60 psig"],
+      ["C", "2~100 psig"],
+    ],
+    cv: [
+      ["", "0.09（缺省）"],
+      ["1", "0.15"],
+    ],
+  }),
+  regulatorSeries({
+    key: "PRT2",
+    name: "PRT2 系列 小流量灵敏减压阀（联结膜片）",
+    example: "316L-PRT2C-SMR4-AC-OG-PI-P-HP",
+    source: "手册1 p095（型号说明-PRT2系列）",
+    portConfigs: REG_PORT_CONFIGS,
+    inlets: [
+      ["SMR4", '1/4" 活接/外螺纹金属面密封'],
+      ["SMR8", '1/2" 活接/外螺纹金属面密封'],
+      ["FMR4", '1/4" 活接/内螺纹金属面密封'],
+      ["FMR8", '1/2" 活接/内螺纹金属面密封'],
+    ],
+    inletPressure: [["A", "0~3500 psig"]],
+    outletPressure: [
+      ["A", "0.5~10 psig"],
+      ["B", "1~30 psig"],
+      ["C", "2~60 psig"],
+      ["D", "2~100 psig"],
+      ["E", "5~150 psig"],
+    ],
+    cv: [
+      ["", "0.13（缺省）"],
+      ["1", "0.16"],
+    ],
+  }),
+  regulatorSeries({
+    key: "PRT3",
+    name: "PRT3 系列 大流量灵敏减压阀（联结膜片）",
+    example: "316L-PRT3C-SMR4-BC-OG-PI-P-HP",
+    source: "手册1 p098（型号说明-PRT3系列）",
+    portConfigs: REG_PORT_CONFIGS,
+    inlets: [
+      ["SMR4", '1/4" 活接/外螺纹金属面密封'],
+      ["SMR8", '1/2" 活接/外螺纹金属面密封'],
+      ["SMR12", '3/4" 活接/外螺纹金属面密封'],
+      ["FMR4", '1/4" 活接/内螺纹金属面密封'],
+      ["FMR8", '1/2" 活接/内螺纹金属面密封'],
+      ["FMR12", '3/4" 活接/内螺纹金属面密封'],
+    ],
+    /** ⚠️ 手册 p098 正文只印了 A（0~1700 psig），但**它自己的型号举例用的是 B**（`…-BC-…`）
+     *  ⇒ 把示例用到的 B 一并列出，标签如实写"手册示例用到"，不替手册编数值。 */
+    inletPressure: [
+      ["A", "0~1700 psig"],
+      ["B", "另一档入口压力（手册型号举例用到）"],
+    ],
+    outletPressure: [
+      ["A", "1~30 psig"],
+      ["B", "2~60 psig"],
+      ["C", "2~100 psig"],
+      ["D", "5~150 psig"],
+    ],
+    cv: [
+      ["", "0.9（缺省）"],
+      ["1", "1.1"],
+    ],
+  }),
   /* —— 单向阀 CV3（手册1 p102）—— */
   {
     key: "CV3",
@@ -516,17 +893,6 @@ export const MANUAL_SERIES_1: ManualSeries[] = [
 /** 手册里**有规格数值、但没有型号段位规则**的系列（登记系列名即可：规格表与「接口与端接」兜底据此生效） */
 const SERIES_NO_RULE: [string, string, string, string][] = [
   // key, 系列中文名, 手册出处, 手册里的一个真实订购号（仅作展示）
-  ["ALD", "ALD 系列 原子层沉积隔膜阀", "手册2 p007 / 手册1 p055（型号说明-ALD系列；段位含「电磁导阀/传感器」合并写法，暂不转录）", "6V-ALD33A-FMR4-FMR4-MR4-NC-VS-UHP"],
-  ["PRE1", "PRE1 系列 小流量减压阀", "手册1 p083（型号说明-PRE1系列；12 段中「入口压力+出口压力」连写为一个 2 字母段，暂不转录）", "316L-PRE1C-SMR4-BC-OG-PI1-P-HP"],
-  ["PRE2", "PRE2 系列 小流量灵敏减压阀", "手册1 p086（型号说明-PRE2系列；同上）", "316L-PRE2C-SMR4-BC-OG-PI-P-HP"],
-  ["PRE3", "PRE3 系列 大流量灵敏减压阀", "手册1 p089（型号说明-PRE3系列；同上）", "316L-PRE3C-SMR4-AC-OG-PI-P-HP"],
-  ["PRT1", "PRT1 系列 小流量减压阀（联结膜片）", "手册1 p092（型号说明-PRT1系列；同上）", "316L-PRT1C-SMR4-BC-OG-PI1-P-HP"],
-  ["PRT2", "PRT2 系列 小流量灵敏减压阀（联结膜片）", "手册1 p095（型号说明-PRT2系列；同上）", "316L-PRT2C-SMR4-BC-OG-PI-P-HP"],
-  ["PRT3", "PRT3 系列 大流量灵敏减压阀（联结膜片）", "手册1 p098（型号说明-PRT3系列；同上）", "316L-PRT3C-SMR4-AC-OG-PI-P-HP"],
-  ["I", "I 系列 微焊接接头", "手册1 p007–p014（I 系列订购信息表）", "316L-IU-TB8-TB4-HP"],
-  ["B", "B 系列 长焊接接头", "手册1 p015–p017（B 系列订购信息表）", "316L-BU-TB8-TB4-HP"],
-  ["G", "G 系列 金属面密封接头", "手册1 p018–p039（G 系列订购信息表）", "316L-GU-MR4-HP"],
-  ["O", "O 系列 O 形圈面密封接头", "手册1 p040–p048（O 系列订购信息表）", "316L-OU-OR4-N4-HP"],
   ["BV1", "BV1 系列 一体式仪表球阀", "球阀目录页（两本手册均无型号规则页）", ""],
   ["BV2", "BV2 系列 三片式球阀（低压）", "球阀目录页", ""],
   ["BV3", "BV3 系列 三片式球阀（高压）", "球阀目录页", ""],
@@ -558,6 +924,71 @@ for (const [key, name, source, example] of SERIES_NO_RULE) {
      */
     ...(key.length === 1 ? { pattern: new RegExp(`(^|[-\\s])${key}(?:[A-Z]{1,3})?(?=[-\\s]|$)`) } : {}),
     ...(key === "2V" ? { pattern: /(^|[-\s])2[DR](H)?(?=[-\d]|$)/ } : {}),
+  });
+}
+
+/* --------------------------------------------------------------------------
+ * 接头四系列 I / B / G / O —— 手册**没有型号说明页**，只有「订购信息表」
+ * --------------------------------------------------------------------------
+ * 订购信息表是**逐行枚举**的基础订购号（`GJ-MR4-TB4-12`、`OJW-FOR4-N4`…），没有段位可转录。
+ * 若按段位拼装（形态 × 端口 × 端口）会拼出**手册里不存在的组合**；
+ * 故这里把手册枚举过的基础订购号直接做成一段下拉（数据见 `lib/manual-conn-codes.ts`，
+ * 每条都带手册型式名、中英双语）。
+ * 完整订货号 = **材料代码（前缀）** + 基础订购号 + **工艺规范代码（后缀）**（手册 p010 订购信息原文）。
+ */
+const CONN_SERIES: [string, string, string, string][] = [
+  ["I", "I 系列 微焊接接头", "手册1 p007–p014（I 系列订购信息表）", "316L-IU-TB8-TB4-HP"],
+  ["B", "B 系列 长焊接接头", "手册1 p015–p017（B 系列订购信息表）", "316L-BU-TB8-TB4-HP"],
+  ["G", "G 系列 金属面密封接头", "手册1 p018–p039（G 系列订购信息表）", "316L-GU-MR4-HP"],
+  ["O", "O 系列 O 形圈面密封接头", "手册1 p040–p048（O 系列订购信息表）", "316L-OU-OR4-N4-HP"],
+];
+
+for (const [key, name, source, example] of CONN_SERIES) {
+  const list = CONN_CODES[key] || [];
+  MANUAL_SERIES_1.push({
+    key,
+    name,
+    source,
+    example,
+    ruleKind: "order-table",
+    /** 单字母系列：型号里的形态字母紧跟系列字母（`316L-GN-FMR4`）或系列级页面（`G Series`） */
+    pattern: new RegExp(`(^|[-\\s])${key}(?:[A-Z]{1,3})?(?=[-\\s]|$)`),
+    segments: list.length
+      ? [
+          {
+            no: 1,
+            name: "材料",
+            en: "Material",
+            note: "手册：材料代码作为前缀（316L / 6V / 6VV）",
+            options: [
+              { code: "316L", label: "316L" },
+              { code: "6V", label: "316L VAR" },
+              { code: "6VV", label: "316L VIM-VAR" },
+            ],
+          },
+          {
+            no: 2,
+            name: "基础订购号",
+            en: "Base order no.",
+            mergeNext: false,
+            note: `手册订购信息表逐行枚举，共 ${list.length} 条（每条都是手册里真实存在的订购号）`,
+            options: list.map((o) => ({
+              code: o.code,
+              label: `${o.code} · ${o.zh}`,
+              labelEn: `${o.code} · ${o.en}`,
+            })),
+          },
+          {
+            ...PROCESS_STD,
+            no: 3,
+            options: [
+              { code: "GP", label: "标准工艺规范" },
+              { code: "HP", label: "高纯工艺规范" },
+              { code: "UHP", label: "超高纯工艺规范" },
+            ],
+          },
+        ]
+      : [],
   });
 }
 
