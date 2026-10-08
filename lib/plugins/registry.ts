@@ -102,6 +102,12 @@ export type PluginMenuGroup =
   | "marketing"  // 营销与线索
   | "data"       // 数据与统计
   | "ai"         // AI 能力
+  /**
+   * 能力市场（= 插件启停中心所在的顶层分组）。
+   * 2026-09-18 owner 口径：插件的后台管理入口应当**落在能力市场内**，
+   * 而不是各自再占一个顶层分组（`mpcvd-calc` 是第一个使用者）。
+   */
+  | "capability"
   | "site"       // 站点设置
   | "ops";       // 系统运维
 
@@ -885,6 +891,33 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     adminUrl: "/admin/home-sections",
   },
 
+  // ===== 2026-09-18 新增：MPCVD 投资测算（前台公开工具 + 后台参数中心/留痕/政策库）=====
+  {
+    key: "mpcvd-calc",
+    name: "MPCVD 投资测算",
+    description:
+      "MPCVD 工厂多地区投入产出测算：前台输入城市 + 机型 + 台数即可生成投资测算报告（含固定资产、成本、产能、收入、回收期、ROI），" +
+      "支持电价/售价/良率等任意条件微调；后台维护 622 城参数库、省级电价（含峰平谷）、产业政策库与测算留痕。",
+    category: "marketing",
+    // owner 2026-09-18：入口归入「能力市场」（与插件启停中心同组），不另占顶层分组
+    menuGroup: "capability",
+    menuOrder: 90,
+    version: "1.0.0",
+    builtin: true,
+    defaultEnabled: true,
+    configurable: false,
+    features: ["多地区测算", "省级电价（峰平谷）", "产业政策库", "测算留痕与复算", "报告打印/PDF"],
+    impact:
+      "启用后前台开放 /services/technical-support/mpcvd 测算入口（原顶级地址 /mpcvd 已下线），后台出现「MPCVD 参数中心 / 测算留痕」；停用则前台入口与接口一并下线",
+    permissions: ["测算参数", "测算留痕"],
+    adminUrl: "/admin/mpcvd",
+    adminUrls: [
+      { label: "参数中心", href: "/admin/mpcvd" },
+      { label: "测算留痕", href: "/admin/mpcvd/records" },
+      { label: "报告索取", href: "/admin/mpcvd/requests" },
+    ],
+  },
+
   // ===== 2026-10-01 owner 新增：社媒一键发布 =====
   {
     key: "social-publish",
@@ -893,8 +926,8 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
       "把产品 / 解决方案 / 新闻一键发布到国内与海外社媒渠道；无开放发文接口的平台（小红书/抖音/视频号/B站/知乎/公众号）" +
       "自动生成文案供一键复制 + 打开发布页。",
     category: "marketing",
-    // ⚠️ 阀门站这份 registry 的 PluginMenuGroup 还没有 "capability"（那是基地后加的），
-    //    按 category 推导即可（marketing → 营销与线索）
+    menuGroup: "capability",
+    menuOrder: 95,
     version: "1.0.0",
     builtin: true,
     defaultEnabled: true,
@@ -914,13 +947,16 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
       "按「类别 → 参数 → 匹配产品」三步式选型：维度从产品中心的产品规格**自动推导**，" +
       "结果直接对应产品中心的型号，可跳详情页 / 加入询价车。",
     category: "marketing",
+    menuGroup: "capability",
+    menuOrder: 96,
     version: "1.0.0",
     builtin: true,
     defaultEnabled: true,
     configurable: false,
     features: ["三步式选型（类别→参数→结果）", "维度自动推导", "规格条件实时匹配", "结果直连产品中心详情与询价车", "产品中心页入口按钮"],
     impact:
-      "启用后：前台出现 /products/selector 选型页，并在产品中心页显示「快速选型」入口；停用则入口隐藏（页面仍可直达）。",
+      "启用后：前台出现 /products/selector 选型页，并在产品中心页显示「快速选型」入口；" +
+      "停用则入口隐藏**且该页直达也返回 404**（owner 2026-10-08：「这些都是阀门网站独有功能」——左文科技站不得暴露阀门产品目录）。",
     permissions: ["产品选型"],
     adminUrl: "/admin/product-selector",
   },
