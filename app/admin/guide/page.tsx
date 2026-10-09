@@ -2,7 +2,14 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import GuideToc from "./GuideToc";
 import CodeCopy from "./CodeCopy";
+import GuideSearch from "./GuideSearch";
 import { renderMarkdown, type TocItem } from "@/lib/guide-render";
+
+/**
+ * 说明书正文是**运行时**读 `docs/user-guide.md`（`readFileSync`）。
+ * 不加这行会被**构建期**预渲染成静态 HTML ⇒ 之后只改 md 不重建，页面仍是旧内容。
+ */
+export const dynamic = "force-dynamic";
 
 export default function GuidePage() {
   let content = "";
@@ -47,6 +54,8 @@ export default function GuidePage() {
           </a>
         </div>
       </div>
+
+      <GuideSearch />
 
       <div className="flex gap-6 items-start">
         <GuideToc items={toc} />
