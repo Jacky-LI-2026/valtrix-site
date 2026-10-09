@@ -472,16 +472,16 @@ model ProductSpec {
   id        BigInt   @id @default(autoincrement())
   siteId    BigInt?  // 所属站点（null=全局共享）
   productId BigInt
-  groupName String?  @db.VarChar(100) // 规格分组
-  label     String   @db.VarChar(100) // 参数名（中文）
+  groupName String?  @db.VarChar(255) // 规格分组
+  label     String   @db.VarChar(255) // 参数名（中文）
   value     String   @db.Text // 参数值（中文）
-  unit      String?  @db.VarChar(20)
+  unit      String?  @db.VarChar(80)
   // 多语言字段
-  labelEn   String?  @db.VarChar(100)
-  labelJa   String?  @db.VarChar(100)
-  labelKo   String?  @db.VarChar(100)
-  labelFr   String?  @db.VarChar(100)
-  labelAr   String?  @db.VarChar(100)
+  labelEn   String?  @db.VarChar(255)
+  labelJa   String?  @db.VarChar(255)
+  labelKo   String?  @db.VarChar(255)
+  labelFr   String?  @db.VarChar(255)
+  labelAr   String?  @db.VarChar(255)
   valueEn   String?  @db.Text
   valueJa   String?  @db.Text
   valueKo   String?  @db.Text
