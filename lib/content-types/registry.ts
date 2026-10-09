@@ -24,6 +24,7 @@ export type ContentFieldKind =
   | MultiLangFieldConfig["kind"]
   | "image" // 图片上传（UrlUploadInput）
   | "video" // 视频 URL / 上传（UrlUploadInput accept=video/*）
+  | "file" // 任意文件（PDF 等）URL / 上传（UrlUploadInput accept=application/pdf）
   | "gallery" // 图集（单语数组，多图 URL）
   | "frames360" // 360° 环拍（单语 JSON 对象 {template,totalFrames,startIndex}，走 ThreeSixtyUpload）
   | "boolean" // 开关
@@ -188,6 +189,16 @@ registerContentType({
     //    _archive/admin-legacy 引用），故后台暂无 360° 编辑入口；此处先补齐白名单，
     //    前台 app/products/[tab]/[id]/ProductDetailClient.tsx 会读取该字段渲染 360° 视图。
     { name: "frames360", label: "360°环拍", kind: "frames360" },
+    /**
+     * 🔴 owner 2026-10-09（产品详情页「下载产品手册」）：「这个功能在后台产品详情页没有看到编辑入口，查一下哪里去了？」
+     *   根因：库表有 `Product.manualUrl`（详情页 `model.manualUrl || DEFAULT_MANUAL_URL` 在用），
+     *   但**迁移到通用内容架构时没登记进本表** ⇒ 后台不渲染该字段、`sanitizeData()` 白名单还会**静默丢弃**提交
+     *   （与 `images` / `frames360` 此前那两次是同一类问题，当时只修了那两个）。
+     *   现补登记：可上传 PDF 或填 URL；留空则前台回退到站点默认手册（阀门站是 valtrix-product-catalog-2026.pdf）。
+     */
+    { name: "manualUrl", label: "产品手册 PDF", kind: "file", placeholder: "/downloads/xxx.pdf 或 https://…（留空用站点默认手册）", placeholderEn: "/downloads/xxx.pdf or https://…" },
+    /** 同理补登记：详情页会渲染 `model.video`（`<video src={model.video}>`），此前同样改不了 */
+    { name: "video", label: "产品视频", kind: "video" },
     { name: "price", label: "参考价（元）", kind: "number", placeholder: "仅用于价格显示策略", placeholderEn: "Reference price" },
     { name: "priceTiers", label: "阶梯价（批量优惠）", kind: "jsonArray", jsonFields: [{ key: "qty", label: "起订量" }, { key: "price", label: "单价（元）" }], placeholder: "[{\"qty\":10,\"price\":1000}]" },
     { name: "isParts", label: "配件产品", kind: "boolean" },

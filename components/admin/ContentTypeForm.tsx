@@ -826,6 +826,24 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
               />
             </div>
           ))}
+          {/**
+            * 任意文件（PDF 等）—— owner 2026-10-09：产品详情页「下载产品手册」在后台没有编辑入口。
+            * 该字段（`products.manualUrl`）此前未登记进内容类型注册表，故补 `kind: 'file'`：
+            * 支持上传（`/api/admin/upload` 的允许类型里已含 application/pdf）或直接填 URL。
+            */}
+          {sideFields.filter((f) => f.kind === 'file').map((f) => (
+            <div key={f.name} className="bg-white rounded-lg border border-gray-200 p-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{f.label}</label>
+              <UrlUploadInput
+                value={form[f.name] || ''}
+                onChange={(v) => handleChange(f.name, v)}
+                accept="application/pdf"
+                showPreview={false}
+                placeholder={f.placeholder || '/downloads/xxx.pdf 或 https://...'}
+              />
+              {f.placeholder && <p className="mt-1 text-xs text-gray-400">{f.placeholder}</p>}
+            </div>
+          ))}
 
           {/* 属性区：状态 / 排序 / 布尔 / 下拉 / 关联 / 日期 */}
           <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
