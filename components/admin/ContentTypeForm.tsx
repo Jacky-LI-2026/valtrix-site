@@ -824,6 +824,8 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
                 showPreview={false}
                 placeholder="/uploads/xxx.mp4 或 https://..."
               />
+              {/* 提示（如"前台显示在哪"）—— owner 2026-10-09：「如何增加了视频，告诉我在前台哪个位置显示」 */}
+              {f.placeholder && <p className="mt-1 text-xs text-gray-400">{f.placeholder}</p>}
             </div>
           ))}
           {/**

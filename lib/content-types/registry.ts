@@ -196,9 +196,18 @@ registerContentType({
      *   （与 `images` / `frames360` 此前那两次是同一类问题，当时只修了那两个）。
      *   现补登记：可上传 PDF 或填 URL；留空则前台回退到站点默认手册（阀门站是 valtrix-product-catalog-2026.pdf）。
      */
-    { name: "manualUrl", label: "产品手册 PDF", kind: "file", placeholder: "/downloads/xxx.pdf 或 https://…（留空用站点默认手册）", placeholderEn: "/downloads/xxx.pdf or https://…" },
-    /** 同理补登记：详情页会渲染 `model.video`（`<video src={model.video}>`），此前同样改不了 */
-    { name: "video", label: "产品视频", kind: "video" },
+    {
+      name: "manualUrl",
+      label: "产品手册 PDF",
+      kind: "file",
+      placeholder: "留空 ⇒ **前台按钮置灰**（不再回退站点默认手册，owner 2026-10-09）",
+      placeholderEn: "Empty ⇒ the front-end button is greyed out (no site-default fallback).",
+    },
+    /**
+     * 同理补登记：详情页会渲染 `model.video`（`<video src={model.video}>`），此前同样改不了。
+     * 前台位置：产品名/型号/简介**下方**、紧接着「下载产品手册」按钮**上方**（留空则整块不显示）。
+     */
+    { name: "video", label: "产品视频", kind: "video", placeholder: "前台位置：产品名 / 型号 / 简介 下方、「下载产品手册」按钮上方；留空则不显示" },
     { name: "price", label: "参考价（元）", kind: "number", placeholder: "仅用于价格显示策略", placeholderEn: "Reference price" },
     { name: "priceTiers", label: "阶梯价（批量优惠）", kind: "jsonArray", jsonFields: [{ key: "qty", label: "起订量" }, { key: "price", label: "单价（元）" }], placeholder: "[{\"qty\":10,\"price\":1000}]" },
     { name: "isParts", label: "配件产品", kind: "boolean" },

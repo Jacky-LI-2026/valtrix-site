@@ -24,7 +24,14 @@ import PriceDisplay, { usePricingContext } from "@/components/PriceDisplay";
 import { getContactEmail, getContactPhone } from "@/lib/brand";
 import { manualCellToEn } from "@/lib/manual-i18n";
 
-const DEFAULT_MANUAL_URL = "/downloads/valtrix-product-catalog-2026.pdf";
+/**
+ * ⚠️ owner 2026-10-09：「这里如果留空**不能**用站点默认手册，前台应该显示灰色」
+ *   ⇒ 不再有"站点默认手册"回退：手册**逐个产品自己填**
+ *   （`products.manualUrl`，后台「产品手册 PDF」字段）。
+ *   留空 ⇒ 前台按钮**置灰不可点**（见下方 Manual Download 区块）。
+ *   注：阀门站的产品目录 PDF 仍在 `public/downloads/valtrix-product-catalog-2026.pdf`，
+ *       需要"全站通用"时请在后台给产品逐个填该路径（或告知我恢复站点级回退）。
+ */
 const DRAG_THRESHOLD = 100; // 拖拽切换图片的阈值（像素），释放时超过此距离才切换
 
 export default function ProductDetailClient() {
@@ -289,7 +296,14 @@ export default function ProductDetailClient() {
     return src.slice(0, dot) + "_thumb.webp";
   };
   const currentImage = images[currentImageIndex] || images[0] || "";
-  const manualUrl = model?.manualUrl || DEFAULT_MANUAL_URL;
+  /**
+   * 本产品的手册链接：**只用产品自己的值**（不再回退站点默认手册 —— owner 2026-10-09）。
+   * 只认"看起来是真实文件"的值（站内路径 `/…` 或绝对 URL）——
+   * 历史数据里有 `#` 这种占位值，HEAD 会打回本页返回 200 从而**骗过**存在性检测，
+   * 结果渲染成一个点了没反应的假下载按钮 ⇒ 一律当作"没有手册"（置灰）。
+   */
+  const manualRaw = String(model?.manualUrl || "").trim();
+  const manualUrl = /^(\/|https?:\/\/)/.test(manualRaw) ? manualRaw : "";
   // 相关产品：来自详情接口的 `related`（服务端按站点过滤、排序，最多 6 条）。
   // 老写法 `category.models.filter(...)` 依赖全量树里的分类对象，已不再适用。
   const relatedModels = (Array.isArray(dp?.related) ? dp.related : []).slice(0, 3);
@@ -345,7 +359,7 @@ export default function ProductDetailClient() {
   // 检测产品手册 PDF 是否存在（HEAD），不存在则隐藏下载按钮显示"暂无资料"
   useEffect(() => {
     let cancelled = false;
-    const url = model?.manualUrl || DEFAULT_MANUAL_URL;
+    const url = String(model?.manualUrl || "").trim();
     if (!url) { setManualOk(false); return; }
     fetch(url, { method: "HEAD" })
       .then((r) => { if (!cancelled) setManualOk(r.ok); })
@@ -834,10 +848,25 @@ export default function ProductDetailClient() {
 
               {/* Manual Download - All products */}
               <div className="mb-8">
-                {manualOk === false ? (
-                  <div className="inline-flex items-center gap-3 bg-dark-50 border-2 border-dashed border-dark-200 text-dark-400 px-6 py-3.5 rounded-lg w-full sm:w-auto">
-                    <FileText size={20} className="text-primary/50 shrink-0" />
-                    <span>{t("noManual")}</span>
+                {/**
+                  * owner 2026-10-09：「留空不能用站点默认手册，前台应该显示灰色」
+                  * ⇒ 两种"没有手册"的情形**统一成同一个置灰态**（不可点、有 title/副标题，不给假链接）：
+                  *   ① `manualUrl` 留空（该产品没填手册）；② 填了但文件 404（HEAD 检测失败）。
+                  */}
+                {!manualUrl || manualOk === false ? (
+                  <div
+                    aria-disabled="true"
+                    title={t("noManual")}
+                    className="inline-flex items-center gap-3 bg-dark-50 border-2 border-dark-100 text-dark-300 px-6 py-3.5 rounded-lg font-medium cursor-not-allowed select-none opacity-70 w-full sm:w-auto"
+                  >
+                    <div className="w-10 h-10 bg-dark-100 rounded-lg flex items-center justify-center">
+                      <FileText size={20} className="text-dark-300" />
+                    </div>
+                    <div className="text-start flex-1">
+                      <div className="font-bold">{t("downloadProductManual")}</div>
+                      <div className="text-xs text-dark-300">{t("noManual")}</div>
+                    </div>
+                    <Download size={20} className="ms-2 text-dark-300" />
                   </div>
                 ) : (
                 <DownloadGateButton
