@@ -26,6 +26,43 @@ interface Props {
   initialItems: any[]
 }
 
+/**
+ * 列表缩略图取值：优先封面图，其次图集首图（products 的 coverImage / images）；
+ * 其他内容类型的常见图片字段（image / videoPoster / logo）一并兜底，取不到返回空串。
+ */
+function thumbOf(item: any): string {
+  const raw =
+    item?.coverImage ||
+    (Array.isArray(item?.images) ? item.images[0] : '') ||
+    item?.image ||
+    item?.videoPoster ||
+    item?.logo
+  return typeof raw === 'string' ? raw.trim() : ''
+}
+
+/** 缩略图单元格：44×44 灰底 contain（透明 PNG/WebP 不裁切、不变形），点击看原图 */
+function ThumbCell({ item }: { item: any }) {
+  const src = thumbOf(item)
+  if (!src) {
+    return (
+      <span className="flex h-11 w-11 items-center justify-center rounded border border-dashed border-gray-200 bg-gray-50 text-[10px] text-gray-300">
+        无图
+      </span>
+    )
+  }
+  return (
+    <a href={src} target="_blank" rel="noopener noreferrer" title="查看原图" className="block">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt=""
+        loading="lazy"
+        className="h-11 w-11 rounded border border-gray-200 bg-gray-50 object-contain"
+      />
+    </a>
+  )
+}
+
 export default function ContentTypeList({ typeName, label, columns, titleField, initialItems }: Props) {
   const [items, setItems] = useState<any[]>(initialItems || [])
   const [loading, setLoading] = useState(false)
@@ -36,6 +73,9 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
   // 列显示勾选：localStorage 按类型记忆（key: content-columns-{typeName}）
   const [visibleCols, setVisibleCols] = useState<string[] | null>(null)
   const [colOpen, setColOpen] = useState(false)
+  // 缩略图列开关：**独立** localStorage key（content-thumb-{type}），
+  // 避免与既有「列表显示列」记忆互相覆盖（老用户存过 visibleCols 时不会漏掉新列）。
+  const [showThumb, setShowThumb] = useState(true)
   // 多选 + AI 批量重写
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [rewriting, setRewriting] = useState(false)
@@ -51,6 +91,25 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
     } catch { /* ignore */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typeName])
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(`content-thumb-${typeName}`) === '0') setShowThumb(false)
+    } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typeName])
+
+  /** 该类型只要有一行带图就显示缩略图列（全都没图时不显示，避免空列） */
+  const hasThumb = items.some((it) => !!thumbOf(it))
+  const thumbCol = hasThumb && showThumb
+
+  const toggleThumb = () => {
+    setShowThumb((prev) => {
+      const next = !prev
+      try { localStorage.setItem(`content-thumb-${typeName}`, next ? '1' : '0') } catch { /* ignore */ }
+      return next
+    })
+  }
 
   const shownColumns = visibleCols ? columns.filter((c) => visibleCols.includes(c.key)) : columns
 
@@ -269,6 +328,13 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
           <div className="admin-modal-panel w-full max-w-sm rounded-xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
             <h3 className="flex items-center gap-2 text-base font-semibold text-gray-900"><Settings2 size={15} className="text-[#CC0000]" /> 列表显示列</h3>
             <p className="mt-1 text-xs text-gray-500">勾选要在列表中显示的列（记忆在本浏览器，可随时调整）。</p>
+            {hasThumb && (
+              <label className="mt-3 flex cursor-pointer items-center gap-2 rounded border border-gray-100 bg-gray-50/60 px-3 py-2">
+                <input type="checkbox" checked={showThumb} onChange={toggleThumb} className="h-4 w-4 accent-[#CC0000]" />
+                <span className="text-sm text-gray-700">缩略图</span>
+                <span className="text-[11px] text-gray-400">列表首列显示产品图（44×44，点击看原图）</span>
+              </label>
+            )}
             <div className="mt-3 max-h-72 space-y-1.5 overflow-auto">
               {columns.map((c) => (
                 <label key={c.key} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 transition-colors hover:bg-gray-50">
@@ -299,6 +365,9 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
               <th className="w-8 px-3 py-2.5">
                 <input type="checkbox" checked={items.length > 0 && selected.size === items.length} onChange={toggleAll} className="h-4 w-4 accent-[#CC0000]" title="全选" />
               </th>
+              {thumbCol && (
+                <th className="w-16 px-4 py-2.5 text-left text-[11px] font-medium tracking-wide text-gray-500">缩略图</th>
+              )}
               {shownColumns.map((c) => (
                 <th key={c.key} className="px-4 py-2.5 text-left text-[11px] font-medium tracking-wide text-gray-500">
                   {c.label}
@@ -313,6 +382,11 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
                 <td className="px-3 py-2.5">
                   <input type="checkbox" checked={selected.has(String(item.id))} onChange={() => toggleSelect(String(item.id))} className="h-4 w-4 accent-[#CC0000]" />
                 </td>
+                {thumbCol && (
+                  <td className="px-4 py-2.5 align-middle">
+                    <ThumbCell item={item} />
+                  </td>
+                )}
                 {shownColumns.map((c) => (
                   <td key={c.key} className="max-w-xs truncate px-4 py-2.5 text-[13px] text-gray-700">
                     {cellValue(item, c.key)}
