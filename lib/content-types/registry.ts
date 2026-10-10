@@ -213,10 +213,20 @@ registerContentType({
     { name: "isParts", label: "配件产品", kind: "boolean" },
     { name: "sortOrder", label: "排序", kind: "number" },
     { name: "status", label: "状态", kind: "select", options: [{ label: "发布", value: "published" }, { label: "草稿", value: "draft" }] },
+    /**
+     * 前台显示开关（owner 2026-10-10：「产品管理再增加一个功能，可以设定产品是否在前台显示」）
+     * ============================================================================
+     * `visible=false` ⇒ 该产品在**前台全部出口**都不出现：产品列表/产品详情页（404）、
+     * 相关产品、猜你喜欢、sitemap / sitemap-images / llms.txt、百度推送、AI 客服知识库。
+     * 后台列表不受影响（照常显示，便于随时改回来），列表里可直接一键切换。
+     * 与「状态」的区别：草稿=还没做完；前台显示=做完了但现在不对外（数据全部保留）。
+     */
+    { name: "visible", label: "前台显示", kind: "boolean" },
     { name: "publishedAt", label: "发布时间", kind: "datetime" },
   ],
   listColumns: [
     { key: "name", label: "产品名称" },
+    { key: "visible", label: "前台显示", width: "90px" },
     { key: "model", label: "型号" },
     { key: "tabId", label: "产品线", width: "120px" },
     { key: "categoryId", label: "产品分类", width: "140px" },

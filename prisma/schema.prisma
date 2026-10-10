@@ -307,6 +307,11 @@ model Product {
   specs        Json?    // 规格参数（兼容旧数据）
   sortOrder    Int      @default(0)
   status       String   @default("published") @db.VarChar(20) // published/draft
+  // 前台显示开关（owner 2026-10-10「可以设定产品是否在前台显示」）。
+  //   false = 后台保留（数据/规格/询价记录都不丢），但前台**列表 / 详情页 / 相关产品 /
+  //   猜你喜欢 / sitemap / llms.txt / 百度推送 / AI 客服知识**一律不出现；
+  //   与 status（published/draft）的分工：草稿=「还没做完」，visible=false=「做完了但不对外」。
+  visible      Boolean  @default(true)
   publishedAt  DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

@@ -4,6 +4,16 @@ import { getSiteBaseUrl } from "@/lib/site-url";
 import { buildLanguageAlternates } from "@/lib/seo-metadata";
 
 /**
+ * 🔴 必须逐请求生成（owner 2026-10-10 起「前台显示」开关可在后台随时改）
+ * ==========================================================================
+ * 不加这行，Next 会在**构建期**把 sitemap 固化成静态文件：后台刚把产品设为
+ * 「前台不显示」，sitemap 里**仍会留着它**（实测：隐藏后 <loc> 仍命中 8 次），
+ * 一直误导搜索引擎去抓 404，直到下一次部署才消失。
+ * 抓取方只有爬虫、查询也就几十行 ⇒ 逐请求生成的代价可忽略。
+ */
+export const dynamic = "force-dynamic";
+
+/**
  * sitemap 条目：路径 + **真实更新时间**（可缺省）
  *
  * 2026-09-18 修正：此前每条都是 `lastModified: new Date()` ——
@@ -47,7 +57,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     // 从数据库获取产品（带真实 updatedAt）
     const products = await prisma.product.findMany({
-      where: { status: "published" },
+      // visible=true：后台设了「前台不显示」的产品不进 sitemap（否则搜索引擎会收录到 404 页）
+      where: { status: "published", visible: true },
       select: {
         slug: true,
         updatedAt: true,

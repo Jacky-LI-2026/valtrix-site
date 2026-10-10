@@ -102,7 +102,8 @@ async function buildKnowledge(locale: string): Promise<string> {
   const parts: string[] = [];
   try {
     const products = await prisma.product.findMany({
-      where: { status: "published" },
+      // 前台不显示的产品不进 AI 客服知识（否则客服会主动介绍"藏起来"的产品）
+      where: { status: "published", visible: true },
       orderBy: { sortOrder: "asc" },
       take: 12,
     });

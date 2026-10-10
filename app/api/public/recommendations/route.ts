@@ -98,7 +98,8 @@ export async function GET(req: NextRequest) {
                 },
               }
             : {
-                where: { slug: id, ...siteWhere },
+                // 产品：前台不显示的（visible=false）不当推荐项
+                where: { slug: id, visible: true, ...siteWhere },
                 include: { tab: { select: { slug: true } } },
               }
         );
@@ -172,7 +173,8 @@ export async function GET(req: NextRequest) {
     // 3) 兜底：同类型最新内容
     if (items.length < limit) {
       const fallback = await (prisma as any)[model].findMany({
-        where: { status: "published", ...siteWhere },
+        // 产品多一个「前台显示」条件；新闻/其它模型没有该列（加了会直接抛错）
+        where: { status: "published", ...(model === "product" ? { visible: true } : {}), ...siteWhere },
         orderBy: { createdAt: "desc" },
         take: limit * 2,
       });

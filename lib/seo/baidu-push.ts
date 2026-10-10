@@ -54,7 +54,8 @@ export async function collectAllPublicUrls(baseUrl: string): Promise<string[]> {
   const urls = staticPaths.map((p) => `${baseUrl}${p}`)
   try {
     const [products, news, industries, resourceCategories, jobs, services] = await Promise.all([
-      prisma.product.findMany({ where: { status: 'published' }, select: { slug: true, category: { select: { slug: true, tab: { select: { slug: true } } } } } }),
+      // visible=true：前台不显示的产品不推给百度（推了只会被抓到 404）
+      prisma.product.findMany({ where: { status: 'published', visible: true }, select: { slug: true, category: { select: { slug: true, tab: { select: { slug: true } } } } } }),
       prisma.news.findMany({ where: { status: 'published' }, select: { slug: true } }),
       prisma.industry.findMany({ where: { status: 'published' }, select: { slug: true } }),
       prisma.resourceCategory.findMany({ select: { type: true } }),

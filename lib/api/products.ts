@@ -18,7 +18,8 @@ export async function getProductTabs(): Promise<ProductTab[]> {
           orderBy: { sortOrder: 'asc' },
           include: {
             products: {
-              where: { status: 'published' },
+              // visible=true：后台设了「前台不显示」的产品不进前台产品树
+              where: { status: 'published', visible: true },
               orderBy: { sortOrder: 'asc' },
               include: {
                 productSpecs: { orderBy: { sortOrder: 'asc' } },
@@ -71,7 +72,8 @@ export async function getProductBySlug(slug: string): Promise<ProductModel | nul
       },
     })
 
-    if (!product) return null
+    // 前台不显示的产品：按不存在处理（详情页 / 短链都据此 404）
+    if (!product || product.visible === false) return null
     return mapProductToModel(product)
   } catch (error) {
     console.warn('[getProductBySlug] 数据库查询失败，回退静态数据:', error)
@@ -99,9 +101,9 @@ export async function getProductCanonicalPath(slug: string): Promise<string | nu
   try {
     const p = await prisma.product.findUnique({
       where: { slug: s },
-      select: { slug: true, status: true, tab: { select: { slug: true } } },
+      select: { slug: true, status: true, visible: true, tab: { select: { slug: true } } },
     })
-    if (!p || p.status !== 'published' || !p.tab?.slug) return null
+    if (!p || p.status !== 'published' || p.visible === false || !p.tab?.slug) return null
     return `/products/${p.tab.slug}/${p.slug}`
   } catch (error) {
     console.warn('[getProductCanonicalPath] 数据库查询失败，回退静态数据:', error)
@@ -120,7 +122,7 @@ export async function getProductCanonicalPath(slug: string): Promise<string | nu
 export async function getAllProductSlugs(): Promise<{ tab: string; id: string }[]> {
   try {
     const products = await prisma.product.findMany({
-      where: { status: 'published' },
+      where: { status: 'published', visible: true },
       select: { slug: true, tab: { select: { slug: true } } },
     })
     return products.map((p) => ({ tab: p.tab.slug, id: p.slug }))

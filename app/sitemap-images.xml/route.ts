@@ -30,7 +30,8 @@ export async function GET(req: NextRequest) {
 
     // 产品
     const products = await prisma.product.findMany({
-      where: { status: "published" },
+      // 与 sitemap.xml 同口径：前台不显示的产品不输出图片
+      where: { status: "published", visible: true },
       select: {
         slug: true, coverImage: true,
         category: { select: { slug: true, tab: { select: { slug: true } } } },

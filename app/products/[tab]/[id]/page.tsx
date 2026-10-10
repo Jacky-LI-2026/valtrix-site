@@ -59,6 +59,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   // 🔴 记录不存在 ⇒ notFound()（HTTP 404）。此前是 `return { title: slug }` ⇒ HTTP 200 = soft-404。
   //    ⚠️ 必须在 try 之外：notFound() 靠抛特殊异常工作，放在 try 里会被上面的 catch 吞掉。
   if (!record) notFound();
+  // 后台把「前台显示」关掉的产品：一律 404（前端各语言页面、富媒体抓取都不应看到）
+  if (record["visible"] === false) notFound();
   return buildSeoMetadata({
     record,
     fallbackTitle: record["nameEn"] || record["name"] || "",
@@ -77,12 +79,13 @@ export default async function Page(props: Props) {
     const slug = decodeURIComponent(props.params.id);
     exists = await (prisma as any)["product"].findUnique({
       where: { slug: slug },
-      select: { id: true, status: true },
+      // visible 必须一起 select：下面的 notFound 条件要判「前台显示」开关
+      select: { id: true, status: true, visible: true },
     });
   } catch (e) {
     exists = { id: -1, status: "published" };
   }
-  if (!exists || exists.status !== "published") notFound();
+  if (!exists || exists.status !== "published" || exists.visible === false) notFound();
 
   let jsonLd = "";
   try {

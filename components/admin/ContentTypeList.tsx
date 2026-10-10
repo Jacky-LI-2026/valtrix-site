@@ -129,6 +129,32 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
     try { localStorage.removeItem(`content-columns-${typeName}`) } catch { /* ignore */ }
   }
 
+  /**
+   * 列表内一键切换「前台显示」（owner 2026-10-10：「可以设定产品是否在前台显示」）
+   * =======================================================================
+   * 走既有 `PUT /api/admin/content/{type}/{id}` 且**只提交 visible 一个字段**：
+   * `sanitizeData()` 按字段白名单裁剪 ⇒ 不会把列表里其它（可能已过期的）值写回库里。
+   */
+  const [visBusy, setVisBusy] = useState<Record<string, boolean>>({})
+  const toggleVisible = async (item: any) => {
+    const id = String(item.id)
+    const next = item.visible === false // 当前隐藏 ⇒ 切回显示
+    setVisBusy((p) => ({ ...p, [id]: true }))
+    try {
+      const res = await fetch(`/api/admin/content/${typeName}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visible: next }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      setItems((prev) => prev.map((it) => (String(it.id) === id ? { ...it, visible: next } : it)))
+    } catch (e: any) {
+      alert('切换失败：' + (e?.message || String(e)))
+    } finally {
+      setVisBusy((p) => { const n = { ...p }; delete n[id]; return n })
+    }
+  }
+
   const load = async (kw = '') => {
     setLoading(true)
     try {
@@ -240,6 +266,7 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
     const v = item[key]
     if (v === null || v === undefined) return '-'
     if (key === 'isParts') return v ? '配件' : '整机'
+    if (key === 'visible') return v ? '显示' : '隐藏'
     if (typeof v === 'boolean') return v ? '✓' : '✗'
     if (key === 'status') return v === 'published' ? '发布' : '草稿'
     if (v instanceof Date || /^\d{4}-\d{2}-\d{2}T/.test(String(v))) {
@@ -389,7 +416,24 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
                 )}
                 {shownColumns.map((c) => (
                   <td key={c.key} className="max-w-xs truncate px-4 py-2.5 text-[13px] text-gray-700">
-                    {cellValue(item, c.key)}
+                    {c.key === 'visible' ? (
+                      <button
+                        type="button"
+                        onClick={() => toggleVisible(item)}
+                        disabled={!!visBusy[String(item.id)]}
+                        title="点击切换：前台显示 / 前台不显示（隐藏后前台列表、详情页、sitemap 都不出现；数据与规格全部保留）"
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] transition-colors disabled:opacity-50 ${
+                          item.visible === false
+                            ? 'border-gray-200 bg-gray-50 text-gray-400 hover:border-gray-300 hover:text-gray-600'
+                            : 'border-green-200 bg-green-50 text-green-700 hover:border-green-300'
+                        }`}
+                      >
+                        <span className={`h-1.5 w-1.5 rounded-full ${item.visible === false ? 'bg-gray-300' : 'bg-green-500'}`} />
+                        {visBusy[String(item.id)] ? '切换中…' : item.visible === false ? '前台不显示' : '前台显示'}
+                      </button>
+                    ) : (
+                      cellValue(item, c.key)
+                    )}
                   </td>
                 ))}
                 <td className="whitespace-nowrap px-4 py-2.5 text-right">

@@ -23,7 +23,8 @@ export async function GET(
     })
 
     // 详情同样只返回已发布内容（与 /api/public/products 列表口径一致；草稿/下线不得经 URL 直读全文）
-    if (!product || product.status !== 'published') {
+    // 另：后台把「前台显示」关掉（visible=false）的产品，同样按不存在返回 404
+    if (!product || product.status !== 'published' || product.visible === false) {
       return cachedJson(
         { success: false, error: '产品不存在' },
         'content', 404)
@@ -43,6 +44,7 @@ export async function GET(
             AND: [
               { categoryId: product.categoryId },
               { status: 'published' },
+              { visible: true },
               { id: { not: product.id } },
               siteWhere,
             ],

@@ -37,7 +37,8 @@ export async function GET() {
   // 产品索引
   try {
     const products = await prisma.product.findMany({
-      where: { status: "published" },
+      // 前台不显示的产品不进 llms.txt（与 sitemap 同口径）
+      where: { status: "published", visible: true },
       orderBy: { sortOrder: "asc" },
       take: 50,
     });

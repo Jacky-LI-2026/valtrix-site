@@ -47,7 +47,8 @@ export async function GET(req: NextRequest) {
           orderBy: { sortOrder: 'asc' },
           include: {
             products: {
-              where: { AND: [{ status: 'published' }, siteWhere] },
+              // visible=true：后台把「前台显示」关掉的产品，前台产品树/列表页一律不出现
+              where: { AND: [{ status: 'published' }, { visible: true }, siteWhere] },
               orderBy: { sortOrder: 'asc' },
               include: {
                 // 限制到 n 行也在**数据库层**生效，省掉读全表规格的开销
