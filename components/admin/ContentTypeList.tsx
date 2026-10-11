@@ -155,6 +155,45 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
     }
   }
 
+  /**
+   * 排序号：**双击即改 + 自动保存**（owner 2026-10-11：「双击可以修改，自动保存」）
+   * ==========================================================================
+   * 与「前台显示」开关同一套路：`PUT /api/admin/content/{type}/{id}` **只提交 `{sortOrder}`**，
+   * 服务端 `sanitizeData()` 按白名单裁剪 ⇒ 不会把列表里其它（可能已过期的）字段写回库。
+   * 保存成功后**本地重排**，立刻看到这条记录的新位置。
+   */
+  const [sortEdit, setSortEdit] = useState<{ id: string; value: string } | null>(null)
+  const [sortSaving, setSortSaving] = useState<Record<string, boolean>>({})
+  const [sortSaved, setSortSaved] = useState<string | null>(null)
+
+  const saveSortOrder = async (item: any, raw: string) => {
+    const id = String(item.id)
+    const next = Math.trunc(Number(raw))
+    const prev = Math.trunc(Number(item.sortOrder ?? 0))
+    setSortEdit(null)
+    if (!Number.isFinite(next) || next === prev) return // 没改（或填了非法值）⇒ 什么都不做
+    setSortSaving((p) => ({ ...p, [id]: true }))
+    try {
+      const res = await fetch(`/api/admin/content/${typeName}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sortOrder: next }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      setItems((prevItems) =>
+        prevItems
+          .map((it) => (String(it.id) === id ? { ...it, sortOrder: next } : it))
+          .sort((a, b) => Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0) || Number(b.id) - Number(a.id))
+      )
+      setSortSaved(id)
+      window.setTimeout(() => setSortSaved((cur) => (cur === id ? null : cur)), 1600)
+    } catch (e: any) {
+      alert('排序保存失败：' + (e?.message || String(e)))
+    } finally {
+      setSortSaving((p) => { const n = { ...p }; delete n[id]; return n })
+    }
+  }
+
   const load = async (kw = '') => {
     setLoading(true)
     try {
@@ -431,6 +470,40 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
                         <span className={`h-1.5 w-1.5 rounded-full ${item.visible === false ? 'bg-gray-300' : 'bg-green-500'}`} />
                         {visBusy[String(item.id)] ? '切换中…' : item.visible === false ? '前台不显示' : '前台显示'}
                       </button>
+                    ) : c.key === 'sortOrder' ? (
+                      /* 排序号：双击即改，回车/失焦自动保存，Esc 取消（owner 2026-10-11） */
+                      sortEdit?.id === String(item.id) ? (
+                        <input
+                          type="number"
+                          autoFocus
+                          value={sortEdit.value}
+                          onChange={(e) => setSortEdit({ id: String(item.id), value: e.target.value })}
+                          onBlur={() => saveSortOrder(item, sortEdit.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              e.currentTarget.blur()
+                            } else if (e.key === 'Escape') {
+                              e.preventDefault()
+                              setSortEdit(null)
+                            }
+                          }}
+                          className="w-20 rounded border border-[#CC0000] px-1.5 py-0.5 text-[13px] tabular-nums outline-none"
+                        />
+                      ) : (
+                        <button
+                          type="button"
+                          onDoubleClick={() => setSortEdit({ id: String(item.id), value: String(item.sortOrder ?? 0) })}
+                          title="双击修改排序号（回车或点别处自动保存，Esc 取消）"
+                          className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[13px] tabular-nums text-gray-700 transition-colors hover:bg-gray-100"
+                        >
+                          {sortSaving[String(item.id)]
+                            ? '保存中…'
+                            : sortSaved === String(item.id)
+                              ? '已保存 ✓'
+                              : String(item.sortOrder ?? 0)}
+                        </button>
+                      )
                     ) : (
                       cellValue(item, c.key)
                     )}

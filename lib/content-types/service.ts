@@ -352,6 +352,24 @@ export const contentService = {
     }
     // 默认状态
     if (cfg?.enableStatus && !("status" in clean)) clean.status = "published";
+    /**
+     * 排序号自动编号（owner 2026-10-11：「后台新增产品时，自动给序号」）
+     * ==========================================================================
+     * 根因：表单对 `kind=number` 的种子默认值是 **0** ⇒ 新建记录一律 `sortOrder = 0`，
+     *   列表里「排序」列全是 0、彼此没有先后，用户还得手动挨个改。
+     * 现口径：创建时若 `sortOrder` 为 0/空 ⇒ 取该类型当前最大值 **+1**（追加到末尾）。
+     *   · **只在 create 生效**：update 时用户把某条明确改成 0 是有意义的，不能偷偷改掉；
+     *   · 取最大值失败（表为空/无该字段）不阻断创建，保持原值即可。
+     */
+    if (cfg?.fields.some((f) => f.name === "sortOrder") && !Number(clean.sortOrder)) {
+      try {
+        const agg = await (d as any).aggregate({ _max: { sortOrder: true } });
+        const max = Number(agg?._max?.sortOrder ?? 0);
+        clean.sortOrder = (Number.isFinite(max) ? max : 0) + 1;
+      } catch {
+        /* 编号失败不影响创建 */
+      }
+    }
     // 产品类型：事务内同步创建 specs 关联表
     if (type === "products" && Array.isArray(data?.specs)) {
       const specs = extractSpecs(data);
