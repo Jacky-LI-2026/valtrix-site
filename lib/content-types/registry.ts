@@ -45,6 +45,16 @@ export interface ContentField extends Omit<MultiLangFieldConfig, "kind"> {
   relationModel?: string;
   /** 关联字段显示字段（如 name / nameEn），用于选项 label */
   relationLabelField?: string;
+  /**
+   * 新建时的默认值（owner 2026-10-11）。
+   * ============================================================
+   * 背景：`defaultSingleValue()` 此前对 `boolean` **一律返回 false** ⇒ 新建记录默认不勾选；
+   * 产品「前台显示」必须默认勾选（否则新建产品一保存就是"前台不显示"，等于刚加就藏起来），
+   * 故这里给出显式默认值。不填时行为与以前一致（false）。
+   */
+  defaultValue?: boolean | string | number;
+  /** `kind=boolean` 时复选框右侧文案（默认「启用」）；语义明确的开关可用它替换，如「前台显示」 */
+  booleanLabel?: string;
 }
 
 export interface ContentTypeConfig {
@@ -221,7 +231,8 @@ registerContentType({
      * 后台列表不受影响（照常显示，便于随时改回来），列表里可直接一键切换。
      * 与「状态」的区别：草稿=还没做完；前台显示=做完了但现在不对外（数据全部保留）。
      */
-    { name: "visible", label: "前台显示", kind: "boolean" },
+    // defaultValue: true —— 新建产品**默认前台显示**（owner 2026-10-11：「新增商品后默认前台显示」）
+    { name: "visible", label: "前台显示", kind: "boolean", defaultValue: true, booleanLabel: "前台显示" },
     { name: "publishedAt", label: "发布时间", kind: "datetime" },
   ],
   listColumns: [

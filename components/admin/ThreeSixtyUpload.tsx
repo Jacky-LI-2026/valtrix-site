@@ -32,11 +32,22 @@ export default function ThreeSixtyUpload({
     return match ? match[1] : ''
   }
 
-  // 生成路径模板（360 帧统一存到 /uploads/360/<slug>/Frame{index}.webp）
-  const generateTemplate = (model: string): string => {
-    const slug = model.toLowerCase().replace(/[^a-z0-9]/g, '-')
-    return `/uploads/360/${slug}/Frame{index}.webp`
-  }
+  /** 目录名归一化：小写 + 非字母数字折叠为单个连字符（与既有目录命名保持一致） */
+  const normalizeDir = (raw: string): string =>
+    raw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+
+  /**
+   * 每个产品一个独立目录（owner 2026-10-11 报障：「上商品的360图片上传成功后显示别的商品的图」）
+   * ==========================================================================
+   * 🔴 旧行为：`generateTemplate(productModel || 'product')` ⇒ 型号与 slug 都为空时，
+   *   **所有产品都往 `/uploads/360/product/` 写**，文件名又都是 `Frame000001.webp…`
+   *   ⇒ 后上传的把先上传的**整目录覆盖**；于是每个打开该产品的详情页/编辑页，
+   *   看到的都是"最后一次上传的那套帧"（= 别的商品的图）。
+   * ✅ 现行为：拿不到型号/slug 时**不再使用共享名 `product`**，改用本组件实例生成的一次性目录名
+   *   （仍满足服务端路径白名单，且两个产品不可能撞同一目录）。
+   */
+  const fallbackDirRef = useRef(`p${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`)
+  const resolveDir = (model: string): string => normalizeDir(model) || fallbackDirRef.current
 
   // 帧图片前端压缩（canvas 转 webp，最大宽度 1024px，质量 0.85）
   const compressImage = (file: File, maxWidth: number = 1024, quality: number = 0.85): Promise<Blob> => {
@@ -110,8 +121,9 @@ export default function ThreeSixtyUpload({
       // 按文件名排序，确保帧顺序正确
       fileArray.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
 
-      const template = generateTemplate(productModel || 'product')
-      const slug = productModel.toLowerCase().replace(/[^a-z0-9]/g, '-') || 'product'
+      // 目录：型号/slug 归一化；两者都空则用一次性随机目录（绝不与他人共享）
+      const dir = resolveDir(productModel)
+      const template = `/uploads/360/${dir}/Frame{index}.webp`
 
       const uploadedUrls: string[] = []
       const previews: string[] = []
@@ -121,7 +133,7 @@ export default function ThreeSixtyUpload({
         const frameIndex = startIndex + i
         // 6 位补零，与前台 ThreeSixtyViewer 的 padStart(6) 保持一致
         const frameLabel = String(frameIndex).padStart(6, '0')
-        const targetPath = `360/${slug}/Frame${frameLabel}`
+        const targetPath = `360/${dir}/Frame${frameLabel}`
 
         // 前端压缩（webp 1024px）
         const compressedBlob = await compressImage(file)
@@ -308,6 +320,7 @@ export default function ThreeSixtyUpload({
           <li>选择多张360度旋转帧图片（建议36张或60张），按文件名序号排序</li>
           <li>系统自动压缩为 WebP（最大宽度1024px），并自动命名 Frame000001.webp、Frame000002.webp...</li>
           <li>上传完成后自动生成路径模板，前台产品详情页即可使用360度旋转功能</li>
+          <li>目录按「型号 / slug」自动生成，**每个产品一个独立目录**，不会互相覆盖</li>
           <li>也可手动输入路径模板（如已通过 FTP 上传的图片序列，可填 /uploads/360/型号/Frame{"{index}"}.png）</li>
         </ul>
       </div>

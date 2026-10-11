@@ -33,7 +33,8 @@ interface Props {
 
 function defaultSingleValue(f: ContentField): any {
   switch (f.kind) {
-    case 'boolean': return false
+    // defaultValue 优先（如产品「前台显示」默认 true）；不填则维持历史行为 false
+    case 'boolean': return (f.defaultValue as boolean) ?? false
     case 'number': return 0
     case 'select': return f.options?.[0]?.value ?? ''
     case 'datetime': return ''
@@ -802,8 +803,11 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
                   value={typeof v.template === 'string' ? v.template : typeof v.path === 'string' ? v.path : ''}
                   totalFrames={Number(v.totalFrames ?? v.count ?? 60) || 60}
                   startIndex={Number(v.startIndex ?? 1) || 1}
-                  // 每产品独立存储目录 /uploads/360/<型号>/（旧版未传 ⇒ 所有产品共用 product/ 目录）
-                  productModel={String(form.model || form.slug || '')}
+                  // 每产品独立的存储目录 /uploads/360/<型号|slug|p<id>>/
+                  // 三级兜底：型号 → slug → p<id>（编辑态 id 一定在）；全空（新建且未填）时由组件生成一次性随机目录。
+                  // 历史坑：旧版根本不传该 prop ⇒ 全站共用 /uploads/360/product/，后上传的把先上传的整目录覆盖
+                  //        （owner 2026-10-11 报障「上传成功后显示别的商品的图」）。
+                  productModel={String(form.model || form.slug || (form.id ? `p${form.id}` : ''))}
                   onChange={(template, totalFrames, startIndex) =>
                     setForm((prev: any) => ({
                       ...prev,
@@ -867,7 +871,7 @@ export default function ContentTypeForm({ typeName, initialId, cfg: cfgProp }: P
                       onChange={(e) => handleChange(f.name, e.target.checked)}
                       className="w-4 h-4"
                     />
-                    <span className="text-sm text-gray-600">启用</span>
+                    <span className="text-sm text-gray-600">{f.booleanLabel || '启用'}</span>
                   </label>
                 )}
                 {f.kind === 'number' && (
