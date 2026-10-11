@@ -40,12 +40,12 @@ function thumbOf(item: any): string {
   return typeof raw === 'string' ? raw.trim() : ''
 }
 
-/** 缩略图单元格：44×44 灰底 contain（透明 PNG/WebP 不裁切、不变形），点击看原图 */
+/** 缩略图单元格：100×100 灰底 contain（透明 PNG/WebP 不裁切、不变形），点击看原图 */
 function ThumbCell({ item }: { item: any }) {
   const src = thumbOf(item)
   if (!src) {
     return (
-      <span className="flex h-11 w-11 items-center justify-center rounded border border-dashed border-gray-200 bg-gray-50 text-[10px] text-gray-300">
+      <span className="flex h-[100px] w-[100px] items-center justify-center rounded border border-dashed border-gray-200 bg-gray-50 text-[11px] text-gray-300">
         无图
       </span>
     )
@@ -57,7 +57,7 @@ function ThumbCell({ item }: { item: any }) {
         src={src}
         alt=""
         loading="lazy"
-        className="h-11 w-11 rounded border border-gray-200 bg-gray-50 object-contain"
+        className="h-[100px] w-[100px] rounded border border-gray-200 bg-gray-50 object-contain"
       />
     </a>
   )
@@ -359,7 +359,7 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
               <label className="mt-3 flex cursor-pointer items-center gap-2 rounded border border-gray-100 bg-gray-50/60 px-3 py-2">
                 <input type="checkbox" checked={showThumb} onChange={toggleThumb} className="h-4 w-4 accent-[#CC0000]" />
                 <span className="text-sm text-gray-700">缩略图</span>
-                <span className="text-[11px] text-gray-400">列表首列显示产品图（44×44，点击看原图）</span>
+                <span className="text-[11px] text-gray-400">列表首列显示产品图（100×100，点击看原图）</span>
               </label>
             )}
             <div className="mt-3 max-h-72 space-y-1.5 overflow-auto">
@@ -393,7 +393,7 @@ export default function ContentTypeList({ typeName, label, columns, titleField, 
                 <input type="checkbox" checked={items.length > 0 && selected.size === items.length} onChange={toggleAll} className="h-4 w-4 accent-[#CC0000]" title="全选" />
               </th>
               {thumbCol && (
-                <th className="w-16 px-4 py-2.5 text-left text-[11px] font-medium tracking-wide text-gray-500">缩略图</th>
+                <th className="w-[132px] px-4 py-2.5 text-left text-[11px] font-medium tracking-wide text-gray-500">缩略图</th>
               )}
               {shownColumns.map((c) => (
                 <th key={c.key} className="px-4 py-2.5 text-left text-[11px] font-medium tracking-wide text-gray-500">
