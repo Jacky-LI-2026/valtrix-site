@@ -10,14 +10,14 @@ import {
   ShoppingCart,
   Activity,
   Clock,
-  CheckCircle,
   ArrowRight,
   LayoutDashboard,
   Settings,
   ShieldCheck,
   RefreshCw,
-  CircleDot,
 } from 'lucide-react'
+import { collectSystemHealth } from '@/lib/system-health'
+import { AdminHealthChips, AdminHealthCardBadge, AdminHealthRows } from '@/components/admin/SystemHealth'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,7 +37,7 @@ export default async function AdminDashboard() {
   const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
 
   // 统计数据
-  const [productCount, userCount, recentLogs, systemVersion, shopOrderCount, pendingOrderCount, memberCount, newsCount] = await Promise.all([
+  const [productCount, userCount, recentLogs, systemVersion, shopOrderCount, pendingOrderCount, memberCount, newsCount, health] = await Promise.all([
     prisma.product.count(),
     prisma.user.count(),
     prisma.operationLog.findMany({ take: 8, orderBy: { createdAt: 'desc' } }),
@@ -46,6 +46,8 @@ export default async function AdminDashboard() {
     prisma.shopOrder.count({ where: { status: 'pending' } }),
     prisma.member.count(),
     prisma.news.count(),
+    // 系统自检（数据库 / 应用服务 / 版本 / 授权）—— 与 /api/admin/system-health 同一采集器
+    collectSystemHealth(),
   ])
 
   const stats = [
@@ -90,9 +92,8 @@ export default async function AdminDashboard() {
           <p className="mt-1 text-xs text-gray-400">{today} · 欢迎回来，{(session?.user as any)?.displayName || (session?.user as any)?.username}</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1.5 rounded border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-medium text-green-600">
-            <CircleDot className="h-3 w-3" /> 未接入自动检测
-          </span>
+          {/* 真实系统自检 + 授权状态（原来这里是写死的「未接入自动检测」） */}
+          <AdminHealthChips initial={health} />
           <span className="rounded border border-gray-200 bg-white px-2.5 py-1 text-xs text-gray-500">
             v{systemVersion?.version || pkgVersion}
           </span>
@@ -170,23 +171,11 @@ export default async function AdminDashboard() {
             <h2 className="flex items-center gap-1.5 text-sm font-semibold text-gray-900">
               <LayoutDashboard className="h-4 w-4 text-[#CC0000]" /> 系统状态
             </h2>
-            <span className="flex items-center gap-1 text-xs text-green-600"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" /> 未检测</span>
+            <AdminHealthCardBadge initial={health} />
           </div>
           <div className="space-y-0.5 p-4">
-            <div className="flex items-center justify-between rounded px-2 py-2 hover:bg-gray-50/60">
-              <div className="flex items-center gap-3">
-                <CheckCircle size={16} className="text-green-500" />
-                <span className="text-[13px] text-gray-700">数据库连接</span>
-              </div>
-              <span className="rounded bg-green-50 px-2 py-0.5 text-[11px] text-green-600">未检测</span>
-            </div>
-            <div className="flex items-center justify-between rounded px-2 py-2 hover:bg-gray-50/60">
-              <div className="flex items-center gap-3">
-                <CheckCircle size={16} className="text-green-500" />
-                <span className="text-[13px] text-gray-700">应用服务</span>
-              </div>
-              <span className="rounded bg-green-50 px-2 py-0.5 text-[11px] text-green-600">未检测</span>
-            </div>
+            {/* 数据库连接 / 应用服务：真实检测值（原来两行都写死「未检测」） */}
+            <AdminHealthRows initial={health} />
             <div className="flex items-center justify-between rounded px-2 py-2 hover:bg-gray-50/60">
               <div className="flex items-center gap-3">
                 <Activity size={16} className="text-blue-500" />

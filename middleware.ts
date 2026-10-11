@@ -142,6 +142,9 @@ const API_PERMISSION: [string, string][] = [
  * - /api/admin/ai-image        ：AI 配图按钮嵌在 ContentTypeForm 中，所有内容编辑者都会用到
  * - /api/admin/languages (GET) ：多语言字段组件需读取启用语种列表（所有内容编辑者）
  * - /api/admin/plugins?mode=enabled (GET)：侧边栏插件菜单元数据（仅 key/名称/入口，不含密钥）
+ * - /api/admin/system-health  ：控制台「系统自检」徽标/卡片（仪表盘是所有后台角色都看的页面；
+ *                               只返回健康状态 —— 数据库往返、应用服务、版本、授权是否到期，
+ *                               **不含密钥，也不含授权客户编号与绑定域名**）
  *
  * ⚠️ 不在此列的敏感读接口必须保持权限校验，例如 /api/admin/site-config：
  *    其 GET 返回 site_config **全表**（含 smtp_config 密码、plugin_api_keys 等密钥）。
@@ -159,6 +162,9 @@ function isOpenAdminApi(request: NextRequest, pathname: string): boolean {
 
   // 启用语种列表：MultiLangFieldV2 / AutoTranslateBar 等组件在所有内容表单中使用
   if (pathname === '/api/admin/languages') return true
+
+  // 控制台「系统自检」（见上方白名单说明）：所有后台角色的仪表盘都在用
+  if (pathname === '/api/admin/system-health') return true
 
   // 侧边栏插件菜单元数据（**不含密钥**；不带 mode 的 GET 会返回插件 config，故必须保持校验）
   if (
