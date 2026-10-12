@@ -91,11 +91,20 @@ function loadProductTabs(mode: TabsMode): Promise<ProductTab[] | null> {
  * @param opts.full 传 `{ full: true }` 才取全量（含详情正文/卖点）；默认走 lite 档。
  *   只有产品详情页应该传 true，其余（列表/首页/相关产品/询价车）保持默认。
  */
-export function useProductTabs(opts?: { full?: boolean }) {
+export function useProductTabs(opts?: { full?: boolean; initial?: ProductTab[] }) {
   const mode: TabsMode = opts?.full ? "full" : "lite"
-  // 初值仍为静态数据 ⇒ SSR 输出与客户端首次渲染完全不变（无 hydration 风险）
-  const [productTabs, setProductTabs] = useState<ProductTab[]>(staticProductTabs)
-  const [loading, setLoading] = useState(true)
+  /**
+   * 首帧初值：**服务端注入的真实产品树**优先，没注入时退回静态兜底树（历史行为不变）。
+   * ============================================================================
+   * 为什么要能注入（owner 2026-10-12「如何让百度完整收录」）：
+   *   以前初值只能是静态兜底树，而它可能过期 ⇒ 产品列表页只好"接口回来前只出骨架"，
+   *   于是 SSR 的 HTML 里**一条产品内链都没有**，爬虫看到空列表。
+   *   现在服务端页面用 `getPublicProductTabs()` 取真值注入 ⇒ HTML 里直接有卡片与内链。
+   * 注入值来自服务端同一份数据 ⇒ SSR 与客户端首渲同值，**无 hydration 风险**。
+   */
+  const seed = opts?.initial && opts.initial.length > 0 ? opts.initial : null
+  const [productTabs, setProductTabs] = useState<ProductTab[]>(seed || staticProductTabs)
+  const [loading, setLoading] = useState(!seed)
 
   useEffect(() => {
     let cancelled = false

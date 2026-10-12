@@ -22,11 +22,14 @@ interface NewsItem {
   coverImage: string;
 }
 
-export default function NewsDefaultClient({ initialCategorySlug }: { initialCategorySlug?: string } = {}) {
+export default function NewsDefaultClient({ initialCategorySlug, initialNews }: { initialCategorySlug?: string; initialNews?: NewsItem[] } = {}) {
   const { locale , t} = useI18n();
     const loc = createLocalizedGetter(locale);
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  // initialNews：服务端注入的真实列表（见 app/news/page.tsx 注释）⇒ 首屏 HTML 里就有标题与内链；
+  // 未注入（接口旧版/取数失败）时保持改造前行为：空列表 + 骨架 → XHR 填充。
+  const seeded = initialNews && initialNews.length > 0 ? initialNews : null;
+  const [news, setNews] = useState<NewsItem[]>(seeded ?? []);
+  const [loading, setLoading] = useState(!seeded);
   /**
    * 当前筛选的**分类 slug**（空串=全部）。
    * `initialCategorySlug`：由 `/news/<分类slug>` 这类链接传入（owner 2026-09-29：

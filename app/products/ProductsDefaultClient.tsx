@@ -55,7 +55,7 @@ function ProductsSkeleton() {
   );
 }
 
-function ProductsContent() {
+function ProductsContent({ initialTabs }: { initialTabs?: any[] } = {}) {
   const { t, locale } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -66,7 +66,9 @@ function ProductsContent() {
    *   （`/products/growth/zw-10d` 之类）。现改为：**接口没回来之前只出骨架**，
    *   不渲染任何拿不准的链接（真实数据到达后再渲染产品树）。
    */
-  const { productTabs, loading: tabsLoading } = useProductTabs();
+  // initialTabs：服务端注入的真实产品树（见 app/products/page.tsx 注释）⇒ 首屏即出卡片与内链，
+  // 且数据是真值 ⇒ 不会像静态兜底树那样挂死链；未注入时行为与改造前完全一致（骨架 → XHR）。
+  const { productTabs, loading: tabsLoading } = useProductTabs({ initial: initialTabs });
   const tabParam = searchParams.get("tab");
   const loc = createLocalizedGetter(locale);
   const [pageConfig, setPageConfig] = useState<any>(null);
@@ -447,10 +449,10 @@ function ProductsContent() {
   );
 }
 
-export default function ProductsDefaultClient() {
-  return (
-    <Suspense fallback={<ProductsSkeleton />}>
-      <ProductsContent />
-    </Suspense>
-  );
-}
+  export default function ProductsDefaultClient({ initialTabs }: { initialTabs?: any[] } = {}) {
+    return (
+      <Suspense fallback={<ProductsSkeleton />}>
+        <ProductsContent initialTabs={initialTabs} />
+      </Suspense>
+    );
+  }

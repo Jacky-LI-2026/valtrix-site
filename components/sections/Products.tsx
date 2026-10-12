@@ -5,49 +5,33 @@ import { ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
 import { useState, useEffect } from "react";
+// 扁平列表的**类型与映射**都在 lib/products-flat.ts（纯函数，服务端页面也用它做首屏注入）
+import { buildHomeProductLists, type HomeCategoryItem as CategoryItem, type HomeProductItem as ProductItem } from "@/lib/products-flat";
 
-interface ProductItem {
-  id: string;
-  slug: string;
-  name: string;
-  nameEn?: string;
-  nameJa?: string;
-  nameKo?: string;
-  nameFr?: string;
-  nameAr?: string;
-  subtitle?: string;
-  subtitleEn?: string;
-  subtitleJa?: string;
-  subtitleKo?: string;
-  subtitleFr?: string;
-  subtitleAr?: string;
-  tabSlug: string;
-}
-
-interface CategoryItem {
-  slug: string;
-  name: string;
-  nameEn?: string;
-  nameJa?: string;
-  nameKo?: string;
-  nameFr?: string;
-  nameAr?: string;
-  description?: string;
-  descriptionEn?: string;
-  descriptionJa?: string;
-  descriptionKo?: string;
-  descriptionFr?: string;
-  descriptionAr?: string;
-}
-
-export default function Products() {
+/**
+ * 首页产品区块。
+ *
+ * `initialCategories` / `initialProducts` / `initialFeatured`：由 `app/page.tsx`（服务端）注入
+ * ⇒ **首屏 HTML 里就有分类/产品内链**（owner 2026-10-12「如何让百度完整收录」：百度几乎不执行 JS，
+ * 纯客户端取数的区块在爬虫眼里是空的）。注入的是**摊平后的小列表**（见 lib/products-flat.ts），
+ * 不再把整棵产品树塞进首页载荷。不注入时保持原行为：挂载后再 fetch。
+ */
+export default function Products({
+  initialCategories,
+  initialProducts,
+  initialFeatured,
+}: {
+  initialCategories?: CategoryItem[];
+  initialProducts?: ProductItem[];
+  initialFeatured?: { featuredCategories?: string[]; featuredProducts?: string[] };
+} = {}) {
   const { t, locale } = useI18n();
   const loc = createLocalizedGetter(locale);
 
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
-  const [products, setProducts] = useState<ProductItem[]>([]);
-  const [featuredCategories, setFeaturedCategories] = useState<string[]>([]);
-  const [featuredProducts, setFeaturedProducts] = useState<string[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>(initialCategories ?? []);
+  const [products, setProducts] = useState<ProductItem[]>(initialProducts ?? []);
+  const [featuredCategories, setFeaturedCategories] = useState<string[]>(initialFeatured?.featuredCategories || []);
+  const [featuredProducts, setFeaturedProducts] = useState<string[]>(initialFeatured?.featuredProducts || []);
 
   // 获取产品数据和首页配置
   useEffect(() => {
@@ -57,47 +41,8 @@ export default function Products() {
       fetch("/api/public/home-config").then((r) => r.json()),
     ])
       .then(([prodData, homeData]) => {
-        const tabs = prodData?.data || [];
-        const cats: CategoryItem[] = [];
-        const prods: ProductItem[] = [];
-        tabs.forEach((tab: any) => {
-          cats.push({
-            slug: tab.id,
-            name: tab.name,
-            nameEn: tab.nameEn,
-            nameJa: tab.nameJa,
-            nameKo: tab.nameKo,
-            nameFr: tab.nameFr,
-            nameAr: tab.nameAr,
-            description: tab.categories?.[0]?.description || "",
-            descriptionEn: tab.categories?.[0]?.descriptionEn || "",
-            descriptionJa: tab.categories?.[0]?.descriptionJa || "",
-            descriptionKo: tab.categories?.[0]?.descriptionKo || "",
-            descriptionFr: tab.categories?.[0]?.descriptionFr || "",
-            descriptionAr: tab.categories?.[0]?.descriptionAr || "",
-          });
-          tab.categories?.forEach((cat: any) => {
-            cat.models?.forEach((p: any) => {
-              prods.push({
-                id: p.id,
-                slug: p.id,
-                name: p.name,
-                nameEn: p.nameEn,
-                nameJa: p.nameJa,
-                nameKo: p.nameKo,
-                nameFr: p.nameFr,
-                nameAr: p.nameAr,
-                subtitle: p.subtitle || p.summary || "",
-                subtitleEn: p.subtitleEn || p.summaryEn || "",
-                subtitleJa: p.subtitleJa || p.summaryJa || "",
-                subtitleKo: p.subtitleKo || p.summaryKo || "",
-                subtitleFr: p.subtitleFr || p.summaryFr || "",
-                subtitleAr: p.subtitleAr || p.summaryAr || "",
-                tabSlug: tab.id,
-              });
-            });
-          });
-        });
+        // 与首屏注入**同一份**映射逻辑（见 lib/products-flat.ts）
+        const { cats, prods } = buildHomeProductLists(prodData?.data || []);
         setCategories(cats);
         setProducts(prods);
         setFeaturedCategories(homeData?.data?.featuredCategories || []);
