@@ -233,6 +233,66 @@ export default function IndexHealthPanel() {
                 }
               />
             </Row>
+            <Row label="搜索引擎爬虫来访">
+              {!h.crawlers.ok ? (
+                <Badge ok={false} text={h.crawlers.error || "无法读取 nginx 访问日志"} />
+              ) : h.crawlers.byBot.length === 0 ? (
+                <Badge ok={false} text={`扫描 ${h.crawlers.scannedLines} 行爬虫请求，暂无记录`} />
+              ) : (
+                <div className="space-y-1">
+                  <div className="flex flex-wrap justify-end gap-1">
+                    {h.crawlers.byBot.slice(0, 6).map((b) => (
+                      <span
+                        key={b.key}
+                        className={`rounded px-1.5 py-0.5 text-[11px] ${
+                          b.key === "baidu" ? "bg-blue-50 text-blue-600" : "bg-gray-100 text-gray-500"
+                        }`}
+                      >
+                        {b.label} {b.count}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="text-[11px] text-gray-400">
+                    百度：最近来访 {h.crawlers.baidu.lastAt ? h.crawlers.baidu.lastAt.slice(0, 20) : "—"} ·{" "}
+                    <span className={h.crawlers.baidu.content > 0 ? "text-green-600" : "text-amber-600"}>
+                      {h.crawlers.baidu.content > 0
+                        ? `已抓内容页 ${h.crawlers.baidu.content} 次`
+                        : "尚未抓过内容页（只停在首页/静态资源）"}
+                    </span>
+                    {h.crawlers.baidu.suspicious > 0 && ` · 疑似伪装扫描 ${h.crawlers.baidu.suspicious} 次`}
+                    {h.crawlers.selfFiltered > 0 && ` · 已排除本机自测 ${h.crawlers.selfFiltered} 次`}
+                  </div>
+                  {h.crawlers.baidu.perDay.length > 0 && (
+                    <div className="text-[11px] text-gray-400">
+                      百度按天：
+                      {h.crawlers.baidu.perDay
+                        .slice(-7)
+                        .map((d) => `${d.day.slice(5)} ${d.count}次`)
+                        .join(" · ")}
+                    </div>
+                  )}
+                  {h.crawlers.baidu.recent.length > 0 && (
+                    <ul className="max-h-32 space-y-0.5 overflow-y-auto text-left text-[11px] text-gray-400">
+                      {h.crawlers.baidu.recent.map((r, i) => (
+                        <li key={i} className={r.kind === "suspicious" ? "text-amber-600" : ""}>
+                          {r.at.slice(0, 20)} · {r.status} · {r.path.slice(0, 60)}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <div className="text-[10px] text-gray-300">
+                    读 {h.crawlers.files.length} 个日志文件 / {h.crawlers.scannedLines} 行爬虫请求（结果缓存 10 分钟）
+                    {/*
+                      只在**真的排除过**时才提自身 IP：域名未切到本机时（如阀门站还在解析旧服务器）
+                      解析出的 IP 与服务不是一回事，写出来会误导。
+                    */}
+                    {h.crawlers.selfFiltered > 0 && h.crawlers.selfIp
+                      ? ` · 已排除站点自身请求 ${h.crawlers.selfFiltered} 次（${h.crawlers.selfIp}）`
+                      : ""}
+                  </div>
+                </div>
+              )}
+            </Row>
             <Row label="推送历史（最近 8 次）">
               {h.pushLog.length === 0 ? (
                 <span className="text-gray-400">暂无推送记录（本页面板上线后开始记录）</span>

@@ -18,6 +18,7 @@ import { prisma } from "@/lib/prisma";
 import { getBaiduPushConfig } from "@/lib/seo/baidu-push";
 import { getIndexNowConfig } from "@/lib/seo/indexnow";
 import { getSiteBaseUrl as deploymentSiteUrl } from "@/lib/site-url";
+import { collectCrawlerVisits, type CrawlerVisits } from "@/lib/seo/crawler-log";
 
 export interface IndexHealthSample {
   url: string;
@@ -68,6 +69,11 @@ export interface IndexHealth {
    *    里 fetch OEM 配置后才渲染），服务端 HTML 里永远看不到备案号 —— 早先据此误判成"未配置"。
    */
   icp: { ok: boolean; value?: string; showLegal?: boolean; error?: string };
+  /**
+   * 搜索引擎爬虫来访（读 nginx access log；owner 2026-10-12）。
+   * 这是"结果指标"：sitemap/内链是我们做的，**爬虫来没来、抓到哪一层**才说明有没有用。
+   */
+  crawlers: CrawlerVisits;
   pushLog: IndexHealthPushLog[];
   manual: { key: string; label: string; hint: string; href: string }[];
 }
@@ -242,6 +248,30 @@ export async function collectIndexHealth(): Promise<IndexHealth> {
     }
   }
 
+  // ---- 爬虫来访（读 nginx 日志；失败只影响这一项）----
+  let crawlers: CrawlerVisits;
+  try {
+    const host = (() => {
+      try {
+        return baseUrl ? new URL(baseUrl).hostname : undefined;
+      } catch {
+        return undefined;
+      }
+    })();
+    crawlers = await collectCrawlerVisits(host);
+  } catch (e: any) {
+    crawlers = {
+      ok: false,
+      error: String(e?.message || e).slice(0, 160),
+      files: [],
+      scannedLines: 0,
+      selfFiltered: 0,
+      byBot: [],
+      baidu: { count: 0, content: 0, suspicious: 0, perDay: [], recent: [] },
+      scannedAt: new Date().toISOString(),
+    };
+  }
+
   return {
     checkedAt: new Date().toISOString(),
     baseUrl,
@@ -258,6 +288,7 @@ export async function collectIndexHealth(): Promise<IndexHealth> {
       hasIndexNowKey: !!(inw.key && inw.host),
     },
     icp,
+    crawlers,
     pushLog: readPushLog(),
     manual: [
       { key: "submit-sitemap", label: "在百度搜索资源平台提交 sitemap", hint: "普通收录 → sitemap → 提交 /sitemap.xml（首次必做，之后自动跟踪）", href: "https://ziyuan.baidu.com/sitemap/index" },
