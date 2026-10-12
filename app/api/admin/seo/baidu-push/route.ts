@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { getBaiduPushConfig, pushUrlsToBaidu, collectAllPublicUrls } from '@/lib/seo/baidu-push'
 import { getIndexNowConfig, pushUrlsToIndexNow } from '@/lib/seo/indexnow'
+import { appendPushLog } from '@/lib/seo/index-health'
 
 // GET：收录推送配置状态（百度 + IndexNow）
 export async function GET() {
@@ -44,6 +45,15 @@ export async function POST(req: NextRequest) {
   const [baidu, indexnow] = await Promise.allSettled([pushUrlsToBaidu(urls), pushUrlsToIndexNow(urls)])
   const br = baidu.status === 'fulfilled' ? baidu.value : { ok: false, error: String((baidu as any).reason || '百度推送失败') }
   const ir = indexnow.status === 'fulfilled' ? indexnow.value : { ok: false, error: String((indexnow as any).reason || 'IndexNow 推送失败') }
+  // 落盘一条推送记录（「收录体检」面板里展示推送历史；写失败不影响推送结果）
+  appendPushLog({
+    at: new Date().toISOString(),
+    count: urls.length,
+    baiduOk: !!br.ok,
+    baiduBody: String(br.body ?? br.error ?? '').slice(0, 160),
+    indexnowOk: !!ir.ok,
+    indexnowBody: String(ir.body ?? ir.error ?? '').slice(0, 160),
+  })
   return NextResponse.json({
     count: urls.length,
     baidu: br,

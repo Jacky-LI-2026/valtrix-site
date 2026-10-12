@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import IndexHealthPanel from "@/components/admin/IndexHealthPanel";
 import { Save, Globe, MapPin, Phone, Mail, Send, RefreshCw, FileText, CheckCircle2, AlertCircle, Sparkles, Loader2 } from "lucide-react";
 
 /**
@@ -210,48 +211,14 @@ export default function SEOConfigPage() {
         <p className="text-dark-500 text-sm mt-1">配置搜索引擎优化和地理位置优化参数</p>
       </div>
 
-      {/* 站点级 Sitemap 状态检测 */}
-      <div className="bg-white rounded-lg border border-dark-100 p-6 mb-6">
-        <h2 className="text-lg font-bold text-dark mb-4 flex items-center gap-2">
-          <FileText size={20} className="text-primary" />
-          站点地图（sitemap.xml）状态
-        </h2>
-        <div className="flex items-start gap-4">
-          <div className="flex-1">
-            {sitemap.checking ? (
-              <div className="flex items-center gap-2 text-sm text-dark-500">
-                <RefreshCw size={14} className="animate-spin" /> 正在检测 /sitemap.xml ...
-              </div>
-            ) : sitemap.ok ? (
-              <div>
-                <div className="flex items-center gap-2 text-sm text-green-600">
-                  <CheckCircle2 size={16} />
-                  <span className="font-medium">sitemap.xml 可正常访问</span>
-                </div>
-                <p className="text-xs text-dark-400 mt-1">
-                  <code className="bg-dark-50 px-1.5 py-0.5 rounded">/sitemap.xml</code>
-                  {" "}当前收录 URL {sitemap.count ?? 0} 条，供 Google / Bing / 百度等搜索引擎爬取。
-                </p>
-              </div>
-            ) : (
-              <div>
-                <div className="flex items-center gap-2 text-sm text-red-600">
-                  <AlertCircle size={16} />
-                  <span className="font-medium">sitemap.xml 访问异常</span>
-                </div>
-                <p className="text-xs text-dark-400 mt-1">{sitemap.error}。请确认已部署到可公网访问的环境。</p>
-              </div>
-            )}
-          </div>
-          <button
-            onClick={checkSitemap}
-            disabled={sitemap.checking}
-            className="flex items-center gap-2 border border-dark-200 text-dark-600 px-4 py-2 rounded text-sm hover:bg-dark-50 disabled:opacity-50"
-          >
-            <RefreshCw size={14} className={sitemap.checking ? "animate-spin" : ""} />
-            重新检测
-          </button>
-        </div>
+      {/*
+        「收录体检」面板（owner 2026-10-12）—— 取代原先只查 sitemap 可读性与条数的那一块：
+        现在一次覆盖 robots / sitemap / **覆盖率**（库里该收录的内容 vs sitemap 条数）/
+        **抽样可达性** / 推送通道 / **推送历史** / 百度平台侧人工清单（含深链接）。
+        原先的 sitemap 检测（含「重新检测」按钮）已被面板内的「立即体检」覆盖。
+      */}
+      <div className="mb-6">
+        <IndexHealthPanel />
       </div>
 
       {/* 基础SEO */}
