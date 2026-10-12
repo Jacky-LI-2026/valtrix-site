@@ -489,8 +489,9 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     impact: "启用后后台出现「外链营销」入口；仅后台使用，不影响前台",
     permissions: ["外链管理", "回链统计", "软文营销"],
     adminUrls: [
-      { label: "外链台账", href: "/admin/backlinks" },
-      { label: "软文营销", href: "/admin/backlinks/posts" },
+      // 2026-10-12 收拢到 SEO 中心（旧路径 /admin/backlinks* 保留永久重定向）
+      { label: "外链台账", href: "/admin/seo/backlinks" },
+      { label: "软文营销", href: "/admin/seo/backlinks/posts" },
     ],
   },
   {

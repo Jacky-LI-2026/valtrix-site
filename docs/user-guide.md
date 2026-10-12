@@ -116,7 +116,8 @@ VALTRIX网站后台管理系统是一个功能完整的企业官网内容管理�
 | 内容管理 | 产品 / 新闻 / 资源 / 行业方案 / 服务 / 成功案例 / 常见问题 / 招聘 / 关于我们 / 菜单 / 产品分类 / 资源分类 | `product:view`·`news:view`·`resource:view`·`industry:view`·`service:view`·`case:view`·`faq:view`·`career:view`·`about:view`·`menu:view` | ✅ 全部可见 |
 | 能力市场 | 插件启停中心、API 网关 | `config:site` | ❌ 不可见 |
 | 能力市场 | AI 开关矩阵、AI 自动运营 | `ai:config` | ❌ 不可见 |
-| 站点设置 | 站点配置 / 定价与价格显示 / 客户分类管理 / 行业包管理 / 品牌 OEM / SEO 优化 / SEO 批量补全 | `config:site` | ❌ 不可见 |
+| 站点设置 | 站点配置 / 定价与价格显示 / 客户分类管理 / 行业包管理 / 品牌 OEM | `config:site` | ❌ 不可见 |
+| **SEO 与数据** | SEO 总览 / SEO / GEO 设置 / 内容 SEO 补全 / 外链台账 / 软文营销 | `seo:view` | ❌ 不可见 |
 | 站点设置 | 首页配置、主题配色、页面头部、模板管理、语种管理、SMTP 邮件 | `config:home`·`config:theme`·`page-hero:view`·`template:view`·`language:view`·`smtp:view` | ❌ 不可见 |
 | 系统运维 | 一键部署、服务器管理 | `deploy:view` | ❌ 不可见 |
 | 系统运维 | 系统更新、数据库备份、操作日志 | `system:update`·`system:backup`·`system:log` | ❌ 不可见 |
@@ -149,7 +150,7 @@ VALTRIX网站后台管理系统是一个功能完整的企业官网内容管理�
 | 入口 | 页面可否打开（内容维护人员 / 零权限账号） | 数据接口 | 结果 |
 |---|---|---|---|
 | 多站点 `/admin/sites`、多租户 `/admin/tenants` | 可打开 / 可打开 | 需 `config:site` | ⚠️ 权限不足时数据 403 |
-| 外链营销 `/admin/backlinks`、外链文案 `/admin/backlinks/posts` | 可打开 / 可打开 | 需 `seo:view` | ⚠️ 同上 |
+| 外链台账 `/admin/seo/backlinks`、软文营销 `/admin/seo/backlinks/posts` | 可打开 / 可打开 | 需 `seo:view` | ⚠️ 同上 |
 | 商城优惠券 `/admin/shop/coupons` | 可打开 / 可打开 | 需 `config:site` | ⚠️ 同上 |
 | AI 知识库 `/admin/ai-knowledge`、AI 建站向导 `/admin/ai-site-wizard` | 可打开 / 可打开 | 需 `ai:config` | ⚠️ 同上 |
 | 运营驾驶舱、漏斗、热力图 | 可打开 / 可打开 | 需 `analytics:view` | 内容维护人员**正常**；零权限账号才会空白 |
@@ -473,7 +474,7 @@ VALTRIX网站后台管理系统是一个功能完整的企业官网内容管理�
 - 翻译 API 密钥配置（DeepSeek API Key 可在翻译配置页填写，用于 AI 翻译）
 
 ### SEO/GEO配置
-- 路径: `/admin/settings/seo`
+- 路径: `/admin/seo/settings`（**2026-10-12 起 SEO 入口统一收拢到「SEO 与数据 → SEO 总览」**；旧路径 `/admin/settings/seo` 保留永久重定向，书签不会失效）
 - 全局 SEO 标题、描述、关键词
 - 默认分享图片
 - GEO 默认地区设置
@@ -1276,8 +1277,10 @@ certbot renew --dry-run
 - **新增「AI 处理模式」单选**：不使用 AI（原文入库）/ AI 生成摘要（大模型提炼 60 字摘要）/ AI 润色正文（大模型润色更专业通顺）。每个采集源独立设置，采集执行时自动调用 AI（失败自动回退原文）。
 - 列表新增「AI 处理」列显示各源模式徽章（原文/AI摘要/AI润色），并支持「编辑」采集源。
 
-### 4. SEO/GEO 配置 → 站点级 Sitemap 检测
-- SEO/GEO 配置页顶部新增「站点地图（sitemap.xml）状态」卡片：自动检测 /sitemap.xml 是否可访问、当前收录 URL 条数，可「重新检测」；异常时给出提示（适合部署前自检）。
+### 4. SEO 与数据 → SEO 总览 → 收录体检（2026-10-12 新增，取代原「站点级 Sitemap 检测」）
+- 入口：**SEO 与数据 → SEO 总览**（`/admin/seo`，体检面板嵌在这一页）。
+- 自动检测：robots.txt、sitemap.xml（URL 条数·hreflang·响应毫秒）、sitemap-images.xml、**覆盖率**（库里该收录的内容页数 vs sitemap 条数）、**抽样可达性**（抽 8 条实抓状态码）、百度/IndexNow 推送配置、**推送历史**、页脚 **ICP 备案号**、**百度收录站点地址**（值非法时自动回退部署域名并告警）。
+- 两个按钮：**「立即体检」**、**「立即推送全部 URL」**（百度 + IndexNow，结果写入推送历史）。⚠️ 百度普通收录**每日配额有限（实测 5 条/天）**，优先推新发布/刚更新的页面。
 - 百度站长主动推送功能保留（站点地址 + token 配置后一键推送全站 URL）。
 
 
@@ -1417,7 +1420,7 @@ certbot renew --dry-run
 - 内容视频字段支持本地大文件分片直传（mp4/webm，最大 512MB，>20MB 自动分片），带进度条与取消；也可粘贴外链视频地址。
 
 ### SEO 批量补全
-- 后台「站点设置 → SEO 批量补全」：统计产品/新闻/服务/行业方案/成功案例缺 SEO 配置的记录，可一键 AI 批量补全（中文）或补全 + 英文翻译，带进度显示。
+- 后台「**SEO 与数据 → 内容 SEO 补全**」（`/admin/seo/audit`，旧路径 `/admin/seo-audit` 保留重定向）：统计产品/新闻/服务/行业方案/成功案例缺 SEO 配置的记录，可一键 AI 批量补全（中文）或补全 + 英文翻译，带进度显示。
 - 内容编辑页的 SEO/GEO 配置中，「AI 一键生成」会同时补全中文与英文 SEO 标题/描述。
 
 ### AI 占位配图

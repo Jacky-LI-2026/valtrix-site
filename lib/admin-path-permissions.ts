@@ -33,7 +33,17 @@ export const PATH_PERMISSION: [string, string][] = [
   ['/admin/settings/ai', 'ai:config'],
   ['/admin/settings/translate', 'translate-config:view'],
   ['/admin/settings/smtp', 'smtp:view'],
+  /**
+   * SEO 与收录（owner 2026-10-12「方案 B：单一 SEO 中心」）
+   * ------------------------------------------------------------------
+   * `/admin/seo` 前缀统一 `seo:view`（最长前缀匹配覆盖各子页）；旧的三个路径也设为同一权限
+   * —— 它们是永久重定向存根，不给人留"菜单看得见却点进去 403"的缝。
+   * （收拢前：`/admin/seo-audit`、`/admin/backlinks` 根本没进页面映射，只靠"能登录"兜着。）
+   */
   ['/admin/settings/seo', 'seo:view'],
+  ['/admin/seo', 'seo:view'],
+  ['/admin/seo-audit', 'seo:view'],
+  ['/admin/backlinks', 'seo:view'],
   ['/admin/templates', 'template:view'],
   ['/admin/collection', 'collect:manage'],
   ['/admin/auto-collection-tasks', 'auto-collection:view'],

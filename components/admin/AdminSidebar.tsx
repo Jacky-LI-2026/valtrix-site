@@ -253,18 +253,23 @@ const menuItems: MenuItem[] = [
     icon: <BarChart3 size={18} />,
     groupKey: 'seo-data',
     children: [
-      // D6: SEO 优化挂 plugin:seo（停用 seo 插件后隐藏）
-      { label: 'SEO 优化', href: '/admin/settings/seo', permission: 'seo:view', plugin: 'seo' },
-      // D6: SEO 批量补全同样挂 plugin:seo，随 seo 插件启停联动
-      { label: 'SEO 批量补全', href: '/admin/seo-audit', permission: 'seo:view', plugin: 'seo' },
+      /**
+       * 2026-10-12（owner「方案 B：单一 SEO 中心」）：SEO 入口统一收拢到 /admin/seo/*
+       * —— 新增「SEO 总览」（收录体检面板就在这一页），其余入口只改路径。
+       * 旧路径（/admin/settings/seo、/admin/seo-audit、/admin/backlinks*）保留永久重定向，书签不失效。
+       * D6 原约定保留：仍挂 plugin:seo（停用 seo 插件后隐藏）。
+       */
+      { label: 'SEO 总览', href: '/admin/seo', permission: 'seo:view', plugin: 'seo' },
+      { label: 'SEO / GEO 设置', href: '/admin/seo/settings', permission: 'seo:view', plugin: 'seo' },
+      { label: '内容 SEO 补全', href: '/admin/seo/audit', permission: 'seo:view', plugin: 'seo' },
       {
         label: '外链营销',
-        href: '/admin/backlinks',
+        href: '/admin/seo/backlinks',
         permission: 'seo:view',
         plugin: 'backlink',
         children: [
-          { label: '外链台账', href: '/admin/backlinks' },
-          { label: '软文营销', href: '/admin/backlinks/posts' },
+          { label: '外链台账', href: '/admin/seo/backlinks' },
+          { label: '软文营销', href: '/admin/seo/backlinks/posts' },
         ],
       },
       {
