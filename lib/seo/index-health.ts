@@ -17,6 +17,7 @@ import { join } from "path";
 import { prisma } from "@/lib/prisma";
 import { getBaiduPushConfig } from "@/lib/seo/baidu-push";
 import { getIndexNowConfig } from "@/lib/seo/indexnow";
+import { getSiteBaseUrl as deploymentSiteUrl } from "@/lib/site-url";
 
 export interface IndexHealthSample {
   url: string;
@@ -51,7 +52,22 @@ export interface IndexHealth {
     gap: number;
   };
   samples: IndexHealthSample[];
-  config: { baiduSite?: string; hasBaiduToken: boolean; hasIndexNowKey: boolean };
+  config: {
+    /** 后台「百度收录站点地址」原样值（可能为空或写错） */
+    baiduSite?: string;
+    /** 该值是否是合法 http(s) 地址；false ⇒ 本次体检用的是部署级域名兜底（见 fallbackBaseUrl） */
+    baiduSiteUrlValid: boolean;
+    /** 校验失败时的兜底域名（来自 NEXT_PUBLIC_SITE_URL） */
+    fallbackBaseUrl?: string;
+    hasBaiduToken: boolean;
+    hasIndexNowKey: boolean;
+  };
+  /**
+   * 页脚 ICP 备案号（**自动检测**，owner 2026-10-12 反馈"已经显示了"后加的）。
+   * ⚠️ 必须查 `/api/public/oem` 而**不是**抓首页 HTML：页脚是客户端组件（`components/layout/Footer.tsx`
+   *    里 fetch OEM 配置后才渲染），服务端 HTML 里永远看不到备案号 —— 早先据此误判成"未配置"。
+   */
+  icp: { ok: boolean; value?: string; showLegal?: boolean; error?: string };
   pushLog: IndexHealthPushLog[];
   manual: { key: string; label: string; hint: string; href: string }[];
 }
@@ -109,7 +125,16 @@ const STATIC_PAGES = 20;
 export async function collectIndexHealth(): Promise<IndexHealth> {
   const cfg = await getBaiduPushConfig();
   const inw = await getIndexNowConfig();
-  const baseUrl = String(cfg.site || "").replace(/\/+$/, "");
+  /**
+   * 站点地址容错（owner 2026-10-12）：
+   * 后台的「百度收录站点地址」实测被写成过地区码（`CN-BJ`）—— 一旦如此，
+   * 原来会让整个体检"全线超时"，看不出真正原因。现在：**不是 http(s) 地址就回退到部署级域名**
+   * （`NEXT_PUBLIC_SITE_URL`），并在返回里显式标出 `baiduSiteUrlValid=false` 让面板告警。
+   */
+  const configuredSite = String(cfg.site || "").trim();
+  const baiduSiteUrlValid = /^https?:\/\//i.test(configuredSite);
+  const fallbackBaseUrl = deploymentSiteUrl();
+  const baseUrl = (baiduSiteUrlValid ? configuredSite : fallbackBaseUrl).replace(/\/+$/, "");
 
   // ---- robots.txt ----
   let robots: IndexHealth["robots"] = { ok: false, declaresSitemap: false, blocksAdminAndApi: false };
@@ -198,6 +223,25 @@ export async function collectIndexHealth(): Promise<IndexHealth> {
     samples.push(...results);
   }
 
+  // ---- 页脚 ICP 备案号（自动检测：查 OEM 接口，而不是抓首页 HTML，见接口注释）----
+  let icp: IndexHealth["icp"] = { ok: false };
+  if (baseUrl) {
+    const res = await fetchWithTimeout(`${baseUrl}/api/public/oem`);
+    if (res?.ok) {
+      try {
+        const j = await res.json();
+        const value = String(j?.data?.icp ?? "").trim();
+        const showLegal = j?.data?.showLegal !== false;
+        const isPlaceholder = !value || /x{4,}/i.test(value); // 代码默认值形如 京ICP备xxxxxxxx号
+        icp = { ok: !isPlaceholder && showLegal, value: value || undefined, showLegal };
+      } catch {
+        icp = { ok: false, error: "OEM 接口返回无法解析" };
+      }
+    } else {
+      icp = { ok: false, error: "取 /api/public/oem 失败（超时或不可达）" };
+    }
+  }
+
   return {
     checkedAt: new Date().toISOString(),
     baseUrl,
@@ -208,16 +252,18 @@ export async function collectIndexHealth(): Promise<IndexHealth> {
     samples,
     config: {
       baiduSite: cfg.site,
+      baiduSiteUrlValid,
+      fallbackBaseUrl,
       hasBaiduToken: !!cfg.token,
       hasIndexNowKey: !!(inw.key && inw.host),
     },
+    icp,
     pushLog: readPushLog(),
     manual: [
       { key: "submit-sitemap", label: "在百度搜索资源平台提交 sitemap", hint: "普通收录 → sitemap → 提交 /sitemap.xml（首次必做，之后自动跟踪）", href: "https://ziyuan.baidu.com/sitemap/index" },
       { key: "push-all", label: "用本页「立即推送全部 URL」补推存量", hint: "新增/更新内容再单独推；面板下方会记录每次推送结果", href: "https://ziyuan.baidu.com/linksubmit/index" },
       { key: "crawl-diagnose", label: "看一次「抓取诊断」", hint: "确认 Baiduspider 抓到的 HTML 里有内容与内链（本轮已把列表页/首页改为服务端渲染）", href: "https://ziyuan.baidu.com/crawltools/index" },
       { key: "index-monitor", label: "盯「索引量」曲线", hint: "提交/推送后通常 3~14 天开始有量，之后每周看一次", href: "https://ziyuan.baidu.com/indexs/index" },
-      { key: "icp", label: "页脚展示 ICP 备案号", hint: "后台「品牌 OEM 配置 → ICP 备案号」填上并开启页脚展示（国内站必备）", href: "/admin/settings/oem" },
     ],
   };
 }

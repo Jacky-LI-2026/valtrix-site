@@ -204,6 +204,35 @@ export default function IndexHealthPanel() {
               <Badge ok={!!h.config.hasBaiduToken} text={h.config.hasBaiduToken ? "百度已配 token" : "百度未配 token"} />{" "}
               <Badge ok={!!h.config.hasIndexNowKey} text={h.config.hasIndexNowKey ? "IndexNow 已配" : "IndexNow 未配"} />
             </Row>
+            <Row label="百度收录站点地址">
+              {h.config.baiduSiteUrlValid ? (
+                <Badge ok text={h.config.baiduSite || ""} />
+              ) : !h.config.baiduSite ? (
+                <Badge ok={false} text={`未配置（本次体检已回退 ${h.config.fallbackBaseUrl}；未配置时「百度主动推送」不可用）`} />
+              ) : (
+                <>
+                  <Badge ok={false} text={`后台值异常（${h.config.baiduSite}），本次已回退 ${h.config.fallbackBaseUrl}`} />
+                  <div className="mt-1 text-[11px] text-amber-700">
+                    ⚠️ 这个值必须填**站点域名**（如 https://www.zuowentech.com）。填错会让「百度主动推送」全部失败 ——
+                    请在下方「站点地址」处改正后再推送。
+                  </div>
+                </>
+              )}
+            </Row>
+            <Row label="页脚 ICP 备案号">
+              <Badge
+                ok={h.icp.ok}
+                text={
+                  h.icp.ok
+                    ? `已展示：${h.icp.value}`
+                    : h.icp.error
+                      ? h.icp.error
+                      : h.icp.value
+                        ? `已填但页脚未展示（showLegal=${h.icp.showLegal ? "true" : "false"}）`
+                        : "未配置（后台：品牌 OEM 配置 → ICP 备案号）"
+                }
+              />
+            </Row>
             <Row label="推送历史（最近 8 次）">
               {h.pushLog.length === 0 ? (
                 <span className="text-gray-400">暂无推送记录（本页面板上线后开始记录）</span>
