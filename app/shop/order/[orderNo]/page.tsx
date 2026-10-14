@@ -7,23 +7,30 @@ import PageHero from "@/components/ui/PageHero";
 import { Search, CheckCircle2, Truck, Package, Printer, RotateCcw, Upload, Building2, FileText, ExternalLink, QrCode } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
-const STATUS_MAP: Record<string, string> = {
-  pending: "待确认",
-  confirmed: "已确认",
-  completed: "已完成",
-  cancelled: "已取消",
+/**
+ * 状态 / 支付方式 / 物流状态：**存 code，不存中文**
+ * --------------------------------------------------------------------------
+ * owner 2026-10-14「前台显示多语言」：这几张表此前直接写死中文（且定义在模块作用域，
+ * 拿不到组件里的 `t`）⇒ 英文/日文访客在查单页看到的是「待确认 / 对公转账 / 已发货」。
+ * 现改为「code → i18n key」，渲染时用组件内的 `tr()` 取当前语种。
+ */
+const STATUS_KEY: Record<string, string> = {
+  pending: "orderStPending",
+  confirmed: "orderStConfirmed",
+  completed: "orderStCompleted",
+  cancelled: "orderStCancelled",
 };
-const PAY_MAP: Record<string, string> = {
-  contact: "联系销售",
-  bank: "对公转账",
-  offline: "线下转账",
-  wechat: "微信支付",
-  alipay: "支付宝",
+const PAY_KEY: Record<string, string> = {
+  contact: "payContact",
+  bank: "payBank",
+  offline: "payOffline",
+  wechat: "payWechat",
+  alipay: "payAlipay",
 };
-const PAY_STATUS_MAP: Record<string, string> = {
-  unpaid: "未支付",
-  paid: "已上传凭证（待财务确认）",
-  confirmed: "已确认到账",
+const PAY_STATUS_KEY: Record<string, string> = {
+  unpaid: "orderPayUnpaid",
+  paid: "orderPayPaid",
+  confirmed: "orderPayConfirmed",
 };
 // 物流商（顺丰 / 跨越 / 京东，与后台一致）
 const SHIPPING_LIST = [
@@ -31,13 +38,21 @@ const SHIPPING_LIST = [
   { code: "KY", name: "跨越速运", url: "https://www.ky-express.com/waybill" },
   { code: "JD", name: "京东物流", url: "https://www.jd.com/waybill" },
 ];
-const SHIPPING_STATUS_MAP: Record<string, string> = { not_shipped: "待发货", shipped: "已发货", delivered: "已送达" };
+const SHIPPING_STATUS_KEY: Record<string, string> = {
+  not_shipped: "orderShipNotShipped",
+  shipped: "orderShipShipped",
+  delivered: "orderShipDelivered",
+};
 const shippingName = (code?: string | null) => SHIPPING_LIST.find((s) => s.code === code)?.name || code || "";
 const shippingUrl = (code?: string | null) => SHIPPING_LIST.find((s) => s.code === code)?.url || "";
 
 export default function ShopOrderQueryPage() {
   const { orderNo } = useParams<{ orderNo: string }>();
   const { t, locale } = useI18n();
+  /** 「code → i18n key」查出来的 key 喂给 t()（显式收窄一次；查不到回退空串由调用方兜底） */
+  const tr = (key?: string): string => (key ? t(key as Parameters<typeof t>[0]) : "");
+  /** 标签后的分隔符：中日用全角「：」，其余语种用半角「: 」（与全站页脚同一口径） */
+  const sep = locale === "zh" || locale === "ja" ? "：" : ": ";
   const [order, setOrder] = useState<any>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(!!orderNo);
@@ -70,9 +85,9 @@ export default function ShopOrderQueryPage() {
       const r = await fetch(`/api/public/shop/orders?orderNo=${encodeURIComponent(no)}`);
       const d = await r.json();
       if (d.ok) setOrder(d.order);
-      else setError(d.error || "查询失败");
+      else setError(d.error || t("orderQueryFailed"));
     } catch {
-      setError("网络错误");
+      setError(t("shopNetErrorShort"));
     } finally {
       setLoading(false);
     }
@@ -90,13 +105,13 @@ export default function ShopOrderQueryPage() {
       const r = await fetch("/api/public/shop/orders/voucher", { method: "POST", body: fd });
       const d = await r.json();
       if (d.ok) {
-        setUploadMsg("凭证已上传，财务确认到账后订单将进入已确认状态");
+        setUploadMsg(t("orderUploadMsgOk"));
         setOrder((o: any) => ({ ...o, payVoucher: d.url, payStatus: "paid" }));
       } else {
-        setUploadMsg(d.error || "上传失败");
+        setUploadMsg(d.error || t("orderUploadFailed"));
       }
     } catch {
-      setUploadMsg("网络错误，上传失败");
+      setUploadMsg(t("orderUploadNetError"));
     } finally {
       setUploading(false);
     }
@@ -172,16 +187,16 @@ export default function ShopOrderQueryPage() {
                 onClick={() => window.print()}
                 className="flex items-center gap-2 rounded-lg border border-dark-200 bg-white px-4 py-2 text-sm font-medium text-dark-700 hover:bg-dark-50"
               >
-                <Printer className="h-4 w-4" /> 打印订单
+                <Printer className="h-4 w-4" /> {t("orderPrintBtn")}
               </button>
               <button
                 onClick={reorder}
                 className="flex items-center gap-2 rounded-lg border border-dark-200 bg-white px-4 py-2 text-sm font-medium text-dark-700 hover:bg-dark-50"
               >
-                <RotateCcw className="h-4 w-4" /> 再次订购
+                <RotateCcw className="h-4 w-4" /> {t("orderReorder")}
               </button>
               <Link href="/shop" className="flex items-center gap-2 rounded-lg border border-dark-200 bg-white px-4 py-2 text-sm font-medium text-dark-700 hover:bg-dark-50">
-                继续购物
+                {t("continueShopping")}
               </Link>
             </div>
 
@@ -194,29 +209,29 @@ export default function ShopOrderQueryPage() {
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="inline-block rounded-full px-3 py-1 text-sm font-medium text-white" style={{ background: "var(--color-primary, #CC0000)" }}>
-                    {STATUS_MAP[order.status] || order.status}
+                    {tr(STATUS_KEY[order.status]) || order.status}
                   </span>
                   {order.payMethod && (
                     <span className="inline-block rounded-full border border-dark-200 px-3 py-1 text-sm text-dark-600">
-                      {PAY_MAP[order.payMethod] || order.payMethod}
+                      {tr(PAY_KEY[order.payMethod]) || order.payMethod}
                     </span>
                   )}
                   {order.payStatus !== "confirmed" && (order.payMethod === "wechat" || order.payMethod === "alipay") && (
-                    <span className="text-xs text-dark-400">在线支付通道待开通，可联系销售或选择对公转账完成付款</span>
+                    <span className="text-xs text-dark-400">{t("orderOnlinePayPending")}</span>
                   )}
                 </div>
               </div>
 
               {/* 订单信息 */}
               <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-dark-600 sm:grid-cols-3">
-                <div><span className="text-dark-400">下单时间：</span>{new Date(order.createdAt).toLocaleString()}</div>
-                {order.poNo && <div><span className="text-dark-400">客户采购单号：</span><span className="font-medium">{order.poNo}</span></div>}
-                {order.invoiceTitle && <div><span className="text-dark-400">发票抬头：</span>{order.invoiceTitle}</div>}
-                {order.taxNo && <div><span className="text-dark-400">税号：</span>{order.taxNo}</div>}
-                <div className="col-span-2"><span className="text-dark-400">客户：</span>{order.name} · {order.phone} · {order.email}</div>
-                {order.company && <div className="col-span-2"><span className="text-dark-400">公司：</span>{order.company}</div>}
-                {order.address && <div className="col-span-2"><span className="text-dark-400">收货地址：</span>{order.address}</div>}
-                {order.remark && <div className="col-span-2"><span className="text-dark-400">备注：</span>{order.remark}</div>}
+                <div><span className="text-dark-400">{t("orderCreatedAt")}{sep}</span>{new Date(order.createdAt).toLocaleString()}</div>
+                {order.poNo && <div><span className="text-dark-400">{t("orderCustomerPoNo")}{sep}</span><span className="font-medium">{order.poNo}</span></div>}
+                {order.invoiceTitle && <div><span className="text-dark-400">{t("orderInvoiceLabel")}{sep}</span>{order.invoiceTitle}</div>}
+                {order.taxNo && <div><span className="text-dark-400">{t("orderTaxNoLabel")}{sep}</span>{order.taxNo}</div>}
+                <div className="col-span-2"><span className="text-dark-400">{t("orderCustomerLabel")}{sep}</span>{order.name} · {order.phone} · {order.email}</div>
+                {order.company && <div className="col-span-2"><span className="text-dark-400">{t("orderCompanyLabel")}{sep}</span>{order.company}</div>}
+                {order.address && <div className="col-span-2"><span className="text-dark-400">{t("orderShipToLabel")}{sep}</span>{order.address}</div>}
+                {order.remark && <div className="col-span-2"><span className="text-dark-400">{t("orderRemarkLabel")}{sep}</span>{order.remark}</div>}
               </div>
 
               {/* 商品明细 */}
@@ -224,11 +239,11 @@ export default function ShopOrderQueryPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-dark-100 text-left text-dark-400">
-                      <th className="py-2 pr-3 font-medium">商品</th>
-                      <th className="py-2 pr-3 font-medium">型号/规格</th>
-                      <th className="py-2 pr-3 text-right font-medium">单价</th>
-                      <th className="py-2 pr-3 text-right font-medium">数量</th>
-                      <th className="py-2 text-right font-medium">金额</th>
+                      <th className="py-2 pr-3 font-medium">{t("orderColProduct")}</th>
+                      <th className="py-2 pr-3 font-medium">{t("orderColSpec")}</th>
+                      <th className="py-2 pr-3 text-right font-medium">{t("orderColPrice")}</th>
+                      <th className="py-2 pr-3 text-right font-medium">{t("orderColQty")}</th>
+                      <th className="py-2 text-right font-medium">{t("orderColAmount")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -253,12 +268,12 @@ export default function ShopOrderQueryPage() {
                 </div>
                 {Number(order.discountAmount) > 0 && (
                   <div className="flex justify-between text-dark-400">
-                    <span>优惠{order.couponCode ? `（${order.couponCode}）` : ""}</span>
+                    <span>{t("shopDiscount")}{order.couponCode ? `（${order.couponCode}）` : ""}</span>
                     <span>-¥{Number(order.discountAmount).toLocaleString()}</span>
                   </div>
                 )}
                 <div className="flex justify-between border-t border-dashed border-dark-200 pt-2 text-base font-semibold">
-                  <span>实付（含税）</span>
+                  <span>{t("orderPayableTax")}</span>
                   <span style={{ color: "var(--color-primary, #CC0000)" }}>¥{payable.toLocaleString()}</span>
                 </div>
               </div>
@@ -268,21 +283,21 @@ export default function ShopOrderQueryPage() {
                 <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm">
                   <div className="flex items-center gap-2 font-medium text-dark-800">
                     <Building2 className="h-4 w-4" style={{ color: "var(--color-primary, #CC0000)" }} />
-                    对公转账信息（请按以下账户汇款并在下方上传凭证）
+                    {t("orderBankInfoTitle")}
                   </div>
                   {bankInfo ? (
                     <div className="mt-2 grid gap-1 text-dark-700 sm:grid-cols-2">
-                      <div>收款单位：{bankInfo.accountName || "-"}</div>
-                      <div>开户银行：{bankInfo.bankName || "-"}</div>
-                      <div>银行账号：<span className="font-mono">{bankInfo.accountNo || "-"}</span></div>
-                      <div>开户支行：{bankInfo.branch || "-"}</div>
-                      {bankInfo.remark && <div className="col-span-2 text-xs text-dark-500">备注：{bankInfo.remark}</div>}
+                      <div>{t("orderBankAccountName")}{sep}{bankInfo.accountName || "-"}</div>
+                      <div>{t("orderBankName")}{sep}{bankInfo.bankName || "-"}</div>
+                      <div>{t("orderBankAccountNo")}{sep}<span className="font-mono">{bankInfo.accountNo || "-"}</span></div>
+                      <div>{t("orderBankBranch")}{sep}{bankInfo.branch || "-"}</div>
+                      {bankInfo.remark && <div className="col-span-2 text-xs text-dark-500">{t("orderRemarkLabel")}{sep}{bankInfo.remark}</div>}
                       {bankInfo.instructions && (
                         <div className="col-span-2 text-xs text-dark-500">{bankInfo.instructions}</div>
                       )}
                     </div>
                   ) : (
-                    <div className="mt-2 text-dark-500">对公账户信息尚未配置，请联系销售获取账户信息。</div>
+                    <div className="mt-2 text-dark-500">{t("orderBankNotConfigured")}</div>
                   )}
                   {/*
                     收款码（owner 2026-10-14「商城需要增加收款管理设置」）：
@@ -298,7 +313,7 @@ export default function ShopOrderQueryPage() {
                             alt="微信收款码"
                             className="h-32 w-32 rounded-lg border border-amber-200 bg-white object-contain"
                           />
-                          <div className="mt-1 text-xs text-dark-500">微信收款码</div>
+                          <div className="mt-1 text-xs text-dark-500">{t("orderWechatQr")}</div>
                         </div>
                       )}
                       {bankInfo?.alipayQr && (
@@ -309,7 +324,7 @@ export default function ShopOrderQueryPage() {
                             alt="支付宝收款码"
                             className="h-32 w-32 rounded-lg border border-amber-200 bg-white object-contain"
                           />
-                          <div className="mt-1 text-xs text-dark-500">支付宝收款码</div>
+                          <div className="mt-1 text-xs text-dark-500">{t("orderAlipayQr")}</div>
                         </div>
                       )}
                     </div>
@@ -317,8 +332,8 @@ export default function ShopOrderQueryPage() {
                   <div className="mt-3">
                     {order.payVoucher ? (
                       <div className="flex items-center gap-2 text-green-600">
-                        <CheckCircle2 className="h-4 w-4" /> 凭证已上传
-                        <a href={order.payVoucher} target="_blank" className="underline">查看</a>
+                        <CheckCircle2 className="h-4 w-4" /> {t("orderVoucherUploaded")}
+                        <a href={order.payVoucher} target="_blank" className="underline">{t("orderView")}</a>
                       </div>
                     ) : (
                       <>
@@ -338,9 +353,9 @@ export default function ShopOrderQueryPage() {
                           className="flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-white disabled:opacity-60"
                           style={{ background: "var(--color-primary, #CC0000)" }}
                         >
-                          <Upload className="h-4 w-4" /> {uploading ? "上传中..." : "上传转账凭证"}
+                          <Upload className="h-4 w-4" /> {uploading ? t("orderUploading") : t("orderUploadVoucher")}
                         </button>
-                        <div className="mt-2 text-xs text-dark-400">支持 JPG/PNG/WebP/PDF，10MB 以内</div>
+                        <div className="mt-2 text-xs text-dark-400">{t("orderVoucherHint")}</div>
                       </>
                     )}
                     {uploadMsg && <div className="mt-2 text-xs text-dark-600">{uploadMsg}</div>}
@@ -353,7 +368,7 @@ export default function ShopOrderQueryPage() {
                 <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm">
                   <div className="flex items-center gap-2 font-medium text-dark-800">
                     <QrCode className="h-4 w-4" style={{ color: "var(--color-primary, #CC0000)" }} />
-                    {order.payMethod === "wechat" ? "微信收款码（请扫码付款）" : "支付宝收款码（请扫码付款）"}
+                    {(order.payMethod === "wechat" ? t("orderWechatQr") : t("orderAlipayQr")) + t("orderQrPayTitle")}
                   </div>
                   <div className="mt-3 flex flex-wrap items-start gap-5">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -363,8 +378,8 @@ export default function ShopOrderQueryPage() {
                       className="h-40 w-40 rounded-lg border border-amber-200 bg-white object-contain"
                     />
                     <div className="text-xs text-dark-500">
-                      <div>支付方式：{PAY_MAP[order.payMethod] || order.payMethod}</div>
-                      <div className="mt-1">应付金额：¥{payable.toLocaleString()}</div>
+                      <div>{t("orderPayMethod")}{sep}{tr(PAY_KEY[order.payMethod]) || order.payMethod}</div>
+                      <div className="mt-1">{t("orderPayAmount")}{sep}¥{payable.toLocaleString()}</div>
                       {bankInfo?.instructions && <div className="mt-1">{bankInfo.instructions}</div>}
                     </div>
                   </div>
@@ -375,8 +390,8 @@ export default function ShopOrderQueryPage() {
               {order.payStatus && order.payStatus !== "unpaid" && (
                 <div className="mt-3 flex items-center gap-2 text-sm">
                   <FileText className="h-4 w-4 text-dark-400" />
-                  <span className="text-dark-400">支付状态：</span>
-                  <span className="font-medium text-dark-700">{PAY_STATUS_MAP[order.payStatus] || order.payStatus}</span>
+                  <span className="text-dark-400">{t("orderPayStatusLabel")}{sep}</span>
+                  <span className="font-medium text-dark-700">{tr(PAY_STATUS_KEY[order.payStatus]) || order.payStatus}</span>
                 </div>
               )}
 
@@ -385,7 +400,7 @@ export default function ShopOrderQueryPage() {
                 <div className="mt-4 rounded-xl border border-dark-100 bg-gray-50 p-3 text-sm">
                   <div className="flex items-center gap-2 font-medium text-dark-700">
                     <Truck className="h-4 w-4" style={{ color: "var(--color-primary, #CC0000)" }} />
-                    物流信息
+                    {t("orderShippingInfo")}
                     <span
                       className="rounded-full px-2 py-0.5 text-xs"
                       style={{
@@ -393,14 +408,14 @@ export default function ShopOrderQueryPage() {
                         color: order.shippingStatus === "delivered" ? "#059669" : order.shippingStatus === "shipped" ? "#2563EB" : "#6B7280",
                       }}
                     >
-                      {SHIPPING_STATUS_MAP[order.shippingStatus || "not_shipped"]}
+                      {tr(SHIPPING_STATUS_KEY[order.shippingStatus || "not_shipped"])}
                     </span>
                   </div>
                   <div className="mt-1.5 space-y-1 text-dark-600">
-                    {order.shippingCompany && <div>承运：{shippingName(order.shippingCompany)}</div>}
+                    {order.shippingCompany && <div>{t("orderShipper")}{sep}{shippingName(order.shippingCompany)}</div>}
                     {order.trackingNo && (
                       <div className="flex items-center gap-1">
-                        物流单号：<span className="font-mono">{order.trackingNo}</span>
+                        {t("orderTrackingNo")}{sep}<span className="font-mono">{order.trackingNo}</span>
                         {shippingUrl(order.shippingCompany) && (
                           <a
                             href={shippingUrl(order.shippingCompany)}
@@ -409,13 +424,13 @@ export default function ShopOrderQueryPage() {
                             className="inline-flex items-center gap-0.5 text-xs"
                             style={{ color: "var(--color-primary, #CC0000)" }}
                           >
-                            查询物流 <ExternalLink className="h-3 w-3" />
+                            {t("orderQueryLogistics")} <ExternalLink className="h-3 w-3" />
                           </a>
                         )}
                       </div>
                     )}
-                    {order.shippedAt && <div className="text-xs text-dark-400">发货时间：{new Date(order.shippedAt).toLocaleString()}</div>}
-                    {order.deliveredAt && <div className="text-xs" style={{ color: "#059669" }}>送达时间：{new Date(order.deliveredAt).toLocaleString()}</div>}
+                    {order.shippedAt && <div className="text-xs text-dark-400">{t("orderShippedAt")}{sep}{new Date(order.shippedAt).toLocaleString()}</div>}
+                    {order.deliveredAt && <div className="text-xs" style={{ color: "#059669" }}>{t("orderDeliveredAt")}{sep}{new Date(order.deliveredAt).toLocaleString()}</div>}
                   </div>
                 </div>
               ) : null}
@@ -487,7 +502,7 @@ export default function ShopOrderQueryPage() {
             <div style={{ marginTop: 12, fontSize: 12, textAlign: "right" }}>
               {Number(order.discountAmount) > 0 && <div>优惠：-¥{Number(order.discountAmount).toLocaleString()}</div>}
               <div style={{ fontSize: 14, fontWeight: 700 }}>实付总额（含税）：¥{payable.toLocaleString()}</div>
-              <div style={{ marginTop: 4 }}>支付方式：{PAY_MAP[order.payMethod] || order.payMethod}</div>
+              <div style={{ marginTop: 4 }}>支付方式：{tr(PAY_KEY[order.payMethod]) || order.payMethod}</div>
             </div>
             <div style={{ marginTop: 32, display: "flex", justifyContent: "space-between", fontSize: 12 }}>
               <div>买方签字 / Buyer Signature：______________________</div>

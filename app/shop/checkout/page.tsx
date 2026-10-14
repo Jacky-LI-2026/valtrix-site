@@ -151,10 +151,10 @@ export default function ShopCheckoutPage() {
         window.dispatchEvent(new Event("shop-cart-updated"));
         setResult(d);
       } else {
-        setError(d.error || "提交失败");
+        setError(d.error || t("shopSubmitFailed"));
       }
     } catch {
-      setError("网络错误，请重试");
+      setError(t("shopNetError"));
     } finally {
       setSubmitting(false);
     }
@@ -189,11 +189,11 @@ export default function ShopCheckoutPage() {
             {Number(result.discountAmount) > 0 && (
               <>
                 <div className="flex justify-between py-1.5">
-                  <span className="text-dark-500">优惠券{result.couponCode ? `（${result.couponCode}）` : ""}</span>
+                  <span className="text-dark-500">{t("orderCoupon")}{result.couponCode ? `（${result.couponCode}）` : ""}</span>
                   <span className="font-medium text-dark-400">-¥{Number(result.discountAmount).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between py-1.5">
-                  <span className="font-medium text-dark-700">实付</span>
+                  <span className="font-medium text-dark-700">{t("shopPayable")}</span>
                   <span className="font-semibold" style={{ color: "var(--color-primary, #CC0000)" }}>¥{Number(result.payAmount).toLocaleString()}</span>
                 </div>
               </>
@@ -269,12 +269,12 @@ export default function ShopCheckoutPage() {
                 <input className={inputCls} placeholder={t("orderPoNoPlaceholder")} value={form.poNo} onChange={(e) => setField("poNo", e.target.value)} />
               </div>
               <div>
-                <label className={labelCls}>发票抬头</label>
-                <input className={inputCls} placeholder="公司全称，会员中心可预设" value={form.invoiceTitle} onChange={(e) => setField("invoiceTitle", e.target.value)} />
+                <label className={labelCls}>{t("shopInvoiceTitle")}</label>
+                <input className={inputCls} placeholder={t("shopInvoiceTitlePh")} value={form.invoiceTitle} onChange={(e) => setField("invoiceTitle", e.target.value)} />
               </div>
               <div>
-                <label className={labelCls}>税号</label>
-                <input className={inputCls} placeholder="纳税人识别号（选填）" value={form.taxNo} onChange={(e) => setField("taxNo", e.target.value)} />
+                <label className={labelCls}>{t("shopTaxNo")}</label>
+                <input className={inputCls} placeholder={t("shopTaxNoPh")} value={form.taxNo} onChange={(e) => setField("taxNo", e.target.value)} />
               </div>
               <div>
                 <label className={labelCls}>{t("orderAddress")}</label>

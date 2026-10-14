@@ -111,7 +111,7 @@ export default function ShopCartPage() {
 
   function chooseCoupon(c: AvailCoupon | null) {
     setSelCoupon(c);
-    setCouponTip(c ? "" : "已不使用优惠券");
+    setCouponTip(c ? "" : t("shopCouponRemoved"));
     if (c) localStorage.setItem("shop_coupon", JSON.stringify({ code: c.code, claimId: c.claimId, name: c.name, discount: c.discount }));
     else localStorage.removeItem("shop_coupon");
   }
@@ -133,12 +133,12 @@ export default function ShopCartPage() {
         setSelCoupon(c);
         setCodeInput("");
         localStorage.setItem("shop_coupon", JSON.stringify({ code: c.code, claimId: "", name: c.name, discount: c.discount }));
-        setCouponTip("券码已生效");
+        setCouponTip(t("shopCouponOk"));
       } else {
-        setCouponTip(d.error || "券码无效");
+        setCouponTip(d.error || t("shopCouponInvalid"));
       }
     } catch {
-      setCouponTip("网络错误，请重试");
+      setCouponTip(t("shopNetError"));
     } finally {
       setCodeBusy(false);
     }
@@ -213,10 +213,10 @@ export default function ShopCartPage() {
               <div className="mb-4 border-b border-dark-100 pb-4">
                 <div className="flex items-center gap-1.5 text-sm font-medium text-dark-700">
                   <TicketPercent className="h-4 w-4" style={{ color: "var(--color-primary, #CC0000)" }} />
-                  优惠券
+                  {t("orderCoupon")}
                   {selCoupon && (
                     <button onClick={() => chooseCoupon(null)} className="ml-auto text-xs text-dark-400 hover:text-red-500">
-                      不使用
+                      {t("shopCouponRemove")}
                     </button>
                   )}
                 </div>
@@ -226,7 +226,7 @@ export default function ShopCartPage() {
                     value={codeInput}
                     onChange={(e) => setCodeInput(e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Enter") applyCode(); }}
-                    placeholder="输入销售提供的优惠券码"
+                    placeholder={t("shopCouponCodePh")}
                     disabled={!!selCoupon}
                     className="min-w-0 flex-1 rounded-lg border border-dark-200 px-3 py-2 text-sm outline-none focus:border-dark-400 disabled:bg-dark-50"
                   />
@@ -236,12 +236,12 @@ export default function ShopCartPage() {
                     className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-40"
                     style={{ background: "var(--color-primary, #CC0000)" }}
                   >
-                    {codeBusy ? "校验中..." : "应用"}
+                    {codeBusy ? t("shopChecking") : t("shopApply")}
                   </button>
                 </div>
                 {!selCoupon && coupons.length > 0 && (
                   <>
-                    <p className="mt-3 text-xs text-dark-400">或选择已领取的优惠券：</p>
+                    <p className="mt-3 text-xs text-dark-400">{t("shopCouponPick")}</p>
                     <div className="mt-1 flex flex-col gap-2">
                       {coupons.map((c) => (
                         <button
@@ -273,11 +273,11 @@ export default function ShopCartPage() {
               {discount > 0 && (
                 <>
                   <div className="mt-1 flex items-center justify-between text-sm text-dark-400">
-                    <span>优惠</span>
+                    <span>{t("shopDiscount")}</span>
                     <span>-¥{discount.toLocaleString()}</span>
                   </div>
                   <div className="mt-1 flex items-center justify-between text-base font-semibold">
-                    <span className="text-dark-800">实付</span>
+                    <span className="text-dark-800">{t("shopPayable")}</span>
                     <span className="text-lg font-bold" style={{ color: "var(--color-primary, #CC0000)" }}>¥{payable.toLocaleString()}</span>
                   </div>
                 </>

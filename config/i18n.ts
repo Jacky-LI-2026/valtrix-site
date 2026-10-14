@@ -1,4 +1,9 @@
 // 国际化配置
+// 商城前台（购物车/结算/领券/查单）文案：一行一句六语种，见 config/i18n-shop.ts
+// 必须在每个语言对象里**展开**（而不是运行时合并），否则 `keyof typeof translations.zh`
+// 推断不到这些 key ⇒ 全站 t() 的拼写检查会整体失效。
+import { shopOf } from "./i18n-shop";
+
 export const locales = ["zh", "en", "ja", "ko", "fr", "ar"] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "en";
@@ -25,6 +30,7 @@ export const localeFlags: Record<Locale, string> = {
 // 通用翻译
 export const translations = {
   zh: {
+    ...shopOf("zh"),
     // === KITZ 洁净科技风模板（kitz-clean）新增键 · 由 scripts/_kitz_i18n_apply.js 自动生成，勿手改 ===
     kitzAboutIntro: "了解我们的公司、技术与团队",
     kitzAllSeries: "全部系列",
@@ -743,6 +749,7 @@ export const translations = {
     unilokLoadMore: "加载更多",
 },
   en: {
+    ...shopOf("en"),
     // === KITZ 洁净科技风模板（kitz-clean）新增键 · 由 scripts/_kitz_i18n_apply.js 自动生成，勿手改 ===
     kitzAboutIntro: "Learn about our company, technology and team",
     kitzAllSeries: "All series",
@@ -1457,6 +1464,7 @@ export const translations = {
     unilokLoadMore: "Load More",
 },
   ja: {
+    ...shopOf("ja"),
     // === KITZ 洁净科技风模板（kitz-clean）新增键 · 由 scripts/_kitz_i18n_apply.js 自动生成，勿手改 ===
     kitzAboutIntro: "会社・技術・チームについて",
     kitzAllSeries: "すべてのシリーズ",
@@ -2172,6 +2180,7 @@ export const translations = {
     unilokLoadMore: "さらに読み込む",
 },
   ko: {
+    ...shopOf("ko"),
     // === KITZ 洁净科技风模板（kitz-clean）新增键 · 由 scripts/_kitz_i18n_apply.js 自动生成，勿手改 ===
     kitzAboutIntro: "회사와 기술, 그리고 팀을 소개합니다",
     kitzAllSeries: "전체 시리즈",
@@ -2886,6 +2895,7 @@ export const translations = {
     unilokLoadMore: "더 보기",
 },
   fr: {
+    ...shopOf("fr"),
     // === KITZ 洁净科技风模板（kitz-clean）新增键 · 由 scripts/_kitz_i18n_apply.js 自动生成，勿手改 ===
     kitzAboutIntro: "Découvrez notre entreprise, nos technologies et nos équipes",
     kitzAllSeries: "Toutes les séries",
@@ -3601,6 +3611,7 @@ export const translations = {
     unilokLoadMore: "Charger plus",
 },
   ar: {
+    ...shopOf("ar"),
     // === KITZ 洁净科技风模板（kitz-clean）新增键 · 由 scripts/_kitz_i18n_apply.js 自动生成，勿手改 ===
     kitzAboutIntro: "تعرّف على شركتنا وتقنياتنا وفريق العمل",
     kitzAllSeries: "جميع السلاسل",
