@@ -58,7 +58,10 @@ export default function ShopDetailPage() {
   const comboText = hasSpecs
     ? specs.map((d, di) => {
         const o = d?.options?.[sel[di] ?? 0];
-        return (d?.name || "") + ":" + (o?.label || "");
+        // 规格名/选项名支持六语种（owner 2026-10-14）：按**访客语种**取，缺失回退中文。
+        // 中文访客得到的串与改造前逐字一致 ⇒ 老购物车里已存的 specText 仍能对上，
+        // 不会因为这次改动多出一条重复行。
+        return loc.get(d, "name") + ":" + loc.get(o, "label");
       }).join(" / ")
     : "";
 
@@ -192,9 +195,9 @@ export default function ShopDetailPage() {
               <div className="mt-5 space-y-4 rounded-xl border border-dark-100 bg-dark-50/40 p-4">
                 {specs.map((d, di) => (
                   <div key={di}>
-                    <div className="mb-1.5 text-xs font-medium text-dark-600">
-                      {d.nameEn ? d.name + " / " + d.nameEn : d.name}
-                    </div>
+                    {/* 规格维度名：按访客语种显示（六语种，缺失回退中文）——
+                        此前是「中文 / English」硬拼，日韩法阿访客看到的是一串中文 */}
+                    <div className="mb-1.5 text-xs font-medium text-dark-600">{loc.get(d, "name")}</div>
                     <div className="flex flex-wrap gap-2">
                       {Array.isArray(d.options) && d.options.map((o: any, oi: number) => {
                         const active = (sel[di] ?? 0) === oi;
@@ -211,8 +214,7 @@ export default function ShopDetailPage() {
                             }`}
                             style={active ? { color: "var(--color-primary, #CC0000)" } : {}}
                           >
-                            {o.label}
-                            {o.labelEn && o.labelEn !== o.label ? " / " + o.labelEn : ""}
+                            {loc.get(o, "label")}
                             {op > 0 ? " +¥" + op.toLocaleString() : ""}
                           </button>
                         );
