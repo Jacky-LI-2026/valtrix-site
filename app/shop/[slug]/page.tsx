@@ -8,6 +8,7 @@ import PageHero from "@/components/ui/PageHero";
 import { ShoppingBag, ImageOff, Minus, Plus, Download } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
+import { localizeUnit, formatDiscount } from "@/lib/units";
 import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { displayUnitPrice } from "@/lib/shop-price";
 import PriceDisplay, { usePricingContext } from "@/components/PriceDisplay";
@@ -161,7 +162,9 @@ export default function ShopDetailPage() {
                         {product.originalPrice ? (
                           <span className="mb-1 text-lg text-dark-300 line-through">¥{Number(product.originalPrice).toLocaleString()}</span>
                         ) : null}
-                        {product.unit ? <span className="mb-1 text-dark-400">/{product.unit}</span> : null}
+                        {product.unit ? (
+                          <span className="mb-1 text-dark-400">/{localizeUnit(product.unit, locale)}</span>
+                        ) : null}
                       </>
                     );
                   }
@@ -246,7 +249,8 @@ export default function ShopDetailPage() {
                           className={`rounded-full px-2.5 py-1 text-xs ${hit ? "bg-primary/10 font-semibold" : "bg-dark-100 text-dark-500"}`}
                           style={hit ? { color: "var(--color-primary, #CC0000)" } : {}}
                         >
-                          {Number(t.qty)}+ 件{isDiscount ? ` ${Number(t.price)}折 ¥${effective.toLocaleString()}` : ` ¥${effective.toLocaleString()}`}
+                          {Number(t.qty)}+ {localizeUnit(product.unit || "件", locale)}
+                          {isDiscount ? ` ${formatDiscount(Number(t.price), locale)}` : ""} ¥{effective.toLocaleString()}
                           {hit ? " ✓" : ""}
                         </span>
                       );
@@ -255,7 +259,7 @@ export default function ShopDetailPage() {
               </div>
             )}
             <div className="mt-2 text-sm text-dark-500">
-              {stockOk ? t("stockUnlimited") : t("stockOut")} · 起订量 {product.minOrder || 1}
+              {stockOk ? t("stockUnlimited") : t("stockOut")} · {t("minOrder")} {product.minOrder || 1}
             </div>
             {/* 数量 */}
             <div className="mt-6 flex items-center gap-3">

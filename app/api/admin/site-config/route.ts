@@ -100,6 +100,8 @@ export async function GET() {
         if (Array.isArray(info.addressesAr)) result.addressesAr = info.addressesAr
         if (Array.isArray(info.addressMaps)) result.addressMaps = info.addressMaps
         if (Array.isArray(info.socials)) result.socials = info.socials
+        // 多家联系方式（owner 2026-10-14）：phones[] 必须一并回传，否则后台表单读不到已存的多行号码
+        if (Array.isArray(info.phones)) result.phones = info.phones
         ;['amapKey', 'amapSecurityCode', 'amapLatitude', 'amapLongitude', 'amapZoom', 'amapMarkerTitle'].forEach((k) => {
           if (info[k] !== undefined && info[k] !== null && info[k] !== '') result[k] = info[k]
         })
@@ -198,7 +200,7 @@ export async function PUT(req: NextRequest) {
     // 支持字段：logo/phone/email/address/addresses/addressEn/addressesEn
     if (
       'logo' in body || 'phone' in body || 'email' in body ||
-      'address' in body || 'addresses' in body || 'addressEn' in body || 'addressesEn' in body || 'addressesJa' in body || 'addressesKo' in body || 'addressesFr' in body || 'addressesAr' in body || 'addressMaps' in body || 'socials' in body || 'siteDomain' in body || 'siteDomainRemark' in body || 'amapKey' in body || 'amapSecurityCode' in body || 'amapLatitude' in body || 'amapLongitude' in body || 'amapZoom' in body || 'amapMarkerTitle' in body || 'recruitEmails' in body
+      'address' in body || 'addresses' in body || 'addressEn' in body || 'addressesEn' in body || 'addressesJa' in body || 'addressesKo' in body || 'addressesFr' in body || 'addressesAr' in body || 'addressMaps' in body || 'socials' in body || 'phones' in body || 'siteDomain' in body || 'siteDomainRemark' in body || 'amapKey' in body || 'amapSecurityCode' in body || 'amapLatitude' in body || 'amapLongitude' in body || 'amapZoom' in body || 'amapMarkerTitle' in body || 'recruitEmails' in body
     ) {
       const contactConfig = await prisma.siteConfig.findUnique({
         where: { configKey: 'contact_info' },
@@ -223,6 +225,8 @@ export async function PUT(req: NextRequest) {
       if ('addressesAr' in body) contactInfo.addressesAr = body.addressesAr
       if ('addressMaps' in body) contactInfo.addressMaps = body.addressMaps
       if ('socials' in body) contactInfo.socials = body.socials
+      // 多家联系方式（数组）：phones[] 原样写回 contact_info
+      if ('phones' in body) contactInfo.phones = body.phones
       if ('siteDomain' in body) contactInfo.siteDomain = body.siteDomain
       if ('siteDomainRemark' in body) contactInfo.siteDomainRemark = body.siteDomainRemark
       if ('amapKey' in body) contactInfo.amapKey = body.amapKey

@@ -7,6 +7,7 @@ import Image from "next/image";
 import PageHero from "@/components/ui/PageHero";
 import { Minus, Plus, Trash2, ImageOff, TicketPercent } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { localizeUnit } from "@/lib/units";
 import { displayUnitPrice } from "@/lib/shop-price";
 
 interface CartItem {
@@ -188,7 +189,9 @@ export default function ShopCartPage() {
                       }
                       return <span className="text-dark-400">{t("priceNegotiable")}</span>;
                     })()}
-                    {it.unit ? <span className="ml-1 text-xs text-dark-400">/{it.unit}</span> : null}
+                    {it.unit ? (
+                      <span className="ml-1 text-xs text-dark-400">/{localizeUnit(it.unit, locale)}</span>
+                    ) : null}
                   </div>
                 </div>
                 <div className="flex items-center rounded-lg border border-dark-200">

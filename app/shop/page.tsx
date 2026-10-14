@@ -8,6 +8,7 @@ import { ShoppingBag, ImageOff, TicketPercent } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
 import { usePricingContext } from "@/components/PriceDisplay";
+import { localizeUnit } from "@/lib/units";
 
 interface ShopItem {
   id: string;
@@ -179,7 +180,9 @@ export default function ShopPage() {
                       {item.originalPrice ? (
                         <span className="ml-2 text-sm text-dark-300 line-through">¥{item.originalPrice.toLocaleString()}</span>
                       ) : null}
-                      {item.unit ? <span className="ml-1 text-xs text-dark-400">/{item.unit}</span> : null}
+                      {item.unit ? (
+                        <span className="ml-1 text-xs text-dark-400">/{localizeUnit(item.unit, locale)}</span>
+                      ) : null}
                     </div>
                     <button
                       onClick={(e) => addToCart(item, e)}

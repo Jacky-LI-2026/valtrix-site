@@ -179,7 +179,7 @@ export default function Footer() {
   };
 
   // 联系方式：DB contact_info 优先，兜底取部署级 env；两者皆空时不渲染该项（不留 tel:/mailto: 空链接）
-  const phone = String(contactData?.phone || getContactPhone()).trim();
+  // 注：单值 phone 的兜底逻辑已并入下方「多家联系方式」渲染块（phones[] 优先，回退 phone/env）
   const email = String(contactData?.email || getContactEmail()).trim();
 
   return (
@@ -195,12 +195,46 @@ export default function Footer() {
                 订阅表单是 max-w-md（448px），这里原来写死 max-w-xs（320px）⇒ 简介被挤成窄条 */}
             <p className="mt-4 max-w-md text-sm text-gray-600 leading-relaxed">{t("footerDesc")}</p>
             <div className="mt-6 space-y-3">
-              {phone && (
-                <a href={`tel:${phone.replace(/[^\d+]/g, "")}`} className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors">
-                  <Phone className="h-4 w-4 text-primary" />
-                  <bdi dir="ltr">{phone}</bdi>
-                </a>
-              )}
+              {/*
+                联系方式（owner 2026-10-14：「增加多行联系方式，并在左侧增加描述」）：
+                  · DB `contact_info.phones[]` 优先 ⇒ 每行「描述：号码」，描述按当前语种取、缺失回退中文；
+                  · 没有 phones 时回退旧的单值 phone / 部署级 env（行为与改造前一致）；
+                  · 全空则不渲染（不留 tel: 空链接）。
+              */}
+              {(() => {
+                const labelKey: Record<string, string> = { en: "labelEn", ja: "labelJa", ko: "labelKo", fr: "labelFr", ar: "labelAr" };
+                const sep = locale === "zh" || locale === "ja" ? "：" : ": ";
+                const raw = (contactData as any)?.phones;
+                let arr: any[] = [];
+                if (Array.isArray(raw)) arr = raw;
+                else if (typeof raw === "string") {
+                  try {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) arr = parsed;
+                  } catch { /* 忽略坏数据，走下面的单值回退 */ }
+                }
+                let rows = arr
+                  .map((p) => ({
+                    label: String((labelKey[locale] ? p?.[labelKey[locale]] : "") || p?.label || "").trim(),
+                    value: String(p?.value ?? "").trim(),
+                  }))
+                  .filter((p) => p.value);
+                if (rows.length === 0) {
+                  const single = String(contactData?.phone || getContactPhone()).trim();
+                  if (single) rows = [{ label: "", value: single }];
+                }
+                return rows.map((p, i) => (
+                  <a
+                    key={i}
+                    href={`tel:${p.value.replace(/[^\d+]/g, "")}`}
+                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors"
+                  >
+                    <Phone className="h-4 w-4 shrink-0 text-primary" />
+                    {p.label ? <span className="text-gray-500">{p.label}{sep}</span> : null}
+                    <bdi dir="ltr">{p.value}</bdi>
+                  </a>
+                ));
+              })()}
               {email && (
                 <a href={`mailto:${email}`} className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors">
                   <Mail className="h-4 w-4 text-primary" />

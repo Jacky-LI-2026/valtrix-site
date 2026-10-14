@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
 import { useProductTabs } from "@/lib/api/useProducts";
+import { localizeUnit } from "@/lib/units";
 import PageHero from "@/components/ui/PageHero";
 import {
   Minus,
@@ -300,18 +301,19 @@ export default function QuoteCartPage() {
                   const p = it.product;
                   const min = p.priceMin != null ? Number(p.priceMin) : null;
                   const max = p.priceMax != null ? Number(p.priceMax) : null;
-                  const unit = p.priceUnit || "元/台";
+                  // 单位本地化（英文/日文等语种不能出现「元/台」）
+                  const unit = localizeUnit(p.priceUnit || "元/台", locale);
                   let priceText = t("priceOnRequest");
                   if (min && max && min > 0 && max > 0) {
                     priceText = `¥${min.toLocaleString()} - ¥${max.toLocaleString()} ${unit}`;
                   } else if (min && min > 0) {
-                    priceText = `¥${min.toLocaleString()} ${unit} 起`;
+                    priceText = `¥${min.toLocaleString()} ${unit} ${t("priceFromSuffix")}`;
                   }
                   let subtotal = "—";
                   if (min && max && min > 0 && max > 0) {
                     subtotal = `¥${(min * it.qty).toLocaleString()} - ¥${(max * it.qty).toLocaleString()}`;
                   } else if (min && min > 0) {
-                    subtotal = `¥${(min * it.qty).toLocaleString()} 起`;
+                    subtotal = `¥${(min * it.qty).toLocaleString()} ${t("priceFromSuffix")}`;
                   }
                   const img =
                     getImgStr(p.image) ||

@@ -14,6 +14,7 @@ import { findManualSeries } from "@/lib/manual-codes";
 import { MANUAL_SPECS } from "@/lib/manual-specs";
 import { addToQuoteCart } from "@/lib/quote-cart";
 import { groupSpecs } from "@/lib/spec-grouping";
+import { localizeUnit } from "@/lib/units";
 import { useProductBySlug } from "@/lib/api/useProducts";
 import ThreeSixtyViewer from "@/components/ui/ThreeSixtyViewer";
 import DownloadGateButton from "@/components/ui/DownloadGateButton";
@@ -257,12 +258,13 @@ export default function ProductDetailClient() {
     if (!model) return "";
     const min = model.priceMin !== null && model.priceMin !== undefined ? Number(model.priceMin) : null;
     const max = model.priceMax !== null && model.priceMax !== undefined ? Number(model.priceMax) : null;
-    const unit = model.priceUnit || "元/台";
+    // 单位本地化（owner 2026-10-14：英文站不能出现「元/台」「件」）；复合单位会逐段映射并去掉货币字
+    const unit = localizeUnit(model.priceUnit || "元/台", locale);
     if (min && max && min > 0 && max > 0) {
       return `${t("referencePrice")}: ¥${min.toLocaleString()} - ¥${max.toLocaleString()} ${unit}`;
     }
     if (min && min > 0) {
-      return `${t("referencePrice")}: ¥${min.toLocaleString()} ${unit} 起`;
+      return `${t("referencePrice")}: ¥${min.toLocaleString()} ${unit} ${t("priceFromSuffix")}`;
     }
     return "";
   })();

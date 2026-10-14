@@ -115,9 +115,36 @@ export default function ContactDefaultClient() {
   const fallbackPhone = getContactPhone();
   const fallbackEmail = getContactEmail();
 
+  /**
+   * 多家联系方式（owner 2026-10-14）：
+   *   `contact_info.phones[]` 优先 ⇒ 每行「描述：号码」，描述按当前语种取、缺语种回退中文；
+   *   没有 phones 时回退旧的单值 phone / 部署级 env；全空则该条目不渲染。
+   */
+  const phoneRowsOf = (data: any): { label: string; value: string }[] => {
+    const labelKey: Record<string, string> = { en: "labelEn", ja: "labelJa", ko: "labelKo", fr: "labelFr", ar: "labelAr" };
+    const raw = data?.phones;
+    let arr: any[] = [];
+    if (Array.isArray(raw)) arr = raw;
+    else if (typeof raw === "string") {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) arr = parsed;
+      } catch { /* 忽略坏数据 */ }
+    }
+    const rows = arr
+      .map((p) => ({
+        label: String((labelKey[locale] ? p?.[labelKey[locale]] : "") || p?.label || "").trim(),
+        value: String(p?.value ?? "").trim(),
+      }))
+      .filter((p) => p.value);
+    if (rows.length > 0) return rows;
+    const single = String(data?.phone || fallbackPhone).trim();
+    return single ? [{ label: "", value: single }] : [];
+  };
+
   // 默认联系信息（回退）
   const defaultContactInfo = [
-    ...(fallbackPhone ? [{ icon: Phone, label: t("phone"), value: fallbackPhone, sub: "" }] : []),
+    ...phoneRowsOf(null).map((p) => ({ icon: Phone, label: p.label || t("phone"), value: p.value, sub: "" })),
     ...(fallbackEmail ? [{ icon: Mail, label: t("email"), value: fallbackEmail, sub: "" }] : []),
     { icon: MapPin, label: t("address"), value: t("address"), sub: "" },
     { icon: Clock, label: t("businessHours"), value: t("businessHours"), sub: "" },
@@ -160,7 +187,12 @@ export default function ContactDefaultClient() {
 
   // 从API数据构建联系信息数组（地址展开为多项）
   const contactInfo = contactData ? [
-    ...(displayPhone ? [{ icon: Phone, label: t("phone"), value: displayPhone, sub: loc.get(contactData, "workTime") || (t("phone")) }] : []),
+    ...phoneRowsOf(contactData).map((p, i) => ({
+      icon: Phone,
+      label: p.label || t("phone"),
+      value: p.value,
+      sub: i === 0 ? (loc.get(contactData, "workTime") || t("phone")) : (p.label || ""),
+    })),
     ...(displayEmail ? [{ icon: Mail, label: t("email"), value: displayEmail, sub: loc.get(contactData, "replyTime") || (t("email")) }] : []),
     ...addressList.map((addr, i) => ({
       icon: MapPin,

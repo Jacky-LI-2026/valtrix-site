@@ -4,12 +4,28 @@ import { useState, useEffect } from "react";
 import { Save, Globe, Phone, Mail, MapPin, FileText, Link2, Plus, Trash2 } from "lucide-react";
 import UrlUploadInput from "@/components/admin/UrlUploadInput";
 
+/**
+ * 单条联系方式（owner 2026-10-14：「增加多行联系方式，并在左侧增加描述」）
+ * label = 描述（设备业务 / 材料业务 / 商务合作…），支持 6 语种；value = 号码，**原样保留格式**（含空格/连字符/+86）。
+ * 存进 `site_config.contact_info.phones`；数组为空时前台回退到旧的单值 `phone`。
+ */
+interface PhoneEntry {
+  label: string;
+  labelEn: string;
+  labelJa: string;
+  labelKo: string;
+  labelFr: string;
+  labelAr: string;
+  value: string;
+}
+
 export default function SiteConfigPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [translatingAddr, setTranslatingAddr] = useState<number | null>(null);
   const [translatingSocial, setTranslatingSocial] = useState<number | null>(null);
+  const [translatingPhone, setTranslatingPhone] = useState<number | null>(null);
   const [amapPreview, setAmapPreview] = useState(false);
   const [form, setForm] = useState({
     siteName: "",
@@ -18,6 +34,7 @@ export default function SiteConfigPage() {
     siteKeywords: "",
     logo: "",
     phone: "",
+    phones: [] as PhoneEntry[],
     email: "",
     address: "",
     addresses: [] as string[],
@@ -96,6 +113,29 @@ export default function SiteConfigPage() {
         const addrKoList = addressesKo.length > 0 ? addressesKo : []
         const addrFrList = addressesFr.length > 0 ? addressesFr : []
         const addrArList = addressesAr.length > 0 ? addressesAr : []
+        // 多家联系方式：优先 phones[]，老数据回退单值 phone（与地址的多行回退同一口径）
+        let rawPhones: any[] = []
+        try {
+          rawPhones = Array.isArray(data.phones)
+            ? data.phones
+            : typeof data.phones === 'string'
+              ? JSON.parse(data.phones)
+              : []
+          if (!Array.isArray(rawPhones)) rawPhones = []
+        } catch { rawPhones = [] }
+        const phoneRows: PhoneEntry[] = rawPhones.length > 0
+          ? rawPhones
+              .map((p: any) => ({
+                label: String(p?.label || ''),
+                labelEn: String(p?.labelEn || ''),
+                labelJa: String(p?.labelJa || ''),
+                labelKo: String(p?.labelKo || ''),
+                labelFr: String(p?.labelFr || ''),
+                labelAr: String(p?.labelAr || ''),
+                value: String(p?.value ?? p?.phone ?? '').trim(),
+              }))
+              .filter((p: PhoneEntry) => p.value)
+          : (data.phone ? [{ label: '', labelEn: '', labelJa: '', labelKo: '', labelFr: '', labelAr: '', value: String(data.phone) }] : [])
         let rawMaps: any[] = Array.isArray(data.addressMaps) ? data.addressMaps : []
         if (typeof data.addressMaps === 'string') {
           try { rawMaps = JSON.parse(data.addressMaps) } catch (e) { rawMaps = [] }
@@ -114,6 +154,7 @@ export default function SiteConfigPage() {
           siteKeywords: data.siteKeywords || "",
           logo: data.logo || "",
           phone: data.phone || "",
+          phones: phoneRows,
           email: data.email || "",
           address: addrList[0] || "",
           addresses: addrList,
@@ -179,6 +220,61 @@ export default function SiteConfigPage() {
       addressesAr: prev.addressesAr.filter((_, i) => i !== index),
       addressMaps: prev.addressMaps.filter((_, i) => i !== index),
     }))
+  }
+
+  /**
+   * 多家联系方式（owner 2026-10-14）：增删改 + 「描述」一键翻译
+   * 描述语种缺失时前台回退中文描述；一条都没有时前台回退单值 phone —— 与地址同一套回退口径。
+   */
+  const updatePhone = (index: number, field: keyof PhoneEntry, value: string) => {
+    setForm((prev) => {
+      const list = [...prev.phones]
+      list[index] = { ...list[index], [field]: value }
+      return { ...prev, phones: list }
+    })
+  }
+  const addPhone = () => {
+    setForm((prev) => ({
+      ...prev,
+      phones: [...prev.phones, { label: "", labelEn: "", labelJa: "", labelKo: "", labelFr: "", labelAr: "", value: "" }],
+    }))
+  }
+  const removePhone = (index: number) => {
+    setForm((prev) => ({ ...prev, phones: prev.phones.filter((_, i) => i !== index) }))
+  }
+  /** 一键翻译「描述」（中文 → en/ja/ko/fr/ar）——号码本身不翻译 */
+  const translatePhoneLabel = async (index: number) => {
+    const zhText = (form.phones[index]?.label || "").trim()
+    if (!zhText) {
+      setMessage("请先填写该条联系方式的中文描述（如：设备业务）")
+      return
+    }
+    setTranslatingPhone(index)
+    setMessage("正在翻译联系方式描述...")
+    try {
+      const targets: { field: keyof PhoneEntry; lang: string }[] = [
+        { field: "labelEn", lang: "en" },
+        { field: "labelJa", lang: "ja" },
+        { field: "labelKo", lang: "ko" },
+        { field: "labelFr", lang: "fr" },
+        { field: "labelAr", lang: "ar" },
+      ]
+      for (const t of targets) {
+        const res = await fetch("/api/admin/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: zhText, from: "zh", targetLang: t.lang }),
+        })
+        const data = await res.json()
+        if (data.translatedText) updatePhone(index, t.field, data.translatedText)
+        await new Promise((r) => setTimeout(r, 300))
+      }
+      setMessage("联系方式描述翻译完成")
+    } catch {
+      setMessage("翻译失败，请重试")
+    } finally {
+      setTranslatingPhone(null)
+    }
   }
 
   // 一键翻译地址（中文 -> 其他5语种）
@@ -379,8 +475,22 @@ export default function SiteConfigPage() {
       const addressesKo = form.addressesKo.map((a) => a.trim())
       const addressesFr = form.addressesFr.map((a) => a.trim())
       const addressesAr = form.addressesAr.map((a) => a.trim())
+      // 多家联系方式：去掉空号码；主号码写回单值 phone（老消费方仍然可用）
+      const phones = form.phones
+        .map((p) => ({
+          label: p.label.trim(),
+          labelEn: p.labelEn.trim(),
+          labelJa: p.labelJa.trim(),
+          labelKo: p.labelKo.trim(),
+          labelFr: p.labelFr.trim(),
+          labelAr: p.labelAr.trim(),
+          value: p.value.trim(),
+        }))
+        .filter((p) => p.value)
       const payload = {
         ...form,
+        phones,
+        phone: phones[0]?.value || "",
         addresses,
         addressesEn,
         addressesJa,
@@ -545,12 +655,74 @@ export default function SiteConfigPage() {
             联系方式
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+            <div className="md:col-span-2">
+              {/*
+                多家联系方式（owner 2026-10-14：「这里可以增加多行联系方式，并可以在联系方式左侧增加描述」）
+                每行 = 描述（可多语种，带一键翻译）+ 号码；保存后写入 contact_info.phones，
+                前台页脚/联系页按「描述：号码」多行展示；老数据（单值 phone）自动回填为第一行。
+              */}
               <label className="block text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
-                <Phone size={12} /> 联系电话
+                <Phone size={12} /> 联系方式（支持多个，第一行为主号码；左侧为描述，如：设备业务）
               </label>
-              <input type="text" value={form.phone} onChange={(e) => handleChange("phone", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none" />
+              <div className="space-y-2">
+                {form.phones.map((p, index) => (
+                  <div key={index} className="border border-gray-200 rounded-md p-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={p.label}
+                        onChange={(e) => updatePhone(index, "label", e.target.value)}
+                        placeholder="描述（中文，如：设备业务 / 材料业务 / 商务合作）"
+                        className="text-xs font-medium text-gray-700 border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none w-56"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => translatePhoneLabel(index)}
+                        disabled={translatingPhone === index}
+                        className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 disabled:text-gray-400 disabled:cursor-not-allowed font-medium"
+                        title="将中文描述一键翻译为其他语种"
+                      >
+                        <Globe size={12} />
+                        {translatingPhone === index ? "翻译中..." : "一键翻译"}
+                      </button>
+                      <input
+                        type="text"
+                        value={p.value}
+                        onChange={(e) => updatePhone(index, "value", e.target.value)}
+                        placeholder="号码（如：17722813298 / 010-67865785）"
+                        className="flex-1 min-w-0 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removePhone(index)}
+                        className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                        title="删除该联系方式"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                      <input type="text" value={p.labelEn} onChange={(e) => updatePhone(index, "labelEn", e.target.value)} placeholder="描述（英文）"
+                        className="px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none" />
+                      <input type="text" value={p.labelJa} onChange={(e) => updatePhone(index, "labelJa", e.target.value)} placeholder="描述（日文）"
+                        className="px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none" />
+                      <input type="text" value={p.labelKo} onChange={(e) => updatePhone(index, "labelKo", e.target.value)} placeholder="描述（韩文）"
+                        className="px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none" />
+                      <input type="text" value={p.labelFr} onChange={(e) => updatePhone(index, "labelFr", e.target.value)} placeholder="描述（法文）"
+                        className="px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none" />
+                      <input type="text" value={p.labelAr} onChange={(e) => updatePhone(index, "labelAr", e.target.value)} placeholder="描述（阿拉伯文）"
+                        className="px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none" />
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addPhone}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:text-red-700"
+                >
+                  <Plus size={12} /> 添加联系方式
+                </button>
+              </div>
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
