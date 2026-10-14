@@ -96,3 +96,23 @@ export function formatDiscount(tenths: number, locale: string | null | undefined
   const percentOff = Math.round((10 - n) * 10);
   return `${percentOff}% off`;
 }
+
+/**
+ * 折扣文案（**百分比制**）—— 商城「阶梯价」用的就是这一套。
+ * ==========================================================================
+ * owner 2026-10-14：「（阶梯价）前台显示多语言」。
+ *
+ * 为什么不能直接用上面的 `formatDiscount`：那个是**十折制**（`9` = 9 折，`>= 10` 视为无折扣
+ * 直接返回空串），而商城阶梯价后台提示写的是「填 95=95折」= **百分比制**（`95` 表示按 95% 计价）。
+ * 把 95 喂给 `formatDiscount` 会命中"≥10 无折扣"分支 ⇒ **折扣文案恒为空**
+ * （价格算得没错，只是那句说明永远不显示）。
+ *
+ * 口径与中文习惯保持一致：zh → `95折`；其余语种 → `5% off`（语义等价，不出现中文"折"）。
+ * 传 ≥100 或 ≤0 视为无折扣，返回空串（调用方据此不渲染）。
+ */
+export function formatPercentOff(percent: number, locale: string | null | undefined): string {
+  const n = Number(percent);
+  if (!Number.isFinite(n) || n <= 0 || n >= 100) return "";
+  if (String(locale || "zh") === "zh") return `${n}折`;
+  return `${Math.round(100 - n)}% off`;
+}

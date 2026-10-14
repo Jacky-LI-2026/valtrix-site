@@ -8,7 +8,7 @@ import PageHero from "@/components/ui/PageHero";
 import { ShoppingBag, ImageOff, Minus, Plus, Download } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { createLocalizedGetter } from "@/lib/localized";
-import { localizeUnit, formatDiscount } from "@/lib/units";
+import { localizeUnit, formatPercentOff } from "@/lib/units";
 import { preserveLeadingSpaces } from "@/lib/rich-text";
 import { displayUnitPrice } from "@/lib/shop-price";
 import PriceDisplay, { usePricingContext } from "@/components/PriceDisplay";
@@ -226,7 +226,10 @@ export default function ShopDetailPage() {
                   <div className="border-t border-dark-100 pt-2 text-sm text-dark-500">
                     {t("selectedModel") || "当前组合"}: <span className="font-medium text-dark-700">{comboText || "—"}</span>
                     {product.price != null && Number(product.price) > 0 && comboPrice !== Number(product.price) && (
-                      <span className="ml-2 text-xs text-dark-400">基础 ¥{Number(product.price).toLocaleString()} + 规格差价</span>
+                      /* 此前是硬编码中文「基础 … + 规格差价」，英文/日文页会直接漏中文 */
+                      <span className="ml-2 text-xs text-dark-400">
+                        {t("shopSpecBase")} ¥{Number(product.price).toLocaleString()} + {t("shopSpecDiff")}
+                      </span>
                     )}
                   </div>
                 )}
@@ -252,7 +255,9 @@ export default function ShopDetailPage() {
                           style={hit ? { color: "var(--color-primary, #CC0000)" } : {}}
                         >
                           {Number(t.qty)}+ {localizeUnit(product.unit || "件", locale)}
-                          {isDiscount ? ` ${formatDiscount(Number(t.price), locale)}` : ""} ¥{effective.toLocaleString()}
+                          {/* 阶梯价按**百分比制**显示折扣（95 → 中文「95折」/ 其余「5% off」）；
+                              此前误用十折制的 formatDiscount，≥10 被判为"无折扣"⇒ 文案恒为空 */}
+                          {isDiscount ? ` ${formatPercentOff(Number(t.price), locale)}` : ""} ¥{effective.toLocaleString()}
                           {hit ? " ✓" : ""}
                         </span>
                       );
@@ -305,13 +310,13 @@ export default function ShopDetailPage() {
             {/* 模型及图纸下载 */}
             {Array.isArray(product.modelFiles) && product.modelFiles.length > 0 && (
               <div className="mt-6 border-t border-dark-100 pt-6">
-                <h3 className="mb-3 text-base font-semibold text-dark-800">模型及图纸下载</h3>
+                <h3 className="mb-3 text-base font-semibold text-dark-800">{t("shopModelDownloads")}</h3>
                 <div className="grid gap-2 sm:grid-cols-2">
                   {product.modelFiles.filter((f: any) => f && f.url).map((f: any, fi: number) => (
                     <a key={fi} href={f.url} target="_blank" rel="noreferrer"
                       className="flex items-center gap-3 rounded-xl border border-dark-100 p-3 text-sm text-dark-700 transition-colors hover:border-primary hover:text-primary">
                       <Download className="h-4 w-4 shrink-0" />
-                      <span className="min-w-0 flex-1 truncate">{f.name || "下载文件"}</span>
+                      <span className="min-w-0 flex-1 truncate">{f.name || t("shopDownloadFile")}</span>
                     </a>
                   ))}
                 </div>
