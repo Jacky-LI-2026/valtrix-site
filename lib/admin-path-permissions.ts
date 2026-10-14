@@ -66,6 +66,10 @@ export const PATH_PERMISSION: [string, string][] = [
   ['/admin/content/services', 'service:view'],
   ['/admin/content/industries', 'industry:view'],
   ['/admin/shop/stats', 'analytics:view'],
+  // 商城设置（2026-10-14 owner 要求收款管理独立成页）：页面只装收款配置，
+  // 保存走 /api/admin/site-config（已收口为 config:site）⇒ **页面与接口同码**，
+  // 不出现"能进页面、点了保存 403"的空壳页。
+  ['/admin/shop/settings', 'config:site'],
   ['/admin/content-types', 'config:site'],
   ['/admin/quotes/template', 'config:site'],
   ['/admin/settings/oem', 'config:site'],

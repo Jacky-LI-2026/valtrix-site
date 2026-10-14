@@ -737,6 +737,10 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
       { label: "订单管理", href: "/admin/shop/orders" },
       { label: "销售统计", href: "/admin/shop/stats" },
       { label: "优惠券管理", href: "/admin/shop/coupons" },
+      // 2026-10-14 owner：「收款管理不要放在商品管理内，单独一页或放在商城设置内」
+      //   ⇒ 收款管理迁到独立页 /admin/shop/settings（页面权限 = config:site，
+      //     与"保存收款设置"所需的接口权限同码，不再出现"能进页面、保存 403"）。
+      { label: "商城设置", href: "/admin/shop/settings" },
     ],
   },
   {
