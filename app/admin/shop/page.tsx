@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Plus, Pencil, Trash2, X, Sparkles } from "lucide-react";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import SpecEditor from "@/components/admin/SpecEditor";
+import UrlUploadInput from "@/components/admin/UrlUploadInput";
+import MultiLangFieldV2 from "@/components/admin/MultiLangFieldV2";
+import SeoGeoConfig from "@/components/admin/SeoGeoConfig";
 
 interface ShopItem {
   id: string;
@@ -54,6 +57,11 @@ const emptyForm = () => ({
   status: "published",
   featured: false,
   sortOrder: "0",
+  // SEO / GEO（owner 2026-10-14「商品页同时也要增加 SEO 和 GEO 功能」）
+  seoTitle: "", seoTitleEn: "",
+  seoDescription: "", seoDescriptionEn: "",
+  seoKeywords: "", seoKeywordsEn: "",
+  geoRegion: "", geoCity: "",
 });
 
 export default function AdminShopPage() {
@@ -122,9 +130,10 @@ export default function AdminShopPage() {
       name: it.name || "",
       nameEn: it.nameEn || "", nameJa: it.nameJa || "", nameKo: it.nameKo || "", nameFr: it.nameFr || "", nameAr: it.nameAr || "",
       summary: it.summary || "",
-      summaryEn: "", summaryJa: "", summaryKo: "", summaryFr: "", summaryAr: "",
-      description: "",
-      descriptionEn: "", descriptionJa: "", descriptionKo: "", descriptionFr: "", descriptionAr: "",
+      // 🔴 2026-10-14 修：此前只回填中文，摘要/详情的其它语种**读不到** ⇒ 一保存就把已翻译的语种清空（真数据丢失）
+      summaryEn: (it as any).summaryEn || "", summaryJa: (it as any).summaryJa || "", summaryKo: (it as any).summaryKo || "", summaryFr: (it as any).summaryFr || "", summaryAr: (it as any).summaryAr || "",
+      description: (it as any).description || "",
+      descriptionEn: (it as any).descriptionEn || "", descriptionJa: (it as any).descriptionJa || "", descriptionKo: (it as any).descriptionKo || "", descriptionFr: (it as any).descriptionFr || "", descriptionAr: (it as any).descriptionAr || "",
       coverImage: it.coverImage || "",
       images: Array.isArray((it as any).images) ? (it as any).images.map((x: any) => (typeof x === "string" ? x : x?.url || "")).join("\n") : "",
       categoryId: (it as any).categoryId ? String((it as any).categoryId) : "",
@@ -140,11 +149,62 @@ export default function AdminShopPage() {
       status: it.status,
       featured: it.featured,
       sortOrder: String(it.sortOrder ?? 0),
+      // SEO / GEO
+      seoTitle: (it as any).seoTitle || "", seoTitleEn: (it as any).seoTitleEn || "",
+      seoDescription: (it as any).seoDescription || "", seoDescriptionEn: (it as any).seoDescriptionEn || "",
+      seoKeywords: (it as any).seoKeywords || "", seoKeywordsEn: (it as any).seoKeywordsEn || "",
+      geoRegion: (it as any).geoRegion || "", geoCity: (it as any).geoCity || "",
     });
     setShowModal(true);
   }
 
   const setF = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }));
+
+  /* ---------- 多语言 / 图集上传（owner 2026-10-14：商品封面与多图支持上传；多语言用产品管理同款卡片） ---------- */
+  /** 语种 → 字段后缀：zh 无后缀，其余首字母大写（与 G4 字段命名口径一致） */
+  const suffixOf = (lang: string) => (lang === "zh" ? "" : lang.charAt(0).toUpperCase() + lang.slice(1));
+  /** 取某字段的六语种值对象，喂给 MultiLangFieldV2 */
+  const langValuesOf = (base: string) =>
+    Object.fromEntries(LANGS.map((l) => [l.code, String((form as any)[base + suffixOf(l.code)] ?? "")]));
+  /** 单条翻译（MultiLangFieldV2 的「翻译」按钮调用，复用后台统一翻译接口） */
+  const translateOne = async (zhValue: string, targetLang: string) => {
+    const r = await fetch("/api/admin/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: zhValue, from: "zh", targetLang }),
+    });
+    const d = await r.json().catch(() => ({}));
+    return d?.translatedText || "";
+  };
+  /** 图集上传（可多选）→ 追加到 images（换行分隔的 URL；后端保存时转成 [{url}]） */
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const uploadGallery = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setGalleryUploading(true);
+    try {
+      const urls: string[] = [];
+      for (const file of Array.from(files)) {
+        const fd = new FormData();
+        fd.append("file", file);
+        const r = await fetch("/api/admin/upload", { method: "POST", body: fd });
+        const d = await r.json().catch(() => ({}));
+        if (r.ok && d?.success && d.url) urls.push(String(d.url));
+        else alert(d?.error || `上传失败：${file.name}`);
+      }
+      if (urls.length) {
+        const cur = String(form.images || "").split("\n").map((s: string) => s.trim()).filter(Boolean);
+        setF("images", [...cur, ...urls].join("\n"));
+      }
+    } finally {
+      setGalleryUploading(false);
+      if (galleryInputRef.current) galleryInputRef.current.value = "";
+    }
+  };
+  const removeGalleryImage = (idx: number) => {
+    const cur = String(form.images || "").split("\n").map((s: string) => s.trim()).filter(Boolean);
+    setF("images", cur.filter((_, i) => i !== idx).join("\n"));
+  };
 
   async function save() {
     const url = editing ? `/api/admin/shop/products/${editing.id}` : "/api/admin/shop/products";
@@ -346,11 +406,14 @@ export default function AdminShopPage() {
                   <input className={inputCls} value={form.minOrder} onChange={(e) => setF("minOrder", e.target.value)} />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">封面图 URL（可留空）</label>
-                <input className={inputCls} value={form.coverImage} onChange={(e) => setF("coverImage", e.target.value)} />
-                {form.coverImage && <img src={form.coverImage} alt="" className="mt-2 h-20 w-28 rounded-lg object-cover" />}
-              </div>
+              {/* 封面图：支持**上传**（owner 2026-10-14「商品封面和多图需要增加上传功能」）—— 下拉选文件即传，也可继续手填 URL */}
+              <UrlUploadInput
+                label="封面图（可上传，也可填 URL）"
+                value={form.coverImage}
+                onChange={(url) => setF("coverImage", url)}
+                accept="image/*"
+                showPreview
+              />
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">商城分类</label>
@@ -422,12 +485,44 @@ export default function AdminShopPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">多图 URL（每行一张，选填；前台详情页画廊展示）</label>
-                <textarea rows={3} className={inputCls} value={form.images || ""} onChange={(e) => setF("images", e.target.value)} placeholder={"https://...\nhttps://..."} />
+                {/* 多图：支持**批量上传**（可多选）；仍保留 URL 文本框（每行一张），上传结果追加到列表 */}
+                <label className="block text-sm font-medium text-gray-700">多图（可批量上传；前台详情页画廊展示）</label>
+                <div className="mb-2 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => galleryInputRef.current?.click()}
+                    disabled={galleryUploading}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-700 transition-colors hover:border-gray-400 disabled:opacity-50"
+                  >
+                    {galleryUploading ? "上传中…" : "上传图片（可多选）"}
+                  </button>
+                  <span className="text-[11px] text-gray-400">
+                    已选 {String(form.images || "").split("\n").map((s: string) => s.trim()).filter(Boolean).length} 张
+                  </span>
+                </div>
+                <input
+                  ref={galleryInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => uploadGallery(e.target.files)}
+                />
+                <textarea rows={3} className={inputCls} value={form.images || ""} onChange={(e) => setF("images", e.target.value)} placeholder={"上传后自动写入；也可手填 URL，每行一张"} />
                 {form.images && (
                   <div className="mt-2 flex flex-wrap gap-2">
                     {String(form.images).split("\n").filter(Boolean).map((u: string, i: number) => (
-                      <img key={i} src={u.trim()} alt="" className="h-16 w-20 rounded-lg object-cover" />
+                      <span key={i} className="relative">
+                        <img src={u.trim()} alt="" className="h-16 w-20 rounded-lg object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryImage(i)}
+                          title="移除这张"
+                          className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-[11px] text-white hover:bg-red-600"
+                        >
+                          ×
+                        </button>
+                      </span>
                     ))}
                   </div>
                 )}
@@ -444,35 +539,56 @@ export default function AdminShopPage() {
                 </label>
               </div>
 
-              {/* 多语言字段 */}
-              {(["name", "summary", "description"] as const).map((base) => (
-                <div key={base} className="rounded-xl border border-gray-100 p-4">
-                  <div className="mb-3 text-sm font-semibold text-gray-700">
-                    {base === "name" ? "商品名称" : base === "summary" ? "简介" : "详情描述"}
-                  </div>
-                  <div className="space-y-2">
-                    {LANGS.map((l) => (
-                      <div key={l.code} className="grid grid-cols-[90px_1fr] items-start gap-2">
-                        <span className="pt-2 text-xs font-medium text-gray-500">{l.label}</span>
-                        {base === "description" ? (
-                          <div className="col-span-1">
-                            <RichTextEditor
-                              value={form[base + (l.code === "zh" ? "" : l.code.charAt(0).toUpperCase() + l.code.slice(1))] || ""}
-                              onChange={(v) => setF(base + (l.code === "zh" ? "" : l.code.charAt(0).toUpperCase() + l.code.slice(1)), v)}
-                              placeholder="支持富文本：加粗 / 列表 / 表格 / 图片 / 链接…"
-                              height={220}
-                            />
-                          </div>
-                        ) : (
-                          <input className={inputCls}
-                            value={form[base + (l.code === "zh" ? "" : l.code.charAt(0).toUpperCase() + l.code.slice(1))] || ""}
-                            onChange={(e) => setF(base + (l.code === "zh" ? "" : l.code.charAt(0).toUpperCase() + l.code.slice(1)), e.target.value)} />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+              {/*
+                多语言字段（owner 2026-10-14：「商品详情多语言采用和产品管理同样风格的卡片式显示」）
+                改用与产品管理同一套组件 `MultiLangFieldV2`：卡片式 + 语种 Tab + 中文改动可一键翻译。
+                ⚠️ 与产品管理同源 ⇒ 以后统一改样式只需改这一个组件。
+              */}
+              <MultiLangFieldV2
+                label="商品名称"
+                values={langValuesOf("name")}
+                onChange={(lang, v) => setF("name" + suffixOf(lang), v)}
+                onTranslate={translateOne}
+                renderEditor={(value, onChange) => (
+                  <input className={inputCls} value={value} onChange={(e) => onChange(e.target.value)} />
+                )}
+              />
+              <MultiLangFieldV2
+                label="简介"
+                values={langValuesOf("summary")}
+                onChange={(lang, v) => setF("summary" + suffixOf(lang), v)}
+                onTranslate={translateOne}
+                renderEditor={(value, onChange) => (
+                  <input className={inputCls} value={value} onChange={(e) => onChange(e.target.value)} />
+                )}
+              />
+              <MultiLangFieldV2
+                label="详情描述"
+                values={langValuesOf("description")}
+                onChange={(lang, v) => setF("description" + suffixOf(lang), v)}
+                onTranslate={translateOne}
+                renderEditor={(value, onChange) => (
+                  <RichTextEditor
+                    value={value}
+                    onChange={onChange}
+                    placeholder="支持富文本：加粗 / 列表 / 表格 / 图片 / 链接…"
+                    height={220}
+                  />
+                )}
+              />
+
+              {/* SEO / GEO（owner 2026-10-14：「商品页同时也要增加 SEO 和 GEO 功能」）：与产品管理同一组件 */}
+              <SeoGeoConfig
+                seoTitle={form.seoTitle}
+                seoTitleEn={form.seoTitleEn}
+                seoDescription={form.seoDescription}
+                seoDescriptionEn={form.seoDescriptionEn}
+                seoKeywords={form.seoKeywords}
+                seoKeywordsEn={form.seoKeywordsEn}
+                geoRegion={form.geoRegion}
+                geoCity={form.geoCity}
+                onChange={(field, value) => setF(field, value)}
+              />
 
               <div className="flex justify-end gap-3 pt-2">
                 <button onClick={() => { setShowModal(false); setEditing(null); }} className="rounded-lg border border-gray-200 px-5 py-2 text-sm text-gray-600">取消</button>
@@ -486,10 +602,40 @@ export default function AdminShopPage() {
         </div>
       )}
 
-      {/* 对公收款账户设置 */}
+      {/*
+        收款管理（owner 2026-10-14：「商城需要增加收款管理设置」）
+        ==========================================================================
+        配置仍存在既有 `shop_bank_info`（**向后兼容**：订单页读 accountName/bankName/… 的老逻辑不变），
+        新增：收款方式开关（结算页只列勾选的）、微信/支付宝收款码（上传图片）、前台说明（中/英）。
+      */}
       <div className="rounded-xl border border-gray-200 bg-white p-5">
-        <h3 className="mb-1 text-base font-semibold">对公收款账户</h3>
-        <p className="mb-4 text-xs text-gray-400">客户选择「对公转账 / 线下转账」支付时展示的收款信息，保存后前台结算页与订单页可见</p>
+        <h3 className="mb-1 text-base font-semibold">收款管理</h3>
+        <p className="mb-4 text-xs text-gray-400">
+          ① 勾选客户可用的收款方式（结算页只显示勾选项）② 对公转账账户 ③ 微信/支付宝收款码（可上传图片）④ 前台说明 —— 保存后结算页与订单页立即生效
+        </p>
+
+        {/* 收款方式开关 */}
+        <div className="mb-4 flex flex-wrap items-center gap-5 rounded-lg bg-gray-50 px-3 py-2.5">
+          {[
+            { key: "bank", label: "对公转账" },
+            { key: "offline", label: "线下转账" },
+            { key: "wechat", label: "微信支付" },
+            { key: "alipay", label: "支付宝" },
+            { key: "contact", label: "联系客服" },
+          ].map((m) => (
+            <label key={m.key} className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={bankInfo?.methods?.[m.key] !== false}
+                onChange={(e) =>
+                  setBankInfo((b: any) => ({ ...b, methods: { ...(b?.methods || {}), [m.key]: e.target.checked } }))
+                }
+              />
+              {m.label}
+            </label>
+          ))}
+        </div>
+
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-sm text-gray-600">收款单位</label>
@@ -511,9 +657,32 @@ export default function AdminShopPage() {
             <label className="mb-1 block text-sm text-gray-600">转账备注</label>
             <input className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" value={bankInfo.remark || ""} onChange={(e) => setBankInfo((b: any) => ({ ...b, remark: e.target.value }))} placeholder="如：转账请备注订单号" />
           </div>
+          {/* 收款码（上传图片；前台选微信/支付宝时展示） */}
+          <UrlUploadInput
+            label="微信收款码（选填）"
+            value={bankInfo.wechatQr || ""}
+            onChange={(url) => setBankInfo((b: any) => ({ ...b, wechatQr: url }))}
+            accept="image/*"
+            showPreview
+          />
+          <UrlUploadInput
+            label="支付宝收款码（选填）"
+            value={bankInfo.alipayQr || ""}
+            onChange={(url) => setBankInfo((b: any) => ({ ...b, alipayQr: url }))}
+            accept="image/*"
+            showPreview
+          />
+          <div className="sm:col-span-2">
+            <label className="mb-1 block text-sm text-gray-600">前台说明（中文）</label>
+            <textarea rows={2} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" value={bankInfo.instructions || ""} onChange={(e) => setBankInfo((b: any) => ({ ...b, instructions: e.target.value }))} placeholder="如：付款后请上传凭证，我们会在 1 个工作日内确认到账" />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="mb-1 block text-sm text-gray-600">前台说明（英文）</label>
+            <textarea rows={2} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" value={bankInfo.instructionsEn || ""} onChange={(e) => setBankInfo((b: any) => ({ ...b, instructionsEn: e.target.value }))} placeholder="e.g. Upload the payment receipt after paying; we will confirm within 1 business day." />
+          </div>
         </div>
         <div className="mt-4 flex items-center gap-3">
-          <button onClick={saveBankInfo} className="rounded-lg px-5 py-2 text-sm font-medium text-white" style={{ background: "var(--color-primary, #CC0000)" }}>保存账户信息</button>
+          <button onClick={saveBankInfo} className="rounded-lg px-5 py-2 text-sm font-medium text-white" style={{ background: "var(--color-primary, #CC0000)" }}>保存收款设置</button>
           {bankMsg && <span className="text-xs text-green-600">{bankMsg}</span>}
         </div>
       </div>

@@ -15,6 +15,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       summary, summaryEn, summaryJa, summaryKo, summaryFr, summaryAr,
       description, descriptionEn, descriptionJa, descriptionKo, descriptionFr, descriptionAr,
       coverImage, images, price, originalPrice, unit, stock, minOrder, status, featured, sortOrder,
+      // SEO / GEO（owner 2026-10-14）
+      seoTitle, seoTitleEn, seoDescription, seoDescriptionEn, seoKeywords, seoKeywordsEn, geoRegion, geoCity,
       categoryId, priceTiers, specs, modelFiles,
     } = body || {};
 
@@ -60,6 +62,14 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         description: description || null, descriptionEn: descriptionEn || null, descriptionJa: descriptionJa || null, descriptionKo: descriptionKo || null, descriptionFr: descriptionFr || null, descriptionAr: descriptionAr || null,
         coverImage: coverImage || null,
         images: imagesData as any,
+        seoTitle: seoTitle || null,
+        seoTitleEn: seoTitleEn || null,
+        seoDescription: seoDescription || null,
+        seoDescriptionEn: seoDescriptionEn || null,
+        seoKeywords: seoKeywords || null,
+        seoKeywordsEn: seoKeywordsEn || null,
+        geoRegion: geoRegion || null,
+        geoCity: geoCity || null,
         categoryId: categoryId === "" || categoryId === null || categoryId === undefined ? null : BigInt(categoryId),
         priceTiers: tiersData as any,
         specs: Array.isArray(specs) ? specs : undefined,

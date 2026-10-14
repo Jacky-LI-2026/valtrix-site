@@ -41,6 +41,11 @@ export default function ShopCheckoutPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<any>(null);
+  /**
+   * 可用的收款方式（owner 2026-10-14「商城需要增加收款管理设置」）：
+   * 后台「收款管理」勾选了哪几种，结算页就只显示哪几种 —— 默认全部显示（与改造前一致）。
+   */
+  const [payMethods, setPayMethods] = useState<string[]>(["contact", "bank", "offline", "wechat", "alipay"]);
 
   useEffect(() => {
     try {
@@ -50,6 +55,24 @@ export default function ShopCheckoutPage() {
     } catch {
       setItems([]);
     }
+  }, []);
+
+  // 收款方式开关：读后台「收款管理」配置（未配置过 ⇒ 保持默认全部）
+  useEffect(() => {
+    fetch("/api/public/site-config?key=shop_bank_info", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => {
+        const methods = d?.data?.methods;
+        if (!methods || typeof methods !== "object") return;
+        const all = ["contact", "bank", "offline", "wechat", "alipay"];
+        const enabled = all.filter((m) => methods[m] !== false);
+        if (enabled.length > 0) {
+          setPayMethods(enabled);
+          // 当前选中项若被后台关掉，自动切到第一个可用方式
+          setForm((f) => (enabled.includes(f.payMethod) ? f : { ...f, payMethod: enabled[0] }));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // 已登录会员自动带出资料
@@ -264,7 +287,7 @@ export default function ShopCheckoutPage() {
               <div>
                 <label className={labelCls}>{t("orderPayMethod")}</label>
                 <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {["contact", "bank", "offline", "wechat", "alipay"].map((m) => (
+                  {payMethods.map((m) => (
                     <button
                       key={m}
                       type="button"

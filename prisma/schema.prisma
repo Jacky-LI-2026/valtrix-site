@@ -378,6 +378,17 @@ model ShopProduct {
   coverImage   String?  @db.VarChar(500)
   categoryId   BigInt? // 所属商城分类（null=未分类）
   images       Json?    // [{url, alt}]
+  // SEO / GEO（owner 2026-10-14：「商品页同时也要增加 SEO 和 GEO 功能」）
+  //   与 Product 同口径：标题/描述/关键词（中英）+ GEO 地区/城市；
+  //   前台 `/shop/<slug>` 的 metadata 优先读这里，缺失回退商品名/简介。
+  seoTitle         String? @db.VarChar(200)
+  seoTitleEn       String? @db.VarChar(200)
+  seoDescription   String? @db.Text
+  seoDescriptionEn String? @db.Text
+  seoKeywords      String? @db.Text
+  seoKeywordsEn    String? @db.Text
+  geoRegion        String? @db.Text
+  geoCity          String? @db.Text
   isParts      Boolean  @default(false) // 是否配件（配件价仅整机/配件客户可见）
   priceTiers   Json?    // [{qty, price}] 阶梯价（批量价），按数量取档
   specs        Json?    // 规格 [{name, nameEn, options:[{label, labelEn, price(增量), stock}]}]

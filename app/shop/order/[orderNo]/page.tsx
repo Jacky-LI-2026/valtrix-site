@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import PageHero from "@/components/ui/PageHero";
-import { Search, CheckCircle2, Truck, Package, Printer, RotateCcw, Upload, Building2, FileText, ExternalLink } from "lucide-react";
+import { Search, CheckCircle2, Truck, Package, Printer, RotateCcw, Upload, Building2, FileText, ExternalLink, QrCode } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
 const STATUS_MAP: Record<string, string> = {
@@ -128,6 +128,19 @@ export default function ShopOrderQueryPage() {
 
   const payable = order ? Math.max(0, Number(order.amount) - Number(order.discountAmount || 0)) : 0;
   const needBank = order && (order.payMethod === "bank" || order.payMethod === "offline") && order.payStatus !== "confirmed";
+  /**
+   * 微信 / 支付宝收款码（owner 2026-10-14「商城需要增加收款管理设置」）：
+   * 客户选了对应方式 **且** 后台「收款管理」上传过该收款码 才展示。
+   * 没有这一块的话，后台上传的收款码只能在对公转账订单里看到，等于摆设。
+   */
+  const onlineQr =
+    order && order.payStatus !== "confirmed"
+      ? order.payMethod === "wechat"
+        ? bankInfo?.wechatQr
+        : order.payMethod === "alipay"
+          ? bankInfo?.alipayQr
+          : null
+      : null;
 
   return (
     <>
@@ -264,9 +277,42 @@ export default function ShopOrderQueryPage() {
                       <div>银行账号：<span className="font-mono">{bankInfo.accountNo || "-"}</span></div>
                       <div>开户支行：{bankInfo.branch || "-"}</div>
                       {bankInfo.remark && <div className="col-span-2 text-xs text-dark-500">备注：{bankInfo.remark}</div>}
+                      {bankInfo.instructions && (
+                        <div className="col-span-2 text-xs text-dark-500">{bankInfo.instructions}</div>
+                      )}
                     </div>
                   ) : (
                     <div className="mt-2 text-dark-500">对公账户信息尚未配置，请联系销售获取账户信息。</div>
+                  )}
+                  {/*
+                    收款码（owner 2026-10-14「商城需要增加收款管理设置」）：
+                    后台「收款管理」上传的微信/支付宝收款码，在这里随对公信息一起展示。
+                  */}
+                  {(bankInfo?.wechatQr || bankInfo?.alipayQr) && (
+                    <div className="mt-3 flex flex-wrap items-start gap-5">
+                      {bankInfo?.wechatQr && (
+                        <div className="text-center">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={String(bankInfo.wechatQr)}
+                            alt="微信收款码"
+                            className="h-32 w-32 rounded-lg border border-amber-200 bg-white object-contain"
+                          />
+                          <div className="mt-1 text-xs text-dark-500">微信收款码</div>
+                        </div>
+                      )}
+                      {bankInfo?.alipayQr && (
+                        <div className="text-center">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={String(bankInfo.alipayQr)}
+                            alt="支付宝收款码"
+                            className="h-32 w-32 rounded-lg border border-amber-200 bg-white object-contain"
+                          />
+                          <div className="mt-1 text-xs text-dark-500">支付宝收款码</div>
+                        </div>
+                      )}
+                    </div>
                   )}
                   <div className="mt-3">
                     {order.payVoucher ? (
@@ -298,6 +344,29 @@ export default function ShopOrderQueryPage() {
                       </>
                     )}
                     {uploadMsg && <div className="mt-2 text-xs text-dark-600">{uploadMsg}</div>}
+                  </div>
+                </div>
+              )}
+
+              {/* 微信 / 支付宝收款码（后台「收款管理」上传；客户选了该方式且已配置时展示） */}
+              {onlineQr && (
+                <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm">
+                  <div className="flex items-center gap-2 font-medium text-dark-800">
+                    <QrCode className="h-4 w-4" style={{ color: "var(--color-primary, #CC0000)" }} />
+                    {order.payMethod === "wechat" ? "微信收款码（请扫码付款）" : "支付宝收款码（请扫码付款）"}
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-start gap-5">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={String(onlineQr)}
+                      alt={order.payMethod === "wechat" ? "微信收款码" : "支付宝收款码"}
+                      className="h-40 w-40 rounded-lg border border-amber-200 bg-white object-contain"
+                    />
+                    <div className="text-xs text-dark-500">
+                      <div>支付方式：{PAY_MAP[order.payMethod] || order.payMethod}</div>
+                      <div className="mt-1">应付金额：¥{payable.toLocaleString()}</div>
+                      {bankInfo?.instructions && <div className="mt-1">{bankInfo.instructions}</div>}
+                    </div>
                   </div>
                 </div>
               )}
